@@ -5,16 +5,65 @@
 		<style>
 			.all {
 				/*background-color: black;*/
-				background-image: url(´img/stars.jpg´);
+				background-image: url('img/stars.jpg');
+				text-align: center;
 			}
 			.header {
 				color: antiquewhite;
 			}
+			.table {
+				background-color: black;
+				margin: 0 auto;
+				width: 600px;
+            	height: 400px;
+				border: 15px solid white;
+				display: flex;
+				justify-content: space-between;
+			}
+			.figure-left {
+				background-color: yellow;
+				width: 20px;
+				height: 100px;/*25%*/
+				margin-top: 50%;
+			}
+			.figure-right {
+				background-color: red;
+				width: 20px;
+				height: 100px;/*25%*/
+				margin-top: 25%;
+			}
 		</style>
 	</head>
 	<body class="all">
-		<div align=center>
+		<div>
 			<h1 class="header">Welcome to the Cosmic 42Pong</h1>
+			<div class="table">
+				<div id="caja" class="figure-left" onmousedown="iniciarMovimiento(event)" onmouseup="detenerMovimiento()"></div>
+				<script>
+					const caja = document.getElementById('caja');
+					let isMouseDown = false;
+			
+					// Evento para detectar el movimiento del ratón
+					document.addEventListener('mousemove', function(event) {
+						if (isMouseDown) { // Verifica si el botón del ratón está presionado
+							// Obtén la posición Y del ratón y ajusta el margin-top de la caja
+							const mouseY = event.clientY;
+							console.log(mouseY);
+							caja.style.marginTop = mouseY + 'px';
+						}
+					});
+			
+					// Eventos para detectar si el botón del ratón está presionado o no
+					document.addEventListener('mousedown', function() {
+						isMouseDown = true;
+					});
+			
+					document.addEventListener('mouseup', function() {
+						isMouseDown = false;
+					});
+				</script>
+				<div class="figure-right"></div></div>
+			</div>
 		</div>
 	</body>
 </html>
