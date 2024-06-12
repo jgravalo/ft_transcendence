@@ -38,7 +38,7 @@
 		<div>
 			<h1 class="header">Welcome to the Cosmic 42Pong</h1>
 			<div class="table">
-				<div id="caja" class="figure-left" onmousedown="iniciarMovimiento(event)" onmouseup="detenerMovimiento()"></div>
+				<div id="caja" class="figure-left"></div> <!--onmousedown="iniciarMovimiento(event)" onmouseup="detenerMovimiento()"></div-->
 				<script>
 					const caja = document.getElementById('caja');
 					let isMouseDown = false;
@@ -48,8 +48,11 @@
 						if (isMouseDown) { // Verifica si el botón del ratón está presionado
 							// Obtén la posición Y del ratón y ajusta el margin-top de la caja
 							const mouseY = event.clientY;
-							console.log(mouseY);
-							caja.style.marginTop = mouseY + 'px';
+							//console.log("mouseY = ", mouseY);
+							const end_pos = mouseY / 6
+							console.log("end_pos = ", end_pos);
+							if (end_pos >= 0 && end_pos <= 50)
+								caja.style.marginTop = end_pos + '%';
 						}
 					});
 			
