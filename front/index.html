@@ -42,26 +42,33 @@
 				<script>
 					const caja = document.getElementById('caja');
 					let isMouseDown = false;
+					const minY = 0; // Límite mínimo de margin-top
+					const maxY = 300; // Límite máximo de margin-top
 			
 					// Evento para detectar el movimiento del ratón
-					document.addEventListener('mousemove', function(event) {
-						if (isMouseDown) { // Verifica si el botón del ratón está presionado
+					document.addEventListener('mousemove', function(event)
+					{
+						if (isMouseDown)
+						{ // Verifica si el botón del ratón está presionado
 							// Obtén la posición Y del ratón y ajusta el margin-top de la caja
 							const mouseY = event.clientY;
 							//console.log("mouseY = ", mouseY);
-							const end_pos = mouseY / 6
-							console.log("end_pos = ", end_pos);
-							if (end_pos >= 0 && end_pos <= 50)
-								caja.style.marginTop = end_pos + '%';
+							let newMarginTop = Math.min(Math.max(mouseY, minY), maxY);
+							//console.log("newMarginTop = ", newMarginTop);
+							caja.style.marginTop = newMarginTop + 'px';
+							//if (mouseY >= 0 && mouseY <= 300)
+								//caja.style.marginTop = mouseY / 6 + '%';
 						}
 					});
 			
 					// Eventos para detectar si el botón del ratón está presionado o no
-					document.addEventListener('mousedown', function() {
+					document.addEventListener('mousedown', function()
+					{
 						isMouseDown = true;
 					});
 			
-					document.addEventListener('mouseup', function() {
+					document.addEventListener('mouseup', function()
+					{
 						isMouseDown = false;
 					});
 				</script>
