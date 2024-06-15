@@ -35,3 +35,20 @@ document.addEventListener('mouseup', function()
 {
 	isMouseDown = false;
 });
+
+
+document.addEventListener('keydown', function(event)
+{
+	const header = document.getElementById('caja');
+	const currentMarginTop = parseInt(window.getComputedStyle(header).marginTop);
+	const speed = 10;
+
+	if (event.key === 'ArrowUp' && currentMarginTop - speed > minY - 5)
+	{
+		header.style.marginTop = (currentMarginTop - speed) + 'px';
+	}
+	else if (event.key === 'ArrowDown' && currentMarginTop + speed < maxY + 5)
+	{
+		header.style.marginTop = (currentMarginTop + speed) + 'px';
+	}
+});

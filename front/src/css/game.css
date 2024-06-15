@@ -7,8 +7,7 @@
 	align-items: center;
 }
 .start-button {
-	height: 50px;
-	width: 140px;
+	padding: 5px 15px;
 	color: brown;
 	font-size: x-large;
 	font-weight: bold;
