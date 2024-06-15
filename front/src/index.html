@@ -6,27 +6,10 @@
 		<link rel="stylesheet" href="css/page.css">
 	</head>
 	<body class="all">
-		<div>
-			<h1 class="header">Welcome to the Cosmic 42Pong</h1>
-			<div class="start-div">
-				<button class="start-button">START</button>
-			</div>
-			<div class="table">
-				<div id="caja" class="figure-left"></div>
-				<div class="marcador">
-					<div id="numero1" class="numero"></div>
-					<div id="numero2" class="numero"></div>
-				</div>
-				<div id="caja" class="figure-right"></div>
-			</div>
+		<div id="content" class="content">
+			<button class="start-button" onclick="changeContent()">GET READY</button>
 		</div>
-		<script src="js/game.js"></script>
-		<script>// para modificar pagina
-			// Nuevo contenido HTML
-			var nuevoContenidoHTML = '<p>Este es un nuevo párrafo.</p><span>Este es un nuevo span.</span>';
-
-			// Establecer el contenido HTML del elemento
-			document.getElementById('miDiv').innerHTML = nuevoContenidoHTML;
-		</script>
+		<!--script src="js/game.js"></script-->
+		<script src="js/game_map.js"></script>
 	</body>
 </html>

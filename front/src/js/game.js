@@ -17,11 +17,11 @@ document.addEventListener('mousemove', function(event)
 	if (isMouseDown)
 	{ // Verifica si el botón del ratón está presionado
 		// Obtén la posición Y del ratón y ajusta el margin-top de la caja
-		const mouseY = event.clientY;
+		const mouseY = event.clientY - 230;
 		//console.log("mouseY = ", mouseY);
-		let newMarginTop = Math.min(Math.max(mouseY, minY), maxY);
+		let newMarginTop = Math.min(Math.max(mouseY, minY), maxY) / 6;
 		//console.log("newMarginTop = ", newMarginTop);
-		caja.style.marginTop = newMarginTop + 'px';
+		caja.style.marginTop = newMarginTop + '%';
 	}
 });
 
