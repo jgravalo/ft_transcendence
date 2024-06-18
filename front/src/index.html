@@ -5,11 +5,22 @@
 		<link rel="stylesheet" href="css/game.css">
 		<link rel="stylesheet" href="css/page.css">
 	</head>
-	<body class="all">
-		<div id="content" class="content">
-			<button class="start-button" onclick="changeContent()">GET READY</button>
+	<body>
+		<div id="barra">
+			<div class="links"><a class="link" href="index.html">Home</a></div>
+			<div class="links"><a>Log in</a></div>
+			<div class="links"><a>Sign up</a></div>
+		</div>
+		<div id="all">
+			<div id="content">
+				<h1 class="header">Welcome to the Cosmic 42Pong</h1>
+				<div id="game">
+					<div><button onclick="putOptions()">GET READY</button></div>
+				</div>
+			</div>
 		</div>
 		<!--script src="js/game.js"></script-->
-		<script src="js/game_map.js"></script>
+		<!--script src="js/game_map.js"></script-->
+		<script src="js/options.js"></script>
 	</body>
 </html>
