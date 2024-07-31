@@ -3,7 +3,7 @@
 	align-items: center;
 }
 
-.table {
+#table {
 	background-color: black;
 	margin: 0 auto;
 	width: 600px;
@@ -40,13 +40,13 @@
 	/* name duration timing-function delay iteration-count direction fill-mode;  */
 }
 
-.figure-left {
+#figure-left {
 	background-color: yellow;
 	width: 20px;
 	height: 100px;/*25%*/
 	margin-top: 0%;
 }
-.figure-right {
+#figure-right {
 	background-color: red;
 	width: 20px;
 	height: 100px;/*25%*/

@@ -2,9 +2,9 @@
 function putOptions()
 {
 	var nuevoContenidoHTML = `
-		<div><button onclick="putGame()">INDIVIDUAL GAME</button></div>
-		<div><button onclick="putGame()">ONLINE</button></div>
-		<div><button onclick="putGame()">GET READY</button></div>
+		<div><button onclick="loadGame()">INDIVIDUAL GAME</button></div>
+		<div><button onclick="loadGame()">ONLINE</button></div>
+		<div><button onclick="loadGame()">GET READY</button></div>
 		`;
 				
 				// Establecer el contenido HTML del elemento

@@ -1,0 +1,26 @@
+networks:
+  jgravalo-pongnet:
+    name: jgravalo-pongnet
+    driver: bridge
+
+services:
+  front:
+    container_name: front
+    build:
+      context: ./front
+    image: front
+    ports:
+      - "8080:80"
+      - "443:443"
+    networks:
+      - jgravalo-pongnet
+
+  back:
+    container_name: back
+    build:
+      context: ./back
+    image: back
+    ports:
+      - "8000:80"
+    networks:
+      - jgravalo-pongnet
