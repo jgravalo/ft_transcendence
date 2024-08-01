@@ -7,7 +7,7 @@ document.getElementById('numero2').textContent = numero2;
 const player = document.getElementById('figure-left');
 let isMouseDown = false;
 const minY = 0; // Límite mínimo de margin-top
-const maxY = 300; // Límite máximo de margin-top
+const maxY = 285; // Límite máximo de margin-top
 
 document.addEventListener('mousemove', function(event)
 {
@@ -35,14 +35,20 @@ document.addEventListener('keydown', function(event)
 {
 	//const player = document.getElementById('figure-left');
 	const currentMarginTop = parseInt(window.getComputedStyle(player).marginTop);
-	const speed = 10;
+	const speed = 1;
 
 	if ((event.key === 'ArrowUp' || event.key === 'w')
 		&& currentMarginTop - speed > minY - 10)
-		player.style.marginTop = (currentMarginTop - speed) + 'px';
+	{
+		console.log(currentMarginTop - speed);
+		player.style.marginTop = (currentMarginTop - speed) + '%';
+	}
 	else if ((event.key === 'ArrowDown' || event.key === 's')
 		&& currentMarginTop + speed < maxY + 10)
-		player.style.marginTop = (currentMarginTop + speed) + 'px';
+	{
+		console.log(currentMarginTop + speed);
+		player.style.marginTop = (currentMarginTop + speed) + '%';
+	}
 });
 
 var table = document.getElementById('table');

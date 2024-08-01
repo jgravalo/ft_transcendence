@@ -13,16 +13,23 @@ function loadGame()
 function startGame()
 {
 	console.log("aqui");
+
+
 	var nuevoContenidoHTML = `
-	<div id="figure-left"></div>
-	<div class="marcador">
-	<div id="numero1" class="numero"></div>
-	<div id="ball"></div>
-	<div id="numero2" class="numero"></div>
+	<div class="start-div">
+		<button onclick="startGame()">RESTART</button>
 	</div>
-	<div id="figure-right"></div>
+	<div id="table">
+		<div id="figure-left"></div>
+		<div class="marcador">
+		<div id="numero1" class="numero"></div>
+		<div id="ball"></div>
+		<div id="numero2" class="numero"></div>
+		</div>
+		<div id="figure-right"></div>
+	</div>
 	`;
-	document.getElementById('table').innerHTML = nuevoContenidoHTML;
+	document.getElementById('game').innerHTML = nuevoContenidoHTML;
 	console.log("aqui2");
 	
 	const scriptElement = document.createElement('script');
