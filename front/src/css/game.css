@@ -6,8 +6,8 @@
 #table {
 	background-color: black;
 	margin: 0 auto;
-	width: 600px;
-	height: 400px;
+	width: 800px;
+	height: 500px;
 	border: 15px solid white;
 	display: flex;
 	justify-content: space-between;

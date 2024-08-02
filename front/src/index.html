@@ -8,11 +8,16 @@
 	</head>
 	<body>
 		<div id="barra">
-			<div class="links"><a class="link" href="index.html">Home</a></div>
-			<div class="links"><a class="link" id="openLoginModal" class="btn btn-link">Log in</a></div>
-			<div class="links"><a class="link" href="#/game">Sign up</a></div>
-
+			<div id="page_links">
+				<div class="links"><a class="link" href="index.html">Home</a></div>
+			</div>
 			<div id="modalContainer"></div>
+			<div id="output"></div>
+			<div id="log_links">
+				<div class="links"><a class="link" id="openLoginModal" class="btn btn-link">Log in</a></div>
+				<div class="links"><a class="link" id="fetchData" class="button-link">Sign up</a></div>
+			</div>
+
 		</div>
 		<div id="all">
 			<div id="content">
@@ -23,6 +28,7 @@
 			</div>
 		</div>
 		<!--script src="js/game.js"></script-->
+		<script src="js/fetch.js"></script>
 		<script src="js/game_map.js"></script>
 		<script src="js/login.js"></script>
 		<script src="js/app.js"></script>

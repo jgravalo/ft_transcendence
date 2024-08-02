@@ -21,10 +21,21 @@ body {
   /* height: 25px; */
   padding: 0px 15px;
   color: aliceblue;
+  /* background-color: brown; */
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   display: flex;
-  justify-content: left;
+  justify-content: space-between;
   /*background-color: aqua;*/
+}
+
+#log_links {
+	display: flex;
+	justify-content: left;
+}
+
+#log_links {
+	display: flex;
+	justify-content: right;
 }
 
 .link {

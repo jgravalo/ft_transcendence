@@ -6,6 +6,7 @@ document.getElementById('numero2').textContent = numero2;
 
 const player = document.getElementById('figure-left');
 let isMouseDown = false;
+const oY   = 230; //punto 0 de la mesa en la pagina
 const minY = 0; // Límite mínimo de margin-top
 const maxY = 285; // Límite máximo de margin-top
 
@@ -13,7 +14,7 @@ document.addEventListener('mousemove', function(event)
 {
 	if (isMouseDown)
 	{ 
-		const mouseY = event.clientY - 230;
+		const mouseY = event.clientY - oY;
 		//console.log("mouseY = ", mouseY);
 		let newMarginTop = Math.min(Math.max(mouseY, minY), maxY) / 6;
 		//console.log("newMarginTop = ", newMarginTop);
@@ -35,19 +36,19 @@ document.addEventListener('keydown', function(event)
 {
 	//const player = document.getElementById('figure-left');
 	const currentMarginTop = parseInt(window.getComputedStyle(player).marginTop);
-	const speed = 1;
+	const speed = 10;
 
 	if ((event.key === 'ArrowUp' || event.key === 'w')
 		&& currentMarginTop - speed > minY - 10)
 	{
 		console.log(currentMarginTop - speed);
-		player.style.marginTop = (currentMarginTop - speed) + '%';
+		player.style.marginTop = (currentMarginTop - speed) + 'px';
 	}
 	else if ((event.key === 'ArrowDown' || event.key === 's')
 		&& currentMarginTop + speed < maxY + 10)
 	{
 		console.log(currentMarginTop + speed);
-		player.style.marginTop = (currentMarginTop + speed) + '%';
+		player.style.marginTop = (currentMarginTop + speed) + 'px';
 	}
 });
 
