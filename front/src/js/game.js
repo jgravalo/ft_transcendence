@@ -4,15 +4,15 @@ var numero2 = 0;
 document.getElementById('numero1').textContent = numero1;
 document.getElementById('numero2').textContent = numero2;
 
-var player1 = document.getElementById('figure-left');
-var player2 = document.getElementById('figure-right');
-var isMouseDown = false;
+//var isMouseDown = false;
 var oY   = 230; //punto 0 de la mesa en la pagina
 var minY = 0; // Límite mínimo de margin-top
 var maxY = 290; // Límite máximo de margin-top
 
 document.addEventListener('keydown', function(event)
 {
+	const player1 = document.getElementById('figure-left');
+	const player2 = document.getElementById('figure-right');
 	//const player1 = document.getElementById('figure-left');
 	var speed = 5;
 	var player;
@@ -34,7 +34,7 @@ document.addEventListener('keydown', function(event)
 		player.style.marginTop = (currentMarginTop + speed) + 'px';
 	}
 });
-
+/* 
 document.addEventListener('keydown', function(event)
 {
 	if (event.key === 'z')
@@ -61,30 +61,25 @@ document.addEventListener('mousedown', function()
 document.addEventListener('mouseup', function()
 {
 	isMouseDown = false;
-});
-
+}); */
+/* 
 var table = document.getElementById('table');
 var tableWidth = window.getComputedStyle(table).width;
 
 var box = document.getElementById('ball');
 var position = 0;
 var direction = 1; // 1 para derecha, -1 para izquierda
+*/
+var position = 0; // Posición inicial en píxeles
+var velocity = 2; // Velocidad en píxeles por frame
 
-function moveBox()
-{
-	position += direction;
-	box.style.left = position + 'px';
-
-	// Cambiar dirección cuando alcanza los bordes de la ventana
-	if (position >= window.innerWidth - box.offsetWidth)
-	{
-		direction = -1;
-	}
-	else if (position <= 0)
-	{
-		direction = 1;
-	}
-	requestAnimationFrame(moveBox);
+function move() {
+  position += velocity; // Incrementa la posición por la velocidad
+  document.getElementById("ball").style.left = position + "px"; // Mueve el div
+  requestAnimationFrame(move); // Llama a move en el siguiente frame
 }
 
-moveBox();
+// Inicia el movimiento cuando la página se carga
+window.onload = function() {
+  move();
+};

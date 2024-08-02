@@ -15,13 +15,13 @@
 
 .marcador {
 	margin: 0 auto;
-	width: 200px;
+	width: 250px;
 	display: flex;
 	justify-content: space-between;
 }
 
 .numero {
-	font-size: 74px;
+	font-size: 110px;
 	color: white;
 	font-weight: bold;
 	text-align: center;
@@ -29,15 +29,18 @@
 }
 
 #ball {
-	/* background-color: aliceblue; */
-	height: 25px;
-	width: 25px;
+	width: 30px;
+	height: 30px;
 	border-radius: 100%;
-	position: absolute;
-	top: 29%; /* Coordenada Y */
-	left: 48.5%; /* Coordenada X */
-	/* animation: moveBox 3s linear infinite; */
-	/* name duration timing-function delay iteration-count direction fill-mode;  */
+	background-color: red;
+	position: absolute; /* Necesario para poder moverlo con exactitud */
+	left: 0; /* Comienza desde el extremo izquierdo */
+	top: 50%; /* Centrado verticalmente */
+	transform: translateY(-50%); /* Asegura que esté centrado verticalmente */
+	/*
+	animation: moveBox 3s linear infinite;
+	name duration timing-function delay iteration-count direction fill-mode;
+	*/
 }
 
 #figure-left {
@@ -52,9 +55,9 @@
 	height: 100px;/*25%*/
 	margin-top: 25%;
 }
-/* 
+
 @keyframes moveBox {
 	0% { left: 0; top: 0;}
-	50% { left: calc(100% - 100px); top: calc(100% - 100px); } /* Se mueve a la derecha 
-	100% { left: 0; top: 0; } /* Vuelve a la posición inicial 
-} */
+	50% { left: calc(100% - 100px); top: calc(100% - 100px); } /* Se mueve a la derecha */
+	100% { left: 0; top: 0; } /* Vuelve a la posición inicial */
+}
