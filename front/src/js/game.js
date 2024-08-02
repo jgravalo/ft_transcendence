@@ -4,11 +4,42 @@ var numero2 = 0;
 document.getElementById('numero1').textContent = numero1;
 document.getElementById('numero2').textContent = numero2;
 
-const player = document.getElementById('figure-left');
-let isMouseDown = false;
-const oY   = 230; //punto 0 de la mesa en la pagina
-const minY = 0; // Límite mínimo de margin-top
-const maxY = 285; // Límite máximo de margin-top
+var player1 = document.getElementById('figure-left');
+var player2 = document.getElementById('figure-right');
+var isMouseDown = false;
+var oY   = 230; //punto 0 de la mesa en la pagina
+var minY = 0; // Límite mínimo de margin-top
+var maxY = 290; // Límite máximo de margin-top
+
+document.addEventListener('keydown', function(event)
+{
+	//const player1 = document.getElementById('figure-left');
+	var speed = 5;
+	var player;
+	if (event.key === 'w' || event.key === 's')
+		player = player1;
+	else if (event.key === 'ArrowUp' || event.key === 'ArrowDown')
+		player = player2;
+	var currentMarginTop = parseInt(window.getComputedStyle(player).marginTop);
+	if ((event.key === 'ArrowUp' || event.key === 'w')
+		&& currentMarginTop - speed > minY)
+	{
+		//console.log(currentMarginTop - speed);
+		player.style.marginTop = (currentMarginTop - speed) + 'px';
+	}
+	else if ((event.key === 'ArrowDown' || event.key === 's')
+		&& currentMarginTop + speed < maxY + 80)
+	{
+		//console.log(currentMarginTop + speed);
+		player.style.marginTop = (currentMarginTop + speed) + 'px';
+	}
+});
+
+document.addEventListener('keydown', function(event)
+{
+	if (event.key === 'z')
+		console.log('hola');
+});
 
 document.addEventListener('mousemove', function(event)
 {
@@ -18,7 +49,7 @@ document.addEventListener('mousemove', function(event)
 		//console.log("mouseY = ", mouseY);
 		let newMarginTop = Math.min(Math.max(mouseY, minY), maxY) / 6;
 		//console.log("newMarginTop = ", newMarginTop);
-		player.style.marginTop = newMarginTop + '%';
+		player1.style.marginTop = newMarginTop + '%';
 	}
 });
 
@@ -32,28 +63,8 @@ document.addEventListener('mouseup', function()
 	isMouseDown = false;
 });
 
-document.addEventListener('keydown', function(event)
-{
-	//const player = document.getElementById('figure-left');
-	const currentMarginTop = parseInt(window.getComputedStyle(player).marginTop);
-	const speed = 10;
-
-	if ((event.key === 'ArrowUp' || event.key === 'w')
-		&& currentMarginTop - speed > minY - 10)
-	{
-		console.log(currentMarginTop - speed);
-		player.style.marginTop = (currentMarginTop - speed) + 'px';
-	}
-	else if ((event.key === 'ArrowDown' || event.key === 's')
-		&& currentMarginTop + speed < maxY + 10)
-	{
-		console.log(currentMarginTop + speed);
-		player.style.marginTop = (currentMarginTop + speed) + 'px';
-	}
-});
-
 var table = document.getElementById('table');
-const tableWidth = window.getComputedStyle(table).width;
+var tableWidth = window.getComputedStyle(table).width;
 
 var box = document.getElementById('ball');
 var position = 0;

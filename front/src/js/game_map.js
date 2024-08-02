@@ -7,14 +7,11 @@ function loadGame()
 		<div id="table">
 		</div>
 		`;
-	document.getElementById('game').innerHTML = nuevoContenidoHTML;
+		document.getElementById('game').innerHTML = nuevoContenidoHTML;
 }
 
 function startGame()
 {
-	console.log("aqui");
-
-
 	var nuevoContenidoHTML = `
 	<div class="start-div">
 		<button onclick="startGame()">RESTART</button>
@@ -30,7 +27,6 @@ function startGame()
 	</div>
 	`;
 	document.getElementById('game').innerHTML = nuevoContenidoHTML;
-	console.log("aqui2");
 	
 	const scriptElement = document.createElement('script');
 	scriptElement.src = 'js/game.js';

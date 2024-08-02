@@ -14,10 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
     navigateTo('home');
 });*/
 
+function loadHome()
+{
+}
+
 // Mapeo de rutas a las funciones correspondientes
 const routes = {
     '/': loadHome,
-    '/login': loadLogin,
+    //'/login': loadLogin,
     '/game': loadGame,
     //'/about': loadAbout,
     //'/contact': loadContact,

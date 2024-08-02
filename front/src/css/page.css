@@ -15,6 +15,7 @@ body {
 }
 
 #game {
+  animation: fadeIn 2s ease-out;
 }
 
 #barra {
@@ -71,4 +72,8 @@ button {
   to {
     opacity: 1;
   }
+}
+
+.fade-in {
+  animation: fadeIn 2s ease-in-out;
 }
