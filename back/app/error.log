@@ -1,0 +1,6 @@
+Watching for file changes with StatReloader
+[22/Oct/2024 17:09:05] [m"GET / HTTP/1.1" 200 14[0m
+Not Found: /favicon.ico
+[22/Oct/2024 17:09:11] [32m"GET /change HTTP/1.1" 301 0[0m
+[22/Oct/2024 17:09:11] [m"GET /change/ HTTP/1.1" 200 18[0m
+[22/Oct/2024 17:09:20] [m"GET / HTTP/1.1" 200 14[0m
