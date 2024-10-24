@@ -10,7 +10,7 @@ services:
       context: ./front
     image: front
     ports:
-      - "8080:80"
+      - "8080:8080"
       - "443:443"
     networks:
       - jgravalo-pongnet

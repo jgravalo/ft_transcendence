@@ -2,15 +2,12 @@ FROM nginx:alpine
 
 COPY src/ /usr/share/nginx/html/
 
-#RUN rm /etc/nginx/conf.d/default.conf
+WORKDIR /usr/share/nginx/html/
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-#COPY nginx.conf /etc/nginx/conf.d/
+EXPOSE 443
 
-#COPY ./certificates/crazy-pong.com_private_key.key /etc/nginx/certs/
-#COPY ./certificates/crazy-pong.com_ssl_certificate.cer /etc/nginx/certs/
+EXPOSE 8080
 
-EXPOSE 80
-#EXPOSE 443
+COPY ./nginx.conf /etc/nginx/sites-enabled/default
 
 CMD ["nginx", "-g", "daemon off;"]
