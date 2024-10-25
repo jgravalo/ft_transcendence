@@ -5,8 +5,10 @@ function testGame()
     fetch(ruta)
         .then(response => response.json()) // Convertir la respuesta a JSON
         .then(data => {
+            console.log("aqui");
             console.log(data); // Ver los datos en consola
-            showGame(data);
+            console.log("aqui2");
+            //showGame(data);
         })
         .catch(error => {
             console.error('Error al obtener productos:', error);
@@ -14,6 +16,7 @@ function testGame()
 }
 
 // Función para mostrar productos en el DOM
+/*
 function showGame(data)
 {
     const lista = document.getElementById('game');
@@ -22,4 +25,4 @@ function showGame(data)
         item.textContent = `${dato.nombre} - $${dato.precio}`;
         lista.appendChild(item);
     });
-}
+}*/
