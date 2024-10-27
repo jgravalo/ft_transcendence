@@ -1,4 +1,4 @@
-const ruta = 'http://127.0.0.1:8000/game/json/';
+const ruta = 'http://127.0.0.1:8000';// /game/json/';
 
 function testGame()
 {
@@ -9,6 +9,7 @@ function testGame()
             console.log(data); // Ver los datos en consola
             console.log("aqui2");
             //showGame(data);
+            document.getElementById('game').innerHTML = `${data.content}`;
         })
         .catch(error => {
             console.error('Error al obtener productos:', error);
