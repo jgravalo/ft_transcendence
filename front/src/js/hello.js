@@ -8,22 +8,14 @@ function testGame()
             console.log("aqui");
             console.log(data); // Ver los datos en consola
             console.log("aqui2");
-            //showGame(data);
-            document.getElementById('game').innerHTML = `${data.content}`;
+            document.getElementById('content').innerHTML = `${data.content}`;
         })
         .catch(error => {
             console.error('Error al obtener productos:', error);
         });
 }
 
-// Función para mostrar productos en el DOM
-/*
-function showGame(data)
+function startGame()
 {
-    const lista = document.getElementById('game');
-    data.forEach(dato => {
-        const item = document.createElement('li');
-        item.textContent = `${dato.nombre} - $${dato.precio}`;
-        lista.appendChild(item);
-    });
-}*/
+
+}
