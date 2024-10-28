@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 
     #'rest_framework', # REST framework
     'corsheaders', # cors-headers
+    'channels', #channels
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -82,6 +83,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
+ASGI_APPLICATION = 'app.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

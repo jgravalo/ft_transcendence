@@ -1,8 +1,4 @@
-var numero1 = 0;
-var numero2 = 0;
 
-document.getElementById('numero1').textContent = numero1;
-document.getElementById('numero2').textContent = numero2;
 
 //var isMouseDown = false;
 var oY   = 230; //punto 0 de la mesa en la pagina

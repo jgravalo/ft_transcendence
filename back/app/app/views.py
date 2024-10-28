@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 # Create your views here.
 
 def get_home(request):
-    content = render_to_string('get_ready.html')
+    content = render_to_string('game.html')
     data = {
         "id": "52263",
         "player1": "jgravalo",

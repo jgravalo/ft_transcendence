@@ -1,25 +1,27 @@
-FROM python:3.9
+# Usar una imagen oficial de Python como base
+FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip
+# Establecer el directorio de trabajo dentro del contenedor
+WORKDIR /app
 
-# Copia los archivos requeridos para la instalación
-#COPY requirements.txt .
+# Copiar el archivo de requisitos (requirements.txt) al contenedor
+COPY requirements.txt /app/
 
-# Instala las dependencias de Python
-#RUN pip install --no-cache-dir -r requirements.txt
-
-RUN pip install django \
-    django-cors-headers \
-    django djangorestframework
-
+# Instalar las dependencias del proyecto
+RUN pip install --no-cache-dir -r requirements.txt
+#RUN pip install django django-cors-headers djangorestframework channels
 #RUN pip install daphne
 
+# Copiar el contenido del proyecto al contenedor
+COPY ./app/ /app/
+
+# Exponer el puerto en el que Django se ejecuta por defecto (8000)
 EXPOSE 8000
 
-COPY ./app/ /
+# Definir las variables de entorno necesarias (por ejemplo, si usas PostgreSQL)
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app/
-
-CMD ["python", "main.py", "runserver"]
+# Crear los archivos de migraciones, aplicar las migraciones y ejecutar el servidor de desarrollo
+CMD ["python", "manage.py", "migrate"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

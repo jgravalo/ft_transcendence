@@ -1,0 +1,17 @@
+# Django Framework
+Django>=4.0,<5.0
+
+# Django REST Framework para crear APIs
+djangorestframework>=3.14
+
+# Django CORS Headers para manejar CORS
+django-cors-headers>=3.13
+
+# Django Channels para WebSockets
+channels>=4.0
+
+# PostgreSQL Driver (psycopg2) para conectarse a una base de datos PostgreSQL
+# psycopg2>=2.9
+
+# Opcional: Channels Redis si estás utilizando Redis para manejar WebSockets
+# channels-redis>=4.0
