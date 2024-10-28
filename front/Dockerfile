@@ -1,12 +1,13 @@
 FROM nginx:alpine
 
-COPY src/ /usr/share/nginx/html/
+RUN rm /etc/nginx/conf.d/default.conf
+COPY ./src/ /usr/share/nginx/html/
 
-WORKDIR /usr/share/nginx/html/
+COPY ./certs/nginx.crt /etc/nginx/certs/
+COPY ./certs/nginx.key /etc/nginx/certs/
 
-EXPOSE 443
-
-EXPOSE 8080
+#EXPOSE 443
+EXPOSE 80
 
 COPY ./nginx.conf /etc/nginx/sites-enabled/default
 

@@ -1,6 +1,8 @@
 function Match()
 {
-    const socket = new WebSocket('ws://' + window.location.host + '/ws/somepath/');
+    const ruta = "ws://" + window.location.host + "/game/sock"; // wss:// si usamos https
+    console.log(ruta);
+    const socket = new WebSocket(ruta);
 
         // Evento cuando la conexión se abre
         socket.onopen = function(e) {
