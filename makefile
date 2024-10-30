@@ -1,6 +1,14 @@
 all:
 	docker compose -f docker-compose.yml up -d --build
 
+front:
+	docker build -t front ./front
+	docker run -d -p 8080:80 front
+
+back:
+	docker build -t front ./back
+	docker run -d -p 8080:80 back
+
 down:
 	docker compose -f docker-compose.yml down
 

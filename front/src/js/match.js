@@ -1,5 +1,12 @@
 function Match()
 {
+    
+    var n1 = 0;
+    var n2 = 0;
+
+    document.getElementById('n1').textContent = n1;
+    document.getElementById('n2').textContent = n2;
+   
     const ruta = "ws://" + window.location.host + "/game/sock"; // wss:// si usamos https
     console.log(ruta);
     const socket = new WebSocket(ruta);

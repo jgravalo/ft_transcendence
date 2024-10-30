@@ -25,13 +25,9 @@ function startGame()
 {
 
 }
-/* 
-var n1 = 0;
-var n2 = 0;
 
-document.getElementById('n1').textContent = n1;
-document.getElementById('n2').textContent = n2;
- */
+var table = document.getElementById('table');
+
 document.addEventListener('keydown', function(event) {
     const container = document.getElementById('table');
     const div = document.getElementById('left');
