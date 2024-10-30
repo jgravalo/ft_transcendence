@@ -1,1 +1,1 @@
-python3 manage.py runserver
+python3 ~/ft_transcendence/back/app/manage.py runserver

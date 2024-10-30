@@ -40,4 +40,4 @@ re:
 	make clean
 	make all
 
-.PHONY: all down ls clean
+.PHONY: all front back down ls clean
