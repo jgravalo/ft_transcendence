@@ -7,7 +7,7 @@ function Match()
     document.getElementById('n2').textContent = n2; */
    
     //const ruta = "ws://" + window.location.host + "/ws/game/sock"; // wss:// si usamos https
-    const ruta = "ws://localhost:8000/ws/game/sock"; // wss:// si usamos https
+    const ruta = "ws://localhost:8000/ws/game"; // wss:// si usamos https
     console.log(ruta);
     const socket = new WebSocket(ruta);
 

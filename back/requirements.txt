@@ -10,6 +10,9 @@ django-cors-headers>=3.13
 # Django Channels para WebSockets
 channels>=4.0
 
+# Daphne para conectarse a WebSockets
+daphne==4.0
+
 # PostgreSQL Driver (psycopg2) para conectarse a una base de datos PostgreSQL
 # psycopg2>=2.9
 
