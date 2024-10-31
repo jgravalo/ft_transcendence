@@ -28,8 +28,8 @@ ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=app.settings
 
 # Crear los archivos de migraciones, aplicar las migraciones y ejecutar el servidor de desarrollo
-#CMD ["python", "manage.py", "migrate"]
-#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "migrate"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
 # Comando para ejecutar Daphne en el contenedor
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "app.asgi:application"]
+#CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "app.asgi:application"]
