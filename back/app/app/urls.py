@@ -20,6 +20,7 @@ from .views import get_home
 
 urlpatterns = [
     #path('admin/', admin.site.urls), #django admin
+    path('login/', include('login.urls')),
     path('game/', include('game.urls')),
     path('', get_home, name='get_home'),
 ]

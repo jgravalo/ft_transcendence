@@ -1,17 +1,19 @@
-const ruta = 'http://127.0.0.1:8000';// /game/json/';
+const origin = 'http://127.0.0.1:8000/game/';// /game/json/';
 
+//window.addEventListener("popstate", (event) => {console.log("Evento popstate activado:", event.state);});
+
+/* console.log("host: <" + window.location.host + ">");
+console.log("hostname: <" + window.location.hostname + ">");
+console.log("origin: <" + window.location.origin + ">");
+ */
 function testGame()
 {
-    console.log("host: <" + window.location.host + ">");
-    console.log("hostname: <" + window.location.hostname + ">");
-    console.log("origin: <" + window.location.origin + ">");
-    fetch(ruta)
+    fetch(origin)
         .then(response => response.json()) // Convertir la respuesta a JSON
         .then(data => {
+            // Agrega una nueva URL al historial sin recargar
+            //window.history.pushState({ page: "home" }, "Home", "/home");
             console.log("aqui");
-            console.log("host: <" + window.location.host + ">");
-            console.log("hostname: <" + window.location.hostname + ">");
-            console.log("origin: <" + window.location.origin + ">");
             console.log(data); // Ver los datos en consola
             console.log("aqui2");
             document.getElementById('content').innerHTML = `${data.content}`;

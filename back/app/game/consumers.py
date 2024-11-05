@@ -5,6 +5,7 @@ class Match(WebsocketConsumer):
     def connect(self):
         # Aceptar la conexión WebSocket
         self.accept()
+        self.send(text_data=json.dumps({"message": "Conexión WebSocket exitosa"}))
 
     def disconnect(self, close_code):
         # Desconectar el WebSocket

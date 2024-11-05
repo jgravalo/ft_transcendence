@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 
+import game.routing
+
 #from .models import Match
 #from .serializers import MatchSerializer
 
@@ -17,7 +19,7 @@ def get_home(request):
         "player2": "IA",
         "content": content
     }
-    print(data)
+    #print(data)
     return JsonResponse(data)
     #match = Match(id_match=54643, player1="jgravalo",  player2="IA")
     #match.save()

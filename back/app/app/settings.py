@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'game',
+    'login',
 
     #'rest_framework', # REST framework
     'corsheaders', # cors-headers

@@ -10,11 +10,15 @@ from django.http import JsonResponse
 # Create your views here.
 
 def home(request):
-    #return render(request, 'index.html', {'nombre': 'Jesus'})
-    #context = {'nombre': 'Jesus'}
-    #response = render_to_string('index.html', context)
-    #return response
-    return HttpResponse("¡Hola, mundo!")
+    content = render_to_string('game.html')
+    data = {
+        "id": "52263",
+        "player1": "jgravalo",
+        "player2": "IA",
+        "content": content
+    }
+    #print(data)
+    return JsonResponse(data)
 
 def change(request):
     return HttpResponse("¡Seguimos, mundo!")
