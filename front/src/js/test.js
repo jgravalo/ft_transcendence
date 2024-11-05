@@ -1,11 +1,3 @@
-const origin = 'http://127.0.0.1:8000/game/';// /game/json/';
-
-//window.addEventListener("popstate", (event) => {console.log("Evento popstate activado:", event.state);});
-
-/* console.log("host: <" + window.location.host + ">");
-console.log("hostname: <" + window.location.hostname + ">");
-console.log("origin: <" + window.location.origin + ">");
- */
 function testGame()
 {
     fetch(origin)
