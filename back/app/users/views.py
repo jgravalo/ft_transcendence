@@ -1,4 +1,8 @@
 from django.shortcuts import render
+from django.template.loader import render_to_string
+
+from django.http import HttpResponse
+from django.http import JsonResponse
 
 # Create your views here.
 def login(request):
@@ -9,5 +13,4 @@ def login(request):
         "player2": "IA",
         "content": content
     }
-    #print(data)
     return JsonResponse(data)
