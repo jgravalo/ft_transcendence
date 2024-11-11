@@ -5,9 +5,9 @@ function testGame()
         .then(data => {
             // Agrega una nueva URL al historial sin recargar
             //window.history.pushState({ page: "home" }, "Home", "/home");
-            console.log("aqui");
+            //console.log("aqui");
             console.log(data); // Ver los datos en consola
-            console.log("aqui2");
+            //console.log("aqui2");
             document.getElementById('content').innerHTML = `${data.content}`;
         })
         .catch(error => {

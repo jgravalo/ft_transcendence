@@ -8,8 +8,8 @@ WORKDIR /usr/share/nginx/html
 #COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./nginx.conf /etc/nginx/sites-enabled/default
 #RUN rm /etc/nginx/conf.d/default.conf
-#COPY ./certs/nginx.crt /etc/nginx/certs/
-#COPY ./certs/nginx.key /etc/nginx/certs/
+COPY ./certs/nginx.crt /etc/nginx/certs/
+COPY ./certs/nginx.key /etc/nginx/certs/
 
 
 # Copia los archivos estáticos de la aplicación al directorio HTML de Nginx
@@ -18,7 +18,7 @@ COPY ./src /usr/share/nginx/html
 
 # Expone el puerto 80 para el tráfico HTTP
 EXPOSE 80
-#EXPOSE 443
+EXPOSE 443
 
 # Comando por defecto para iniciar Nginx
 CMD ["nginx", "-g", "daemon off;"]

@@ -18,7 +18,7 @@ body {
   animation: fadeIn 2s ease-out;
 }
 
-#barra {
+#bar {
   /* height: 25px; */
   padding: 0px 15px;
   color: aliceblue;
@@ -29,7 +29,14 @@ body {
   /*background-color: aqua;*/
 }
 
-#log_links {
+.bar-links {
+  padding: 15px;
+  font-weight: bold;
+  color: aliceblue;
+  /* text-decoration: none; */
+}
+
+#page_links {
 	display: flex;
 	justify-content: left;
 }
@@ -39,15 +46,10 @@ body {
 	justify-content: right;
 }
 
-.link {
+.bar-link {
   font-weight: bold;
   color: aliceblue;
   text-decoration: none;
-}
-
-.links {
-  padding: 15px;
-  font-weight: bold;
 }
 
 #header {
