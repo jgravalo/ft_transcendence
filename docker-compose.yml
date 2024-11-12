@@ -11,7 +11,7 @@ services:
     image: front
     ports:
       - "8080:80"
-      - "443:443"
+      - "4433:443"
     networks:
       - jgravalo-pongnet
 

@@ -11,8 +11,9 @@ import game.routing
 
 # Create your views here.
 
+#def home(request):
 def get_home(request):
-    content = render_to_string('game.html')
+    content = render_to_string('index.html')
     data = {
         "id": "52263",
         "player1": "jgravalo",

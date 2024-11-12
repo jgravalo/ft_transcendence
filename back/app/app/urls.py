@@ -23,4 +23,5 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('game/', include('game.urls')),
     path('', get_home, name='get_home'),
+    #path('', home, name='home'),
 ]
