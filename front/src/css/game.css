@@ -43,22 +43,27 @@
 	*/
 }
 
+.goal {
+	width: 20px;
+}
+
 .figure {
 	background-color: white;
 	height: 100px;
 	width: 10px;
 /* 	margin: 10px; */
-	top: 290px;
-	position: absolute;
+/* 	top: 290px;
+	position: absolute; */
 }
 
 #left {
+	margin-top: 50%;
 	margin-left: 10px;
 }
 
 #right {
+	margin-top: 50%;
 	margin-right: 10px;
-/* 	right: 0; */
 }
 
 @keyframes moveBox {

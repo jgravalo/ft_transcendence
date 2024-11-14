@@ -21,31 +21,54 @@ function startGame()
 }
 
 var table = document.getElementById('table');
+const start = table.getBoundingClientRect().top;
+const final = table.getBoundingClientRect().height;
 
+document.addEventListener('keydown', function(event)
+{
+	const player = document.getElementById('left');
+	const currentMarginTop = parseInt(window.getComputedStyle(player).marginTop);
+	const speed = 10;
+	if (event.key === 'ArrowUp' && currentMarginTop - speed > minY - 5)
+	{
+		player.style.marginTop = (currentMarginTop - speed) + 'px';
+	}
+	else if (event.key === 'ArrowDown' && currentMarginTop + speed < maxY + 5)
+	{
+		player.style.marginTop = (currentMarginTop + speed) + 'px';
+	}
+});
+
+/*
 document.addEventListener('keydown', function(event) {
-    const container = document.getElementById('table');
-    const div = document.getElementById('left');
+    const table = document.getElementById('table');
+    const player = document.getElementById('left');
     const step = 5; // Define cuánto se moverá el div en píxeles
 
     // Obtener dimensiones del contenedor y el div
-    const containerRect = container.getBoundingClientRect();
-    const divRect = div.getBoundingClientRect();
+    const containerRect = table.getBoundingClientRect();
+    const divRect = player.getBoundingClientRect();
+    const start = table.getBoundingClientRect().top;
+    const final = table.getBoundingClientRect().height;
+    //console.log("containerRect: " + containerRect + ", divRect: " + divRect);
+    console.log("start: " + start + ", final: " + final + ", total: " + (final + start));
 
     // Obtenemos la posición actual del div
-    let top = parseInt(window.getComputedStyle(div).top);
-    var start = 200;
+    let marginPlayer = document.getElementById('left').marginTop;
+    //let top = parseInt(window.getComputedStyle(player).top);
+    //console.log("top = " + top);
 
     // Detectamos la tecla presionada y movemos el div si está dentro de los límites del contenedor
     switch(event.key) {
       case 'ArrowUp':
-        if (top > start) {  // Evita que se mueva fuera de la parte superior
-          div.style.top = (top - step) + 'px';
+        if (marginPlayer - step > start) {  // Evita que se mueva fuera de la parte superior
+          player.style.marginTop = (marginPlayer - step) + 'px';
         }
         break;
       case 'ArrowDown':
-        if (top + divRect.height < containerRect.height + start - 40) {  // Evita que se mueva fuera de la parte inferior
-          div.style.top = (top + step) + 'px';
+        if (marginPlayer - step > start + final) {  // Evita que se mueva fuera de la parte inferior
+          player.style.marginTop = (marginPlayer + step) + 'px';
         }
         break;
     }
-  });
+  });*/
