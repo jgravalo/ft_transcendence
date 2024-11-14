@@ -19,25 +19,47 @@ function startGame()
 {
 
 }
+/* const movible = document.getElementById("left");
+const contenedor = document.querySelector(".table");
 
-var table = document.getElementById('table');
-const start = table.getBoundingClientRect().top;
-const final = table.getBoundingClientRect().height;
+// Distancia de movimiento en píxeles
+const paso = 10;
+
+// Captura el evento de teclado
+document.addEventListener("keydown", (event) => {
+    // Obtiene el valor actual de "margin-top" del div movible
+    let margenActual = parseInt(window.getComputedStyle(movible).marginTop);
+
+    if (event.key === "ArrowUp") {
+        // Mueve hacia arriba y asegura que no salga del contenedor
+        margenActual = Math.max(margenActual - paso, 0);
+        movible.style.marginTop = margenActual + "px";
+    }
+
+    if (event.key === "ArrowDown") {
+        // Mueve hacia abajo y asegura que no salga del contenedor
+        margenActual = Math.min(margenActual + paso, contenedor.clientHeight - movible.clientHeight);
+        movible.style.marginTop = margenActual + "px";
+    }
+}); */
+
+const minY = 0; // Límite mínimo de margin-top
+const maxY = 300; // Límite máximo de margin-top
 
 document.addEventListener('keydown', function(event)
 {
-	const player = document.getElementById('left');
+  const player = document.getElementById('left');
 	const currentMarginTop = parseInt(window.getComputedStyle(player).marginTop);
 	const speed = 10;
-	if (event.key === 'ArrowUp' && currentMarginTop - speed > minY - 5)
-	{
+
+	if ((event.key === 'ArrowUp' || event.key === 'w')
+		&& currentMarginTop - speed > minY - 10)
 		player.style.marginTop = (currentMarginTop - speed) + 'px';
-	}
-	else if (event.key === 'ArrowDown' && currentMarginTop + speed < maxY + 5)
-	{
+	else if ((event.key === 'ArrowDown' || event.key === 's')
+		&& currentMarginTop + speed < maxY + 10)
 		player.style.marginTop = (currentMarginTop + speed) + 'px';
-	}
 });
+
 
 /*
 document.addEventListener('keydown', function(event) {
