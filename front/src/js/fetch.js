@@ -12,7 +12,7 @@ document.getElementById('gameButton').addEventListener('click', function(event) 
     console.log(window.location.pathname);
 }); */
 
-handleLinks()
+handleLinks();
 
 function handleLinks()
 {
@@ -48,6 +48,7 @@ function handleLink(event)
             console.log("esta en handleLink");
             console.log(data); // Ver los datos en consola
             document.getElementById('content').innerHTML = `${data.content}`;
+            handleLinks();
         })
         .catch(error => {
             console.error('Error al obtener productos:', error);

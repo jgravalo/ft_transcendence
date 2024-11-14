@@ -57,6 +57,16 @@ body {
 	color: white;
 }
 
+a {
+  color: white;
+  text-decoration: none;
+  font-size: large;
+}
+
+a:hover {
+  text-decoration: white;
+}
+
 button {
 	padding: 5px 15px;
 	color: white;
@@ -64,11 +74,16 @@ button {
 	font-weight: bold;
 	/*color: brown;
 	border: 4px solid brown;
-	background-color: sandybrown;*/
-  color: white;
+	background-color: sandybrown;
+  color: white;*/
 	border: 4px solid white;
-	background-color: grey;
+	background-color: black;
 	border-radius: 10px;
+}
+
+button:hover {
+  color: black;
+  background-color: white;
 }
 
 @keyframes fadeIn {
