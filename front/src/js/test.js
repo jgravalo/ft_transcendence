@@ -58,10 +58,10 @@ function moverCirculo() {
     //const contenedor = table.getBoundingClientRect().height;
     
     const minY = table.getBoundingClientRect().top + marginTable;
-    const maxY = table.getBoundingClientRect().height + minY - marginTable;
+    const maxY = table.getBoundingClientRect().height - (2 * marginTable) + minY;
 
     const minX = table.getBoundingClientRect().left + marginTable;
-    const maxX = table.getBoundingClientRect().width + minX - marginTable;
+    const maxX = table.getBoundingClientRect().width - (2 * marginTable) + minX;
 
     // Obtener posición actual
     let top = parseInt(window.getComputedStyle(ball).top);
