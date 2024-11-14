@@ -19,78 +19,70 @@ function startGame()
 {
 
 }
-/* const movible = document.getElementById("left");
-const contenedor = document.querySelector(".table");
 
-// Distancia de movimiento en píxeles
-const paso = 10;
-
-// Captura el evento de teclado
-document.addEventListener("keydown", (event) => {
-    // Obtiene el valor actual de "margin-top" del div movible
-    let margenActual = parseInt(window.getComputedStyle(movible).marginTop);
-
-    if (event.key === "ArrowUp") {
-        // Mueve hacia arriba y asegura que no salga del contenedor
-        margenActual = Math.max(margenActual - paso, 0);
-        movible.style.marginTop = margenActual + "px";
-    }
-
-    if (event.key === "ArrowDown") {
-        // Mueve hacia abajo y asegura que no salga del contenedor
-        margenActual = Math.min(margenActual + paso, contenedor.clientHeight - movible.clientHeight);
-        movible.style.marginTop = margenActual + "px";
-    }
-}); */
-
-const minY = 0; // Límite mínimo de margin-top
-const maxY = 300; // Límite máximo de margin-top
+// PLAYER
 
 document.addEventListener('keydown', function(event)
 {
-  const player = document.getElementById('left');
-	const currentMarginTop = parseInt(window.getComputedStyle(player).marginTop);
-	const speed = 10;
+    const table = document.getElementById('table');
+    const maxY = table.getBoundingClientRect().height;
+    const minY = 0;
+    console.log("maxY = " + maxY);
+
+    const player = document.getElementById('left');
+    const playerHeight = player.getBoundingClientRect().height;
+    const top = parseInt(window.getComputedStyle(player).marginTop);
+    const speed = 5;
 
 	if ((event.key === 'ArrowUp' || event.key === 'w')
-		&& currentMarginTop - speed > minY - 10)
-		player.style.marginTop = (currentMarginTop - speed) + 'px';
+		&& top - speed > minY)
+		player.style.marginTop = (top - speed) + 'px';
 	else if ((event.key === 'ArrowDown' || event.key === 's')
-		&& currentMarginTop + speed < maxY + 10)
-		player.style.marginTop = (currentMarginTop + speed) + 'px';
+		&& top + speed < maxY - playerHeight - 30)
+		player.style.marginTop = (top + speed) + 'px';
 });
 
+// BALL
 
-/*
-document.addEventListener('keydown', function(event) {
+
+// Tamaño del paso de movimiento y dirección inicial
+const ballSpeed = 2;
+let direccionX = ballSpeed;
+let direccionY = ballSpeed;
+
+function moverCirculo() {
+    const marginTable = 15;
+    const ball = document.getElementById("ball");
+    //const contenedor = document.querySelector(".contenedor");
     const table = document.getElementById('table');
-    const player = document.getElementById('left');
-    const step = 5; // Define cuánto se moverá el div en píxeles
+    //const contenedor = table.getBoundingClientRect().height;
+    
+    const minY = table.getBoundingClientRect().top + marginTable;
+    const maxY = table.getBoundingClientRect().height + minY - marginTable;
 
-    // Obtener dimensiones del contenedor y el div
-    const containerRect = table.getBoundingClientRect();
-    const divRect = player.getBoundingClientRect();
-    const start = table.getBoundingClientRect().top;
-    const final = table.getBoundingClientRect().height;
-    //console.log("containerRect: " + containerRect + ", divRect: " + divRect);
-    console.log("start: " + start + ", final: " + final + ", total: " + (final + start));
+    const minX = table.getBoundingClientRect().left + marginTable;
+    const maxX = table.getBoundingClientRect().width + minX - marginTable;
 
-    // Obtenemos la posición actual del div
-    let marginPlayer = document.getElementById('left').marginTop;
-    //let top = parseInt(window.getComputedStyle(player).top);
-    //console.log("top = " + top);
+    // Obtener posición actual
+    let top = parseInt(window.getComputedStyle(ball).top);
+    let left = parseInt(window.getComputedStyle(ball).left);
 
-    // Detectamos la tecla presionada y movemos el div si está dentro de los límites del contenedor
-    switch(event.key) {
-      case 'ArrowUp':
-        if (marginPlayer - step > start) {  // Evita que se mueva fuera de la parte superior
-          player.style.marginTop = (marginPlayer - step) + 'px';
-        }
-        break;
-      case 'ArrowDown':
-        if (marginPlayer - step > start + final) {  // Evita que se mueva fuera de la parte inferior
-          player.style.marginTop = (marginPlayer + step) + 'px';
-        }
-        break;
+    // Calcular nuevas posiciones
+    let newTop = top + direccionY;
+    let newLeft = left + direccionX;
+
+    // Comprobar si el círculo ha tocado los bordes del contenedor
+    if (newTop <= minY || newTop + ball.clientHeight >= maxY) {// table.clientHeight) {
+        direccionY *= -1; // Invertir la dirección en el eje Y
     }
-  });*/
+    if (newLeft <= minX || newLeft + ball.clientWidth >= maxX) {// table.clientWidth) {
+        direccionX *= -1; // Invertir la dirección en el eje X
+    }
+
+    // Aplicar nuevas posiciones
+    ball.style.top = newTop + "px";
+    ball.style.left = newLeft + "px";
+}
+
+// Configurar el movimiento automático con setInterval
+setInterval(moverCirculo, 10); // Mueve el círculo cada 10ms

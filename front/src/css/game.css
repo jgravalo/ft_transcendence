@@ -28,21 +28,6 @@
 	margin-top: 20px;
 }
 
-#ball {
-	width: 30px;
-	height: 30px;
-	border-radius: 100%;
-	background-color: red;
-	position: absolute; /* Necesario para poder moverlo con exactitud */
-	left: 0; /* Comienza desde el extremo izquierdo */
-	top: 50%; /* Centrado verticalmente */
-	transform: translateY(-50%); /* Asegura que esté centrado verticalmente */
-	/*
-	animation: moveBox 3s linear infinite;
-	name duration timing-function delay iteration-count direction fill-mode;
-	*/
-}
-
 .goal {
 	width: 20px;
 }
@@ -51,8 +36,8 @@
 	background-color: white;
 	height: 100px;
 	width: 10px;
-/* 	margin: 10px; */
-/* 	top: 290px;
+	/* 	margin: 10px; */
+	/* 	top: 290px;
 	position: absolute; */
 }
 
@@ -64,6 +49,16 @@
 #right {
 	margin-top: 50%;
 	margin-right: 10px;
+}
+
+#ball {
+	width: 50px;
+	height: 50px;
+	background-color: red;
+	border-radius: 50%;
+	position: absolute; /* Para que podamos moverlo con top y left */
+	top: 300px;
+	left: 400px;
 }
 
 @keyframes moveBox {
