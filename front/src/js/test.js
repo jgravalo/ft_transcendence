@@ -27,7 +27,7 @@ document.addEventListener('keydown', function(event)
     const table = document.getElementById('table');
     const maxY = table.getBoundingClientRect().height;
     const minY = 0;
-    console.log("maxY = " + maxY);
+    //console.log("maxY = " + maxY);
 
     const player = document.getElementById('left');
     const playerHeight = player.getBoundingClientRect().height;
@@ -53,9 +53,8 @@ let direccionY = ballSpeed;
 function moverCirculo() {
     const marginTable = 15;
     const ball = document.getElementById("ball");
-    //const contenedor = document.querySelector(".contenedor");
     const table = document.getElementById('table');
-    //const contenedor = table.getBoundingClientRect().height;
+    const player = document.getElementById('left');
     
     const minY = table.getBoundingClientRect().top + marginTable;
     const maxY = table.getBoundingClientRect().height - (2 * marginTable) + minY;
@@ -64,17 +63,36 @@ function moverCirculo() {
     const maxX = table.getBoundingClientRect().width - (2 * marginTable) + minX;
 
     // Obtener posición actual
-    let top = parseInt(window.getComputedStyle(ball).top);
-    let left = parseInt(window.getComputedStyle(ball).left);
+    let topBall = parseInt(window.getComputedStyle(ball).top);
+    let leftBall = parseInt(window.getComputedStyle(ball).left);
+    let heightBall = parseInt(window.getComputedStyle(ball).left);
+    let centerBall = topBall + (heightBall / 2);
+
+    //let topPlayer = parseInt(window.getComputedStyle(player).top);
+    let topPlayer = player.getBoundingClientRect().top;
+    //let heightPlayer = parseInt(window.getComputedStyle(player).height);
+    let heightPlayer = player.getBoundingClientRect().height;
 
     // Calcular nuevas posiciones
-    let newTop = top + direccionY;
-    let newLeft = left + direccionX;
+    let newTop = topBall + direccionY;
+    let newLeft = leftBall + direccionX;
 
     // Comprobar si el círculo ha tocado los bordes del contenedor
     if (newTop <= minY || newTop + ball.clientHeight >= maxY) {// table.clientHeight) {
         direccionY *= -1; // Invertir la dirección en el eje Y
     }
+    if (
+        (newLeft <= minX + 20 &&
+            centerBall > topPlayer && centerBall < topPlayer + heightPlayer) // ||
+            //(newLeft + ball.clientWidth >= maxX - 20 &&
+            //    centerBall > topPlayer && centerBall < topPlayer + heightPlayer)
+        ) {
+            console.log("centerBall: " + centerBall);
+            console.log(", topPlayer: " + topPlayer);
+            console.log(", heightPlayer: " + (topPlayer + heightPlayer));
+            console.log("goal!!!!");
+            direccionX *= -1;
+        }
     if (newLeft <= minX || newLeft + ball.clientWidth >= maxX) {// table.clientWidth) {
         direccionX *= -1; // Invertir la dirección en el eje X
     }
