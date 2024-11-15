@@ -42,8 +42,11 @@ document.addEventListener('keydown', function(event)
 		player.style.marginTop = (top + speed) + 'px';
 });
 
-// BALL
+// SCORES
+var score1 = 0;
+var score2 = 0;
 
+// BALL
 
 // Tamaño del paso de movimiento y dirección inicial
 const ballSpeed = 2;
@@ -51,6 +54,10 @@ let direccionX = ballSpeed;
 let direccionY = ballSpeed;
 
 function moverCirculo() {
+    // Muestra el número en el contenedor
+    document.getElementById('score1').textContent = score1;
+    document.getElementById('score2').textContent = score2;
+
     const marginTable = 15;
     const ball = document.getElementById("ball");
     const table = document.getElementById('table');
@@ -95,6 +102,12 @@ function moverCirculo() {
         }
     if (newLeft <= minX || newLeft + ball.clientWidth >= maxX) {// table.clientWidth) {
         direccionX *= -1; // Invertir la dirección en el eje X
+        if (newLeft <= minX)
+            score2++;
+            //document.getElementById('score1').textContent = score1 + 1;
+        else
+            score1++;
+            //document.getElementById('score2').textContent = score1 + 1;
     }
 
     // Aplicar nuevas posiciones
