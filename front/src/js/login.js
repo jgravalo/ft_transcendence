@@ -1,7 +1,9 @@
+/* 
 document.getElementById('openLoginModal').addEventListener('click', function(event) {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
     loginForm();
 });
+ */
 function loginForm()
 {
     // Crear la estructura del modal como una cadena de texto
@@ -49,13 +51,14 @@ function loginForm()
     */
 };
 
-function makeForm(modalHTML)
+function makeForm()//modalHTML)
 {
 
     // Insertar el modal en el contenedor
-    document.getElementById('modalContainer').innerHTML = modalHTML;
+    //document.getElementById('modalContainer').innerHTML = modalHTML;
 
     // Mostrar el modal
+    console.log("esta en makeForm");
     var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
     myModal.show();
 

@@ -11,7 +11,7 @@ def login(request):
         "id": "52263",
         "player1": "jgravalo",
         "player2": "IA",
-        "element": 'openLoginModal',
+        "element": 'modalContainer',
         "content": content
     }
     return JsonResponse(data)

@@ -56,7 +56,10 @@ function fetchLink(base, path)
             //var dest = 'content';
             var dest = `${data.element}`;
             document.getElementById(dest).innerHTML = `${data.content}`;
-            handleLinks();
+            if (path == "/users/login/")
+                makeForm();
+            else 
+                handleLinks();
         })
         .catch(error => {
             console.error('Error al obtener productos:', error);
