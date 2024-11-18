@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'game',
     'users',
 
-    #'rest_framework', # REST framework
+    'rest_framework', # REST framework
     'corsheaders', # cors-headers
     'channels', #channels
 

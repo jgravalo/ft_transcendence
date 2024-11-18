@@ -1,7 +1,9 @@
 document.getElementById('openLoginModal').addEventListener('click', function(event) {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
+    makeForm();
+});
 
-
+/*
     fetch(base + ":8000" + "/login")
         .then(response => response.json()) // Convertir la respuesta a JSON
         .then(data => {
@@ -27,10 +29,12 @@ document.getElementById('openLoginModal').addEventListener('click', function(eve
                 })})
         .catch(error => {
             console.error('Error al obtener productos:', error);
-        });
-});
+        });*/
+
+function makeForm()
+{
     // Crear la estructura del modal como una cadena de texto
-/*     const modalHTML = `
+    const modalHTML = `
         <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="color: #000;">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -55,10 +59,10 @@ document.getElementById('openLoginModal').addEventListener('click', function(eve
                 </div>
             </div>
         </div>
-    `; */
+    `;
 
     // Insertar el modal en el contenedor
-    /* document.getElementById('modalContainer').innerHTML = modalHTML;
+    document.getElementById('modalContainer').innerHTML = modalHTML;
 
     // Mostrar el modal
     var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
@@ -73,8 +77,9 @@ document.getElementById('openLoginModal').addEventListener('click', function(eve
         const password = document.getElementById('password').value;
 
         console.log('Correo Electrónico:', email);
-        console.log('Contraseña:', password); */
-
+        console.log('Contraseña:', password);
+    })
+}
         // Aquí podrías enviar los datos a un servidor usando fetch() o XMLHttpRequest
         /*
         fetch('https://example.com/login', {

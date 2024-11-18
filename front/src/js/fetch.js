@@ -12,7 +12,7 @@ document.getElementById('gameButton').addEventListener('click', function(event) 
     console.log(window.location.pathname);
 }); */
 
-//window.addEventListener('popstate', handleLink);
+window.addEventListener('popstate', handleLink);
 
 handleLinks();
 

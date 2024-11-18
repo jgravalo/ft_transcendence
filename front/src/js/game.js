@@ -29,6 +29,8 @@ function startGame()
     var score2 = 0;
     
     // BALL
+    var startBallY = parseInt(window.getComputedStyle(ball).top);
+    var startBallX = parseInt(window.getComputedStyle(ball).left);
     
     // Tamaño del paso de movimiento y dirección inicial
     const ballSpeed = 2;
@@ -72,9 +74,7 @@ function startGame()
         }
         if (
             (newLeft <= minX + 20 &&
-                centerBall > topPlayer && centerBall < topPlayer + heightPlayer) // ||
-                //(newLeft + ball.clientWidth >= maxX - 20 &&
-                //    centerBall > topPlayer && centerBall < topPlayer + heightPlayer)
+                centerBall > topPlayer && centerBall < topPlayer + heightPlayer)
             ) {
                 console.log("centerBall: " + centerBall);
                 console.log(", topPlayer: " + topPlayer);
@@ -82,8 +82,13 @@ function startGame()
                 console.log("goal!!!!");
                 direccionX *= -1;
             }
+            // Aplicar nuevas posiciones
+            ball.style.top = newTop + "px";
+            ball.style.left = newLeft + "px";
             if (newLeft <= minX || newLeft + ball.clientWidth >= maxX) {// table.clientWidth) {
                 direccionX *= -1; // Invertir la dirección en el eje X
+                ball.style.top = startBallY + "px";
+                ball.style.left = startBallX + "px";
                 if (newLeft <= minX)
                     score2++;
                 //document.getElementById('score1').textContent = score1 + 1;
@@ -92,9 +97,6 @@ function startGame()
             //document.getElementById('score2').textContent = score1 + 1;
         }
         
-        // Aplicar nuevas posiciones
-        ball.style.top = newTop + "px";
-        ball.style.left = newLeft + "px";
         if (score1 >= 10 || score2 >= 10)
             //return ;
             clearInterval(Match);
