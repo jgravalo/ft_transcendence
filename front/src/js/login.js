@@ -1,9 +1,51 @@
+
+function makeForm() //modalHTML)
+{
+    // Mostrar el modal
+    console.log("esta en makeForm");
+    var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    myModal.show();
+
+    // Manejador del evento de envío del formulario
+    const form =  document.getElementById('loginForm');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Obtener los valores de los inputs
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        console.log('Correo Electrónico:', email);
+        console.log('Contraseña:', password);
+        let valid = true;
+        // Validaciones
+        if (email === '' || !email.includes('@')) {
+            document.getElementById('errorEmail').textContent = 'Ingresa un correo válido.';
+            valid = false;
+        }
+        if (password.length < 6) {
+            document.getElementById('errorPassword').textContent = 'La contraseña debe tener al menos 6 caracteres.';
+            valid = false;
+        }
+        // Si todo es válido, enviar formulario
+        if (valid) {
+            alert('Formulario enviado con éxito');
+            document.getElementById('close').click();
+        }
+        else
+        {
+            form.reset(); // Reiniciar formulario
+        }
+    })
+}
+
+
 /* 
 document.getElementById('openLoginModal').addEventListener('click', function(event) {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
     loginForm();
 });
  */
+/*
 function loginForm()
 {
     // Crear la estructura del modal como una cadena de texto
@@ -48,32 +90,9 @@ function loginForm()
         </div>
     `;
     makeForm(modalHTML);
-    */
+    
 };
-
-function makeForm()//modalHTML)
-{
-
-    // Insertar el modal en el contenedor
-    //document.getElementById('modalContainer').innerHTML = modalHTML;
-
-    // Mostrar el modal
-    console.log("esta en makeForm");
-    var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
-    myModal.show();
-
-    // Manejador del evento de envío del formulario
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        // Obtener los valores de los inputs
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        console.log('Correo Electrónico:', email);
-        console.log('Contraseña:', password);
-    })
-}
+*/
         // Aquí podrías enviar los datos a un servidor usando fetch() o XMLHttpRequest
         /*
         fetch('https://example.com/login', {

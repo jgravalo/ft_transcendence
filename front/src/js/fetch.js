@@ -6,7 +6,13 @@ console.log("origin: <" + window.location.origin + ">");
 console.log("pathname: <" + window.location.pathname + ">");
 console.log("");
 */
-window.addEventListener('popstate', handleLink);
+window.addEventListener('popstate', handlePopstate);
+
+function handlePopstate()
+{
+    var path = window.location.href;
+    fetchLink(base, path);
+}
 
 handleLinks();
 
@@ -40,10 +46,7 @@ function handleLink(event)
         "/" + title
     );
     console.log("path = " + path);
-    //if (path == "/login")
-    //    ;//loginForm();
-    //else
-        fetchLink(base, path);
+    fetchLink(base, path);
 }
 
 function fetchLink(base, path)

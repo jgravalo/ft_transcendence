@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 
@@ -12,10 +12,12 @@
                     <div class="mb-3">
                         <label for="email" class="form-label">Correo Electrónico</label>
                         <input type="email" class="form-control" id="email" required>
+                        <span id="errorEmail" class="error"></span><br>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Contraseña</label>
                         <input type="password" class="form-control" id="password" required>
+                        <span id="errorPassword" class="error"></span><br>
                     </div>
                     <button type="submit" class="btn btn-primary">Ingresar</button>
                 </form>
