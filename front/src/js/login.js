@@ -1,8 +1,36 @@
 document.getElementById('openLoginModal').addEventListener('click', function(event) {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
 
+
+    fetch(base + ":8000" + "/login")
+        .then(response => response.json()) // Convertir la respuesta a JSON
+        .then(data => {
+            // Agrega una nueva URL al historial sin recargar
+            //window.history.pushState({ page: "home" }, "Home", "/home");
+            console.log("esta en handleLink");
+            console.log(data); // Ver los datos en consola
+            document.getElementById('modalContainer').innerHTML = `${data.content}`;
+            var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            handleLinks();
+            myModal.show();
+
+    // Manejador del evento de envío del formulario
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Obtener los valores de los inputs
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                console.log('Correo Electrónico:', email);
+                console.log('Contraseña:', password);
+                })})
+        .catch(error => {
+            console.error('Error al obtener productos:', error);
+        });
+});
     // Crear la estructura del modal como una cadena de texto
-    const modalHTML = `
+/*     const modalHTML = `
         <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="color: #000;">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -18,8 +46,8 @@ document.getElementById('openLoginModal').addEventListener('click', function(eve
                                 <input type="email" class="form-control" id="email" required>
                             </div>
                             <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password" required>
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Ingresar</button>
                         </form>
@@ -27,10 +55,10 @@ document.getElementById('openLoginModal').addEventListener('click', function(eve
                 </div>
             </div>
         </div>
-    `;
+    `; */
 
     // Insertar el modal en el contenedor
-    document.getElementById('modalContainer').innerHTML = modalHTML;
+    /* document.getElementById('modalContainer').innerHTML = modalHTML;
 
     // Mostrar el modal
     var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
@@ -45,7 +73,7 @@ document.getElementById('openLoginModal').addEventListener('click', function(eve
         const password = document.getElementById('password').value;
 
         console.log('Correo Electrónico:', email);
-        console.log('Contraseña:', password);
+        console.log('Contraseña:', password); */
 
         // Aquí podrías enviar los datos a un servidor usando fetch() o XMLHttpRequest
         /*
@@ -63,5 +91,5 @@ document.getElementById('openLoginModal').addEventListener('click', function(eve
 
         //alert('Formulario enviado');
         //myModal.hide();
-    });
-});
+    //});
+//});

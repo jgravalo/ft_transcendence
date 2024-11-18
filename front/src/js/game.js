@@ -1,81 +1,105 @@
-
-
-//var isMouseDown = false;
-var oY   = 230; //punto 0 de la mesa en la pagina
-var minY = 0; // Límite mínimo de margin-top
-var maxY = 290; // Límite máximo de margin-top
+// PLAYER
 
 document.addEventListener('keydown', function(event)
 {
-	const player1 = document.getElementById('figure-left');
-	const player2 = document.getElementById('figure-right');
-	//const player1 = document.getElementById('figure-left');
-	var speed = 5;
-	var player;
-	if (event.key === 'w' || event.key === 's')
-		player = player1;
-	else if (event.key === 'ArrowUp' || event.key === 'ArrowDown')
-		player = player2;
-	var currentMarginTop = parseInt(window.getComputedStyle(player).marginTop);
+    const table = document.getElementById('table');
+    const maxY = table.getBoundingClientRect().height;
+    const minY = 0;
+    //console.log("maxY = " + maxY);
+    
+    const player = document.getElementById('left');
+    const playerHeight = player.getBoundingClientRect().height;
+    const top = parseInt(window.getComputedStyle(player).marginTop);
+    const speed = 5;
+    
 	if ((event.key === 'ArrowUp' || event.key === 'w')
-		&& currentMarginTop - speed > minY)
-	{
-		//console.log(currentMarginTop - speed);
-		player.style.marginTop = (currentMarginTop - speed) + 'px';
-	}
+		&& top - speed > minY)
+    player.style.marginTop = (top - speed) + 'px';
 	else if ((event.key === 'ArrowDown' || event.key === 's')
-		&& currentMarginTop + speed < maxY + 80)
-	{
-		//console.log(currentMarginTop + speed);
-		player.style.marginTop = (currentMarginTop + speed) + 'px';
-	}
-});
-/* 
-document.addEventListener('keydown', function(event)
-{
-	if (event.key === 'z')
-		console.log('hola');
+		&& top + speed < maxY - playerHeight - 30)
+    player.style.marginTop = (top + speed) + 'px';
 });
 
-document.addEventListener('mousemove', function(event)
+// MATCH
+
+function startGame()
 {
-	if (isMouseDown)
-	{ 
-		const mouseY = event.clientY - oY;
-		//console.log("mouseY = ", mouseY);
-		let newMarginTop = Math.min(Math.max(mouseY, minY), maxY) / 6;
-		//console.log("newMarginTop = ", newMarginTop);
-		player1.style.marginTop = newMarginTop + '%';
-	}
-});
-
-document.addEventListener('mousedown', function()
-{
-	isMouseDown = true;
-});
-
-document.addEventListener('mouseup', function()
-{
-	isMouseDown = false;
-}); */
-/* 
-var table = document.getElementById('table');
-var tableWidth = window.getComputedStyle(table).width;
-
-var box = document.getElementById('ball');
-var position = 0;
-var direction = 1; // 1 para derecha, -1 para izquierda
-*/
-var position = 0; // Posición inicial en píxeles
-var velocity = 2; // Velocidad en píxeles por frame
-
-function move() {
-  position += velocity; // Incrementa la posición por la velocidad
-  document.getElementById("ball").style.left = position + "px"; // Mueve el div
-  requestAnimationFrame(move); // Llama a move en el siguiente frame
+    // SCORES
+    var score1 = 0;
+    var score2 = 0;
+    
+    // BALL
+    
+    // Tamaño del paso de movimiento y dirección inicial
+    const ballSpeed = 2;
+    let direccionX = ballSpeed;
+    let direccionY = ballSpeed;
+    
+    function moverCirculo() {
+        // Muestra el número en el contenedor
+        document.getElementById('score1').textContent = score1;
+        document.getElementById('score2').textContent = score2;
+        
+        const marginTable = 15;
+        const ball = document.getElementById("ball");
+        const table = document.getElementById('table');
+        const player = document.getElementById('left');
+        
+        const minY = table.getBoundingClientRect().top + marginTable;
+        const maxY = table.getBoundingClientRect().height - (2 * marginTable) + minY;
+        
+        const minX = table.getBoundingClientRect().left + marginTable;
+        const maxX = table.getBoundingClientRect().width - (2 * marginTable) + minX;
+        
+        // Obtener posición actual
+        let topBall = parseInt(window.getComputedStyle(ball).top);
+        let leftBall = parseInt(window.getComputedStyle(ball).left);
+        let heightBall = parseInt(window.getComputedStyle(ball).left);
+        let centerBall = topBall + (heightBall / 2);
+        
+        //let topPlayer = parseInt(window.getComputedStyle(player).top);
+        let topPlayer = player.getBoundingClientRect().top;
+        //let heightPlayer = parseInt(window.getComputedStyle(player).height);
+        let heightPlayer = player.getBoundingClientRect().height;
+        
+        // Calcular nuevas posiciones
+        let newTop = topBall + direccionY;
+        let newLeft = leftBall + direccionX;
+        
+        // Comprobar si el círculo ha tocado los bordes del contenedor
+        if (newTop <= minY || newTop + ball.clientHeight >= maxY) {// table.clientHeight) {
+            direccionY *= -1; // Invertir la dirección en el eje Y
+        }
+        if (
+            (newLeft <= minX + 20 &&
+                centerBall > topPlayer && centerBall < topPlayer + heightPlayer) // ||
+                //(newLeft + ball.clientWidth >= maxX - 20 &&
+                //    centerBall > topPlayer && centerBall < topPlayer + heightPlayer)
+            ) {
+                console.log("centerBall: " + centerBall);
+                console.log(", topPlayer: " + topPlayer);
+                console.log(", heightPlayer: " + (topPlayer + heightPlayer));
+                console.log("goal!!!!");
+                direccionX *= -1;
+            }
+            if (newLeft <= minX || newLeft + ball.clientWidth >= maxX) {// table.clientWidth) {
+                direccionX *= -1; // Invertir la dirección en el eje X
+                if (newLeft <= minX)
+                    score2++;
+                //document.getElementById('score1').textContent = score1 + 1;
+                else
+                score1++;
+            //document.getElementById('score2').textContent = score1 + 1;
+        }
+        
+        // Aplicar nuevas posiciones
+        ball.style.top = newTop + "px";
+        ball.style.left = newLeft + "px";
+        if (score1 >= 10 || score2 >= 10)
+            //return ;
+            clearInterval(Match);
+    }
+    
+    // Configurar el movimiento automático con setInterval
+    let Match = setInterval(moverCirculo, 10); // Mueve el círculo cada 10ms
 }
-
-// Inicia el movimiento cuando la página se carga
-window.onload = function() {
-  move();
-};

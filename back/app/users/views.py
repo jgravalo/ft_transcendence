@@ -14,3 +14,5 @@ def login(request):
         "content": content
     }
     return JsonResponse(data)
+
+#def set_login()

@@ -5,7 +5,7 @@ class Match(WebsocketConsumer):
     def connect(self):
         # Aceptar la conexión WebSocket
         self.accept()
-        self.send(text_data=json.dumps({"message": "Conexión WebSocket exitosa"}))
+        self.send(text_data=json.dumps({"message": "Conexión WebSocket exitosa from Django"}))
 
     def disconnect(self, close_code):
         # Desconectar el WebSocket
@@ -15,7 +15,6 @@ class Match(WebsocketConsumer):
         # Recibir un mensaje desde el WebSocket
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-
         # Enviar un mensaje de vuelta al WebSocket
         self.send(text_data=json.dumps({
             'message': message

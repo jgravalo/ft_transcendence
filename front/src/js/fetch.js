@@ -12,6 +12,8 @@ document.getElementById('gameButton').addEventListener('click', function(event) 
     console.log(window.location.pathname);
 }); */
 
+//window.addEventListener('popstate', handleLink);
+
 handleLinks();
 
 function handleLinks()
@@ -28,18 +30,32 @@ function handleLink(event)
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
     var path = event.currentTarget.getAttribute('href');
     //var base = window.location.origin;
+    //var base = window.location.origin.slice();
     var base = "http://localhost";
-    var base_test = "http://localhost";
     if (path == "/")
         path = "";
     else
-        path += "/";
+    path += "/";
     var state = base + path;
+    var title = path.slice(1, -1);
+    console.log("page = <" + title + ">");
+    window.history.pushState(
+        { page: title},
+        //title[0].toUpperCase() + title.slice(1),
+        title,
+        "/" + title
+    );
+    console.log("base = <" + base + ">");
     console.log("path = <" + path + ">");
     console.log("state = <" + state + ">");
     console.log("fetch = <" + base + ":8000" + path + ">");
     //window.history.pushState({path: state}, '', state); // Revisar Uncaught DOMException: The operation is insecure.
     console.log("funciono");
+    fetchLink(base, path);
+}
+
+function fetchLink(base, path)
+{
     fetch(base + ":8000" + path)
         .then(response => response.json()) // Convertir la respuesta a JSON
         .then(data => {
