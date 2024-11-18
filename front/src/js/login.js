@@ -1,40 +1,25 @@
 document.getElementById('openLoginModal').addEventListener('click', function(event) {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
-    makeForm();
+    loginForm();
 });
-
-/*
-    fetch(base + ":8000" + "/login")
-        .then(response => response.json()) // Convertir la respuesta a JSON
-        .then(data => {
-            // Agrega una nueva URL al historial sin recargar
-            //window.history.pushState({ page: "home" }, "Home", "/home");
-            console.log("esta en handleLink");
-            console.log(data); // Ver los datos en consola
-            document.getElementById('modalContainer').innerHTML = `${data.content}`;
-            var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
-            handleLinks();
-            myModal.show();
-
-    // Manejador del evento de envío del formulario
-            document.getElementById('loginForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                // Obtener los valores de los inputs
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-
-                console.log('Correo Electrónico:', email);
-                console.log('Contraseña:', password);
-                })})
-        .catch(error => {
-            console.error('Error al obtener productos:', error);
-        });*/
-
-function makeForm()
+function loginForm()
 {
     // Crear la estructura del modal como una cadena de texto
-    const modalHTML = `
+    //var base = "http://localhost";
+    console.log("esta en login");
+    console.log(base + ":8000" + "/users/login");
+    fetch(base + ":8000" + "/users/login")
+        .then(response => response.json()) // Convertir la respuesta a JSON
+        .then(data => {
+            //document.getElementById('content').innerHTML = `${data.content}`;
+            const modalHTML = `${data.content}`;
+            makeForm(modalHTML);
+        })
+        .catch(error => {
+            console.error('Error al obtener productos:', error);
+        });
+        /*
+        const modalHTML = `
         <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="color: #000;">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -60,6 +45,12 @@ function makeForm()
             </div>
         </div>
     `;
+    makeForm(modalHTML);
+    */
+};
+
+function makeForm(modalHTML)
+{
 
     // Insertar el modal en el contenedor
     document.getElementById('modalContainer').innerHTML = modalHTML;

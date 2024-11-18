@@ -18,6 +18,7 @@ def get_home(request):
         "id": "52263",
         "player1": "jgravalo",
         "player2": "IA",
+        "element": 'content',
         "content": content
     }
     #print(data)
