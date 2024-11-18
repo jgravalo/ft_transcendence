@@ -1,5 +1,5 @@
 
-function makeForm() //modalHTML)
+function makeLogin() //modalHTML)
 {
     // Mostrar el modal
     console.log("esta en makeForm");
@@ -12,12 +12,17 @@ function makeForm() //modalHTML)
         event.preventDefault();
 
         // Obtener los valores de los inputs
+        //const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         console.log('Correo Electrónico:', email);
         console.log('Contraseña:', password);
         let valid = true;
         // Validaciones
+        /* if (username.slice(3) === 'AI ') {
+            document.getElementById('errorEmail').textContent = 'Ingresa un correo válido.';
+            valid = false;
+        } */
         if (email === '' || !email.includes('@')) {
             document.getElementById('errorEmail').textContent = 'Ingresa un correo válido.';
             valid = false;
@@ -26,9 +31,27 @@ function makeForm() //modalHTML)
             document.getElementById('errorPassword').textContent = 'La contraseña debe tener al menos 6 caracteres.';
             valid = false;
         }
+        /*
+        const data = {
+            //username: username,
+            email: email,
+            password: password
+        };
+        */
+        fetch(base + ":8000/users/set_login/"/*, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        }*/)
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+
         // Si todo es válido, enviar formulario
         if (valid) {
-            alert('Formulario enviado con éxito');
+            //alert('Formulario enviado con éxito');
             document.getElementById('close').click();
         }
         else

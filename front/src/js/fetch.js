@@ -60,7 +60,7 @@ function fetchLink(base, path)
             var dest = `${data.element}`;
             document.getElementById(dest).innerHTML = `${data.content}`;
             if (path == "/users/login/")
-                makeForm();
+                makeLogin();
             else 
                 handleLinks();
         })
