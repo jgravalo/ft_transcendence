@@ -16,19 +16,18 @@ def login(request):
     }
     return JsonResponse(data)
 
- #def set_login(request)
- #{
-#     if request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             email = data.get('email')
-#             password = data.get('password')
-#             #User(email, password);
-#             return JsonResponse({'mensaje': f'Hola, {email}. Tienes {password} años.'})
-#         except json.JSONDecodeError:
-#             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
- #    return JsonResponse({'mensaje': f'Hola, \"email\". Tienes \"password\" años.'})
- #}
+def set_login(request):
+    #return JsonResponse({'mensaje': 'Hola, \"email\". Tienes \"password\" años.'})
+    print('aqui')
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            password = data.get('password')
+            #User(email, password);
+            return JsonResponse({'mensaje': f'Hola, {email}. Tienes {password} años.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
 def sign_up(request):
     content = render_to_string('sign_up.html')

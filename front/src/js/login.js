@@ -31,22 +31,25 @@ function makeLogin() //modalHTML)
             document.getElementById('errorPassword').textContent = 'La contraseña debe tener al menos 6 caracteres.';
             valid = false;
         }
-        /*
+        
         const data = {
             //username: username,
             email: email,
             password: password
         };
-        */
-        fetch(base + ":8000/users/set_login/"/*, {
+        console.log("hace fetch con data")
+        fetch(base + ":8000/users/set_login/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data),
-        }*/)
+        })
             .then(response => response.json())
-            .then(data => console.log(data))
+            .then(data => {
+                console.log("imprime data")
+                console.log(data)
+            })
             .catch(error => console.error('Error:', error));
 
         // Si todo es válido, enviar formulario
