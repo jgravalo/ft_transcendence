@@ -24,6 +24,12 @@ EXPOSE 8001
 # Definir las variables de entorno necesarias (por ejemplo, si usas PostgreSQL)
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+
+ENV CREATE_SUPERUSER=true
+ENV DJANGO_SUPERUSER_USERNAME=admin
+ENV DJANGO_SUPERUSER_PASSWORD=admin
+ENV DJANGO_SUPERUSER_EMAIL=admin@example.com
+
 # Establece la variable de entorno para las configuraciones de Django
 ENV DJANGO_SETTINGS_MODULE=app.settings
 
@@ -32,4 +38,7 @@ ENV DJANGO_SETTINGS_MODULE=app.settings
 #CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
 # Comando para ejecutar Daphne en el contenedor
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "app.asgi:application"]
+#CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "app.asgi:application"]
+COPY init.sh .
+RUN chmod +x init.sh
+CMD ["sh", "init.sh"]

@@ -64,7 +64,7 @@ function makeLogin() //modalHTML)
                 console.log(data)
             })
             .catch(error => {
-                console.log("llego a js");
+                console.log("error llego a js");
                 console.error('Error:', error)
             });
 
