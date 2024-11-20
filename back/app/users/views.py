@@ -4,6 +4,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.http import JsonResponse
 import json
+from .models import User
 
 # Create your views here.
 def login(request):
@@ -25,7 +26,14 @@ def set_login(request):
             data = json.loads(request.body)
             email = data.get('email')
             password = data.get('password')
-            #User(email, password);
+            # # Usando create()
+            # user = User.objects.create(email=email, password=password)
+
+            # # Instanciando y luego guardando
+            # user = User(email=email, password=password)
+            # user.save()
+
+            #return JsonResponse({'mensaje': f'Hola, {user.email}. Tienes {user.password} años.'})
             return JsonResponse({'mensaje': f'Hola, {email}. Tienes {password} años.'})
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
