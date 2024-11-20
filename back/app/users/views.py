@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 
 from django.http import HttpResponse
 from django.http import JsonResponse
+import json
 
 # Create your views here.
 def login(request):
@@ -18,9 +19,9 @@ def login(request):
 
 def set_login(request):
     #return JsonResponse({'mensaje': 'Hola, \"email\". Tienes \"password\" años.'})
-    print('aqui')
     if request.method == "POST":
         try:
+            print('aqui')
             data = json.loads(request.body)
             email = data.get('email')
             password = data.get('password')

@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware', # token CSRF
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -66,6 +66,11 @@ CORS_ALLOW_ALL_ORIGINS = True # cors-headers
 #    "http://127.0.0.1:8000",
 #    "http://jgravalo.42.fr:8000",
 #]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8080',  # Dominio del frontend
+    'http://127.0.0.1:8080',  # También si se usa con IP
+]
 
 TEMPLATES = [
     {

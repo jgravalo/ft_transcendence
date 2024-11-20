@@ -1,4 +1,17 @@
 
+function getCSRFToken() {
+    const cookies = document.cookie.split(';');
+    console.log("how many cookies");
+    for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'csrftoken') {
+            console.log("CookieValue = <" + value + ">");
+            return value;
+        }
+    }
+    return null;
+}
+
 function makeLogin() //modalHTML)
 {
     // Mostrar el modal
@@ -10,7 +23,6 @@ function makeLogin() //modalHTML)
     const form =  document.getElementById('loginForm');
     form.addEventListener('submit', function(event) {
         event.preventDefault();
-
         // Obtener los valores de los inputs
         //const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
@@ -32,7 +44,7 @@ function makeLogin() //modalHTML)
             valid = false;
         }
         
-        const data = {
+        const datos = {
             //username: username,
             email: email,
             password: password
@@ -42,15 +54,19 @@ function makeLogin() //modalHTML)
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(datos),
         })
             .then(response => response.json())
             .then(data => {
                 console.log("imprime data")
                 console.log(data)
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.log("llego a js");
+                console.error('Error:', error)
+            });
 
         // Si todo es válido, enviar formulario
         if (valid) {
