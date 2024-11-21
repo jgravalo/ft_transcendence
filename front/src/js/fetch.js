@@ -11,7 +11,7 @@ window.addEventListener('popstate', handlePopstate);
 function handlePopstate()
 {
     var path = window.location.href;
-    fetchLink(base, path);
+    fetchLink(path);
 }
 
 handleLinks();

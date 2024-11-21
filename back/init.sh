@@ -5,6 +5,7 @@ set -e
 
 # Ejecuta las migraciones
 echo "Aplicando migraciones..."
+python manage.py makemigrations
 python manage.py migrate
 
 # Crea un usuario administrador si es necesario (opcional)

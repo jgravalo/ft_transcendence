@@ -36,14 +36,16 @@ def set_login(request):
             email = data.get('email')
             password = data.get('password')
             # # Usando create()
-            # user = User.objects.create(email=email, password=password)
+            user = User.objects.create(email=email, password=password)
+            print(user.email)
+            print(user.password)
 
             # # Instanciando y luego guardando
             # user = User(email=email, password=password)
             # user.save()
 
-            #return JsonResponse({'mensaje': f'Hola, {user.email}. Tienes {user.password} años.'})
-            return JsonResponse({'mensaje': f'Hola, {email}. Tienes {password} años.'})
+            return JsonResponse({'mensaje': f'Hola, user: {user.email}. Tienes {user.password} años.'})
+            #return JsonResponse({'mensaje': f'Hola, {email}. Tienes {password} años.'})
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
