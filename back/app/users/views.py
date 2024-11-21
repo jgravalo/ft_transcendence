@@ -18,6 +18,15 @@ def login(request):
     }
     return JsonResponse(data)
 
+def close_login(request):
+    content = render_to_string('close_login.html')
+    data = {
+        "element": 'log_links',
+        "content": content
+    }
+    return JsonResponse(data)
+
+#@csrf_exempt
 def set_login(request):
     #return JsonResponse({'mensaje': 'Hola, \"email\". Tienes \"password\" años.'})
     if request.method == "POST":

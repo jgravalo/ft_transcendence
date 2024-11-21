@@ -46,10 +46,10 @@ function handleLink(event)
         "/" + title
     );
     console.log("path = " + path);
-    fetchLink(base, path);
+    fetchLink(path);
 }
 
-function fetchLink(base, path)
+function fetchLink(path)
 {
     fetch(base + ":8000" + path)
         .then(response => response.json()) // Convertir la respuesta a JSON

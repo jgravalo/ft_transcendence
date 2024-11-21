@@ -72,6 +72,8 @@ function makeLogin() //modalHTML)
         if (valid) {
             //alert('Formulario enviado con éxito');
             document.getElementById('close').click();
+            fetchLink('/users/close_login/');
+            document.getElementById('Home').click();
         }
         else
         {

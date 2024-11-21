@@ -1,19 +1,19 @@
 function Match()
 {
     //const ruta = "ws://" + window.location.host + "/ws/game/sock"; // wss:// si usamos https
-    const ruta = "ws://localhost:8000/ws/game"; // wss:// si usamos https
+    const ruta = "ws://localhost:8000/ws/game/"; // wss:// si usamos https
     console.log(ruta);
     const socket = new WebSocket(ruta);
 
     socket.onopen = function(event) {
         console.log("Conexión WebSocket abierta");
     };
-    
+
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         console.log("Mensaje recibido del servidor:", data.message);
     };
-    
+
     socket.onerror = function(event) {
         console.error("Error en WebSocket:", event);
     };
