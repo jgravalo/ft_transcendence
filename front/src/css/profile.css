@@ -1,3 +1,11 @@
+.info {
+	height: 300px;
+	border: 5px solid white;
+	border-radius: 30px;
+	margin: 5px;
+	background-color: black;
+}
+
 .fila {
 	display: flex;
 }

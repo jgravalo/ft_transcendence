@@ -1,6 +1,9 @@
 all:
 	docker compose -f docker-compose.yml up -d --build
 
+down:
+	docker compose -f docker-compose.yml down
+
 front:
 	docker build -t front ./front
 	docker run -d -p 8080:80 front
@@ -13,8 +16,8 @@ migrations:
 	docker exec -it back python manage.py makemigrations
 	docker exec -it back python manage.py migrate
 
-down:
-	docker compose -f docker-compose.yml down
+dbshell:
+	docker exec -it db psql -U jgravalo -d postgres
 
 ls:
 	@docker ps -a
@@ -44,4 +47,4 @@ re:
 	make clean
 	make all
 
-.PHONY: all front back migrations down ls clean
+.PHONY: all down front back migrations dbshell ls clean
