@@ -52,19 +52,19 @@ body {
   text-decoration: none;
 }
 
+.link {
+  color: white;
+}
+
 #header {
 	font-size: xx-large;
 	color: white;
 }
 
 a {
-  color: white;
+  /* color: white; */
   text-decoration: none;
   font-size: large;
-}
-
-a:hover {
-  text-decoration: white;
 }
 
 button {
