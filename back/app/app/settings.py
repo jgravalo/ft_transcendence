@@ -106,6 +106,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': os.getenv('DJANGO_DB_NAME', '42Pong'),
+    #     'USER': os.getenv('DJANGO_DB_USER', 'jgravalo'),
+    #     'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
+    #     'HOST': os.getenv('DJANGO_DB_HOST', 'localhost'),
+    #     'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
+    # }
 }
 
 

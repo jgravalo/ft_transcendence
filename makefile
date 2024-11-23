@@ -9,6 +9,10 @@ back:
 	docker build -t front ./back
 	docker run -d -p 8080:80 back
 
+migrations:
+	docker exec -it back python manage.py makemigrations
+	docker exec -it back python manage.py migrate
+
 down:
 	docker compose -f docker-compose.yml down
 
@@ -40,4 +44,4 @@ re:
 	make clean
 	make all
 
-.PHONY: all front back down ls clean
+.PHONY: all front back migrations down ls clean
