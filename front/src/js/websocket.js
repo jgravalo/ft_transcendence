@@ -1,7 +1,32 @@
 function Match()
 {
-    //const ruta = "ws://" + window.location.host + "/ws/game/sock"; // wss:// si usamos https
-    const ruta = "ws://localhost:8000/ws/game/"; // wss:// si usamos https
+    //const ruta = "ws://" + window.location.host + "/ws/game/"; // wss:// si usamos https
+    
+    const socket = new WebSocket('ws://localhost:8000/ws/game/');
+
+    // Escuchar eventos de conexión
+    socket.onopen = function (event) {
+        console.log("WebSocket conectado");
+        socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
+    };
+
+    // Escuchar mensajes desde el servidor
+    socket.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        console.log("Mensaje recibido del servidor:", data.message);
+    };
+
+    // Manejar desconexión
+    socket.onclose = function (event) {
+        console.log("WebSocket desconectado");
+    };
+
+    // Manejar errores
+    socket.onerror = function (error) {
+        console.error("WebSocket error:", error);
+    };
+    
+    /*const ruta = "ws://localhost:8000/ws/game/"; // wss:// si usamos https
     console.log(ruta);
     const socket = new WebSocket(ruta);
 
@@ -20,7 +45,7 @@ function Match()
     
     socket.onclose = function(event) {
         console.log("WebSocket cerrado:", event);
-    };
+    };*/
     /* 
         // Evento cuando la conexión se abre
         socket.onopen = function(e) {
