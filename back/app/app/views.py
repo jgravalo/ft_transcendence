@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 
 import game.routing
+#import users.models.User
 
 #from .models import Match
 #from .serializers import MatchSerializer

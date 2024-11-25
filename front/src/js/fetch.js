@@ -59,9 +59,11 @@ function fetchLink(path)
             //var dest = 'content';
             var dest = `${data.element}`;
             document.getElementById(dest).innerHTML = `${data.content}`;
-            if (path == "/users/login/")
-                makeLogin();
-            else 
+            if (path == "/users/login/" ||
+                path == "/users/register/"
+            )
+                makeLogin(path);
+            else
                 handleLinks();
         })
         .catch(error => {
