@@ -50,7 +50,7 @@ function makeLogin() //modalHTML)
             password: password
         };
         console.log("hace fetch con data")
-        fetch(base + ":8000/users/set_login/", {
+        fetch(base + ":8000/users/login/set/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -72,7 +72,7 @@ function makeLogin() //modalHTML)
         if (valid) {
             //alert('Formulario enviado con éxito');
             document.getElementById('close').click();
-            fetchLink('/users/close_login/');
+            fetchLink('/users/login/close/');
             document.getElementById('Home').click();
         }
         else

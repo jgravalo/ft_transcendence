@@ -49,12 +49,9 @@ def set_login(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
-def sign_up(request):
+def register(request):
     content = render_to_string('sign_up.html')
     data = {
-        "id": "52263",
-        "player1": "jgravalo",
-        "player2": "IA",
         "element": 'modalContainer',
         "content": content
     }
