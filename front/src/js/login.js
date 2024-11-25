@@ -77,7 +77,7 @@ function getInfoRegister()
 
     // Validaciones
     if (info.username.slice(3) === 'AI ') {
-        document.getElementById('errorName').textContent = 'Ingresa un correo válido.';
+        document.getElementById('errorName').textContent = 'Ingresa un usuario válido.';
         valid = false;
     }
     if (info.email === '' || !info.email.includes('@')) {
