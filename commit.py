@@ -5,7 +5,7 @@ import sys
 programa = "/usr/bin/git"
 
 # Argumentos para el programa (el primero suele ser el nombre del programa)
-args = [["git", "add", "."], ["git", "commit", "-m", sys.argv[0]], ["git", "push"]]
+args = [["git", "add", "."], ["git", "commit", "-m", sys.argv[1]], ["git", "push"]]
 
 # Variables de entorno (puedes copiar las existentes con os.environ)
 entorno = os.environ.copy()
