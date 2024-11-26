@@ -27,10 +27,11 @@ def make_token(user):
     print("JWT: " + token)
     return token
 
-def unlock_token():
+def decode_token(token):
     try:
         decoded_payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         print("Token válido:", decoded_payload)
+        return decoded_payload
     except jwt.ExpiredSignatureError:
         print("El token ha expirado.")
     except jwt.InvalidTokenError:
@@ -64,22 +65,27 @@ def set_login(request):
             # # Usando create()
             #user = User.objects.create(email=email, password=password, logged=True)
             user = User.objects.get(email=email)
+            print("login:")
             print(user.username)
             print(user.email)
             print(user.password)
             print(user.logged)
-            print(user.jwt)
+            print("jwt (login) = " + user.jwt)
 
             # # Instanciando y luego guardando
             # user = User(email=email, password=password)
             # user.save()
-            data = {
-                "username": user.username,
-                "email": user.email,
-                "password": user.password,
-                "logged": user.logged,
-                "jwt": user.jwt
-            }
+
+            # data = {
+            #     "username": user.username,
+            #     "email": user.email,
+            #     "password": user.password,
+            #     "logged": user.logged,
+            #     "jwt": user.jwt
+            # }
+            data = decode_token(user.jwt)
+            print('data:')
+            print(data)
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
@@ -98,15 +104,6 @@ def set_register(request):
             data = json.loads(request.body)
             email = data.get('email')
             password = data.get('password')
-            # # Usando create()
-            user = User.objects.create(email=email, password=password, logged=True)
-            print(user.email)
-            print(user.password)
-            print(user.logged)
-            token = make_token(user)
-            User.objects.filter(email=user.email).update(jwt=token)
-            print("jwt = " + user.jwt)
-            
             #if username == '' or email == '':
             #return JsonResponse({'error': 'No deje campos vacios.'}, status=400)
             #if username[0:3] == "AI ":
@@ -115,6 +112,15 @@ def set_register(request):
             #return JsonResponse({'error': 'Ingresa un correo válido.'}, status=400)
             #if len(password) < 6:
             #return JsonResponse({'error': 'La contraseña debe tener al menos 6 caracteres.'}, status=400)
+            
+            # # Usando create()
+            user = User.objects.create(email=email, password=password, logged=True)
+            print(user.email)
+            print(user.password)
+            print(user.logged)
+            token = make_token(user)
+            User.objects.filter(email=user.email).update(jwt=token)
+            print("jwt(register) = " + user.jwt)
 
             # # Instanciando y luego guardando
             # user = User(email=email, password=password)
@@ -122,7 +128,8 @@ def set_register(request):
             data = {
                 "user": user.email,
                 "password": user.password,
-                "logged": user.logged
+                "logged": user.logged,
+                "jwt": user.jwt
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
