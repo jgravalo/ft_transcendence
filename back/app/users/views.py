@@ -1,8 +1,9 @@
-from django.shortcuts import render
-from django.template.loader import render_to_string
-
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
+
 import json
 from .models import User
 
@@ -55,7 +56,7 @@ def close_login(request):
     }
     return JsonResponse(data)
 
-#@csrf_exempt
+@csrf_exempt
 def set_login(request):
     if request.method == "POST":
         try:
@@ -98,6 +99,7 @@ def register(request):
     }
     return JsonResponse(data)
 
+@csrf_exempt
 def set_register(request):
     if request.method == "POST":
         try:
