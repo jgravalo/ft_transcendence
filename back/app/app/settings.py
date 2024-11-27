@@ -102,20 +102,28 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DJANGO_DB_NAME', '42Pong'),
+        'USER': os.getenv('DJANGO_DB_USER', 'jgravalo'),
+        'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
+        'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
+        'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
+
     # 'default': {
     #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.getenv('DJANGO_DB_NAME', '42Pong'),
-    #     'USER': os.getenv('DJANGO_DB_USER', 'jgravalo'),
-    #     'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
-    #     'HOST': os.getenv('DJANGO_DB_HOST', 'localhost'),
-    #     'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
-    # }
-}
+    #     'NAME': '42Pong',
+    #     'USER': 'jgravalo',
+    #     'PASSWORD': 'Jesus20022',
+    #     'HOST': 'db',  # Si usas Docker, cambia esto por el nombre del contenedor de la base de datos
+    #     'PORT': '5432',
 
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

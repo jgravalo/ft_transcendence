@@ -15,6 +15,7 @@ daphne==4.0
 
 # PostgreSQL Driver (psycopg2) para conectarse a una base de datos PostgreSQL
 psycopg2>=2.9
+psycopg2-binary>=2.9
 
 # PyJWT para crear y verificar tokens JWT
 PyJWT==2.8.0

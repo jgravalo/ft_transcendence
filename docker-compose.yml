@@ -1,7 +1,3 @@
-networks:
-  jgravalo-pongnet:
-    name: jgravalo-pongnet
-    driver: bridge
 
 services:
   front:
@@ -13,7 +9,7 @@ services:
       - "8080:80"
       - "8443:443"
     networks:
-      - jgravalo-pongnet
+      - pongnet
 
   back:
     container_name: back
@@ -22,15 +18,25 @@ services:
     image: back
     ports:
       - "8000:8000"
+    environment:
+      DATABASE_URL: "postgres://jgravalo:Jesus20022@db:5432/42Pong"
+    depends_on:
+      - db
     networks:
-      - jgravalo-pongnet
+      - pongnet
 
-  # db:
-  #   image: postgres:15
-  #   container_name: db
-  #   environment:
-  #     POSTGRES_USER: jgravalo
-  #     POSTGRES_PASSWORD: Jesus20022
-  #     POSTGRES_DB: 42Pong
-  #   networks:
-  #     - jgravalo-pongnet
+  db:
+    image: postgres:15
+    container_name: db
+    environment:
+      POSTGRES_USER: jgravalo
+      POSTGRES_PASSWORD: Jesus20022
+      POSTGRES_DB: 42Pong
+    networks:
+      - pongnet
+    ports:
+      - "5432:5432"
+
+networks:
+  pongnet:
+    driver: bridge
