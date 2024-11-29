@@ -18,24 +18,24 @@ services:
     image: back
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: "postgres://jgravalo:Jesus20022@db:5432/42Pong"
-    depends_on:
-      - db
+    # environment:
+    #   DATABASE_URL: "postgres://postgres:Jesus20022@db:5432/postgres"
+    # depends_on:
+    #   - db
     networks:
       - pongnet
 
-  db:
-    image: postgres:15
-    container_name: db
-    environment:
-      POSTGRES_USER: jgravalo
-      POSTGRES_PASSWORD: Jesus20022
-      POSTGRES_DB: 42Pong
-    networks:
-      - pongnet
-    ports:
-      - "5432:5432"
+  # db:
+  #   image: postgres:15
+  #   container_name: db
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: Jesus20022
+  #     POSTGRES_DB: postgres
+  #   networks:
+  #     - pongnet
+  #   ports:
+  #     - "5432:5432"
 
 networks:
   pongnet:

@@ -1,20 +1,44 @@
-function Match()
+function testWebSocket()
 {
     //const ruta = "ws://" + window.location.host + "/ws/game/"; // wss:// si usamos https
     
     const socket = new WebSocket('ws://localhost:8000/ws/game/');
-
+    
     // Escuchar eventos de conexión
     socket.onopen = function (event) {
         console.log("WebSocket conectado");
         socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
     };
-
+    
     // Escuchar mensajes desde el servidor
     socket.onmessage = function (event) {
         const data = JSON.parse(event.data);
         console.log("Mensaje recibido del servidor:", data.message);
     };
+    
+    document.addEventListener('keydown', function(event) 
+    {
+        if ((event.key === 'ArrowUp' || event.key === 'w')
+            && top - speed > minY)
+        {
+            socket.send(JSON.stringify({ message: "flecha arriba" }));
+            player.style.marginTop = (top - speed) + 'px';
+        }
+        else if ((event.key === 'ArrowDown' || event.key === 's')
+            && top + speed < maxY - playerHeight - 30)
+        {
+            socket.send(JSON.stringify({ message: "flecha abajo" }));
+            //player.style.marginTop = (top + speed) + 'px';
+        }
+    });
+/* 
+    document.addEventListener('keydown', function(event) 
+    {
+        if (event.key === 'ArrowUp' || event.key === 'w')
+            socket.send(JSON.stringify({ message: "flecha arriba" }));
+        else if (event.key === 'ArrowDown' || event.key === 's')
+            socket.send(JSON.stringify({ message: "flecha abajo" }));
+    }); */
 
     // Manejar desconexión
     socket.onclose = function (event) {
@@ -25,53 +49,4 @@ function Match()
     socket.onerror = function (error) {
         console.error("WebSocket error:", error);
     };
-    
-    /*const ruta = "ws://localhost:8000/ws/game/"; // wss:// si usamos https
-    console.log(ruta);
-    const socket = new WebSocket(ruta);
-
-    socket.onopen = function(event) {
-        console.log("Conexión WebSocket abierta");
-    };
-
-    socket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        console.log("Mensaje recibido del servidor:", data.message);
-    };
-
-    socket.onerror = function(event) {
-        console.error("Error en WebSocket:", event);
-    };
-    
-    socket.onclose = function(event) {
-        console.log("WebSocket cerrado:", event);
-    };*/
-    /* 
-        // Evento cuando la conexión se abre
-        socket.onopen = function(e) {
-            console.log("Conexión establecida");
-        };
-
-        // Evento cuando se recibe un mensaje
-        socket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            console.log("Mensaje recibido:", data.message);
-        };
-
-        // Evento cuando la conexión se cierra
-        socket.onclose = function(e) {
-            console.log("Conexión cerrada");
-        };
-
-        // Evento cuando hay un error
-        socket.onerror = function(e) {
-            console.error("Error en el WebSocket", e);
-        };
-
-        // Enviar un mensaje al WebSocket
-        document.getElementById('sendMessageButton').onclick = function() {
-            socket.send(JSON.stringify({
-                'message': 'Hola desde el cliente!'
-            }));
-        }; */
 }

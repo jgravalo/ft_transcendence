@@ -15,7 +15,19 @@ class Match(WebsocketConsumer):
         # Recibir un mensaje desde el WebSocket
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        # Enviar un mensaje de vuelta al WebSocket
-        self.send(text_data=json.dumps({
-            'message': message
-        }))
+        try:
+            player1 = text_data_json['player1']
+            player2 = text_data_json['player2']
+            print("player1:", text_data_json['player1'])
+            print("player2:", text_data_json['player2'])
+            # Enviar un mensaje de vuelta al WebSocket
+            self.send(text_data=json.dumps({
+                'message': 'exito',
+                'player1': player1,
+                'player2': player2
+            }))
+        except:
+            self.send(text_data=json.dumps({
+                'message': 'error'
+            }))
+        
