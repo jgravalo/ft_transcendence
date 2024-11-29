@@ -16,7 +16,7 @@ function startGame()
     socket.onmessage = function (event) {
         const data = JSON.parse(event.data);
         //console.log("Mensaje recibido del servidor:", data.message);
-        console.log("player1 after:", data.player1, "player2 after:", data.player2);
+        //console.log("player1 after:", data.player1, "player2 after:", data.player2);
         document.getElementById('left').style.marginTop = data.player1;
         document.getElementById('right').style.marginTop = data.player2;
     };
@@ -54,7 +54,7 @@ function startGame()
             dir2 = -1;
         else if (event.key === 'ArrowDown' && top2 + speed < maxY - playerHeight - 30)
             dir2 = 1;
-        console.log("player1 before:", (top1 + (dir1 * speed)) + 'px', "player2 before:", (top2 + (dir2 * speed)) + 'px');
+        //console.log("player1 before:", (top1 + (dir1 * speed)) + 'px', "player2 before:", (top2 + (dir2 * speed)) + 'px');
         socket.send(JSON.stringify({
             message: (top1 + (dir1 * speed)) + 'px',
             player1: (top1 + (dir1 * speed)) + 'px',
@@ -83,7 +83,8 @@ function startGame()
         const marginTable = 15;
         const ball = document.getElementById("ball");
         const table = document.getElementById('table');
-        const player = document.getElementById('left');
+        const player1 = document.getElementById('left');
+        const player2 = document.getElementById('right');
         
         const minY = table.getBoundingClientRect().top + marginTable;
         const maxY = table.getBoundingClientRect().height - (2 * marginTable) + minY;
@@ -106,9 +107,8 @@ function startGame()
         let centerBall = topBall + (heightBall / 2);
         
         //let topPlayer = parseInt(window.getComputedStyle(player).top);
-        let topPlayer = player.getBoundingClientRect().top;
-        //let heightPlayer = parseInt(window.getComputedStyle(player).height);
-        let heightPlayer = player.getBoundingClientRect().height;
+        let topPlayer1 = player1.getBoundingClientRect().top;
+        let topPlayer2 = player2.getBoundingClientRect().top;
         
         // Calcular nuevas posiciones
         let newTop = topBall + direccionY;
@@ -119,13 +119,15 @@ function startGame()
         ) {// table.clientHeight) {
             direccionY *= -1; // Invertir la dirección en el eje Y
         }
-        if (newLeft <= minX + 20 &&
-                centerBall > topPlayer && centerBall < topPlayer + heightPlayer)
+        if ((newLeft <= minX + 20 &&
+                centerBall > topPlayer1 && centerBall < topPlayer1 + playerHeight) ||
+            (newLeft <= maxX - 20 &&
+                centerBall > topPlayer2 && centerBall < topPlayer2 + playerHeight))
         {
-            console.log("centerBall: " + centerBall);
-            console.log(", topPlayer: " + topPlayer);
-            console.log(", heightPlayer: " + (topPlayer + heightPlayer));
-            console.log("goal!!!!");
+            // console.log("centerBall: " + centerBall);
+            // console.log(", topPlayer: " + topPlayer);
+            // console.log(", heightPlayer: " + (topPlayer + heightPlayer));
+            // console.log("goal!!!!");
             direccionX *= -1;
         }
             // Aplicar nuevas posiciones
@@ -140,7 +142,6 @@ function startGame()
             else
                 score1++;
         }
-        
         if (score1 >= 10 || score2 >= 10)
             clearInterval(Match);
     }
