@@ -31,19 +31,27 @@ function startGame()
         console.error("WebSocket error:", error);
     };
 
-    
     const speed = 5;
     const table = document.getElementById('table');
     const playerHeight = document.getElementById('left').getBoundingClientRect().height;
-    //console.log("height", playerHeight);
+    var moveP1;
+    var moveP2;
+    
+    var dir1 = 0;
+    var dir2 = 0;
+    document.addEventListener('keyup', function(event)
+    {
+        if (event.key === 'w' || event.key === 's')
+            dir1 = 0;
+        else if (event.key === 'ArrowUp' || event.key === 'ArrowDown')
+            dir2 = 0;
+    });
     document.addEventListener('keydown', function(event)
     {
         const maxY = table.getBoundingClientRect().height;
         const minY = 0;
-        var dir1 = 0;
         const player1 = document.getElementById('left');
         const top1 = parseInt(window.getComputedStyle(player1).marginTop);
-        var dir2 = 0;
         const player2 = document.getElementById('right');
         const top2 = parseInt(window.getComputedStyle(player2).marginTop);
         if (event.key === 'w' && top1 - speed > minY)
@@ -57,13 +65,15 @@ function startGame()
         else
             return ;
         //console.log("player1 before:", (top1 + (dir1 * speed)) + 'px', "player2 before:", (top2 + (dir2 * speed)) + 'px');
-        socket.send(JSON.stringify({
-            message: (top1 + (dir1 * speed)) + 'px',
-            player1: (top1 + (dir1 * speed)) + 'px',
-            player2: (top2 + (dir2 * speed)) + 'px'
-        }));
+        moveP1 = (top1 + (dir1 * speed)) + 'px';
+        moveP2 = (top2 + (dir2 * speed)) + 'px';
+        /* socket.send(JSON.stringify({
+            message: 'message',
+            player1: moveP1,
+            player2: moveP2
+        })); */
     });
-
+    
     // SCORES
     var score1 = 0;
     var score2 = 0;
@@ -74,9 +84,9 @@ function startGame()
     
     // Tamaño del paso de movimiento y dirección inicial
     const ballSpeed = 1;
-    let direccionX = ballSpeed;
-    let direccionY = ballSpeed;
-
+    let dirBallX = ballSpeed;
+    let dirBallY = ballSpeed;
+    
     function moverCirculo() {
         // Muestra el número en el contenedor
         document.getElementById('score1').textContent = score1;
@@ -98,56 +108,47 @@ function startGame()
         let heightBall = parseInt(window.getComputedStyle(ball).height);
         let centerBall = topBall + (heightBall / 2);
         
-        //let topPlayer = parseInt(window.getComputedStyle(player).top);
         let topPlayer1 = player1.getBoundingClientRect().top;
         let topPlayer2 = player2.getBoundingClientRect().top;
         
-        // Calcular nuevas posiciones
-        // console.log("dirX:", direccionY, "dirY:", direccionY);
-        // console.log("leftBall:", leftBall, "topBall:", topBall);
-        let newTop = topBall + direccionY;
-        let newLeft = leftBall + direccionX;
+        let newTop = topBall + dirBallY;
+        let newLeft = leftBall + dirBallX;
         
         // Comprobar si el círculo ha tocado los bordes del contenedor
-        if (newTop <= minY || newTop + ball.clientHeight >= maxY
-        ) {// table.clientHeight) {
-            direccionY *= -1; // Invertir la dirección en el eje Y
-        }
-        if (newLeft + playerHeight >= maxX - 20)
-            console.log("TOCADO!!!", newLeft + playerHeight, "maxY:", maxX);
+        if (newTop <= minY || newTop + ball.clientHeight >= maxY)
+            dirBallY *= -1; // Invertir la dirección en el eje Y
         if ((newLeft <= minX + 20 &&
-                centerBall > topPlayer1 && centerBall < topPlayer1 + playerHeight) ||
+            centerBall > topPlayer1 && centerBall < topPlayer1 + playerHeight) ||
             (newLeft + heightBall >= maxX - 20 &&
                 centerBall > topPlayer2 && centerBall < topPlayer2 + playerHeight))
-        {
-            // console.log("centerBall: " + centerBall);
-            // console.log(", topPlayer: " + topPlayer);
-            // console.log(", heightPlayer: " + (topPlayer + heightPlayer));
-            // console.log("goal!!!!");
-            direccionX *= -1;
-        }
-            // Aplicar nuevas posiciones
-        ball.style.top = newTop + "px";
-        ball.style.left = newLeft + "px";
-        if (newLeft <= minX || newLeft + ball.clientWidth >= maxX) {// table.clientWidth) {
-            direccionX *= -1; // Invertir la dirección en el eje X
-            ball.style.top = startBallY + "px";
-            ball.style.left = startBallX + "px";
-            if (newLeft <= minX)
-                score2++;
-            else
-                score1++;
-        }
-        if (score1 >= 10 || score2 >= 10)
-        {
-            if (score1 >= 10)
-                score1++;
-            if (score2 >= 10)
-                score2++;
-            clearInterval(Match);
-        }
-    }
-    
-    // Configurar el movimiento automático con setInterval
-    let Match = setInterval(moverCirculo, 5); // Mueve el círculo cada 5ms
-}
+                dirBallX *= -1;
+                // Aplicar nuevas posiciones
+                ball.style.top = newTop + "px";
+                ball.style.left = newLeft + "px";
+                if (newLeft <= minX || newLeft + ball.clientWidth >= maxX)
+                    {
+                        dirBallX *= -1; // Invertir la dirección en el eje X
+                        ball.style.top = startBallY + "px";
+                        ball.style.left = startBallX + "px";
+                        if (newLeft <= minX)
+                            score2++;
+                        else
+                        score1++;
+                }
+                socket.send(JSON.stringify({
+                    message: 'message',
+                    player1: moveP1,
+                    player2: moveP2
+                }));
+                if (score1 >= 10 || score2 >= 10)
+                    {
+                        document.getElementById('score1').textContent = score1;
+                        document.getElementById('score2').textContent = score2;
+                        clearInterval(Match);
+                    }
+                }
+                
+                // Configurar el movimiento automático con setInterval
+                let Match = setInterval(moverCirculo, 5); // Mueve el círculo cada 5ms
+            }
+            
