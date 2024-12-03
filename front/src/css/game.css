@@ -57,8 +57,8 @@
 	background-color: red;
 	border-radius: 50%;
 	position: absolute; /* Para que podamos moverlo con top y left */
-	top: 300px;
-	left: 400px;
+	top: 400px;
+	left: 50vw;
 }
 
 @keyframes moveBox {

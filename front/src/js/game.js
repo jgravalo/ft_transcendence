@@ -36,10 +36,10 @@ function startGame()
     const table = document.getElementById('table');
     const playerHeight = document.getElementById('left').getBoundingClientRect().height;
     //console.log("height", playerHeight);
-    const maxY = table.getBoundingClientRect().height;
-    const minY = 0;
     document.addEventListener('keydown', function(event)
     {
+        const maxY = table.getBoundingClientRect().height;
+        const minY = 0;
         var dir1 = 0;
         const player1 = document.getElementById('left');
         const top1 = parseInt(window.getComputedStyle(player1).marginTop);
@@ -76,7 +76,7 @@ function startGame()
     const ballSpeed = 1;
     let direccionX = ballSpeed;
     let direccionY = ballSpeed;
-    
+
     function moverCirculo() {
         // Muestra el número en el contenedor
         document.getElementById('score1').textContent = score1;
@@ -92,16 +92,6 @@ function startGame()
         const maxY = table.getBoundingClientRect().height - (2 * marginTable) + minY;
         const minX = table.getBoundingClientRect().left + marginTable;
         const maxX = table.getBoundingClientRect().width - (2 * marginTable) + minX;
-        
-        // const minY = parseInt(window.getComputedStyle(table).top) + marginTable;
-        // const maxY = parseInt(window.getComputedStyle(table).height) - (2 * marginTable) + minY;
-        // const minX = parseInt(window.getComputedStyle(table).left) + marginTable;
-        // const maxX = parseInt(window.getComputedStyle(table).width) - (2 * marginTable) + minX;
-        
-        // Obtener posición actual
-        // let topBall = ball.getBoundingClientRect().top;
-        // let leftBall = ball.getBoundingClientRect().left;
-        // let heightBall = ball.getBoundingClientRect().height;
         
         let topBall = parseInt(window.getComputedStyle(ball).top);
         let leftBall = parseInt(window.getComputedStyle(ball).left);
@@ -123,12 +113,14 @@ function startGame()
         ) {// table.clientHeight) {
             direccionY *= -1; // Invertir la dirección en el eje Y
         }
+        if (newLeft + playerHeight >= maxX - 20)
+            console.log("TOCADO!!!", newLeft + playerHeight, "maxY:", maxX);
         if ((newLeft <= minX + 20 &&
                 centerBall > topPlayer1 && centerBall < topPlayer1 + playerHeight) ||
-            (newLeft >= maxX - 20 &&
+            (newLeft + heightBall >= maxX - 20 &&
                 centerBall > topPlayer2 && centerBall < topPlayer2 + playerHeight))
         {
-            console.log("centerBall: " + centerBall);
+            // console.log("centerBall: " + centerBall);
             // console.log(", topPlayer: " + topPlayer);
             // console.log(", heightPlayer: " + (topPlayer + heightPlayer));
             // console.log("goal!!!!");
@@ -147,7 +139,13 @@ function startGame()
                 score1++;
         }
         if (score1 >= 10 || score2 >= 10)
+        {
+            if (score1 >= 10)
+                score1++;
+            if (score2 >= 10)
+                score2++;
             clearInterval(Match);
+        }
     }
     
     // Configurar el movimiento automático con setInterval
