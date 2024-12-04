@@ -123,43 +123,42 @@ function startGame()
         if (newTop <= minY || newTop + ball.clientHeight >= maxY)
             dirBallY *= -1; // Invertir la dirección en el eje Y
         if ((newLeft <= minX + 20 &&
-            centerBall > topPlayer1 && centerBall < topPlayer1 + playerHeight) ||
+                centerBall > topPlayer1 && centerBall < topPlayer1 + playerHeight) ||
             (newLeft + heightBall >= maxX - 20 &&
                 centerBall > topPlayer2 && centerBall < topPlayer2 + playerHeight))
-                dirBallX *= -1;
-                // Aplicar nuevas posiciones
-                // ball.style.top = newTop + "px";
-                // ball.style.left = newLeft + "px";
-                ballTop = newTop + "px";
-                ballLeft = newLeft + "px";
-                if (newLeft <= minX || newLeft + ball.clientWidth >= maxX)
-                    {
-                        dirBallX *= -1; // Invertir la dirección en el eje X
-                        // ball.style.top = startBallY + "px";
-                        // ball.style.left = startBallX + "px";
-                        ballTop = startBallY + "px";
-                        ballLeft = startBallX + "px";
-                        if (newLeft <= minX)
-                            score2++;
-                        else
-                        score1++;
-                }
-                socket.send(JSON.stringify({
-                    message: 'message',
-                    player1: moveP1,
-                    player2: moveP2,
-                    ballLeft: ballLeft,
-                    ballTop: ballTop
-                }));
-                if (score1 >= 10 || score2 >= 10)
-                    {
-                        document.getElementById('score1').textContent = score1;
-                        document.getElementById('score2').textContent = score2;
-                        clearInterval(Match);
-                    }
-                }
-                
-                // Configurar el movimiento automático con setInterval
-                let Match = setInterval(moverCirculo, 5); // Mueve el círculo cada 5ms
+            dirBallX *= -1;
+            // Aplicar nuevas posiciones
+            // ball.style.top = newTop + "px";
+            // ball.style.left = newLeft + "px";
+            ballTop = newTop + "px";
+            ballLeft = newLeft + "px";
+            if (newLeft <= minX || newLeft + ball.clientWidth >= maxX)
+            {
+                dirBallX *= -1; // Invertir la dirección en el eje X
+                // ball.style.top = startBallY + "px";
+                // ball.style.left = startBallX + "px";
+                ballTop = startBallY + "px";
+                ballLeft = startBallX + "px";
+                if (newLeft <= minX)
+                    score2++;
+                else
+                    score1++;
             }
+            socket.send(JSON.stringify({
+                message: 'message',
+                player1: moveP1,
+                player2: moveP2,
+                ballLeft: ballLeft,
+                ballTop: ballTop
+            }));
+            if (score1 >= 10 || score2 >= 10)
+            {
+                document.getElementById('score1').textContent = score1;
+                document.getElementById('score2').textContent = score2;
+                clearInterval(Match);
+            }
+        }   
+        // Configurar el movimiento automático con setInterval
+        let Match = setInterval(moverCirculo, 5); // Mueve el círculo cada 5ms
+}
             
