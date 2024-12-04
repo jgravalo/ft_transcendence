@@ -92,7 +92,8 @@ function startGame()
     let dirBallX = ballSpeed;
     let dirBallY = ballSpeed;
     
-    function moverCirculo() {
+    function moverCirculo()
+    {
         // Muestra el número en el contenedor
         document.getElementById('score1').textContent = score1;
         document.getElementById('score2').textContent = score2;
@@ -130,35 +131,35 @@ function startGame()
             // Aplicar nuevas posiciones
             // ball.style.top = newTop + "px";
             // ball.style.left = newLeft + "px";
-            ballTop = newTop + "px";
-            ballLeft = newLeft + "px";
-            if (newLeft <= minX || newLeft + ball.clientWidth >= maxX)
-            {
-                dirBallX *= -1; // Invertir la dirección en el eje X
-                // ball.style.top = startBallY + "px";
-                // ball.style.left = startBallX + "px";
-                ballTop = startBallY + "px";
-                ballLeft = startBallX + "px";
-                if (newLeft <= minX)
-                    score2++;
-                else
-                    score1++;
-            }
-            socket.send(JSON.stringify({
-                message: 'message',
-                player1: moveP1,
-                player2: moveP2,
-                ballLeft: ballLeft,
-                ballTop: ballTop
-            }));
-            if (score1 >= 10 || score2 >= 10)
-            {
-                document.getElementById('score1').textContent = score1;
-                document.getElementById('score2').textContent = score2;
-                clearInterval(Match);
-            }
-        }   
+        ballTop = newTop + "px";
+        ballLeft = newLeft + "px";
+        if (newLeft <= minX || newLeft + ball.clientWidth >= maxX)
+        {
+            dirBallX *= -1; // Invertir la dirección en el eje X
+            // ball.style.top = startBallY + "px";
+            // ball.style.left = startBallX + "px";
+            ballTop = startBallY + "px";
+            ballLeft = startBallX + "px";
+            if (newLeft <= minX)
+                score2++;
+            else
+                score1++;
+        }
+        socket.send(JSON.stringify({
+            message: 'message',
+            player1: moveP1,
+            player2: moveP2,
+            ballLeft: ballLeft,
+            ballTop: ballTop
+        }));
+        if (score1 >= 10 || score2 >= 10)
+        {
+            document.getElementById('score1').textContent = score1;
+            document.getElementById('score2').textContent = score2;
+            clearInterval(Match);
+        }
+    }   
         // Configurar el movimiento automático con setInterval
-        let Match = setInterval(moverCirculo, 5); // Mueve el círculo cada 5ms
+    let Match = setInterval(moverCirculo, 5); // Mueve el círculo cada 5ms
 }
             
