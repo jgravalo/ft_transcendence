@@ -1,5 +1,32 @@
 
 services:
+  # nginx-proxy:
+  #   image: jwilder/nginx-proxy
+  #   container_name: nginx-proxy
+  #   networks:
+  #     - pongnet
+  #   ports:
+  #     - "8080:80"
+  #     - "8443:443"
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock:ro
+  #     - ./certs:/etc/nginx/certs:rw
+  #     - ./vhost.d:/etc/nginx/vhost.d
+  #     - ./html:/usr/share/nginx/html
+
+  # nginx-proxy-letsencrypt:
+  #   image: jrcs/letsencrypt-nginx-proxy-companion
+  #   container_name: nginx-proxy-letsencrypt
+  #   networks:
+  #     - pongnet
+  #   depends_on:
+  #     - nginx-proxy
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - ./certs:/etc/nginx/certs:rw
+  #     - ./vhost.d:/etc/nginx/vhost.d
+  #     - ./html:/usr/share/nginx/html
+
   front:
     container_name: front
     build:
@@ -10,6 +37,10 @@ services:
       - "8443:443"
     networks:
       - pongnet
+    # environment:
+    #   - VIRTUAL_HOST=jgravalo.42.fr
+    #   - LETSENCRYPT_HOST=jgravalo.42.fr
+    #   - LETSENCRYPT_EMAIL=jgravalo@student.42barcelona.com
 
   back:
     container_name: back

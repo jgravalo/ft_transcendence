@@ -1,5 +1,6 @@
 # Usa la imagen oficial de Nginx como base
 FROM nginx:alpine
+#FROM nginx:latest
 
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /usr/share/nginx/html
@@ -8,7 +9,8 @@ WORKDIR /usr/share/nginx/html
 
 # Copia el archivo de configuración personalizado a la ubicación predeterminada de Nginx
 #COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY ./nginx.conf /etc/nginx/sites-enabled/default
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+#COPY ./nginx.conf /etc/nginx/sites-enabled/default
 #COPY nginx.conf /etc/nginx/conf.d/
 #RUN rm /etc/nginx/conf.d/default.conf
 COPY ./certs/nginx.crt /etc/nginx/certs/

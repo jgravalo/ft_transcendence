@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-2tl!jw4)_*9-ti+%cahe3d(!sd74$4xqjmrnk$rq$s+#oue31j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = []#'*'] # CAMBIAR!!! por el dominio
 
 # Application definition
 
@@ -40,8 +39,7 @@ INSTALLED_APPS = [
 
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.contenttypes',4886
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
@@ -67,10 +65,10 @@ CORS_ALLOW_ALL_ORIGINS = True # cors-headers
 #    "http://jgravalo.42.fr:8000",
 #]
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8080',  # Dominio del frontend
-    'http://127.0.0.1:8080',  # También si se usa con IP
-]
+CSRF_TRUSTED_ORIGINS = ['http://*:8080']
+#     'http://localhost:8080',  # Dominio del frontend
+#     'http://127.0.0.1:8080',  # También si se usa con IP
+# ]
 
 TEMPLATES = [
     {

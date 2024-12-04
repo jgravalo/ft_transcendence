@@ -4,7 +4,9 @@
 function startGame()
 {
     // PLAYER
-    const socket = new WebSocket('ws://localhost:8000/ws/game/');
+    const route = 'ws://' + base.slice(7) + ':8000/ws/game/';
+    console.log('ruta: ', route);
+    const socket = new WebSocket(route);
     
     // Escuchar eventos de conexión
     socket.onopen = function (event) {
@@ -123,14 +125,29 @@ function startGame()
         // Comprobar si el círculo ha tocado los bordes del contenedor
         if (newTop <= minY || newTop + ball.clientHeight >= maxY)
             dirBallY *= -1; // Invertir la dirección en el eje Y
+
+        if ((newLeft < minX + 20 &&
+                (topBall + heightBall == topPlayer1 || topBall == topPlayer1 + playerHeight)) ||
+            (newLeft + heightBall > maxX - 20 &&
+                (topBall + heightBall == topPlayer2 || topBall == topPlayer2 + playerHeight)))
+            dirBallY *= -1; // Invertir la dirección en el eje Y
+        /* if ((newLeft == minX + 20 &&
+                (topBall + heightBall == topPlayer1 || topBall == topPlayer1 + playerHeight)) ||
+            (newLeft + heightBall == maxX - 20 &&
+                (topBall + heightBall == topPlayer2 || topBall == topPlayer2 + playerHeight)))
+        {
+            dirBallX *= -1;
+            dirBallY *= -1;
+        } */
+
         if ((newLeft <= minX + 20 &&
                 centerBall > topPlayer1 && centerBall < topPlayer1 + playerHeight) ||
             (newLeft + heightBall >= maxX - 20 &&
                 centerBall > topPlayer2 && centerBall < topPlayer2 + playerHeight))
             dirBallX *= -1;
-            // Aplicar nuevas posiciones
-            // ball.style.top = newTop + "px";
-            // ball.style.left = newLeft + "px";
+        // Aplicar nuevas posiciones
+        // ball.style.top = newTop + "px";
+        // ball.style.left = newLeft + "px";
         ballTop = newTop + "px";
         ballLeft = newLeft + "px";
         if (newLeft <= minX || newLeft + ball.clientWidth >= maxX)

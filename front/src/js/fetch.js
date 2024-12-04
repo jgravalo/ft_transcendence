@@ -26,8 +26,10 @@ function handleLinks()
 }
 
 //var base = window.location.origin;
-//var base = window.location.origin.slice();
-var base = "http://localhost";
+var base = window.location.origin.slice(0, -5);
+console.log("base: ", base);
+//var base = "http://localhost";
+//console.log("base after: ", base);
 
 function handleLink(event)
 {
@@ -38,33 +40,38 @@ function handleLink(event)
     else
         path += "/";
     var state = base + path;
-    var title = path.slice(1, -1);
-    console.log("title = <" + title + ">");
-    window.history.pushState(
-        { page: title},
-        title,
-        "/" + title
-    );
     console.log("path = " + path);
     fetchLink(path);
 }
 
 function fetchLink(path)
 {
-    fetch(base + ":8000" + path)
-        .then(response => response.json()) // Convertir la respuesta a JSON
-        .then(data => {
-            console.log("esta en handleLink");
-            console.log(data); // Ver los datos en consola
-            //var dest = 'content';
-            var dest = `${data.element}`;
-            document.getElementById(dest).innerHTML = `${data.content}`;
-            if (path == "/users/login/" ||
-                path == "/users/register/"
-            )
-                makeLogin(path);
-            else
-                handleLinks();
+    fetch(base + ":8000" + path, {
+        method: "GET",
+        headers: {
+            'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
+        },
+    })
+    .then(response => response.json()) // Convertir la respuesta a JSON
+    .then(data => {
+        console.log("esta en handleLink");
+        var title = path.slice(1, -1);
+        console.log("title = <" + title + ">");
+        window.history.pushState(
+            { page: title},
+            title,
+            "/" + title
+        );
+        console.log(data); // Ver los datos en consola
+        //var dest = 'content';
+        var dest = `${data.element}`;
+        document.getElementById(dest).innerHTML = `${data.content}`;
+        if (path == "/users/login/" ||
+        path == "/users/register/"
+    )
+    makeLogin(path);
+    else
+    handleLinks();
         })
         .catch(error => {
             console.error('Error al obtener productos:', error);
