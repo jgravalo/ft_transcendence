@@ -39,15 +39,15 @@
 	/* 	margin: 10px; */
 	/* 	top: 290px;
 	position: absolute; */
+	margin-top: 150px;
 }
 
 #left {
-	margin-top: 50%;
 	margin-left: 10px;
 }
 
 #right {
-	margin-top: 50%;
+	/* margin-top: 150px; */
 	margin-right: 10px;
 }
 

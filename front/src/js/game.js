@@ -19,6 +19,9 @@ function startGame()
         //console.log("player1 after:", data.player1, "player2 after:", data.player2);
         document.getElementById('left').style.marginTop = data.player1;
         document.getElementById('right').style.marginTop = data.player2;
+        var ball = document.getElementById('ball');
+        ball.style.top = data.ballTop;
+        ball.style.left = data.ballLeft;
     };
 
     // Manejar desconexión
@@ -36,6 +39,8 @@ function startGame()
     const playerHeight = document.getElementById('left').getBoundingClientRect().height;
     var moveP1;
     var moveP2;
+    var ballLeft;
+    var ballTop;
     
     var dir1 = 0;
     var dir2 = 0;
@@ -123,13 +128,17 @@ function startGame()
                 centerBall > topPlayer2 && centerBall < topPlayer2 + playerHeight))
                 dirBallX *= -1;
                 // Aplicar nuevas posiciones
-                ball.style.top = newTop + "px";
-                ball.style.left = newLeft + "px";
+                // ball.style.top = newTop + "px";
+                // ball.style.left = newLeft + "px";
+                ballTop = newTop + "px";
+                ballLeft = newLeft + "px";
                 if (newLeft <= minX || newLeft + ball.clientWidth >= maxX)
                     {
                         dirBallX *= -1; // Invertir la dirección en el eje X
-                        ball.style.top = startBallY + "px";
-                        ball.style.left = startBallX + "px";
+                        // ball.style.top = startBallY + "px";
+                        // ball.style.left = startBallX + "px";
+                        ballTop = startBallY + "px";
+                        ballLeft = startBallX + "px";
                         if (newLeft <= minX)
                             score2++;
                         else
@@ -138,7 +147,9 @@ function startGame()
                 socket.send(JSON.stringify({
                     message: 'message',
                     player1: moveP1,
-                    player2: moveP2
+                    player2: moveP2,
+                    ballLeft: ballLeft,
+                    ballTop: ballTop
                 }));
                 if (score1 >= 10 || score2 >= 10)
                     {
