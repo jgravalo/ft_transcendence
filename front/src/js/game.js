@@ -1,6 +1,44 @@
 
 // MATCH
 
+function startAsyncGame()
+{
+    // PLAYER
+    const route = 'ws://' + base.slice(7) + ':8000/ws/game/async/';
+    console.log('ruta: ', route);
+    const socket = new WebSocket(route);
+    
+    // Escuchar eventos de conexión
+    socket.onopen = function (event) {
+        console.log("WebSocket conectado");
+        socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
+    };
+    
+    // Escuchar mensajes desde el servidor
+    socket.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        //console.log("Mensaje recibido del servidor:", data.message);
+        //console.log("player1 after:", data.player1, "player2 after:", data.player2);
+        /* document.getElementById('left').style.marginTop = data.player1;
+        document.getElementById('right').style.marginTop = data.player2;
+        var ball = document.getElementById('ball');
+        ball.style.top = data.ballTop;
+        ball.style.left = data.ballLeft; */
+        console.log(data.message);
+    };
+
+    // Manejar desconexión
+    socket.onclose = function (event) {
+        console.log("WebSocket desconectado");
+    };
+
+    // Manejar errores
+    socket.onerror = function (error) {
+        console.error("WebSocket error:", error);
+    };
+
+}
+
 function startGame()
 {
     // PLAYER
@@ -114,7 +152,7 @@ function startGame()
         let topBall = parseInt(window.getComputedStyle(ball).top);
         let leftBall = parseInt(window.getComputedStyle(ball).left);
         let heightBall = parseInt(window.getComputedStyle(ball).height);
-        let centerBall = topBall + (heightBall / 2);
+        let centerBallY = topBall + (heightBall / 2);
         
         let topPlayer1 = player1.getBoundingClientRect().top;
         let topPlayer2 = player2.getBoundingClientRect().top;
@@ -123,27 +161,20 @@ function startGame()
         let newLeft = leftBall + dirBallX;
         
         // Comprobar si el círculo ha tocado los bordes del contenedor
-        if (newTop <= minY || newTop + ball.clientHeight >= maxY)
+        if ((newTop <= minY || newTop + ball.clientHeight >= maxY))
             dirBallY *= -1; // Invertir la dirección en el eje Y
-
+        /* if ((newLeft <= minX + 20 &&
+                ((newTop + ball.clientHeight < topPlayer1 && centerBallY < topPlayer1) ||
+                (newTop + ball.clientHeight > topPlayer1 + playerHeight && centerBallY < topPlayer1 + playerHeight))) ||
+            (newLeft + heightBall >= maxX + 20 &&
+                ((newTop + ball.clientHeight < topPlayer2 && centerBallY < topPlayer2) ||
+                (newTop + ball.clientHeight > topPlayer2 + playerHeight && centerBallY < topPlayer2 + playerHeight))))
+            dirBallY *= -1; // Invertir la dirección en el eje Y */
+    
         if ((newLeft < minX + 20 &&
-                (topBall + heightBall == topPlayer1 || topBall == topPlayer1 + playerHeight)) ||
+                centerBallY > topPlayer1 && centerBallY < topPlayer1 + playerHeight) ||
             (newLeft + heightBall > maxX - 20 &&
-                (topBall + heightBall == topPlayer2 || topBall == topPlayer2 + playerHeight)))
-            dirBallY *= -1; // Invertir la dirección en el eje Y
-        /* if ((newLeft == minX + 20 &&
-                (topBall + heightBall == topPlayer1 || topBall == topPlayer1 + playerHeight)) ||
-            (newLeft + heightBall == maxX - 20 &&
-                (topBall + heightBall == topPlayer2 || topBall == topPlayer2 + playerHeight)))
-        {
-            dirBallX *= -1;
-            dirBallY *= -1;
-        } */
-
-        if ((newLeft <= minX + 20 &&
-                centerBall > topPlayer1 && centerBall < topPlayer1 + playerHeight) ||
-            (newLeft + heightBall >= maxX - 20 &&
-                centerBall > topPlayer2 && centerBall < topPlayer2 + playerHeight))
+                centerBallY > topPlayer2 && centerBallY < topPlayer2 + playerHeight))
             dirBallX *= -1;
         // Aplicar nuevas posiciones
         // ball.style.top = newTop + "px";

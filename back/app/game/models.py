@@ -6,6 +6,8 @@ class Match(models.Model):
     id_match = models.IntegerField()  # Campo de número decimal
     player1 = models.CharField(max_length=100)  # Campo de texto con longitud máxima
     player2 = models.CharField(max_length=100)  # Campo de texto con longitud máxima
+    p1_move = models.IntegerField(default=0)  # Campo de número decimal
+    p2_move = models.IntegerField(default=0)  # Campo de número decimal
     #precio = models.DecimalField(max_digits=10, decimal_places=2)  # Campo de número decimal
     #descripcion = models.TextField()  # Campo de texto largo
 
