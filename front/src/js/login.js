@@ -23,14 +23,13 @@ function makeLogin(path) //modalHTML)
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         // Obtener los valores de los inputs
-        let valid;// = true;
 
         if (path === '/users/login/')
-            valid, info = getInfoLogin();
+            info = getInfoLogin();
         else if (path === '/users/register/')
-            valid, info = getInfoRegister();
+            info = getInfoRegister();
 
-        console.log("valid ", valid);
+        console.log("valid: ", info.valid);
         console.log("hace fetch con data");
         fetch(base + ":8000" + path + "set/", {
             method: "POST",
@@ -42,16 +41,16 @@ function makeLogin(path) //modalHTML)
         })
         .then(response => response.json())
         .then(data => {
-            console.log("imprime data")
-            console.log(data)
+            console.log("imprime data");
+            console.log(data);
         })
         .catch(error => {
             console.log("error llego a js");
-            console.error('Error:', error)
+            console.error('Error:', error);
         });
         
         // Si todo es válido, enviar formulario
-        if (valid) {
+        if (info.valid) {
             //alert('Formulario enviado con éxito');
             document.getElementById('close').click();
             fetchLink('/users/login/close/');
@@ -68,7 +67,8 @@ function getInfoRegister()
         //username: username,
         username: document.getElementById('username').value,
         email: document.getElementById('email').value,
-        password: document.getElementById('password').value
+        password: document.getElementById('password').value,
+        valid: true
     };
     console.log('Usuario:', info.username);
     console.log('Correo Electrónico:', info.email);
@@ -88,14 +88,16 @@ function getInfoRegister()
         document.getElementById('errorPassword').textContent = 'La contraseña debe tener al menos 6 caracteres.';
         valid = false;
     }
-    return (valid, info);
+    info.valid = valid;
+    return (info);
 }
 
 function getInfoLogin()
 {
     const info = {
         email: document.getElementById('email').value,
-        password: document.getElementById('password').value
+        password: document.getElementById('password').value,
+        valid: true
     };
     console.log('Correo Electrónico:', info.email);
     console.log('Contraseña:', info.password);
@@ -110,5 +112,6 @@ function getInfoLogin()
         document.getElementById('errorPassword').textContent = 'La contraseña debe tener al menos 6 caracteres.';
         valid = false;
     }
-    return (valid, info);
+    info.valid = valid;
+    return (info);
 }

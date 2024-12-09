@@ -51,7 +51,7 @@ def login(request):
 def close_login(request):
     content = render_to_string('close_login.html')
     data = {
-        "element": 'log_links',
+        "element": 'bar',
         "content": content
     }
     return JsonResponse(data)
@@ -136,3 +136,11 @@ def set_register(request):
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+
+def profile(request):
+    content = render_to_string('profile.html')
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
