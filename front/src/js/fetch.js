@@ -68,10 +68,10 @@ function fetchLink(path)
         document.getElementById(dest).innerHTML = `${data.content}`;
         if (path == "/users/login/" ||
         path == "/users/register/"
-    )
-    makeLogin(path);
-    else
-    handleLinks();
+        )
+            makeLogin(path);
+        else
+            handleLinks();
         })
         .catch(error => {
             console.error('Error al obtener productos:', error);

@@ -16,6 +16,7 @@ body {
 
 #game {
   animation: fadeIn 2s ease-out;
+  --color: white;
 }
 
 #bar {
@@ -32,7 +33,7 @@ body {
 .bar-links {
   padding: 15px;
   font-weight: bold;
-  color: aliceblue;
+  --color: white;
   /* text-decoration: none; */
 }
 
@@ -53,7 +54,9 @@ body {
 }
 
 .link {
-  color: white;
+  /* color: white; */
+	color: var(--color);
+
 }
 
 #header {

@@ -137,6 +137,14 @@ def set_register(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
+def logout(request):
+    content = render_to_string('logout.html')
+    data = {
+        "element": 'modalContainer',
+        "content": content
+    }
+    return JsonResponse(data)
+
 def profile(request):
     content = render_to_string('profile.html')
     data = {

@@ -8,6 +8,7 @@
 
 .fila {
 	display: flex;
+	justify-content: center;
 }
 
 .item {
@@ -18,7 +19,7 @@
 	border-radius: 10%;
 	margin: 5px;
 	/* color: white; */
-	--color-fondo: white;
+	--color: white;
 	display: flex;
 	justify-content: center;
 	align-items: center; /* Centrado vertical */
@@ -30,11 +31,11 @@
 	height: 350px;
 	background-color: white;
 	/* color: black; */
-	--color-fondo: black;
+	color: black;
 
 }
-
+/* 
 .option {
 	font-size: 40px;
-	color: var(--color-fondo);
-}
+	color: var(--color);
+} */

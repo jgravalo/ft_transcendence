@@ -54,7 +54,9 @@ function makeLogin(path) //modalHTML)
             //alert('Formulario enviado con éxito');
             document.getElementById('close').click();
             fetchLink('/users/login/close/');
-            document.getElementById('Home').click();
+            // no llega a hacer el siguinte fetch
+            fetchLink('/users/profile/');
+            handleLinks();
         }
         else
             form.reset(); // Reiniciar formulario
