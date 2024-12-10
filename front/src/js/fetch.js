@@ -6,7 +6,7 @@ console.log("origin: <" + window.location.origin + ">");
 console.log("pathname: <" + window.location.pathname + ">");
 console.log("");
 */
-
+/* // averiguar para que sirve
 (function() {
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
@@ -26,7 +26,7 @@ console.log("");
 window.addEventListener('custom-navigation', () => {
     console.log('La URL cambió en la SPA:', window.location.href);
 });
-
+ */
 
 window.addEventListener('popstate', handlePopstate);
 
@@ -88,9 +88,9 @@ function fetchLink(path)
         //var dest = 'content';
         var dest = `${data.element}`;
         document.getElementById(dest).innerHTML = `${data.content}`;
-        if (path == "/users/login/" ||
-        path == "/users/register/"
-        )
+        if (dest == 'modalContainer')
+        //     path == "/users/login/" ||
+        // path == "/users/register/"
             makeLogin(path);
         else
             handleLinks();

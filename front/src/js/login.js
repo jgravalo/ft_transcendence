@@ -28,7 +28,8 @@ function makeLogin(path) //modalHTML)
             info = getInfoLogin();
         else if (path === '/users/register/')
             info = getInfoRegister();
-
+        /* else
+            fetchLink(/users/logout/); */
         console.log("valid: ", info.valid);
         console.log("hace fetch con data");
         fetch(base + ":8000" + path + "set/", {
