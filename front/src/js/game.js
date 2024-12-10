@@ -119,6 +119,7 @@ function startGame()
         })); */
     });
     
+    
     // SCORES
     var score1 = 0;
     var score2 = 0;
@@ -132,6 +133,13 @@ function startGame()
     let dirBallX = ballSpeed;
     let dirBallY = ballSpeed;
     
+    document.getElementById('offline-button').addEventListener('click', () => {
+        clearInterval(Match); // Detener el intervalo
+        ball.style.top = startBallY + "px";
+        ball.style.left = startBallX + "px";
+        console.log('Intervalo detenido');
+    });
+
     function moverCirculo()
     {
         // Muestra el número en el contenedor
@@ -206,7 +214,7 @@ function startGame()
             document.getElementById('score2').textContent = score2;
             clearInterval(Match);
         }
-    }   
+    }
         // Configurar el movimiento automático con setInterval
     let Match = setInterval(moverCirculo, 5); // Mueve el círculo cada 5ms
 }

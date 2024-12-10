@@ -6,6 +6,28 @@ console.log("origin: <" + window.location.origin + ">");
 console.log("pathname: <" + window.location.pathname + ">");
 console.log("");
 */
+
+(function() {
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    history.pushState = function (...args) {
+        originalPushState.apply(this, args);
+        window.dispatchEvent(new Event('custom-navigation'));
+    };
+
+    history.replaceState = function (...args) {
+        originalReplaceState.apply(this, args);
+        window.dispatchEvent(new Event('custom-navigation'));
+    };
+})();
+
+// Detectar la navegación personalizada
+window.addEventListener('custom-navigation', () => {
+    console.log('La URL cambió en la SPA:', window.location.href);
+});
+
+
 window.addEventListener('popstate', handlePopstate);
 
 function handlePopstate()

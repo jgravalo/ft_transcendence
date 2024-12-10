@@ -1,9 +1,12 @@
-.info {
+.profile {
 	height: 300px;
 	border: 5px solid white;
 	border-radius: 30px;
 	margin: 5px;
 	background-color: black;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .fila {
@@ -34,8 +37,31 @@
 	color: black;
 
 }
-/* 
-.option {
-	font-size: 40px;
-	color: var(--color);
-} */
+
+.profile-photo {
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
+	overflow: hidden; /* Oculta el exceso de la imagen si es necesario */
+}
+
+.profile-photo img {
+	width: 100%;
+    height: 100%;
+    object-fit: cover; /* Hace que la imagen llene completamente el contenedor */
+}
+
+.info {
+	margin-left: 30px;
+	height: 250px;
+	min-width: 600px;
+	border: 15px;
+	border-color: aqua;
+	border-radius: 30px;
+	text-align: left;
+	color: white;
+}
+
+.stats {
+	margin-top: 30px;
+}
