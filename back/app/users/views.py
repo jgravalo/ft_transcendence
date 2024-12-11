@@ -80,7 +80,8 @@ def set_login(request):
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
                 return JsonResponse({'type': 'errorName', 'error': 'User does not exist.'})
-            #JsonResponse({'type': 'errorName', 'error': 'User already exists.'})
+            if password != user.password:
+                return JsonResponse({'type': 'errorPassword', 'error': 'Password is not correct'})
             print("login:")
             print(user.username)
             print(user.email)
