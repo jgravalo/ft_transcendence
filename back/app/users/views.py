@@ -56,6 +56,14 @@ def close_login(request):
     }
     return JsonResponse(data)
 
+def close_logout(request):
+    content = render_to_string('close_logout.html')
+    data = {
+        "element": 'bar',
+        "content": content
+    }
+    return JsonResponse(data)
+
 @csrf_exempt
 def set_login(request):
     if request.method == "POST":

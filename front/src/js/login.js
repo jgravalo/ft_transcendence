@@ -16,6 +16,11 @@ function makeLogout()
 {
     document.getElementById('close-session').addEventListener('click', () => {
         console.log('El botón de cerrar sesion ha sido pulsado');
+        document.getElementById('cancel-logout').click();
+        fetchLink('/users/logout/close/');
+        // no llega a hacer el siguinte fetch
+        fetchLink('/');
+        handleLinks();
     });
 }
 

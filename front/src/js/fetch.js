@@ -83,7 +83,8 @@ function fetchLink(path)
         document.getElementById(dest).innerHTML = `${data.content}`;
         if (dest == 'modalContainer')
             //     path == "/users/login/" ||
-        // path == "/users/register/"
+            //     path == "/users/logout/" ||
+            // path == "/users/register/"
             makeLogin(path);
         else
         {
