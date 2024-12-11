@@ -21,6 +21,7 @@ def make_token(user):
         "email": user.email,
         "password": user.password,
         "role": "admin",
+        "error": "Success",
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expiración
     }
 
@@ -71,13 +72,11 @@ def set_login(request):
             data = json.loads(request.body)
             username = data.get('username')
             password = data.get('password')
-            # error = parse_data(username, email, password)
-            # if error != None:
-            #     return JsonResponse(error)
-            # # Usando create()
-            #user = User.objects.create(email=email, password=password, logged=True)
             try:
-                user = User.objects.get(username=username)
+                if not '@' in username:
+                    user = User.objects.get(username=username)
+                else:
+                    user = User.objects.get(email=username)
             except User.DoesNotExist:
                 return JsonResponse({'type': 'errorName', 'error': 'User does not exist.'})
             if password != user.password:
@@ -116,19 +115,18 @@ def register(request):
     return JsonResponse(data)
 
 def parse_data(username, email, password):
-    user = User.objects.filter(username=username)
-    if user.exists():
-        return {'type': 'errorName', 'error': 'User already exists.'}
     if username == '':
         return {'type': 'errorName', 'error': 'Empty fields.'}#, status=400)
+    if User.objects.filter(username=username).exists():
+        return {'type': 'errorName', 'error': 'User already exists.'}
     if username[0:3] == "AI ":
-        return {'type': 'errorName', 'error': 'The username cannot start by \'AI \'.'}#, status=400)
+        return {'type': 'errorName', 'error': 'Username cannot start by \'AI \'.'}#, status=400)
+    if '@' in username:
+        return {'type': 'errorName', 'error': 'Username cannot include \'@\'.'}
     if email == '':
         return {'type': 'errorEmail', 'error': 'Empty fields.'}#, status=400)
     if not '@' in email:
         return {'type': 'errorEmail', 'error': 'The email must include \'@\'.'}#, status=400)
-    if password == '':
-        return {'type': 'errorPassword', 'error': 'Empty fields.'}#, status=400)
     if len(password) < 6:
         return {'type': 'errorPassword', 'error': 'The password must be at least 6 characters long.'}#, status=400)
     return None
