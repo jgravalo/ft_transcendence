@@ -95,54 +95,23 @@ function makeLogin(path) //modalHTML)
 function getInfoRegister()
 {
     const info = {
-        //username: username,
         username: document.getElementById('username').value,
         email: document.getElementById('email').value,
         password: document.getElementById('password').value,
-        valid: true
     };
     console.log('Usuario:', info.username);
     console.log('Correo Electrónico:', info.email);
     console.log('Contraseña:', info.password);
-    let valid = true;
-
-    // Validaciones
-    /* if (info.username.slice(3) === 'AI ') {
-        document.getElementById('errorName').textContent = 'Ingresa un usuario válido.';
-        valid = false;
-    }
-    if (info.email === '' || !info.email.includes('@')) {
-        document.getElementById('errorEmail').textContent = 'Ingresa un correo válido.';
-        valid = false;
-    }
-    if (info.password.length < 6) {
-        document.getElementById('errorPassword').textContent = 'La contraseña debe tener al menos 6 caracteres.';
-        valid = false;
-    } */
-    info.valid = valid;
     return (info);
 }
 
 function getInfoLogin()
 {
     const info = {
-        email: document.getElementById('email').value,
+        username: document.getElementById('username').value,
         password: document.getElementById('password').value,
-        valid: true
     };
-    console.log('Correo Electrónico:', info.email);
+    console.log('Username:', info.username);
     console.log('Contraseña:', info.password);
-    let valid = true;
-
-    // Validaciones
-    if (info.email === '' || !info.email.includes('@')) {
-        document.getElementById('errorEmail').textContent = 'Ingresa un correo válido.';
-        valid = false;
-    }
-    if (info.password.length < 6) {
-        document.getElementById('errorPassword').textContent = 'La contraseña debe tener al menos 6 caracteres.';
-        valid = false;
-    }
-    info.valid = valid;
     return (info);
 }

@@ -69,11 +69,18 @@ def set_login(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            email = data.get('email')
+            username = data.get('username')
             password = data.get('password')
+            # error = parse_data(username, email, password)
+            # if error != None:
+            #     return JsonResponse(error)
             # # Usando create()
             #user = User.objects.create(email=email, password=password, logged=True)
-            user = User.objects.get(email=email)
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return JsonResponse({'type': 'errorName', 'error': 'User does not exist.'})
+            #JsonResponse({'type': 'errorName', 'error': 'User already exists.'})
             print("login:")
             print(user.username)
             print(user.email)
@@ -107,7 +114,7 @@ def register(request):
     }
     return JsonResponse(data)
 
-def parse_register(username, email, password):
+def parse_data(username, email, password):
     if username == '':
         return {'type': 'errorName', 'error': 'Empty fields.'}#, status=400)
     if username[0:3] == "AI ":
@@ -130,7 +137,7 @@ def set_register(request):
             username = data.get('username')
             email = data.get('email')
             password = data.get('password')
-            error = parse_register(username, email, password)
+            error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
             # # Usando create()
