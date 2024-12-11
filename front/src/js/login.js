@@ -1,11 +1,11 @@
 
 function getCSRFToken() {
     const cookies = document.cookie.split(';');
-    console.log("how many cookies");
+    // console.log("how many cookies");
     for (const cookie of cookies) {
         const [name, value] = cookie.trim().split('=');
         if (name === 'csrftoken') {
-            console.log("CookieValue = <" + value + ">");
+            // console.log("CookieValue = <" + value + ">");
             return value;
         }
     }
@@ -42,7 +42,7 @@ function makeLogin(path) //modalHTML)
             info = getInfoLogin();
         else if (path === '/users/register/')
             info = getInfoRegister();
-        console.log("valid: ", info.valid);
+        // console.log("valid: ", info.valid);
         console.log("hace fetch con data");
         fetch(base + ":8000" + path + "set/", {
             method: "POST",
@@ -54,25 +54,41 @@ function makeLogin(path) //modalHTML)
         })
         .then(response => response.json())
         .then(data => {
+            let valid = false;
             console.log("imprime data");
             console.log(data);
+            //if (`${data.error}` != false)
+            if (`${data.error}` == "Success")
+            {
+                valid = true;
+                console.log("valid is true");
+            }
+            else
+            {
+                valid = false;
+                console.log("valid is false: " + valid);
+                console.log("error: " + `${data.error}`);
+                document.getElementById(`${data.type}`).textContent = `${data.error}`;
+            }
+            // Si todo es válido, enviar formulario
+            //if (info.valid) {
+            console.log("valid after fetch: ", valid);
+            if (valid) {
+                //alert('Formulario enviado con éxito');
+                document.getElementById('close').click();
+                fetchLink('/users/login/close/');
+                // no llega a hacer el siguinte fetch
+                fetchLink('/users/profile/');
+                handleLinks();
+            }
+            else
+                form.reset(); // Reiniciar formulario
         })
         .catch(error => {
-            console.log("error llego a js");
+            console.log("fetch login catch");
             console.error('Error:', error);
         });
         
-        // Si todo es válido, enviar formulario
-        if (info.valid) {
-            //alert('Formulario enviado con éxito');
-            document.getElementById('close').click();
-            fetchLink('/users/login/close/');
-            // no llega a hacer el siguinte fetch
-            fetchLink('/users/profile/');
-            handleLinks();
-        }
-        else
-            form.reset(); // Reiniciar formulario
     })
 }
 
@@ -91,7 +107,7 @@ function getInfoRegister()
     let valid = true;
 
     // Validaciones
-    if (info.username.slice(3) === 'AI ') {
+    /* if (info.username.slice(3) === 'AI ') {
         document.getElementById('errorName').textContent = 'Ingresa un usuario válido.';
         valid = false;
     }
@@ -102,7 +118,7 @@ function getInfoRegister()
     if (info.password.length < 6) {
         document.getElementById('errorPassword').textContent = 'La contraseña debe tener al menos 6 caracteres.';
         valid = false;
-    }
+    } */
     info.valid = valid;
     return (info);
 }

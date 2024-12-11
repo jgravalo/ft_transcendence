@@ -107,24 +107,39 @@ def register(request):
     }
     return JsonResponse(data)
 
+def parse_register(username, email, password):
+    if username == '':
+        return {'type': 'errorName', 'error': 'Empty fields.'}#, status=400)
+    if username[0:3] == "AI ":
+        return {'type': 'errorName', 'error': 'The username cannot start by \'AI \'.'}#, status=400)
+    if email == '':
+        return {'type': 'errorEmail', 'error': 'Empty fields.'}#, status=400)
+    if not '@' in email:
+        return {'type': 'errorEmail', 'error': 'The email must include \'@\'.'}#, status=400)
+    if password == '':
+        return {'type': 'errorPassword', 'error': 'Empty fields.'}#, status=400)
+    if len(password) < 6:
+        return {'type': 'errorPassword', 'error': 'The password must be at least 6 characters long.'}#, status=400)
+    return None
+
 @csrf_exempt
 def set_register(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
+            username = data.get('username')
             email = data.get('email')
             password = data.get('password')
-            #if username == '' or email == '':
-            #return JsonResponse({'error': 'No deje campos vacios.'}, status=400)
-            #if username[0:3] == "AI ":
-            #return JsonResponse({'error': 'El usuario no puede empezar por \'AI \'.'}, status=400)
-            #if not '@' in email:
-            #return JsonResponse({'error': 'Ingresa un correo válido.'}, status=400)
-            #if len(password) < 6:
-            #return JsonResponse({'error': 'La contraseña debe tener al menos 6 caracteres.'}, status=400)
-            
+            error = parse_register(username, email, password)
+            if error != None:
+                return JsonResponse(error)
             # # Usando create()
-            user = User.objects.create(email=email, password=password, logged=True)
+            user = User.objects.create(
+                username=username,
+                email=email,
+                password=password,
+                logged=True
+                )
             print(user.email)
             print(user.password)
             print(user.logged)
@@ -136,10 +151,11 @@ def set_register(request):
             # user = User(email=email, password=password)
             # user.save()
             data = {
-                "user": user.email,
+                "email": user.email,
                 "password": user.password,
                 "logged": user.logged,
-                "jwt": user.jwt
+                "jwt": user.jwt,
+                "error": "Success"
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
