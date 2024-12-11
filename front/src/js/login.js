@@ -12,6 +12,13 @@ function getCSRFToken() {
     return null;
 }
 
+function makeLogout()
+{
+    document.getElementById('close-session').addEventListener('click', () => {
+        console.log('El botón de cerrar sesion ha sido pulsado');
+    });
+}
+
 function makeLogin(path) //modalHTML)
 {
     // Mostrar el modal
@@ -19,6 +26,8 @@ function makeLogin(path) //modalHTML)
     myModal.show();
 
     // Manejador del evento de envío del formulario
+    if (path == "/users/logout/")
+        makeLogout();
     const form =  document.getElementById('loginForm');
     form.addEventListener('submit', function(event) {
         event.preventDefault();
@@ -28,8 +37,6 @@ function makeLogin(path) //modalHTML)
             info = getInfoLogin();
         else if (path === '/users/register/')
             info = getInfoRegister();
-        /* else
-            fetchLink(/users/logout/); */
         console.log("valid: ", info.valid);
         console.log("hace fetch con data");
         fetch(base + ":8000" + path + "set/", {
