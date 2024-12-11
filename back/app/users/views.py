@@ -115,6 +115,9 @@ def register(request):
     return JsonResponse(data)
 
 def parse_data(username, email, password):
+    user = User.objects.filter(username=username)
+    if user.exists():
+        return {'type': 'errorName', 'error': 'User already exists.'}
     if username == '':
         return {'type': 'errorName', 'error': 'Empty fields.'}#, status=400)
     if username[0:3] == "AI ":
