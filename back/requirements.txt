@@ -22,3 +22,6 @@ PyJWT==2.8.0
 
 # Opcional: Channels Redis si estás utilizando Redis para manejar WebSockets
 # channels-redis>=4.0
+
+# Libreria Pillow para usar ImageField en Models
+Pillow>=10.0.0  # Ajusta según la versión instalada o requerida

@@ -147,6 +147,10 @@ def set_register(request):
                 username=username,
                 email=email,
                 password=password,
+                image="España.webp",
+                wins=0,
+                losses=0,
+                matches=0,
                 logged=True
                 )
             print(user.email)
@@ -179,12 +183,14 @@ def logout(request):
     return JsonResponse(data)
 
 def profile(request):
+    user = User.objects.get(username="jesus")
     context = {
     'user': {
-        'username': 'jgravalo',
-        'wins': '0',
-        'losses': '0',
-        'matches': '0'
+        'username': user.username,
+        'wins': user.wins,
+        'losses': user.losses,
+        'matches': user.matches,
+        'image': user.image
         }
     }
     content = render_to_string('profile.html', context)

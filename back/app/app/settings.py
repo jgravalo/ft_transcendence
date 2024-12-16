@@ -70,6 +70,10 @@ CSRF_TRUSTED_ORIGINS = ['http://*']
 #     'http://127.0.0.1:8080',  # También si se usa con IP
 # ]
 
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -85,6 +89,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
