@@ -20,8 +20,8 @@ def make_token(user):
         "username": user.username,
         "email": user.email,
         "password": user.password,
-        "role": "admin",
         "error": "Success",
+        "role": "admin",
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expiración
     }
 
@@ -179,7 +179,15 @@ def logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    content = render_to_string('profile.html')
+    context = {
+    'user': {
+        'username': 'jgravalo',
+        'wins': '0',
+        'losses': '0',
+        'matches': '0'
+        }
+    }
+    content = render_to_string('profile.html', context)
     data = {
         "element": 'content',
         "content": content

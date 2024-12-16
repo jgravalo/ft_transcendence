@@ -3,11 +3,11 @@
 		<img src="img/España.webp">
 	</div>
 	<div class="info">
-		<h1 id="username">jgravalo</h1>
+		<h1 id="username">{{ user.username }}</h1>
 		<div class="stats">
-			<h2>wins: <span id="wins">0</span></h2>
-			<h2>losses: <span id="losses">0</span></h2>
-			<h2>matches: <span id="matches">0</span></h2>
+			<h2>wins: {{ user.wins }}<!--span id="wins">0</span--></h2>
+			<h2>losses: {{ user.losses }}<!--span id="losses">0</span--></h2>
+			<h2>matches: {{ user.matches }}<!--span id="matches">0</span--></h2>
 		</div>
 	</div>
 </div>
