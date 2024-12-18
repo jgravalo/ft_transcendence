@@ -88,13 +88,16 @@ function fetchLink(path)
             makeLogin(path);
         else
         {
-            var title = path.slice(1, -1);
-            console.log("title = <" + title + ">");
-            window.history.pushState(
-                { page: title},
-                title,
-                "/" + title
-            );
+            if (path != '/users/logout/close/')
+            {
+                var title = path.slice(1, -1);
+                console.log("title = <" + title + ">");
+                window.history.pushState(
+                    { page: title},
+                    title,
+                    "/" + title
+                );
+            }
             handleLinks();
         }
         })

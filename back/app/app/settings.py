@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'corsheaders', # cors-headers
     'channels', #channels
 
+    'rest_framework_simplejwt',
+    # 'django_otp',
+    # 'django_otp.plugins.otp_totp',  # OTP basado en tiempo (Google Authenticator)
+    # 'django_otp.plugins.otp_email',  # OTP vía email
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -70,9 +75,9 @@ CSRF_TRUSTED_ORIGINS = ['http://*']
 #     'http://127.0.0.1:8080',  # También si se usa con IP
 # ]
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/img/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'img')
 
 TEMPLATES = [
     {
@@ -176,3 +181,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Django REST Framework configuración
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+# Configuración de SimpleJWT
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}

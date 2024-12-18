@@ -18,10 +18,26 @@ from django.contrib import admin
 from django.urls import include, path
 from .views import get_home
 
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+# from your_app.views import EnableTOTPView, VerifyTOTPView, EnableEmailOTPView, VerifyEmailOTPView
+
 urlpatterns = [
     #path('admin/', admin.site.urls), #django admin
-    path('users/', include('users.urls')),
-    path('game/', include('game.urls')),
-    path('', get_home, name='get_home'),
     #path('', home, name='home'),
+    path('', get_home, name='get_home'),
+    path('game/', include('game.urls')),
+    path('users/', include('users.urls')),
+    
+    # JWT Authentication
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
+""" 
+    # TOTP (Google Authenticator)
+    path('api/enable-totp/', EnableTOTPView.as_view(), name='enable_totp'),
+    path('api/verify-totp/', VerifyTOTPView.as_view(), name='verify_totp'),
+
+    # OTP via Email
+    path('api/enable-email-otp/', EnableEmailOTPView.as_view(), name='enable_email_otp'),
+    path('api/verify-email-otp/', VerifyEmailOTPView.as_view(), name='verify_email_otp'),
+ """

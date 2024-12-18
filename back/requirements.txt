@@ -11,7 +11,7 @@ django-cors-headers>=3.13
 channels>=4.0
 
 # Daphne para conectarse a WebSockets
-daphne==4.0
+daphne>=4.0,<5.0
 
 # PostgreSQL Driver (psycopg2) para conectarse a una base de datos PostgreSQL
 psycopg2>=2.9
@@ -24,4 +24,19 @@ PyJWT==2.8.0
 # channels-redis>=4.0
 
 # Libreria Pillow para usar ImageField en Models
-Pillow>=10.0.0  # Ajusta según la versión instalada o requerida
+Pillow>=10.0.0 
+
+# Para autenticación con JWT
+djangorestframework-simplejwt==5.2.2
+
+# Base para 2FA
+#django-otp==1.0.4
+
+# OTP basado en tiempo (Google Authenticator)
+#django-otp-totp==1.0.3  # Versión ajustada para compatibilidad
+
+# OTP vía email
+#django-otp-email==1.0.4
+
+# Para gestionar variables de entorno
+#django-environ==0.10.0
