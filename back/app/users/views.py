@@ -103,7 +103,9 @@ def set_login(request):
             content = render_to_string('close_login.html')
             data.update({
                 "element": 'bar',
-                "content": content
+                "content": content,
+                "next_path": '/users/profile/'
+                #"next_path": '/two_fa/'
             })
             print('data:')
             print(data)
@@ -178,7 +180,9 @@ def set_register(request):
             content = render_to_string('close_login.html')
             data.update({
                 "element": 'bar',
-                "content": content
+                "content": content,
+                "next_path": '/users/profile/'
+                #"next_path": '/two_fa/'
             })
             return JsonResponse(data)
         except json.JSONDecodeError:

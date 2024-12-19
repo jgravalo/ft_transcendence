@@ -9,15 +9,20 @@
             <div class="modal-body">
 				
 				<!-- Formulario de Login -->
-				<form method="POST">
-					<!-- {% csrf_token %} -->
-					<label for="otp_code">Introduce tu código OTP:</label>
-					<input type="text" id="otp_code" name="otp_code" required>
-					<button type="submit">Verificar</button>
-					{% if error %}
-						<p style="color: red;">{{ error }}</p>
-					{% endif %}
-				</form>
+				<button id="Email" style="min-width: 50%;" data-bs-dismiss="modal" type="submit" class="btn btn-primary" href="/two_fa/email" >Email</button>
+				<button id="Google" style="min-width: 50%;" data-bs-dismiss="modal" type="submit" class="btn btn-primary" >Google</button>
+				<button id="SMS" style="min-width: 50%;" data-bs-dismiss="modal" type="submit" class="btn btn-primary" >SMS</button>
+
+				<!-- <form action="/submit" method="post">
+					<label for="opciones">Options:</label>
+					<select id="opciones" name="opcion">
+						<option value="opcion1">Email</option>
+						<option value="opcion2">Google</option>
+						<option value="opcion3">SMS</option>
+					</select>
+					<br><br>
+					<button type="submit">Enviar</button>
+				</form> -->
 
             </div>
         </div>

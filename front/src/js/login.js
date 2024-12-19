@@ -42,6 +42,8 @@ function makeLogin(path) //modalHTML)
             info = getInfoLogin();
         else if (path === '/users/register/')
             info = getInfoRegister();
+        else if (path === '/two_fa/')
+            info = getInfo2FA();
         // console.log("valid: ", info.valid);
         console.log("hace fetch con data");
         fetch(base + ":8000" + path + "set/", {
@@ -61,14 +63,21 @@ function makeLogin(path) //modalHTML)
             {
                 console.log("valid is true");
                 //alert('Formulario enviado con éxito');
-                document.getElementById('close').click();
-                var dest = `${data.element}`;
-                document.getElementById(dest).innerHTML = `${data.content}`;
-                //fetchLink('/users/login/close/');
-                // no llega a hacer el siguinte fetch
-                //fetchLink('/two_fa/');
-                fetchLink('/users/profile/');
-                handleLinks();
+                /* if (path == '/two_fa/')
+                {
+                    document.getElementById(dest).innerHTML = `${data.content}`;  //two_fa.html
+                }
+                //if (path == '/two_fa/')
+                if (path == '/users/login/' || path === '/users/register/')
+                { */
+                    document.getElementById('close').click();
+                    var dest = `${data.element}`;
+                    document.getElementById(dest).innerHTML = `${data.content}`;
+                    //fetchLink('/two_fa/');
+                    //fetchLink('/users/profile/');
+                    fetchLink(`${data.next_path}`);
+                    handleLinks();
+                //}
             }
             else
             {
@@ -110,7 +119,7 @@ function getInfoLogin()
     return (info);
 }
 
-function get2FA()
+function getInfo2FA()
 {
-
+    fetchLink('/users/profile/');
 }
