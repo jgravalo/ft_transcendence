@@ -100,6 +100,11 @@ def set_login(request):
             #     "jwt": user.jwt
             # }
             data = decode_token(user.jwt)
+            content = render_to_string('close_login.html')
+            data.update({
+                "element": 'bar',
+                "content": content
+            })
             print('data:')
             print(data)
             return JsonResponse(data)
@@ -170,6 +175,11 @@ def set_register(request):
                 "jwt": user.jwt,
                 "error": "Success"
             }
+            content = render_to_string('close_login.html')
+            data.update({
+                "element": 'bar',
+                "content": content
+            })
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)

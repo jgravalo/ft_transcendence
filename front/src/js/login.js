@@ -54,36 +54,29 @@ function makeLogin(path) //modalHTML)
         })
         .then(response => response.json())
         .then(data => {
-            let valid = false;
             console.log("imprime data");
             console.log(data);
             //if (`${data.error}` != false)
             if (`${data.error}` == "Success")
             {
-                valid = true;
                 console.log("valid is true");
-            }
-            else
-            {
-                valid = false;
-                console.log("valid is false: " + valid);
-                console.log("error: " + `${data.error}`);
-                document.getElementById(`${data.type}`).textContent = `${data.error}`;
-            }
-            // Si todo es válido, enviar formulario
-            //if (info.valid) {
-            //console.log("valid after fetch: ", valid);
-            if (valid) {
                 //alert('Formulario enviado con éxito');
                 document.getElementById('close').click();
-                fetchLink('/users/login/close/');
+                var dest = `${data.element}`;
+                document.getElementById(dest).innerHTML = `${data.content}`;
+                //fetchLink('/users/login/close/');
                 // no llega a hacer el siguinte fetch
-                fetchLink('/users/profile/');
                 //fetchLink('/two_fa/');
+                fetchLink('/users/profile/');
                 handleLinks();
             }
             else
+            {
+                console.log("valid is false");
+                console.log("error: " + `${data.error}`);
+                document.getElementById(`${data.type}`).textContent = `${data.error}`;
                 form.reset(); // Reiniciar formulario
+            }
         })
         .catch(error => {
             console.log("fetch login catch");
