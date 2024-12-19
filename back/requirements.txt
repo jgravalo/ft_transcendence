@@ -38,5 +38,8 @@ djangorestframework-simplejwt==5.2.2
 # OTP vía email
 #django-otp-email==1.0.4
 
+# Para implementar el estándar de códigos OTP basados en tiempo (TOTP).
+pyotp>=2.9.0
+
 # Para gestionar variables de entorno
 #django-environ==0.10.0

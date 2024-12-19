@@ -16,9 +16,6 @@ import game.routing
 def get_home(request):
     content = render_to_string('index.html')
     data = {
-        "id": "52263",
-        "player1": "jgravalo",
-        "player2": "IA",
         "element": 'content',
         "content": content
     }

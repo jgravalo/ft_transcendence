@@ -1,0 +1,25 @@
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="color: #000;">
+    <div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
+                <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+				
+				<!-- Formulario de Login -->
+				<form method="POST">
+					<!-- {% csrf_token %} -->
+					<label for="otp_code">Introduce tu código OTP:</label>
+					<input type="text" id="otp_code" name="otp_code" required>
+					<button type="submit">Verificar</button>
+					{% if error %}
+						<p style="color: red;">{{ error }}</p>
+					{% endif %}
+				</form>
+
+            </div>
+        </div>
+    </div>
+</div>

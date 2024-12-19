@@ -27,6 +27,7 @@ urlpatterns = [
     path('', get_home, name='get_home'),
     path('game/', include('game.urls')),
     path('users/', include('users.urls')),
+    #path('two_fa/', include('two_fa.urls')),
     
     # JWT Authentication
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

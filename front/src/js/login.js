@@ -72,13 +72,14 @@ function makeLogin(path) //modalHTML)
             }
             // Si todo es válido, enviar formulario
             //if (info.valid) {
-            console.log("valid after fetch: ", valid);
+            //console.log("valid after fetch: ", valid);
             if (valid) {
                 //alert('Formulario enviado con éxito');
                 document.getElementById('close').click();
                 fetchLink('/users/login/close/');
                 // no llega a hacer el siguinte fetch
                 fetchLink('/users/profile/');
+                //fetchLink('/two_fa/');
                 handleLinks();
             }
             else
@@ -114,4 +115,9 @@ function getInfoLogin()
     console.log('Username:', info.username);
     console.log('Contraseña:', info.password);
     return (info);
+}
+
+function get2FA()
+{
+
 }
