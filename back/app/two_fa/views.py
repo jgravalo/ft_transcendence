@@ -7,7 +7,10 @@ from .models import TwoFactorAuth
 from django.core.mail import send_mail
 
 def two_fa(request):
-    send_email_otp()
+    username = request.GET.get('user', 'error')
+    print(username)
+    user = User.objects.get(username=username)
+    send_email_otp(user)
     content = render_to_string('two_fa.html')
     data = {
         "element": 'modalContainer',
@@ -17,7 +20,8 @@ def two_fa(request):
 
 #def send_email_otp(request):
 def send_email_otp(user):
-    two_fa = TwoFactorAuth.objects.get(user=user)
+    #two_fa = TwoFactorAuth.objects.get(user=user)
+    two_fa = TwoFactorAuth.objects.create(user=user)
     otp_code = two_fa.generate_otp()
 
     # Envía el OTP por correo electrónico
@@ -25,17 +29,16 @@ def send_email_otp(user):
         subject='Tu código OTP',
         message=f'Tu código OTP es: {otp_code}',
         from_email='no-reply@example.com',
-        recipient_list=[""" user.email """],
+        recipient_list=[user.email],
     )
-    data = {
-				"otp_code": otp_code,
-                "error": "Success"
-    }
+    # data = {
+	# 			#"otp_code": otp_code,
+    #             "error": "Success"
+    # }
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 
-@login_required
+# @login_required
 def verify_otp(request): # email o SMS
     if request.method == 'POST':
         otp_code = request.POST.get('otp_code')

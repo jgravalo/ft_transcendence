@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['*'] # CAMBIAR!!! por el dominio
 INSTALLED_APPS = [
     'game',
     'users',
-#    'two_fa',
+    'two_fa',
 
     'rest_framework', # REST framework
     'corsheaders', # cors-headers

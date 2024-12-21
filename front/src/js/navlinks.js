@@ -63,6 +63,8 @@ function handleLink(event)
         path += "/";
     var state = base + path;
     console.log("path = " + path);
+    if (path.slice(0, 8) === '/two_fa/')
+        getInfo2FA();
     fetchLink(path);
 }
 

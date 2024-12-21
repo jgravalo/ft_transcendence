@@ -42,7 +42,7 @@ function makeLogin(path) //modalHTML)
             info = getInfoLogin();
         else if (path === '/users/register/')
             info = getInfoRegister();
-        else if (path === '/two_fa/')
+        else if (path.slice(0, 8) === '/two_fa/')
             info = getInfo2FA();
         // console.log("valid: ", info.valid);
         console.log("hace fetch con data");
