@@ -28,6 +28,7 @@ window.addEventListener('custom-navigation', () => {
 });
  */
 
+
 window.addEventListener('popstate', handlePopstate);
 
 function handlePopstate()
@@ -47,6 +48,7 @@ function handleLinks()
     });
 }
 
+
 //var base = window.location.origin;
 var base = window.location.origin.slice(0, -5);
 console.log("base: ", base);
@@ -60,7 +62,7 @@ function handleLink(event)
     if (path == "/")
         path = "";
     else
-        path += "/";
+    path += "/";
     var state = base + path;
     console.log("path = " + path);
     if (path.slice(0, 8) === '/two_fa/')
@@ -68,11 +70,14 @@ function handleLink(event)
     fetchLink(path);
 }
 
+
 function fetchLink(path)
 {
     fetch(base + ":8000" + path, {
         method: "GET",
         headers: {
+            'Authorization': `Bearer ${getToken()}`,
+            'Content-Type': 'application/json',
             'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
         },
     })

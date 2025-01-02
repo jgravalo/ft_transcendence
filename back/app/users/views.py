@@ -20,7 +20,6 @@ def make_token(user):
         "username": user.username,
         "email": user.email,
         "password": user.password,
-        "error": "Success",
         "role": "admin",
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expiración
     }
@@ -81,34 +80,21 @@ def set_login(request):
                 return JsonResponse({'type': 'errorName', 'error': 'User does not exist.'})
             if password != user.password:
                 return JsonResponse({'type': 'errorPassword', 'error': 'Password is not correct'})
-            print("login:")
-            print(user.username)
-            print(user.email)
-            print(user.password)
-            print(user.logged)
             print("jwt (login) = " + user.jwt)
 
             # # Instanciando y luego guardando
             # user = User(email=email, password=password)
             # user.save()
-
-            # data = {
-            #     "username": user.username,
-            #     "email": user.email,
-            #     "password": user.password,
-            #     "logged": user.logged,
-            #     "jwt": user.jwt
-            # }
             data = decode_token(user.jwt)
             content = render_to_string('close_login.html')
             data.update({
+                "error": "Success",
                 "element": 'bar',
                 "content": content,
                 "next_path": '/users/profile/'
                 #"next_path": '/two_fa/'
             })
-            print('data:')
-            print(data)
+            print('data:', data)
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
@@ -160,30 +146,27 @@ def set_register(request):
                 matches=0,
                 logged=True
                 )
-            print(user.email)
-            print(user.password)
-            print(user.logged)
             token = make_token(user)
-            User.objects.filter(email=user.email).update(jwt=token)
-            print("jwt(register) = " + user.jwt)
+            print("token = " + token)
+            User.objects.filter(username=user.username).update(jwt=token)
+            user = User.objects.get(username=username)
+            print("jwt(register) =", user.jwt)
 
             # # Instanciando y luego guardando
             # user = User(email=email, password=password)
             # user.save()
-            data = {
-                "email": user.email,
-                "password": user.password,
-                "logged": user.logged,
-                "jwt": user.jwt,
-                "error": "Success"
-            }
             content = render_to_string('close_login.html')
-            data.update({
+            data = {
+                #"email": user.email,
+                #"password": user.password,
+                #"logged": user.logged,
+                "jwt": user.jwt,
+                "error": "Success",
                 "element": 'bar',
                 "content": content,
                 "next_path": '/users/profile/'
                 #"next_path": '/two_fa/'
-            })
+            }
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
@@ -197,15 +180,20 @@ def logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    user = User.objects.get(username="jesus")
+    auth = request.headers.get('Authorization')
+    print("auth:", auth)
+    token = auth.split(" ")[1]
+    #if token == 'empty':
+    data = decode_token(token)
+    user = User.objects.get(username=data["username"])
     context = {
-    'user': {
-        'username': user.username,
-        'wins': user.wins,
-        'losses': user.losses,
-        'matches': user.matches,
-        'image': user.image
-        }
+        'user': {
+            'username': user.username,
+            'wins': user.wins,
+            'losses': user.losses,
+            'matches': user.matches,
+            'image': user.image
+            }
     }
     content = render_to_string('profile.html', context)
     data = {

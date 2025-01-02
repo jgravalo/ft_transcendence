@@ -1,3 +1,4 @@
+//import { getInfo2FA } from './two_fa.js';
 
 function getCSRFToken() {
     const cookies = document.cookie.split(';');
@@ -49,6 +50,7 @@ function makeLogin(path) //modalHTML)
         fetch(base + ":8000" + path + "set/", {
             method: "POST",
             headers: {
+                'Authorization': `Bearer ${getToken()}`,
                 "Content-Type": "application/json",
                 'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
             },
@@ -62,14 +64,9 @@ function makeLogin(path) //modalHTML)
             if (`${data.error}` == "Success")
             {
                 console.log("valid is true");
-                //alert('Formulario enviado con éxito');
-                /* if (path == '/two_fa/')
-                {
-                    document.getElementById(dest).innerHTML = `${data.content}`;  //two_fa.html
-                }
-                //if (path == '/two_fa/')
-                if (path == '/users/login/' || path === '/users/register/')
-                { */
+                    saveToken(`${data.jwt}`);
+                    console.log("2:",`${data.jwt}`)
+                    console.log("2:", getToken())
                     document.getElementById('close').click();
                     var dest = `${data.element}`;
                     document.getElementById(dest).innerHTML = `${data.content}`;
@@ -77,7 +74,6 @@ function makeLogin(path) //modalHTML)
                     //fetchLink('/users/profile/');
                     fetchLink(`${data.next_path}`);
                     handleLinks();
-                //}
             }
             else
             {
@@ -119,7 +115,10 @@ function getInfoLogin()
     return (info);
 }
 
-function getInfo2FA()
-{
-    fetchLink('/users/profile/');
-}
+const saveToken = (token) => {
+    sessionStorage.setItem('token', token);
+};
+
+const getToken = () => {
+    return sessionStorage.getItem('token');
+};

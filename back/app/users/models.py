@@ -10,7 +10,7 @@ class User(models.Model):
 	losses = models.IntegerField(default=0)
 	matches = models.IntegerField(default=0)
 	logged = models.BooleanField(default=False)
-	jwt = models.CharField(max_length=500)
+	jwt = models.CharField(max_length=512, null=True, blank=True)
 #
 #	def __str__(self):
 #       return self.username  # Representación amigable del objeto
