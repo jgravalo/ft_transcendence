@@ -7,10 +7,10 @@ from .models import TwoFactorAuth
 from django.core.mail import send_mail
 
 def two_fa(request):
-    username = request.GET.get('user', 'error')
-    print(username)
-    user = User.objects.get(username=username)
-    send_email_otp(user)
+    #username = request.GET.get('user', 'error')
+    #print(username)
+    #user = User.objects.get(username=username)
+    #send_email_otp(user)
     content = render_to_string('two_fa.html')
     data = {
         "element": 'modalContainer',

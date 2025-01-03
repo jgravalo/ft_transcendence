@@ -29,12 +29,14 @@ window.addEventListener('custom-navigation', () => {
  */
 
 
-window.addEventListener('popstate', handlePopstate);
+window.addEventListener('popstate', (event) => handlePopstate(event));
 
-function handlePopstate()
+function handlePopstate(event)
 {
+    console.log("Se cambió la URL", event.state);
     var path = window.location.href;
-    fetchLink(path);
+    console.log(path);
+    handleLink(path);
 }
 
 handleLinks();
@@ -47,7 +49,6 @@ function handleLinks()
         link.addEventListener('click', handleLink);
     });
 }
-
 
 //var base = window.location.origin;
 var base = window.location.origin.slice(0, -5);
@@ -62,33 +63,35 @@ function handleLink(event)
     if (path == "/")
         path = "";
     else
-    path += "/";
+        path += "/";
     var state = base + path;
     console.log("path = " + path);
-    if (path.slice(0, 8) === '/two_fa/')
-        getInfo2FA();
+    //if (path.slice(0, 8) === '/two_fa/')
+    //    getInfo2FA();
     fetchLink(path);
 }
 
-
 function fetchLink(path)
 {
+    console.log("JWT before GET:", getJWTToken());
     fetch(base + ":8000" + path, {
         method: "GET",
         headers: {
-            'Authorization': `Bearer ${getToken()}`,
+            'Authorization': `Bearer ${getJWTToken()}`,
             'Content-Type': 'application/json',
             'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
         },
     })
     .then(response => response.json()) // Convertir la respuesta a JSON
     .then(data => {
-        console.log("esta en handleLink");
+        //console.log("esta en handleLink");
         console.log(data); // Ver los datos en consola
+        //console.log("JWT after GET:", getJWTToken());
+        //console.log("JWT from GET:", `${data.jwt}`);
         //var dest = 'content';
         var dest = `${data.element}`;
         document.getElementById(dest).innerHTML = `${data.content}`;
-        if (dest == 'modalContainer')
+        if (dest == 'modalContainer' /*&& path != '/two_fa/'*/)
             //     path == "/users/login/" ||
             //     path == "/users/logout/" ||
             // path == "/users/register/"
@@ -98,7 +101,7 @@ function fetchLink(path)
             if (path != '/users/logout/close/')
             {
                 var title = path.slice(1, -1);
-                console.log("title = <" + title + ">");
+                console.log("pushState = <" + title + ">");
                 window.history.pushState(
                     { page: title},
                     title,
@@ -107,10 +110,10 @@ function fetchLink(path)
             }
             handleLinks();
         }
-        })
-        .catch(error => {
+    })
+    .catch(error => {
             console.error('Error al obtener productos:', error);
-        });
+    });
 }
 
 

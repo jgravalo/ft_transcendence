@@ -35,6 +35,10 @@ def decode_token(token):
         return decoded_payload
     except jwt.ExpiredSignatureError:
         print("El token ha expirado.")
+    except jwt.InvalidSignatureError:
+        print("El token no esta bien firmado.")
+    except jwt.DecodeError:
+        print("El token no puede ser decodificado.")
     except jwt.InvalidTokenError:
         print("El token no es válido.")
 
@@ -80,7 +84,7 @@ def set_login(request):
                 return JsonResponse({'type': 'errorName', 'error': 'User does not exist.'})
             if password != user.password:
                 return JsonResponse({'type': 'errorPassword', 'error': 'Password is not correct'})
-            print("jwt (login) = " + user.jwt)
+            #print("jwt (login) = " + user.jwt)
 
             # # Instanciando y luego guardando
             # user = User(email=email, password=password)
@@ -91,10 +95,11 @@ def set_login(request):
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
+                "jwt": user.jwt,
                 "next_path": '/users/profile/'
                 #"next_path": '/two_fa/'
             })
-            print('data:', data)
+            #print('data:', data)
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
@@ -147,10 +152,10 @@ def set_register(request):
                 logged=True
                 )
             token = make_token(user)
-            print("token = " + token)
+            #print("token = " + token)
             User.objects.filter(username=user.username).update(jwt=token)
             user = User.objects.get(username=username)
-            print("jwt(register) =", user.jwt)
+            #print("jwt(register) =", user.jwt)
 
             # # Instanciando y luego guardando
             # user = User(email=email, password=password)
@@ -183,8 +188,11 @@ def profile(request):
     auth = request.headers.get('Authorization')
     print("auth:", auth)
     token = auth.split(" ")[1]
+    print("token:", token)
     #if token == 'empty':
     data = decode_token(token)
+    print("data:", data)
+    print("username:", data["username"])
     user = User.objects.get(username=data["username"])
     context = {
         'user': {

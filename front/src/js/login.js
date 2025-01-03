@@ -13,6 +13,11 @@ function getCSRFToken() {
     return null;
 }
 
+function make2FA()
+{
+    handleLinks();
+}
+
 function makeLogout()
 {
     document.getElementById('close-session').addEventListener('click', () => {
@@ -34,23 +39,23 @@ function makeLogin(path) //modalHTML)
     // Manejador del evento de envío del formulario
     if (path == "/users/logout/")
         makeLogout();
+    if (path == "/two_fa/")
+        make2FA();
     const form =  document.getElementById('loginForm');
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         // Obtener los valores de los inputs
 
-        if (path === '/users/login/')
-            info = getInfoLogin();
-        else if (path === '/users/register/')
-            info = getInfoRegister();
-        else if (path.slice(0, 8) === '/two_fa/')
-            info = getInfo2FA();
-        // console.log("valid: ", info.valid);
-        console.log("hace fetch con data");
+        if (path === '/users/login/' || path === '/users/register/')
+            info = getInfo();
+        //if (path.slice(0, 8) === '/two_fa/')
+            //info = getInfo2FA();
+        //console.log("hace fetch con data");
+        console.log("JWT before POST:", getJWTToken());
         fetch(base + ":8000" + path + "set/", {
             method: "POST",
             headers: {
-                'Authorization': `Bearer ${getToken()}`,
+                'Authorization': `Bearer ${getJWTToken()}`,
                 "Content-Type": "application/json",
                 'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
             },
@@ -60,25 +65,23 @@ function makeLogin(path) //modalHTML)
         .then(data => {
             console.log("imprime data");
             console.log(data);
-            //if (`${data.error}` != false)
             if (`${data.error}` == "Success")
             {
-                console.log("valid is true");
-                    saveToken(`${data.jwt}`);
-                    console.log("2:",`${data.jwt}`)
-                    console.log("2:", getToken())
-                    document.getElementById('close').click();
-                    var dest = `${data.element}`;
-                    document.getElementById(dest).innerHTML = `${data.content}`;
-                    //fetchLink('/two_fa/');
-                    //fetchLink('/users/profile/');
-                    fetchLink(`${data.next_path}`);
-                    handleLinks();
+                console.log("JWT after POST:", getJWTToken());
+                saveJWTToken(`${data.jwt}`);
+                console.log("JWT from POST:",`${data.jwt}`)
+                //console.log("2:", getJWTToken())
+                document.getElementById('close').click();
+                var dest = `${data.element}`;
+                document.getElementById(dest).innerHTML = `${data.content}`;
+                //fetchLink('/two_fa/');
+                //fetchLink('/users/profile/');
+                fetchLink(`${data.next_path}`);
+                handleLinks();
             }
             else
             {
-                console.log("valid is false");
-                console.log("error: " + `${data.error}`);
+                //console.log("error: " + `${data.error}`);
                 document.getElementById(`${data.type}`).textContent = `${data.error}`;
                 form.reset(); // Reiniciar formulario
             }
@@ -91,34 +94,31 @@ function makeLogin(path) //modalHTML)
     })
 }
 
-function getInfoRegister()
+function getInfo()
 {
-    const info = {
-        username: document.getElementById('username').value,
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value,
-    };
-    console.log('Usuario:', info.username);
-    console.log('Correo Electrónico:', info.email);
-    console.log('Contraseña:', info.password);
-    return (info);
+    const form = document.getElementById('loginForm'); // Selecciona el formulario
+    const formData = new FormData(form);
+    const formDataObject = {};
+
+    formData.forEach((value, key) => {
+        formDataObject[key] = value;
+        //console.log("key =", key, "value =", value);
+    });
+    //console.log(formDataObject);
+    return (formDataObject)
 }
 
-function getInfoLogin()
+function getInfo2FA()
 {
-    const info = {
-        username: document.getElementById('username').value,
-        password: document.getElementById('password').value,
-    };
-    console.log('Username:', info.username);
-    console.log('Contraseña:', info.password);
-    return (info);
+    const userData = decodeToken(getJWTToken());
+    console.log("Datos del usuario:", userData);
+    fetchLink('/users/profile/');
 }
 
-const saveToken = (token) => {
+const saveJWTToken = (token) => {
     sessionStorage.setItem('token', token);
 };
 
-const getToken = () => {
+const getJWTToken = () => {
     return sessionStorage.getItem('token');
 };
