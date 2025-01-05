@@ -208,10 +208,11 @@ function startGame()
             ballLeft: ballLeft,
             ballTop: ballTop
         }));
-        if (score1 >= 10 || score2 >= 10)
+        if (score1 >= 5 || score2 >= 5)
         {
             document.getElementById('score1').textContent = score1;
             document.getElementById('score2').textContent = score2;
+            socket.close(1000, 'Finalizando conexión de manera ordenada');
             clearInterval(Match);
         }
     }

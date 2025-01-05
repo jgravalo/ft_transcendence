@@ -71,10 +71,10 @@ CORS_ALLOW_ALL_ORIGINS = True # cors-headers
 #    "http://jgravalo.42.fr:8000",
 #]
 
-CSRF_TRUSTED_ORIGINS = ['http://*']
-#     'http://localhost:8080',  # Dominio del frontend
-#     'http://127.0.0.1:8080',  # También si se usa con IP
-# ]
+CSRF_TRUSTED_ORIGINS = [#'http://*']
+    'http://localhost:8080',  # Dominio del frontend
+    'http://127.0.0.1:8080',  # También si se usa con IP
+]
 
 MEDIA_URL = '/img/'
 

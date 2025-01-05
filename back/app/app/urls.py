@@ -27,11 +27,11 @@ urlpatterns = [
     path('', get_home, name='get_home'),
     path('game/', include('game.urls')),
     path('users/', include('users.urls')),
-    #path('two_fa/', include('two_fa.urls')),
+    path('two_fa/', include('two_fa.urls')),
     
     # JWT Authentication
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    #path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    #path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 """ 
     # TOTP (Google Authenticator)

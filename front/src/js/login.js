@@ -45,14 +45,15 @@ function makeLogin(path) //modalHTML)
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         // Obtener los valores de los inputs
-
         if (path === '/users/login/' || path === '/users/register/')
             info = getInfo();
-        //if (path.slice(0, 8) === '/two_fa/')
-            //info = getInfo2FA();
         //console.log("hace fetch con data");
         console.log("JWT before POST:", getJWTToken());
-        fetch(base + ":8000" + path + "set/", {
+        if (path.slice(0, 8) === '/two_fa/')
+            path = "/two_fa/verify/";
+        else
+            path += "set/";
+        fetch(base + ":8000" + path, {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${getJWTToken()}`,
@@ -65,11 +66,11 @@ function makeLogin(path) //modalHTML)
         .then(data => {
             console.log("imprime data");
             console.log(data);
-            if (`${data.error}` == "Success")
+            if (`${data.error}` == "Success")// CAMBIAR POR STATUS !!
             {
                 console.log("JWT after POST:", getJWTToken());
                 saveJWTToken(`${data.jwt}`);
-                console.log("JWT from POST:",`${data.jwt}`)
+                console.log("JWT from POST:",`${data.jwt}`);
                 //console.log("2:", getJWTToken())
                 document.getElementById('close').click();
                 var dest = `${data.element}`;

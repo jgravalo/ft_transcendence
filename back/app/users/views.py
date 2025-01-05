@@ -68,6 +68,9 @@ def close_logout(request):
     }
     return JsonResponse(data)
 
+            # # Instanciando y luego guardando
+            # user = User(email=email, password=password)
+            # user.save()
 @csrf_exempt
 def set_login(request):
     if request.method == "POST":
@@ -85,11 +88,7 @@ def set_login(request):
             if password != user.password:
                 return JsonResponse({'type': 'errorPassword', 'error': 'Password is not correct'})
             #print("jwt (login) = " + user.jwt)
-
-            # # Instanciando y luego guardando
-            # user = User(email=email, password=password)
-            # user.save()
-            data = decode_token(user.jwt)
+            data = decode_token(user.jwt) # porque hago decode?
             content = render_to_string('close_login.html')
             data.update({
                 "error": "Success",
@@ -140,7 +139,6 @@ def set_register(request):
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
-            # # Usando create()
             user = User.objects.create(
                 username=username,
                 email=email,
@@ -156,21 +154,15 @@ def set_register(request):
             User.objects.filter(username=user.username).update(jwt=token)
             user = User.objects.get(username=username)
             #print("jwt(register) =", user.jwt)
-
-            # # Instanciando y luego guardando
-            # user = User(email=email, password=password)
-            # user.save()
-            content = render_to_string('close_login.html')
+            #content = render_to_string('close_login.html') # online_bar
+            content = render_to_string('close_logout.html') # offline_bar
             data = {
-                #"email": user.email,
-                #"password": user.password,
-                #"logged": user.logged,
                 "jwt": user.jwt,
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
-                "next_path": '/users/profile/'
-                #"next_path": '/two_fa/'
+                #"next_path": '/users/profile/'
+                "next_path": '/two_fa/'
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
