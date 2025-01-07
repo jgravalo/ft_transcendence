@@ -10,7 +10,13 @@ from users.models import User
 
 # Create your views here.
 
+import logging
 from django.core.mail import send_mail
+from django.core.mail import BadHeaderError
+from smtplib import SMTPException
+
+
+logger = logging.getLogger(__name__)
 
 def two_fa(request):
     #username = request.GET.get('user', 'error')
@@ -25,40 +31,46 @@ def two_fa(request):
 
 #def send_email_otp(request):
 def send_email_otp(user):
-    two_fa = TwoFactorAuth.objects.create(user=user)
-    #two_fa = TwoFactorAuth.objects.get(user=user)
-    otp_code = two_fa.generate_otp()
-    # Envía el OTP por correo electrónico
-    send_mail(
-        subject='Tu código OTP',
-        message=f'Tu código OTP es: {otp_code}',
-        from_email='no-reply@example.com',
-        recipient_list=[user.email],
-    )
-    # data = {
-    #             "otp_code": otp_code,
-    #             "error": "Success"
-    # }
-    return otp_code
+    try:
+        two_fa = TwoFactorAuth.objects.create(user=user)
+        otp_code = two_fa.generate_otp()
+        # Envía el OTP por correo electrónico
+        send_mail(
+            subject='Tu código OTP',
+            message=f'Tu código OTP es: {otp_code}',
+            from_email='no-reply@example.com',
+            recipient_list=[user.email],
+        )
+        """ send_mail(
+            'Tu código OTP',
+            f'Tu código OTP es: {otp_code}',
+            'no-reply@example.com',
+            [user.email],
+        ) """
+        two_fa.update({ "otp_code": otp_code })
+    except BadHeaderError:
+        logger.error("Se detectó un encabezado no válido al intentar enviar el correo.")
+    except SMTPException as e:
+        logger.error(f"Error al enviar correo: {e}")
+    except Exception as e:
+        logger.error(f"Error inesperado: {e}")
 
 def email(request):
-    # auth = request.headers.get('Authorization')
-    # print("auth:", auth)
-    # token = auth.split(" ")[1]
-    # print("token:", token)
+    auth = request.headers.get('Authorization')
+    print("auth:", auth)
+    token = auth.split(" ")[1]
+    print("token:", token)
     # #if token == 'empty':
     # data = decode_token(token)
     # print("data:", data)
     # print("username:", data["username"])
-    # user = User.objects.get(username=data["username"])
-    # #""" otp_code =  """send_email_otp(user)
+    user = User.objects.get(jwt=token)
+    send_email_otp(user)
     content = render_to_string('two_fa_email.html')
     data = {
-        #"jwt": user.jwt,
-        #"error": "Success",
+        #"opt_code": opt_code,
         "element": 'modalContainer',
-        "content": content,
-        #"next_path": '/users/profile/'
+        "content": content
     }
     return JsonResponse(data)
 
@@ -71,22 +83,22 @@ def verify_otp(request): # email o SMS
     if request.method == 'POST':
         data = json.loads(request.body)
         otp_code = data.get('otp_code')
-        # two_fa = TwoFactorAuth.objects.get(user=request.user)
-        # if not two_fa.verify_otp(otp_code):
-        # 	return JsonResponse({'error': 'Código incorrecto'})
-        # """ content = render_to_string('two_fa.html')
-        # data = {
-        # 	"element": 'content',
-        # 	"content": content
-        # } """
+        auth = request.headers.get('Authorization')
+        print("auth:", auth)
+        token = auth.split(" ")[1]
+        print("token:", token)
+        two_fa = TwoFactorAuth.objects.filter(user__jwt=token)
+        if (otp_code != two_fa.otp_code):
+            #User.objects.filter(jwt=token).delete()
+            return JsonResponse({'type': 'errorName', 'error': 'Your code is wrong.'})
+        two_fa.delete()
         content = render_to_string('close_login.html') # online_bar
         data = {
-        		"otp_code": otp_code,
-                "error": "Success",
-                #"jwt": user.jwt,
-                "element": 'bar',
-                "content": content,
-                "next_path": '/users/profile/'
+            "error": "Success",
+            "jwt": token,
+            "element": 'bar',
+            "content": content,
+            "next_path": '/users/profile/'
         }
         #print(data)
 

@@ -49,23 +49,26 @@ function makeLogin(path) //modalHTML)
             info = getInfo();
         //console.log("hace fetch con data");
         console.log("JWT before POST:", getJWTToken());
-        if (path.slice(0, 8) === '/two_fa/')
-            path = "/two_fa/verify/";
+        let post = path;
+        if (path.slice(0, 8) == '/two_fa/')
+            post = "/two_fa/verify/";
         else
-            path += "set/";
-        fetch(base + ":8000" + path, {
+            //if (path.slice(-5) != '/set/')
+                post += "set/";
+    console.log("post =", post);
+    console.log("info =", info);
+        fetch(base + ":8000" + post, {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${getJWTToken()}`,
                 "Content-Type": "application/json",
                 'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
             },
-            body: JSON.stringify(info),
+            body: JSON.stringify(info), 
         })
         .then(response => response.json())
         .then(data => {
-            console.log("imprime data");
-            console.log(data);
+            console.log("data POST:", data);
             if (`${data.error}` == "Success")// CAMBIAR POR STATUS !!
             {
                 console.log("JWT after POST:", getJWTToken());
@@ -105,7 +108,7 @@ function getInfo()
         formDataObject[key] = value;
         //console.log("key =", key, "value =", value);
     });
-    //console.log(formDataObject);
+    console.log("formDataObject =", formDataObject);
     return (formDataObject)
 }
 

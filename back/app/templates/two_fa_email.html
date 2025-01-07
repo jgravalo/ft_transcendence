@@ -13,6 +13,7 @@
 					<!-- {% csrf_token %} -->
 					<label for="otp_code">Introduce tu código OTP:</label>
 					<input type="text" id="otp_code" name="otp_code" required>
+					<span id="errorName" class="error"></span><br>
 					<button type="submit">Verificar</button>
 					{% if error %}
 						<p style="color: red;">{{ error }}</p>

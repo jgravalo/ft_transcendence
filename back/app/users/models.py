@@ -10,6 +10,7 @@ class User(models.Model):
 	losses = models.IntegerField(default=0)
 	matches = models.IntegerField(default=0)
 	logged = models.BooleanField(default=False)
+	two_fa_enabled = models.BooleanField(default=True)
 	jwt = models.CharField(max_length=512, null=True, blank=True)
 #
 #	def __str__(self):

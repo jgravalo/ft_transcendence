@@ -89,14 +89,20 @@ def set_login(request):
                 return JsonResponse({'type': 'errorPassword', 'error': 'Password is not correct'})
             #print("jwt (login) = " + user.jwt)
             data = decode_token(user.jwt) # porque hago decode?
-            content = render_to_string('close_login.html')
+            if not user.two_fa_enabled:
+                content = render_to_string('close_login.html') # online_bar
+                next_path = '/users/profile/'
+            else:
+                content = render_to_string('close_logout.html') # offline_bar
+                next_path = '/two_fa/'
             data.update({
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
                 "jwt": user.jwt,
-                "next_path": '/users/profile/'
+                #"next_path": '/users/profile/'
                 #"next_path": '/two_fa/'
+                "next_path": next_path
             })
             #print('data:', data)
             return JsonResponse(data)
@@ -154,15 +160,19 @@ def set_register(request):
             User.objects.filter(username=user.username).update(jwt=token)
             user = User.objects.get(username=username)
             #print("jwt(register) =", user.jwt)
-            #content = render_to_string('close_login.html') # online_bar
-            content = render_to_string('close_logout.html') # offline_bar
+
+            if not user.two_fa_enabled:
+                content = render_to_string('close_login.html') # online_bar
+                next_path = '/users/profile/'
+            else:
+                content = render_to_string('close_logout.html') # offline_bar
+                next_path = '/two_fa/'
             data = {
                 "jwt": user.jwt,
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
-                #"next_path": '/users/profile/'
-                "next_path": '/two_fa/'
+                "next_path": next_path
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
