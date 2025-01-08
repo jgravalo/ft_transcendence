@@ -1,0 +1,47 @@
+<h1 id="header">Welcome to the Cosmic 42Pong 2</h1>
+<div class="modal-content" style="background-color: rgb(32, 32, 32); padding: 10px; border: 20px; border-color: red;">
+	<div class="modal-header">
+		<h5 style="color: white;" class="modal-title" id="loginModalLabel">Regístrate</h5>
+	</div>
+	<div class="modal-body">
+		<!-- Formulario de Login -->					
+		<form id="loginForm">
+			<div class="file-upload">
+				<input type="file" id="fileInput" accept="image/*">
+				<label for="fileInput">
+					<div class="circle">
+						<img id="preview" src="img/España.webp"> <!-- alt="Vista previa"> -->
+					</div>
+				</label>
+				</div>
+				<div class="mb-3">
+					<label style="color: white;" for="username" class="form-label">Nombre de usuario</label>
+					<input type="text" class="form-control" id="username" value="jesus" required>
+					<span id="errorName" class="error"></span><br>
+				</div>
+				<div class="mb-3">
+					<label style="color: white;" for="email" class="form-label">Correo Electrónico</label>
+					<input type="email" class="form-control" id="email" value="jesus@gmail.com" required>
+					<span id="errorEmail" class="error"></span><br>
+				</div>
+				<div class="mb-3">
+					<label style="color: white;" for="password" class="form-label">Contraseña Actual</label>
+					<input type="password" class="form-control" id="password">
+					<span id="errorPassword" class="error"></span><br>
+				</div>
+				<div class="mb-3">
+					<label style="color: white;" for="password" class="form-label">Nueva Contraseña</label>
+					<input type="password" class="form-control" id="password">
+					<span id="errorPassword" class="error"></span><br>
+				</div>
+				<div class="mb-3">
+					<label class="switch">
+						<input type="checkbox">
+						<span class="slider"></span>
+					</label>
+					<label style="color: white;" for="username" class="form-label">Enable Two-Factor Authentication</label>
+				</div>
+			<button type="submit">Ingresar</button>
+		</form>
+	</div>
+</div>

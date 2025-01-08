@@ -56,7 +56,7 @@
 	height: 250px;
 	min-width: 600px;
 	border: 15px;
-	border-color: aqua;
+	border-color: red;
 	border-radius: 30px;
 	text-align: left;
 	color: white;
@@ -64,17 +64,4 @@
 
 .stats {
 	margin-top: 30px;
-}
-
-#uploadForm {
-	display: flex;
-	justify-content: center;
-	flex-direction: column;
-	/* align-items: center; */
-}
-
-#fileInput {
-	width: 100px;
-	height: 100px;
-	border-radius: 50%;
 }

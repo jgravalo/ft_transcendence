@@ -8,6 +8,7 @@
 	<link rel="stylesheet" href="css/game.css">
 	<link rel="stylesheet" href="css/page.css">
 	<link rel="stylesheet" href="css/profile.css">
+	<link rel="stylesheet" href="css/update.css">
 
 </head>
 
@@ -30,26 +31,23 @@
 				style="background-color: rgb(32, 32, 32); padding: 10px; border: 20px; border-color: red;">
 				<div class="modal-header">
 					<h5 style="color: white;" class="modal-title" id="loginModalLabel">Regístrate</h5>
-					<button id="close" type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<!-- Formulario de Login -->
-					
-					
+					<!-- Formulario de Login -->					
 					<form id="loginForm">
 						<!-- <label for="fileInput">Selecciona un archivo:</label> -->
 						<div class="file-upload">
+							<!-- <img src="img/España.webp"> -->
 							<input type="file" id="fileInput" accept="image/*">
 							<label for="fileInput">
 								<div class="circle">
-									<img id="preview" src="" alt="Vista previa">
+									<img id="preview" src="img/España.webp"> <!-- alt="Vista previa"> -->
 								</div>
 							</label>
 						</div>
 						<!-- <div class="profile-photo">
 							<img src="img/España.webp"> -->
-							<div class="mb-3">
+						<div class="mb-3">
 							<label style="color: white;" for="username" class="form-label">Nombre de usuario</label>
 							<input type="text" class="form-control" id="username" value="jesus" required>
 							<span id="errorName" class="error"></span><br>
@@ -68,6 +66,13 @@
 							<label style="color: white;" for="password" class="form-label">Nueva Contraseña</label>
 							<input type="password" class="form-control" id="password">
 							<span id="errorPassword" class="error"></span><br>
+						</div>
+						<div class="mb-3">
+							<label class="switch">
+								<input type="checkbox">
+								<span class="slider"></span>
+							</label>
+							<label style="color: white;" for="username" class="form-label">Enable Two-Factor Authentication</label>
 						</div>
 						<button type="submit">Ingresar</button>
 					</form>
