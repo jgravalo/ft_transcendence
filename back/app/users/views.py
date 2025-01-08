@@ -211,3 +211,11 @@ def profile(request):
         "content": content
     }
     return JsonResponse(data)
+
+def update(request):
+    content = render_to_string('upload.html')
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
