@@ -95,13 +95,12 @@ def set_login(request):
             else:
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/'
+            #data = {
             data.update({
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
                 "jwt": user.jwt,
-                #"next_path": '/users/profile/'
-                #"next_path": '/two_fa/'
                 "next_path": next_path
             })
             #print('data:', data)
@@ -149,7 +148,7 @@ def set_register(request):
                 username=username,
                 email=email,
                 password=password,
-                image="España.webp",
+                #image="España.webp",
                 wins=0,
                 losses=0,
                 matches=0,
@@ -187,15 +186,10 @@ def logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    auth = request.headers.get('Authorization')
-    print("auth:", auth)
-    token = auth.split(" ")[1]
+    token = request.headers.get('Authorization').split(" ")[1]
     print("token:", token)
     #if token == 'empty':
-    data = decode_token(token)
-    print("data:", data)
-    print("username:", data["username"])
-    user = User.objects.get(username=data["username"])
+    user = User.objects.get(jwt=token)
     context = {
         'user': {
             'username': user.username,
@@ -213,9 +207,61 @@ def profile(request):
     return JsonResponse(data)
 
 def update(request):
-    content = render_to_string('upload.html')
+    token = request.headers.get('Authorization').split(" ")[1]
+    print("token:", token)
+    #if token == 'empty':
+    user = User.objects.get(jwt=token)
+    context = {
+        'user': {
+            'username': user.username,
+            'email': user.email,
+            'password': user.password,
+            'two_fa_enabled': user.two_fa_enabled,
+            'image': user.image
+            }
+    }
+    content = render_to_string('upload.html', context)
     data = {
         "element": 'content',
         "content": content
     }
     return JsonResponse(data)
+
+def set_update(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            image = data.get('image')
+            username = data.get('username')
+            email = data.get('email')
+            old_password = data.get('old-password')
+            new_password = data.get('new-password')
+            two_fa_enabled = data.get('two_fa_enabled')
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = User.objects.get(jwt=token)
+            if old_password == '' and new_password == '':
+                old_password == user.password
+                new_password == user.password
+            if old_password != user.password:
+                return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
+            error = parse_data(username, email, new_password)
+            if error != None:
+                return JsonResponse(error)
+            user.update(
+                username=username,
+                email=email,
+                password=new_password,
+                image=image,
+                two_fa_enabled=two_fa_enabled
+            )
+            content = render_to_string('close_login.html') # online_bar
+            data = {
+                "jwt": user.jwt,
+                "error": "Success",
+                "element": 'bar',
+                "content": content,
+                "next_path": '/users/profile/'
+            }
+            return JsonResponse(data)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)

@@ -5,7 +5,7 @@ class User(models.Model):
 	username = models.CharField(max_length=100)
 	email = models.CharField(max_length=100)
 	password = models.CharField(max_length=100)
-	image = models.ImageField(upload_to='')  # Carpeta dentro de MEDIA_ROOT
+	image = models.ImageField(upload_to='', default='España.webp') # Carpeta dentro de MEDIA_ROOT
 	wins = models.IntegerField(default=0)
 	losses = models.IntegerField(default=0)
 	matches = models.IntegerField(default=0)

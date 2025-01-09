@@ -30,7 +30,7 @@ function makeLogout()
     });
 }
 
-function makeLogin(path) //modalHTML)
+function makeModal(path) //modalHTML)
 {
     // Mostrar el modal
     var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
@@ -41,6 +41,11 @@ function makeLogin(path) //modalHTML)
         makeLogout();
     if (path == "/two_fa/")
         make2FA();
+    makePost(path);
+}
+
+function makePost(path)
+{
     const form =  document.getElementById('loginForm');
     form.addEventListener('submit', function(event) {
         event.preventDefault();
@@ -75,7 +80,8 @@ function makeLogin(path) //modalHTML)
                 saveJWTToken(`${data.jwt}`);
                 console.log("JWT from POST:",`${data.jwt}`);
                 //console.log("2:", getJWTToken())
-                document.getElementById('close').click();
+                if (path != '/users/update/')
+                    document.getElementById('close').click();
                 var dest = `${data.element}`;
                 document.getElementById(dest).innerHTML = `${data.content}`;
                 //fetchLink('/two_fa/');

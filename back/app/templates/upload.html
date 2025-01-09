@@ -10,33 +10,33 @@
 				<input type="file" id="fileInput" accept="image/*">
 				<label for="fileInput">
 					<div class="circle">
-						<img id="preview" src="img/España.webp"> <!-- alt="Vista previa"> -->
+						<img id="preview" src="{{ user.image.url }}"> <!-- alt="Vista previa"> -->
 					</div>
 				</label>
 				</div>
 				<div class="mb-3">
 					<label style="color: white;" for="username" class="form-label">Nombre de usuario</label>
-					<input type="text" class="form-control" id="username" value="jesus" required>
+					<input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
 					<span id="errorName" class="error"></span><br>
 				</div>
 				<div class="mb-3">
 					<label style="color: white;" for="email" class="form-label">Correo Electrónico</label>
-					<input type="email" class="form-control" id="email" value="jesus@gmail.com" required>
+					<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
 					<span id="errorEmail" class="error"></span><br>
 				</div>
 				<div class="mb-3">
-					<label style="color: white;" for="password" class="form-label">Contraseña Actual</label>
-					<input type="password" class="form-control" id="password">
-					<span id="errorPassword" class="error"></span><br>
+					<label style="color: white;" for="old-password" class="form-label">Contraseña Actual</label>
+					<input type="old-password" class="form-control" id="old-password" name="old-password">
+					<span id="errorOldPassword" class="error"></span><br>
 				</div>
 				<div class="mb-3">
-					<label style="color: white;" for="password" class="form-label">Nueva Contraseña</label>
-					<input type="password" class="form-control" id="password">
+					<label style="color: white;" for="new-password" class="form-label">Nueva Contraseña</label>
+					<input type="new-password" class="form-control" id="new-password" name="new-password">
 					<span id="errorPassword" class="error"></span><br>
 				</div>
 				<div class="mb-3">
 					<label class="switch">
-						<input type="checkbox">
+						<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value="{{ user.two_fa_enabled }}">
 						<span class="slider"></span>
 					</label>
 					<label style="color: white;" for="username" class="form-label">Enable Two-Factor Authentication</label>

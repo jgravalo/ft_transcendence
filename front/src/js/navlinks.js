@@ -95,7 +95,9 @@ function fetchLink(path)
             //     path == "/users/login/" ||
             //     path == "/users/logout/" ||
             // path == "/users/register/"
-            makeLogin(path);
+            makeModal(path);
+        else if (path == '/users/update/')
+            makePost(path);
         else
         {
             if (path != '/users/logout/close/')
