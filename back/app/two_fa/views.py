@@ -47,7 +47,9 @@ def send_email_otp(user):
             'no-reply@example.com',
             [user.email],
         ) """
-        two_fa.update({ "otp_code": otp_code })
+        two_fa.otp_code = otp_code
+        two_fa.save()
+        print("otp_code:", two_fa.otp_code)
     except BadHeaderError:
         logger.error("Se detectó un encabezado no válido al intentar enviar el correo.")
     except SMTPException as e:
@@ -83,11 +85,11 @@ def verify_otp(request): # email o SMS
     if request.method == 'POST':
         data = json.loads(request.body)
         otp_code = data.get('otp_code')
-        auth = request.headers.get('Authorization')
-        print("auth:", auth)
-        token = auth.split(" ")[1]
+        token = request.headers.get('Authorization').split(" ")[1]
         print("token:", token)
         two_fa = TwoFactorAuth.objects.filter(user__jwt=token)
+        print("otp_code:", otp_code)
+        print("data.otp_code:", two_fa.otp_code)
         if (otp_code != two_fa.otp_code):
             #User.objects.filter(jwt=token).delete()
             return JsonResponse({'type': 'errorName', 'error': 'Your code is wrong.'})

@@ -247,13 +247,14 @@ def set_update(request):
             error = parse_data(username, email, new_password)
             if error != None:
                 return JsonResponse(error)
-            user.update(
-                username=username,
-                email=email,
-                password=new_password,
-                image=image,
-                two_fa_enabled=two_fa_enabled
-            )
+            #user.update(
+            user.username=username
+            user.email=email
+            user.password=new_password
+            user.image=image
+            user.two_fa_enabled=two_fa_enabled
+            #)
+            user.save()
             content = render_to_string('close_login.html') # online_bar
             data = {
                 "jwt": user.jwt,
