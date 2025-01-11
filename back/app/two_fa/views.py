@@ -18,9 +18,6 @@ from smtplib import SMTPException
 logger = logging.getLogger(__name__)
 
 def two_fa(request):
-    #username = request.GET.get('user', 'error')
-    #print(username)
-    #user = User.objects.get(username=username)
     content = render_to_string('two_fa.html')
     data = {
         "element": 'modalContainer',
@@ -58,11 +55,47 @@ def send_email_otp(user):
 
 def email(request):
     token = request.headers.get('Authorization').split(" ")[1]
-    #print("token:", token)
-    # #if token == 'empty':
     user = User.objects.get(jwt=token)
     send_email_otp(user)
-    content = render_to_string('two_fa_email.html')
+    context = {
+        'user': {
+            'email': user.email,
+        }
+    }
+    content = render_to_string('two_fa_email.html', context)
+    data = {
+        "element": 'modalContainer',
+        "content": content
+    }
+    return JsonResponse(data)
+
+def set_email(request):
+    if request.method == "POST":
+        try:
+            token = request.headers.get('Authorization').split(" ")[1]
+            data = json.loads(request.body)
+            password = data.get('password')
+            #print("jwt (login) = " + user.jwt)
+            user = User.objects.get(jwt=token)
+            send_email_otp(user)
+            data = decode_token(token) # porque hago decode?
+            #data = {
+            data.update({
+                "error": "Success",
+                "element": 'bar',
+                "content": content,
+                "jwt": token,
+                "next_path": '/two_fa/verify/'
+            })
+            return JsonResponse(data)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+
+def verify(request):
+    token = request.headers.get('Authorization').split(" ")[1]
+    user = User.objects.get(jwt=token)
+    send_email_otp(user)
+    content = render_to_string('two_fa_verify.html')
     data = {
         #"opt_code": opt_code,
         "element": 'modalContainer',

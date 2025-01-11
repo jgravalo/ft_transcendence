@@ -3,6 +3,6 @@ from . import views
 
 urlpatterns = [
     path('', views.two_fa, name='two_fa'),
-    path('email/', views.email, name='email'),
-    path('verify/', views.verify_otp, name='verify_otp'),
+    path('verify/', views.verify, name='verify'),
+    path('verify/set/', views.verify_otp, name='verify_otp'),
 ]

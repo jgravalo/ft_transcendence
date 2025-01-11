@@ -58,9 +58,9 @@ function makePost(path)
         //console.log("hace fetch con data");
         // console.log("JWT before POST:", getJWTToken());
         let post = path;
-        if (path.slice(0, 8) == '/two_fa/')
+        /* if (path.slice(0, 8) == '/two_fa/')
             post = "/two_fa/verify/";
-        else
+        else */
             //if (path.slice(-5) != '/set/')
                 post += "set/";
     console.log("post =", post);
