@@ -21,7 +21,7 @@ function make2FA()
 function makeLogout()
 {
     document.getElementById('close-session').addEventListener('click', () => {
-        console.log('El botón de cerrar sesion ha sido pulsado');
+        // console.log('El botón de cerrar sesion ha sido pulsado');
         document.getElementById('cancel-logout').click();
         fetchLink('/users/logout/close/');
         // no llega a hacer el siguinte fetch
@@ -50,10 +50,13 @@ function makePost(path)
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         // Obtener los valores de los inputs
-        if (path === '/users/login/' || path === '/users/register/')
+        console.log("id =", path.slice(path.slice(1, -1).indexOf('/') + 2, -1));
+        if (path === '/users/login/' ||
+        path === '/users/register/' ||
+        path === '/two_fa/verify/')
             info = getInfo();
         //console.log("hace fetch con data");
-        console.log("JWT before POST:", getJWTToken());
+        // console.log("JWT before POST:", getJWTToken());
         let post = path;
         if (path.slice(0, 8) == '/two_fa/')
             post = "/two_fa/verify/";
@@ -78,7 +81,7 @@ function makePost(path)
             {
                 console.log("JWT after POST:", getJWTToken());
                 saveJWTToken(`${data.jwt}`);
-                console.log("JWT from POST:",`${data.jwt}`);
+                // console.log("JWT from POST:",`${data.jwt}`);
                 //console.log("2:", getJWTToken())
                 if (path != '/users/update/')
                     document.getElementById('close').click();
@@ -106,7 +109,8 @@ function makePost(path)
 
 function getInfo()
 {
-    const form = document.getElementById('loginForm'); // Selecciona el formulario
+    //const form = document.getElementById('loginForm'); // Selecciona el formulario
+    const form = document.querySelector('#loginForm');
     const formData = new FormData(form);
     const formDataObject = {};
 

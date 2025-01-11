@@ -12,9 +12,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+LANGUAGE_CODE = 'es-es'  # Español
+TIME_ZONE = 'Europe/Madrid'  # Cambia según tu ubicación
+
+# Clave secreta para firmar el token
+SECRET_KEY = "mi_clave_secreta"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -114,31 +119,30 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+ 
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DJANGO_DB_NAME'),
+#         'USER': os.getenv('DJANGO_DB_USER'),
+#         'PASSWORD': os.getenv('DJANGO_DB_PASSWORD'),
+#         'HOST': os.getenv('DJANGO_DB_HOST'),
+#         'PORT': os.getenv('DJANGO_DB_PORT'),
 
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.getenv('DJANGO_DB_NAME'),
-    #     'USER': os.getenv('DJANGO_DB_USER'),
-    #     'PASSWORD': os.getenv('DJANGO_DB_PASSWORD'),
-    #     'HOST': os.getenv('DJANGO_DB_HOST'),
-    #     'PORT': os.getenv('DJANGO_DB_PORT'),
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
+#         'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
+#         'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
+#         'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
+#         'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
 
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
-    #     'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
-    #     'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
-    #     'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
-    #     'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
-
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': '42Pong',
-    #     'USER': 'jgravalo',
-    #     'PASSWORD': 'Jesus20022',
-    #     'HOST': 'db',  # Si usas Docker, cambia esto por el nombre del contenedor de la base de datos
-    #     'PORT': '5432',
-
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': '42Pong',
+#         'USER': 'jgravalo',
+#         'PASSWORD': 'Jesus20022',
+#         'HOST': 'db',  # Si usas Docker, cambia esto por el nombre del contenedor de la base de datos
+#         'PORT': '5432',
     }
 }
 
@@ -213,4 +217,24 @@ EMAIL_USE_SSL = False  # Asegúrate de no usar ambos al mismo tiempo
 EMAIL_HOST_USER = 'tu_correo@example.com'  # Tu dirección de correo
 EMAIL_HOST_PASSWORD = 'tu_contraseña'  # Tu contraseña o clave para aplicaciones
 DEFAULT_FROM_EMAIL = 'no-reply@example.com'  # Dirección de remitente por defecto
-
+""" 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+            'encoding': 'utf-8',  # Importante
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+ """

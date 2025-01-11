@@ -73,7 +73,7 @@ function handleLink(event)
 
 function fetchLink(path)
 {
-    console.log("JWT before GET:", getJWTToken());
+    // console.log("JWT before GET:", getJWTToken());
     fetch(base + ":8000" + path, {
         method: "GET",
         headers: {
@@ -85,9 +85,9 @@ function fetchLink(path)
     .then(response => response.json()) // Convertir la respuesta a JSON
     .then(data => {
         //console.log("esta en handleLink");
-        console.log("data GET:", data); // Ver los datos en consola
-        console.log("JWT after GET:", getJWTToken());
-        console.log("JWT from GET:", `${data.jwt}`);
+        // console.log("data GET:", data); // Ver los datos en consola
+        // console.log("JWT after GET:", getJWTToken());
+        // console.log("JWT from GET:", `${data.jwt}`);
         //var dest = 'content';
         var dest = `${data.element}`;
         document.getElementById(dest).innerHTML = `${data.content}`;
@@ -103,7 +103,7 @@ function fetchLink(path)
             if (path != '/users/logout/close/')
             {
                 var title = path.slice(1, -1);
-                console.log("pushState = <" + title + ">");
+                // console.log("pushState = <" + title + ">");
                 window.history.pushState(
                     { page: title},
                     title,

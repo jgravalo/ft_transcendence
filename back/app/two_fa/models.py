@@ -10,9 +10,16 @@ class TwoFactorAuth(models.Model):
     otp_code = models.CharField(max_length=6, unique=True)
     secret_key = models.CharField(max_length=32, unique=True)
     is_2fa_enabled = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        if not self.secret_key:
+            self.secret_key = pyotp.random_base32()  # Genera una clave secreta segura
+        super().save(*args, **kwargs)
 
     def generate_otp(self):
+        print(f"Clave secreta: {self.secret_key}")
         totp = pyotp.TOTP(self.secret_key)
+        print(f"totp: {totp.now()}")
         return totp.now()
 
     def verify_otp(self, otp_code):
