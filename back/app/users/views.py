@@ -285,3 +285,13 @@ def set_update(request):
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+
+def friends(request):
+    token = request.headers.get('Authorization').split(" ")[1]
+    users = User.objects.exclude(jwt=token)
+    content = render_to_string('friends.html', {'users': users}) # online_bar
+    data = {
+        "element": 'content',
+        "content": content,
+    }
+    return JsonResponse(data)

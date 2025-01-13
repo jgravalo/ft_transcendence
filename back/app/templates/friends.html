@@ -1,0 +1,24 @@
+<h1 style="color: white;">Lista de Usuarios</h1>
+<table style="color: white;">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Nombre de Usuario</th>
+			<th>Email</th>
+			<th>Nombre Completo</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for user in users %}
+			<tr>
+				<td>{{ forloop.counter }}</td>
+				<td>{{ user.username }}</td>
+				<td>{{ user.email }}</td>
+			</tr>
+		{% empty %}
+		<tr>
+			<td colspan="4">No hay usuarios disponibles.</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

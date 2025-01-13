@@ -26,113 +26,32 @@
 	</div>
 	<div id="all">
 		<div id="content">
-			<h1 id="header">Welcome to the Cosmic 42Pong 2</h1>
-			<div class="modal-content"
-				style="background-color: rgb(32, 32, 32); padding: 10px; border: 20px; border-color: red;">
-				<div class="modal-header">
-					<h5 style="color: white;" class="modal-title" id="loginModalLabel">Regístrate</h5>
-				</div>
-				<div class="modal-body">
-					<!-- Formulario de Login -->					
-					<form id="loginForm">
-						<!-- <label for="fileInput">Selecciona un archivo:</label> -->
-						<div class="file-upload">
-							<!-- <img src="img/España.webp"> -->
-							<input type="file" id="fileInput" accept="image/*">
-							<label for="fileInput">
-								<div class="circle">
-									<img id="preview" src="img/España.webp"> <!-- alt="Vista previa"> -->
-								</div>
-							</label>
-						</div>
-						<!-- <div class="profile-photo">
-							<img src="img/España.webp"> -->
-						<div class="mb-3">
-							<label style="color: white;" for="username" class="form-label">Nombre de usuario</label>
-							<input type="text" class="form-control" id="username" value="jesus" required>
-							<span id="errorName" class="error"></span><br>
-						</div>
-						<div class="mb-3">
-							<label style="color: white;" for="email" class="form-label">Correo Electrónico</label>
-							<input type="email" class="form-control" id="email" value="jesus@gmail.com" required>
-							<span id="errorEmail" class="error"></span><br>
-						</div>
-						<div class="mb-3">
-							<label style="color: white;" for="password" class="form-label">Contraseña Actual</label>
-							<input type="password" class="form-control" id="password">
-							<span id="errorPassword" class="error"></span><br>
-						</div>
-						<div class="mb-3">
-							<label style="color: white;" for="password" class="form-label">Nueva Contraseña</label>
-							<input type="password" class="form-control" id="password">
-							<span id="errorPassword" class="error"></span><br>
-						</div>
-						<div class="mb-3">
-							<label class="switch">
-								<input type="checkbox">
-								<span class="slider"></span>
-							</label>
-							<label style="color: white;" for="username" class="form-label">Enable Two-Factor Authentication</label>
-						</div>
-						<button type="submit">Ingresar</button>
-					</form>
-							<!-- <form action="/submit" method="post">
-								<label>
-									<input type="radio" name="opcion" value="Email"> Email
-								</label>
-								<br>
-								<label>
-									<input type="radio" name="opcion" value="Google"> Google
-								</label>
-								<br>
-								<label>
-									<input type="radio" name="opcion" value="SMS"> SMS
-								</label>
-								<br><br>
-								<button type="submit">Enviar</button>
-							</form>
-				
-				
-							<form action="/submit" method="post">
-								<label for="opciones">Options:</label>
-								<select id="opciones" name="opcion">
-									<option value="opcion1">Email</option>
-									<option value="opcion2">Google</option>
-									<option value="opcion3">SMS</option>
-								</select>
-								<br><br>
-								<button type="submit">Enviar</button>
-							</form> -->
-				<!-- 
-						<button id="Email" style="min-width: 50%;" data-bs-dismiss="modal" type="submit" class="btn btn-primary" >Email</button>
-						<button id="Google" style="min-width: 50%;" data-bs-dismiss="modal" type="submit" class="btn btn-primary" >Google</button>
-						<button id="SMS" style="min-width: 50%;" data-bs-dismiss="modal" type="submit" class="btn btn-primary" >SMS</button>
-				-->
-				</div>
-			</div>
-			<!-- <div class="profile">
-				<div class="profile-photo">
-					<img src="img/España.webp">
-				</div>
-				<div class="info">
-					<h1 id="username">jgravalo</h1>
-					<div class="stats">
-						<h2>wins: <span id="wins">0</span></h2>
-						<h2>losses: <span id="losses">0</span></h2>
-						<h2>matches: <span id="matches">0</span></h2>
+			<h1 style="color: white;">Lista de Usuarios</h1>
+			<table style="color: white;">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Nombre de Usuario</th>
+						<th>Email</th>
+						<th>Nombre Completo</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for user in users %}
+					<div class="item">
+						<tr>
+							<td>{{ forloop.counter }}</td>
+							<td>{{ user.username }}</td>
+							<td>{{ user.email }}</td>
+						</tr>
 					</div>
-				</div>
-			</div>
-			<div class="fila">
-				<button class="item" class="link" href="/game">Play</button>
-					<button class="item" href="/game">Play</button>
-					<button class="item" href="/game">Play</button>
-				</div>
-				<div class="fila">
-					<div class="item"></div>
-					<div class="item"></div>
-					<div class="item"></div>
-				</div> -->
+				{% empty %}
+				<tr>
+					<td colspan="4">No hay usuarios disponibles.</td>
+				</tr>
+				{% endfor %}
+				</tbody>
+			</table>
 		</div>
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
