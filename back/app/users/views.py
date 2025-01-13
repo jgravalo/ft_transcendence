@@ -204,7 +204,7 @@ def profile(request):
             'losses': user.losses,
             'matches': user.matches,
             'image': user.image
-            }
+        }
     }
     content = render_to_string('profile.html', context)
     data = {
@@ -234,19 +234,31 @@ def update(request):
     }
     return JsonResponse(data)
 
+from django.core.files.storage import default_storage
+
 @csrf_exempt
 def set_update(request):
     if request.method == "POST":
         try:
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = User.objects.get(jwt=token)
             data = json.loads(request.body)
-            image = data.get('image')
+            try:
+                #image = data.get('image')
+                # Acceder al archivo 'image' desde request.FILES
+                image = request.FILES['image']
+                # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
+                image_name = default_storage.save(f'uploads/{image.name}', image)
+                image_url = default_storage.url(image_name)
+                if user.image != image:
+                    user.image=image
+            except:
+                print("fallo al subir image")
             username = data.get('username')
             email = data.get('email')
             old_password = data.get('old-password')
             new_password = data.get('new-password')
             two_fa_enabled = data.get('two_fa_enabled')
-            token = request.headers.get('Authorization').split(" ")[1]
-            user = User.objects.get(jwt=token)
             if old_password != '' and old_password != user.password:
                 return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
             error = parse_data(username, email, new_password)
@@ -259,8 +271,6 @@ def set_update(request):
                 user.email=email
             if old_password != '' or new_password != '':
                 user.password=new_password
-            if user.image != image:
-                user.image=image
             user.two_fa_enabled=two_fa_enabled
             #)
             user.save()

@@ -28,11 +28,15 @@ urlpatterns = [
     path('game/', include('game.urls')),
     path('users/', include('users.urls')),
     path('two_fa/', include('two_fa.urls')),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
     
     # JWT Authentication
     #path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     #path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-]
 """ 
     # TOTP (Google Authenticator)
     path('api/enable-totp/', EnableTOTPView.as_view(), name='enable_totp'),

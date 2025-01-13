@@ -132,7 +132,10 @@ function getInfo()
     const formDataObject = {};
 
     formData.forEach((value, key) => {
-        formDataObject[key] = value;
+        if (key === 'image' && value instanceof File)
+            formDataObject[key] = value; // Agregar el archivo (imagen) seleccionada
+        else
+            formDataObject[key] = value;
         console.log("key =", key, "value =", value);
     });
     console.log("formDataObject =", formDataObject);
