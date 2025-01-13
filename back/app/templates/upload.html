@@ -7,7 +7,7 @@
 		<!-- Formulario de Login -->					
 		<form id="loginForm">
 			<div class="file-upload">
-				<input type="file" id="fileInput" accept="image/*">
+				<input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
 				<label for="fileInput">
 					<div class="circle">
 						<img id="preview" src="{{ user.image.url }}"> <!-- alt="Vista previa"> -->
@@ -35,8 +35,10 @@
 					<span id="errorPassword" class="error"></span><br>
 				</div>
 				<div class="mb-3">
+					<input type="hidden" name="two_fa_enabled" value=False>
 					<label class="switch">
-						<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value="{{ user.two_fa_enabled }}">
+						<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value=True
+							{% if user.two_fa_enabled %}checked{% endif %}>
 						<span class="slider"></span>
 					</label>
 					<label style="color: white;" for="username" class="form-label">Enable Two-Factor Authentication</label>

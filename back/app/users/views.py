@@ -40,6 +40,16 @@ def decode_token(token):
     except jwt.InvalidTokenError:
         print("El token no es válido.")
 
+@csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend
+def delete_user(request):
+    if request.method == "DELETE":
+        token = request.headers.get('Authorization').split(" ")[1]
+        #user = get_object_or_404(User, id=user_id)
+        user = User.objects.get(jwt=token)
+        user.delete()
+        return JsonResponse({"message": "Usuario borrado con éxito."}, status=200)
+    return JsonResponse({"error": "Método no permitido."}, status=405)
+
 
 # Create your views here.
 def login(request):
@@ -117,8 +127,6 @@ def register(request):
 def parse_data(username, email, password):
     if username == '':
         return {'type': 'errorName', 'error': 'Empty fields.'}#, status=400)
-    if User.objects.filter(username=username).exists():
-        return {'type': 'errorName', 'error': 'User already exists.'}
     if username[0:3] == "AI ":
         return {'type': 'errorName', 'error': 'Username cannot start by \'AI \'.'}#, status=400)
     if '@' in username:
@@ -127,8 +135,6 @@ def parse_data(username, email, password):
         return {'type': 'errorEmail', 'error': 'Empty fields.'}#, status=400)
     if not '@' in email:
         return {'type': 'errorEmail', 'error': 'The email must include \'@\'.'}#, status=400)
-    if len(password) < 6:
-        return {'type': 'errorPassword', 'error': 'The password must be at least 6 characters long.'}#, status=400)
     return None
 
 @csrf_exempt
@@ -139,6 +145,10 @@ def set_register(request):
             username = data.get('username')
             email = data.get('email')
             password = data.get('password')
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({'type': 'errorName', 'error': 'User already exists.'})
+            if len(password) < 6:
+                return JsonResponse({'type': 'errorPassword', 'error': 'The password must be at least 6 characters long.'})
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
@@ -146,7 +156,6 @@ def set_register(request):
                 username=username,
                 email=email,
                 password=password,
-                #image="España.webp",
                 wins=0,
                 losses=0,
                 matches=0,
@@ -225,6 +234,7 @@ def update(request):
     }
     return JsonResponse(data)
 
+@csrf_exempt
 def set_update(request):
     if request.method == "POST":
         try:
@@ -237,19 +247,20 @@ def set_update(request):
             two_fa_enabled = data.get('two_fa_enabled')
             token = request.headers.get('Authorization').split(" ")[1]
             user = User.objects.get(jwt=token)
-            if old_password == '' and new_password == '':
-                old_password == user.password
-                new_password == user.password
-            if old_password != user.password:
+            if old_password != '' and old_password != user.password:
                 return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
             error = parse_data(username, email, new_password)
             if error != None:
                 return JsonResponse(error)
             #user.update(
-            user.username=username
-            user.email=email
-            user.password=new_password
-            user.image=image
+            if user.username != username:
+                user.username=username
+            if user.email != email:
+                user.email=email
+            if old_password != '' or new_password != '':
+                user.password=new_password
+            if user.image != image:
+                user.image=image
             user.two_fa_enabled=two_fa_enabled
             #)
             user.save()

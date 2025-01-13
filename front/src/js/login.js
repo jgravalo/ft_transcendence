@@ -30,11 +30,27 @@ function makeLogout()
     });
 }
 
+function deleteUser(path)
+{
+    if (path.slice(8) == "/two_fa/")
+        //remove_user();
+        fetch(base + ":8000" + '/users/delete/', {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${getJWTToken()}`,
+                "Content-Type": "application/json",
+                'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
+            },
+        });
+}
+
 function makeModal(path) //modalHTML)
 {
     // Mostrar el modal
     var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
     myModal.show();
+
+    //document.getElementById('close').addEventListener('click', deleteUser(path));
 
     // Manejador del evento de envío del formulario
     if (path == "/users/logout/")
@@ -53,6 +69,7 @@ function makePost(path)
         console.log("id =", path.slice(path.slice(1, -1).indexOf('/') + 2, -1));
         if (path === '/users/login/' ||
         path === '/users/register/' ||
+        path === '/users/update/' ||
         path === '/two_fa/verify/')
             info = getInfo();
         //console.log("hace fetch con data");
@@ -62,9 +79,9 @@ function makePost(path)
             post = "/two_fa/verify/";
         else */
             //if (path.slice(-5) != '/set/')
-                post += "set/";
-    console.log("post =", post);
-    console.log("info =", info);
+        post += "set/";
+        console.log("post =", post);
+        console.log("info =", info);
         fetch(base + ":8000" + post, {
             method: "POST",
             headers: {
@@ -116,7 +133,7 @@ function getInfo()
 
     formData.forEach((value, key) => {
         formDataObject[key] = value;
-        //console.log("key =", key, "value =", value);
+        console.log("key =", key, "value =", value);
     });
     console.log("formDataObject =", formDataObject);
     return (formDataObject)
