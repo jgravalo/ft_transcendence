@@ -198,13 +198,7 @@ def profile(request):
     #if token == 'empty':
     user = User.objects.get(jwt=token)
     context = {
-        'user': {
-            'username': user.username,
-            'wins': user.wins,
-            'losses': user.losses,
-            'matches': user.matches,
-            'image': user.image
-        }
+        'user': user
     }
     content = render_to_string('profile.html', context)
     data = {
@@ -219,13 +213,7 @@ def update(request):
     #if token == 'empty':
     user = User.objects.get(jwt=token)
     context = {
-        'user': {
-            'username': user.username,
-            'email': user.email,
-            'password': user.password,
-            'two_fa_enabled': user.two_fa_enabled,
-            'image': user.image
-            }
+        'user': user
     }
     content = render_to_string('upload.html', context)
     data = {
@@ -290,8 +278,12 @@ def set_update(request):
 def friends(request):
     token = request.headers.get('Authorization').split(" ")[1]
     users = User.objects.exclude(jwt=token)
-    #friends = User.objects.get(jwt=token).friends.all()
-    content = render_to_string('friends.html', {'users': users})#, {'friends': friends}) # online_bar
+    friends = User.objects.get(jwt=token).friends.all()
+    context = {
+        'users': users,
+        'friends': friends
+    }
+    content = render_to_string('friends.html', context)#, {'friends': friends}) # online_bar
     data = {
         "element": 'content',
         "content": content,
@@ -302,7 +294,10 @@ def friends(request):
 def add_friend(request):
     # valor_q = request.GET.get('q', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     friends_name = request.GET.get('add', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-    user2 = User.objects.get(username=friends_name)
+    try:
+        user2 = User.objects.get(username=friends_name)
+    except: #Does not exist
+        print(f"user {friends_name} does not exist")
     print(user2.email)
     token = request.headers.get('Authorization').split(" ")[1]
     user1 = User.objects.get(jwt=token)
@@ -317,11 +312,14 @@ def add_friend(request):
     }
     return JsonResponse(data)
 
-#@csrf_exempt
+@csrf_exempt
 def remove_friend(request):
     # valor_q = request.GET.get('q', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     friends_name = request.GET.get('add', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-    user2 = User.objects.get(username=friends_name)
+    try:
+        user2 = User.objects.get(username=friends_name)
+    except: #Does not exist
+        print(f"user {friends_name} does not exist")
     print(user2.email)
     token = request.headers.get('Authorization').split(" ")[1]
     user1 = User.objects.get(jwt=token)

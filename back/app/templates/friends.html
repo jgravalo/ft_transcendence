@@ -3,12 +3,39 @@
 	<input type="text" name="q" placeholder="Buscar..." />
 	<button type="submit"><i class="fas fa-search"></i></button>
 </form>
+<h5 style="color: white;">Users</h1>
+	<table class="user">
+		<thead>
+			<tr>
+				<th>Username</th>
+				<th>Email</th>
+				<th>Record</th>
+				<th>-</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for friend in friends %}
+			<tr>
+				<td>{{ friend.username }}</td>
+				<td>{{ friend.email }}</td>
+				<td>{{ friend.wins }}-{{ friend.losses }}</td>
+				<td id="user{{ forloop.counter }}">
+					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ forloop.counter }}', '{{ friend.username }}')"></i>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="4">Yo haven't friends</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 <h5 style="color: white;">Friends</h1>
 	<table class="user">
 		<thead>
 			<tr>
 				<!-- <th>#</th> -->
-				<th>Nombre de Usuario</th>
+				<th>Username</th>
 				<th>Email</th>
 				<th>Record</th>
 				<th>-</th>
@@ -27,36 +54,8 @@
 			</tr>
 			{% empty %}
 			<tr>
-				<td colspan="4">No hay usuarios disponibles.</td>
+				<td colspan="4">There are not users.</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
-	<!-- 
-<h5 style="color: white;">Friends</h1>
-	<table class="user">
-		<thead>
-			<tr>
-				<th>Nombre de Usuario</th>
-				<th>Email</th>
-				<th>Record</th>
-				<th>-</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for friend in friends %}
-			<tr>
-				<td>{{ friend.username }}</td>
-				<td>{{ friend.email }}</td>
-				<td>{{ friend.wins }}-{{ friend.losses }}</td>
-				<td id="user{{ forloop.counter }}">
-					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ forloop.counter }}', '{{ friend.username }}')"></i>
-				</td>
-			</tr>
-			{% empty %}
-			<tr>
-				<td colspan="4">No hay usuarios disponibles.</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table> -->
