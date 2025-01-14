@@ -1,0 +1,59 @@
+.user {
+	width: 800px;
+	height: 30px;
+	background-color: black;
+	border: 5px solid white;
+	border-collapse: separate; /* Necesario para que funcione border-radius */
+	border-radius: 20px;
+	margin: 5px;
+	color: white;
+	line-height: 2;
+	/* display: flex;
+	--color: white;
+	justify-content: center;
+	align-items: center; /* Centrado vertical 
+	text-align: center; /* Opcional si el texto ocupa varias líneas */
+}
+
+.barra-busqueda {
+	display: flex;
+	align-items: center;
+	max-width: 800px;
+	height: 40px;
+	margin: 20px auto;
+	border: 2px solid #898989;
+	background-color: #e0e0e0;
+	border-radius: 15px;
+	overflow: hidden;
+}
+
+.barra-busqueda input {
+	flex: 1;
+	padding: 10px;
+	border: none;
+	outline: none;
+	background-color: #e0e0e0;
+}
+
+.barra-busqueda button {
+	padding: 10px 20px;
+	background-color: #e0e0e0;
+	color: black;
+	border: none;
+	cursor: pointer;
+	font-size: medium;
+}
+
+.barra-busqueda button:hover {
+	background-color: #e0e0e0;
+	color: black;
+}
+
+.friend-icon {
+    display: inline-block; /* Asegura que el tamaño sea consistente */
+    width: 16px;           /* Ancho fijo */
+    height: 16px;          /* Alto fijo */
+    text-align: center;    /* Centra el contenido */
+    line-height: 16px;     /* Alinea el icono verticalmente */
+    font-size: 16px;       /* Tamaño del icono */
+}

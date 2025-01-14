@@ -1,24 +1,62 @@
 <h1 style="color: white;">Lista de Usuarios</h1>
-<table style="color: white;">
-	<thead>
-		<tr>
-			<th>#</th>
-			<th>Nombre de Usuario</th>
-			<th>Email</th>
-			<th>Nombre Completo</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for user in users %}
+<form class="barra-busqueda" action="/search" method="get">
+	<input type="text" name="q" placeholder="Buscar..." />
+	<button type="submit"><i class="fas fa-search"></i></button>
+</form>
+<h5 style="color: white;">Friends</h1>
+	<table class="user">
+		<thead>
 			<tr>
-				<td>{{ forloop.counter }}</td>
+				<!-- <th>#</th> -->
+				<th>Nombre de Usuario</th>
+				<th>Email</th>
+				<th>Record</th>
+				<th>-</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for user in users %}
+			<tr>
+				<!-- <td>{{ forloop.counter }}</td> -->
 				<td>{{ user.username }}</td>
 				<td>{{ user.email }}</td>
+				<td>{{ user.wins }}-{{ user.losses }}</td>
+				<td id="user{{ forloop.counter }}">
+					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ forloop.counter }}', '{{ user.username }}')"></i>
+				</td>
 			</tr>
-		{% empty %}
-		<tr>
-			<td colspan="4">No hay usuarios disponibles.</td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
+			{% empty %}
+			<tr>
+				<td colspan="4">No hay usuarios disponibles.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<!-- 
+<h5 style="color: white;">Friends</h1>
+	<table class="user">
+		<thead>
+			<tr>
+				<th>Nombre de Usuario</th>
+				<th>Email</th>
+				<th>Record</th>
+				<th>-</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for friend in friends %}
+			<tr>
+				<td>{{ friend.username }}</td>
+				<td>{{ friend.email }}</td>
+				<td>{{ friend.wins }}-{{ friend.losses }}</td>
+				<td id="user{{ forloop.counter }}">
+					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ forloop.counter }}', '{{ friend.username }}')"></i>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="4">No hay usuarios disponibles.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table> -->

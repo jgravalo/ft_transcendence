@@ -286,12 +286,51 @@ def set_update(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
+@csrf_exempt
 def friends(request):
     token = request.headers.get('Authorization').split(" ")[1]
     users = User.objects.exclude(jwt=token)
-    content = render_to_string('friends.html', {'users': users}) # online_bar
+    #friends = User.objects.get(jwt=token).friends.all()
+    content = render_to_string('friends.html', {'users': users})#, {'friends': friends}) # online_bar
     data = {
         "element": 'content',
         "content": content,
     }
     return JsonResponse(data)
+
+@csrf_exempt
+def add_friend(request):
+    # valor_q = request.GET.get('q', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    friends_name = request.GET.get('add', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    user2 = User.objects.get(username=friends_name)
+    print(user2.email)
+    token = request.headers.get('Authorization').split(" ")[1]
+    user1 = User.objects.get(jwt=token)
+    user1.friends.add(user2)
+    friends = user1.friends.filter(username=friends_name)
+    for friend in friends:
+        print(friend.username)
+    content = render_to_string('close_login.html') # online_bar
+    data = {
+        "element": 'bar',
+        "content": content,
+    }
+    return JsonResponse(data)
+
+#@csrf_exempt
+def remove_friend(request):
+    # valor_q = request.GET.get('q', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    friends_name = request.GET.get('add', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    user2 = User.objects.get(username=friends_name)
+    print(user2.email)
+    token = request.headers.get('Authorization').split(" ")[1]
+    user1 = User.objects.get(jwt=token)
+    user1.friends.remove(user2)
+    content = render_to_string('close_login.html') # online_bar
+    data = {
+        "element": 'bar',
+        "content": content,
+    }
+    return JsonResponse(data)
+
+
