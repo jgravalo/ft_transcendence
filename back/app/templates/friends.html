@@ -3,7 +3,7 @@
 	<input type="text" name="q" placeholder="Buscar..." />
 	<button type="submit"><i class="fas fa-search"></i></button>
 </form>
-<h5 style="color: white;">Users</h1>
+<h5 style="color: white;">Friends</h1>
 	<table class="user">
 		<thead>
 			<tr>
@@ -19,8 +19,8 @@
 				<td>{{ friend.username }}</td>
 				<td>{{ friend.email }}</td>
 				<td>{{ friend.wins }}-{{ friend.losses }}</td>
-				<td id="user{{ forloop.counter }}">
-					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ forloop.counter }}', '{{ friend.username }}')"></i>
+				<td id="friend{{ forloop.counter }}">
+					<i class="fas fa-check friend-icon" onclick="deleteFriend('friend{{ forloop.counter }}', '{{ friend.username }}')"></i>
 				</td>
 			</tr>
 			{% empty %}
@@ -30,11 +30,11 @@
 			{% endfor %}
 		</tbody>
 	</table>
-<h5 style="color: white;">Friends</h1>
+<h5 style="color: white;">Other users</h1>
 	<table class="user">
 		<thead>
 			<tr>
-				<!-- <th>#</th> -->
+				<th>#</th>
 				<th>Username</th>
 				<th>Email</th>
 				<th>Record</th>
@@ -44,12 +44,12 @@
 		<tbody>
 			{% for user in users %}
 			<tr>
-				<!-- <td>{{ forloop.counter }}</td> -->
+				<td>{{ forloop.counter }}</td>
 				<td>{{ user.username }}</td>
 				<td>{{ user.email }}</td>
 				<td>{{ user.wins }}-{{ user.losses }}</td>
 				<td id="user{{ forloop.counter }}">
-					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ forloop.counter }}', '{{ user.username }}')"></i>
+					<i class="fas fa-plus friend-icon" onclick="addFriend('user{{ forloop.counter }}', '{{ user.username }}')"></i>
 				</td>
 			</tr>
 			{% empty %}

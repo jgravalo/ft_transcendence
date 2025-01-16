@@ -277,11 +277,26 @@ def set_update(request):
 @csrf_exempt
 def friends(request):
     token = request.headers.get('Authorization').split(" ")[1]
-    users = User.objects.exclude(jwt=token)
+    user1 = User.objects.get(jwt=token)
+    #users = User.objects.exclude(jwt=token)
     friends = User.objects.get(jwt=token).friends.all()
+    #non_friends
+    # Obtener todos los usuarios
+    #todos_los_usuarios = set(User.objects.all())
+
+    # Convertir a un conjunto los amigos de user1
+    #amigos = set(user1.amigos.all())
+
+    # Usuarios que no son amigos
+    non_friends = set(User.objects.all()) - set(friends) - {user1}
+
+    #print(usuarios_no_amigos)  # Devuelve usuarios no amigos
+
     context = {
-        'users': users,
-        'friends': friends
+        #'users': users,
+        'users': non_friends,
+        'friends': friends,
+        'num_friends': user1.num_friends() + 1 
     }
     content = render_to_string('friends.html', context)#, {'friends': friends}) # online_bar
     data = {
@@ -313,14 +328,15 @@ def add_friend(request):
     return JsonResponse(data)
 
 @csrf_exempt
-def remove_friend(request):
+def delete_friend(request):
     # valor_q = request.GET.get('q', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-    friends_name = request.GET.get('add', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    friends_name = request.GET.get('delete', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
+    print(friends_name)
     try:
         user2 = User.objects.get(username=friends_name)
     except: #Does not exist
         print(f"user {friends_name} does not exist")
-    print(user2.email)
+    #print(user2.email)
     token = request.headers.get('Authorization').split(" ")[1]
     user1 = User.objects.get(jwt=token)
     user1.friends.remove(user2)

@@ -17,3 +17,6 @@ class User(models.Model):
 #
 #	def __str__(self):
 #       return self.username  # Representación amigable del objeto
+
+	def num_friends(self):
+		return self.friends.count()

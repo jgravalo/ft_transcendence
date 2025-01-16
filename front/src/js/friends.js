@@ -1,12 +1,12 @@
-function addFriend(num, user)
+function addFriend(id, user)
 {
-	document.getElementById("user" + num).innerHTML = '<i class="fas fa-check friend-icon" onclick="deleteFriend(\'' + num + '\', \'' + user + '\')"></i>';
+	document.getElementById(id).innerHTML = '<i class="fas fa-check friend-icon" onclick="deleteFriend(\'' + id + '\', \'' + user + '\')"></i>';
 	fetchFriend(user, 'add');
 }
 
-function deleteFriend(num, user)
+function deleteFriend(id, user)
 {
-	document.getElementById("user" + num).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + num + '\', \'' + user + '\')"></i>';
+	document.getElementById(id).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + id + '\', \'' + user + '\')"></i>';
 	fetchFriend(user, 'delete');
 }
 

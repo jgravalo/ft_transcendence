@@ -141,14 +141,14 @@ function getInfo()
     console.log("formDataObject =", formDataObject);
     return (formDataObject)
 }
-
+/* 
 function getInfo2FA()
 {
     const userData = decodeToken(getJWTToken());
     console.log("Datos del usuario:", userData);
     fetchLink('/users/profile/');
 }
-
+ */
 const saveJWTToken = (token) => {
     sessionStorage.setItem('token', token);
 };
