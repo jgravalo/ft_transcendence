@@ -12,9 +12,7 @@ from .token import decode_token, make_token
 @csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend
 def delete_user(request):
     if request.method == "DELETE":
-        token = request.headers.get('Authorization').split(" ")[1]
-        #user = get_object_or_404(User, id=user_id)
-        user = User.objects.get(jwt=token)
+        user = User.get_user(request)
         user.delete()
         return JsonResponse({"message": "Usuario borrado con éxito."}, status=200)
     return JsonResponse({"error": "Método no permitido."}, status=405)
@@ -45,9 +43,6 @@ def close_logout(request):
     }
     return JsonResponse(data)
 
-            # # Instanciando y luego guardando
-            # user = User(email=email, password=password)
-            # user.save()
 @csrf_exempt
 def set_login(request):
     if request.method == "POST":
@@ -131,10 +126,8 @@ def set_register(request):
                 logged=True
                 )
             token = make_token(user)
-            #print("token = " + token)
             User.objects.filter(username=user.username).update(jwt=token)
             user = User.objects.get(username=username)
-            #print("jwt(register) =", user.jwt)
 
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
@@ -162,10 +155,6 @@ def logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    # token = request.headers.get('Authorization').split(" ")[1]
-    # print("token:", token)
-    # #if token == 'empty':
-    # user = User.objects.get(jwt=token)
     user = User.get_user(request)
     context = {
         'user': user
@@ -178,10 +167,7 @@ def profile(request):
     return JsonResponse(data)
 
 def update(request):
-    token = request.headers.get('Authorization').split(" ")[1]
-    print("token:", token)
-    #if token == 'empty':
-    user = User.objects.get(jwt=token)
+    user = User.get_user(request)
     context = {
         'user': user
     }
@@ -198,8 +184,7 @@ from django.core.files.storage import default_storage
 def set_update(request):
     if request.method == "POST":
         try:
-            token = request.headers.get('Authorization').split(" ")[1]
-            user = User.objects.get(jwt=token)
+            user = User.get_user(request)
             data = json.loads(request.body)
             try:
                 #image = data.get('image')
@@ -246,10 +231,9 @@ def set_update(request):
 
 @csrf_exempt
 def friends(request):
-    token = request.headers.get('Authorization').split(" ")[1]
-    user1 = User.objects.get(jwt=token)
-    friends = User.objects.get(jwt=token).friends.all()
-    non_friends = set(User.objects.all()) - set(friends) - {user1}
+    user = User.get_user(request)
+    friends = user.friends.all()
+    non_friends = set(User.objects.all()) - set(friends) - {user}
     context = {
         'users': non_friends,
         'friends': friends,
@@ -269,8 +253,7 @@ def add_friend(request):
     except: #Does not exist
         print(f"user {friends_name} does not exist")
     print(user2.email)
-    token = request.headers.get('Authorization').split(" ")[1]
-    user1 = User.objects.get(jwt=token)
+    user1 = User.get_user(request)
     user1.friends.add(user2)
     friends = user1.friends.filter(username=friends_name)
     for friend in friends:
@@ -290,8 +273,7 @@ def delete_friend(request):
         user2 = User.objects.get(username=friends_name)
     except: #Does not exist
         print(f"user {friends_name} does not exist")
-    token = request.headers.get('Authorization').split(" ")[1]
-    user1 = User.objects.get(jwt=token)
+    user1 = User.get_user(request)
     user1.friends.remove(user2)
     content = render_to_string('close_login.html') # online_bar
     data = {
