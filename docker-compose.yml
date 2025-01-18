@@ -56,17 +56,17 @@ services:
     networks:
       - pongnet
 
-  db:
-    image: postgres:15
-    container_name: db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Jesus20022
-      POSTGRES_DB: postgres
-    networks:
-      - pongnet
-    ports:
-      - "5432:5432"
+  # db:
+  #   image: postgres:15
+  #   container_name: db
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: Jesus20022
+  #     POSTGRES_DB: postgres
+  #   networks:
+  #     - pongnet
+  #   ports:
+  #     - "5432:5432"
 
 networks:
   pongnet:

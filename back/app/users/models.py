@@ -1,7 +1,7 @@
 from django.db import models
+#from .views import decode_token
 
 # Create your models here.
-#class User(models.Model):
 class User(models.Model):
 	username = models.CharField(max_length=100)
 	email = models.CharField(max_length=100)
@@ -17,6 +17,13 @@ class User(models.Model):
 #
 #	def __str__(self):
 #       return self.username  # Representación amigable del objeto
+
+	@classmethod
+	def get_user(cls, request):
+		token = request.headers.get('Authorization').split(" ")[1]
+		#if token == 'empty':
+		data = decode_token(token)
+		return cls.objects.get(user_id=data.user_id)
 
 	def num_friends(self):
 		return self.friends.count()
