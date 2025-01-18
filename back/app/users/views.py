@@ -119,16 +119,11 @@ def set_register(request):
             user = User.objects.create(
                 username=username,
                 email=email,
-                password=password,
-                wins=0,
-                losses=0,
-                matches=0,
-                logged=True
+                password=password
                 )
             token = make_token(user)
             User.objects.filter(username=user.username).update(jwt=token)
             user = User.objects.get(username=username)
-
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -238,7 +233,7 @@ def friends(request):
         'users': non_friends,
         'friends': friends,
     }
-    content = render_to_string('friends.html', context)#, {'friends': friends}) # online_bar
+    content = render_to_string('friends.html', context)
     data = {
         "element": 'content',
         "content": content,
@@ -255,15 +250,7 @@ def add_friend(request):
     print(user2.email)
     user1 = User.get_user(request)
     user1.friends.add(user2)
-    friends = user1.friends.filter(username=friends_name)
-    for friend in friends:
-        print(friend.username)
-    content = render_to_string('close_login.html') # online_bar
-    data = {
-        "element": 'bar',
-        "content": content,
-    }
-    return JsonResponse(data)
+    return None
 
 @csrf_exempt
 def delete_friend(request):
@@ -275,11 +262,7 @@ def delete_friend(request):
         print(f"user {friends_name} does not exist")
     user1 = User.get_user(request)
     user1.friends.remove(user2)
-    content = render_to_string('close_login.html') # online_bar
-    data = {
-        "element": 'bar',
-        "content": content,
-    }
-    return JsonResponse(data)
+    return None
+
 
 
