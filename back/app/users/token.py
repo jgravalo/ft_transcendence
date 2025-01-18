@@ -5,10 +5,7 @@ import datetime
 # Crear un token
 def make_token(user):
     payload = {
-        "user_id": 123,
-        "username": user.username,
-        "email": user.email,
-        "password": user.password,
+        "user_id": str(user.user_id),
         "role": "admin",
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1) # Expiración
     }

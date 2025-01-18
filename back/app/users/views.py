@@ -162,10 +162,11 @@ def logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    token = request.headers.get('Authorization').split(" ")[1]
-    print("token:", token)
-    #if token == 'empty':
-    user = User.objects.get(jwt=token)
+    # token = request.headers.get('Authorization').split(" ")[1]
+    # print("token:", token)
+    # #if token == 'empty':
+    # user = User.objects.get(jwt=token)
+    user = User.get_user(request)
     context = {
         'user': user
     }

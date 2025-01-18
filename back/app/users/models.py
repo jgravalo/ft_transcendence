@@ -1,8 +1,10 @@
 from django.db import models
-#from .views import decode_token
+from .token import decode_token
+import uuid
 
 # Create your models here.
 class User(models.Model):
+	user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
 	username = models.CharField(max_length=100)
 	email = models.CharField(max_length=100)
 	password = models.CharField(max_length=100)
@@ -23,7 +25,7 @@ class User(models.Model):
 		token = request.headers.get('Authorization').split(" ")[1]
 		#if token == 'empty':
 		data = decode_token(token)
-		return cls.objects.get(user_id=data.user_id)
+		return cls.objects.get(user_id=data["user_id"])
 
 	def num_friends(self):
 		return self.friends.count()
