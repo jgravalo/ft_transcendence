@@ -15,7 +15,7 @@
 	text-align: center; /* Opcional si el texto ocupa varias líneas */
 }
 
-.barra-busqueda {
+.search-bar {
 	display: flex;
 	align-items: center;
 	max-width: 800px;
@@ -27,7 +27,7 @@
 	overflow: hidden;
 }
 
-.barra-busqueda input {
+.search-bar input {
 	flex: 1;
 	padding: 10px;
 	border: none;
@@ -35,7 +35,7 @@
 	background-color: #e0e0e0;
 }
 
-.barra-busqueda button {
+.search-bar button {
 	padding: 10px 20px;
 	background-color: #e0e0e0;
 	color: black;
@@ -44,7 +44,7 @@
 	font-size: medium;
 }
 
-.barra-busqueda button:hover {
+.search-bar button:hover {
 	background-color: #e0e0e0;
 	color: black;
 }

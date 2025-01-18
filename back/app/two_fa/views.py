@@ -62,7 +62,7 @@ def email(request):
             'email': user.email,
         }
     }
-    content = render_to_string('two_fa_email.html', context)
+    content = render_to_string('get_email.html', context)
     data = {
         "element": 'modalContainer',
         "content": content
@@ -95,7 +95,7 @@ def verify(request):
     token = request.headers.get('Authorization').split(" ")[1]
     user = User.objects.get(jwt=token)
     send_email_otp(user)
-    content = render_to_string('two_fa_verify.html')
+    content = render_to_string('verify.html')
     data = {
         #"opt_code": opt_code,
         "element": 'modalContainer',
