@@ -7,6 +7,9 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libffi-dev \
 	gcc \
+    netcat-openbsd \
+    curl \
+    bash \
     && rm -rf /var/lib/apt/lists/* \
 	&& apt-get clean
 
@@ -49,6 +52,10 @@ ENV DJANGO_SETTINGS_MODULE=app.settings
 
 # Comando para ejecutar Daphne en el contenedor
 #CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "app.asgi:application"]
+
+# Cambiar el shell por defecto a bash
+SHELL ["/bin/bash", "-c"]
+
 COPY init.sh .
 RUN chmod +x init.sh
-CMD ["sh", "init.sh"]
+CMD ["/bin/bash", "./init.sh"]

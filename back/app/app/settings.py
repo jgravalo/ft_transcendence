@@ -117,32 +117,18 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # Old database, commented just in case of emergency
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
 
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DJANGO_DB_NAME'),
-#         'USER': os.getenv('DJANGO_DB_USER'),
-#         'PASSWORD': os.getenv('DJANGO_DB_PASSWORD'),
-#         'HOST': os.getenv('DJANGO_DB_HOST'),
-#         'PORT': os.getenv('DJANGO_DB_PORT'),
+        # New database
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
+        'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
+        'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
+        'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
 
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
-#         'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
-#         'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
-#         'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
-#         'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
-
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': '42Pong',
-#         'USER': 'jgravalo',
-#         'PASSWORD': 'Jesus20022',
-#         'HOST': 'db',  # Si usas Docker, cambia esto por el nombre del contenedor de la base de datos
-#         'PORT': '5432',
     }
 }
 
