@@ -9,15 +9,20 @@ front:
 	docker run -d -p 8080:80 front
 
 back:
-	docker build -t front ./back
-	docker run -d -p 8080:80 back
+	docker build -t back ./back
+	docker run -d -p 8000:8000 back
+
+db:
+	docker build -t db ./db
+	docker run -d -p 5432:5432 db
 
 migrations:
 	docker exec -it back python manage.py makemigrations
 	docker exec -it back python manage.py migrate
 
 dbshell:
-	docker exec -it db psql -U jgravalo -d postgres
+	docker exec -it db psql -U postgres -d postgres
+
 
 ls:
 	@docker ps -a
@@ -29,19 +34,18 @@ ls:
 	@docker network ls 
 
 clean:
+	@echo "Deteniendo y eliminando contenedores..."
+	@docker compose down
 	@if [ ! -z "$$(docker ps -aq)" ]; then \
 		docker stop $$(docker ps -aq); \
 		docker rm $$(docker ps -aq); \
 	fi
-	@if [ ! -z "$$(docker images -aq)" ]; then \
-		docker rmi $$(docker images -aq); \
-	fi
-	@if [ ! -z "$$(docker volume ls -q)" ]; then \
-		docker volume rm $$(docker volume ls -q); \
-	fi
-	@if [ ! -z "$$(docker network ls -q --filter type=custom)" ]; then \
-		docker network rm $$(docker network ls -q --filter type=custom); \
-	fi
+	@echo "Eliminando imágenes..."
+	@docker rmi -f $$(docker images -aq) 2>/dev/null || true
+	@echo "Eliminando volúmenes..."
+	@docker volume rm $$(docker volume ls -q) 2>/dev/null || true
+	@echo "Eliminando redes personalizadas..."
+	@docker network rm $$(docker network ls -q --filter type=custom) 2>/dev/null || true
 
 re:
 	make clean
