@@ -18,8 +18,8 @@ COPY ./certs/nginx.key /etc/nginx/certs/
 
 
 # Copia los archivos estáticos de la aplicación al directorio HTML de Nginx
-#COPY ./html /usr/share/nginx/html
-COPY src/ /usr/share/nginx/html/.
+#Es mejor usar un volumen para ver las modificaciones directamente y evitar reconstruir el contenedor cada vez
+#COPY src/ /usr/share/nginx/html/.
 
 # Expone el puerto 80 para el tráfico HTTP
 EXPOSE 80
