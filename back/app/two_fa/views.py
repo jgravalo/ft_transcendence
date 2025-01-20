@@ -1,6 +1,7 @@
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 import json
 
 from .models import TwoFactorAuth
@@ -22,42 +23,53 @@ def two_fa(request):
 
 #def send_email_otp(request):
 
-def email(request):
+def phone(request):
     user = User.get_user(request)
-    send_email_otp(user)
     context = {
         'user': user
     }
-    content = render_to_string('get_email.html', context)
+    content = render_to_string('get_number.html', context)
     data = {
         "element": 'modalContainer',
         "content": content
     }
     return JsonResponse(data)
 
-def set_email(request):
+def set_phone(request):
     if request.method == "POST":
         try:
             user = User.get_user(request)
             data = json.loads(request.body)
-            password = data.get('password')
+            password = data.get('number')
             #print("jwt (login) = " + user.jwt)
-            send_email_otp(user)
+            #send_email_otp(user)
             token = request.headers.get('Authorization').split(" ")[1]
+            #content = render_to_string('close_login.html')
             data = {
                 "error": "Success",
-                "element": 'bar',
-                "content": content,
+                "element": None,
+                #"element": 'bar',
+                #"content": content,
                 "jwt": token,
-                "next_path": '/two_fa/verify/'
+                "next_path": '/two_fa/verify/?way=sms'
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
+@csrf_exempt
 def verify(request):
+    way = request.GET.get('way', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
+    print(way)
     user = User.get_user(request)
-    send_email_otp(user)
+    if way == 'email/':
+        send_email_otp(user)
+    elif way == 'sms/':
+        send_sms_code(user)
+    elif way == 'google/':
+        generate_qr_code(user)
+    else:
+        return JsonResponse({'error': 'Query inválida'}, status=404)
     content = render_to_string('verify.html')
     data = {
         #"opt_code": opt_code,

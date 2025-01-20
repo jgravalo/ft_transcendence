@@ -23,7 +23,7 @@ def send_email_otp(user):
 		logger.error(f"Error al enviar correo: {e}")
 	except Exception as e:
 		logger.error(f"Error send_mail: {e}")
- 	two_fa.otp_code = otp_code
+	two_fa.otp_code = otp_code
 	two_fa.save()
 	print("two_fa.otp_code:", two_fa.otp_code)
 

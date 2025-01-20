@@ -13,7 +13,7 @@ class User(models.Model):
 	losses = models.IntegerField(default=0)
 	matches = models.IntegerField(default=0)
 	logged = models.BooleanField(default=False)
-	two_fa_enabled = models.BooleanField(default=True)
+	two_fa_enabled = models.BooleanField(default=False)
 	jwt = models.CharField(max_length=512, null=True, blank=True)
 	friends = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
 #

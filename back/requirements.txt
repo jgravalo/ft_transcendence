@@ -41,5 +41,16 @@ djangorestframework-simplejwt==5.2.2
 # Para implementar el estándar de códigos OTP basados en tiempo (TOTP).
 pyotp>=2.9.0
 
+#django
+#pyotp==2.8.0
+
+# Twilio para enviar SMS
+twilio==8.0.0
+
+# Para generar QR
+qrcode==7.3
+
 # Para gestionar variables de entorno
 #django-environ==0.10.0
+
+python-dateutil==2.8.2
