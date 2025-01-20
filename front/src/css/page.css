@@ -43,8 +43,18 @@ body {
 }
 
 #log_links {
-	display: flex;
-	justify-content: right;
+  display: flex;
+  align-items: center; /* Align items vertically in the center */
+  gap: 10px; /* Add spacing between items */
+}
+
+#log_links .dropdown button {
+  display: flex; /* Ensure the button contents align properly */
+  align-items: center; /* Center the flag image vertically inside the button */
+  background: none; /* Remove default button styles for consistency */
+  border: none; /* Remove button border */
+  padding: 0; /* Remove default button padding */
+  cursor: pointer; /* Show a pointer cursor on hover */
 }
 
 .bar-link {
@@ -101,4 +111,11 @@ button:hover {
 
 .fade-in {
   animation: fadeIn 2s ease-in-out;
+}
+
+.dropdown img {
+  margin-right: 8px;
+  vertical-align: middle;
+  width: 25px;
+  height: 20px;
 }

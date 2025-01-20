@@ -57,7 +57,6 @@ services:
     #   - db
     networks:
       - pongnet
-
   # db:
   #   image: postgres:15
   #   container_name: db

@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libffi-dev \
 	gcc \
+    gettext \
     && rm -rf /var/lib/apt/lists/* \
 	&& apt-get clean
 
@@ -42,6 +43,7 @@ ENV DJANGO_SUPERUSER_EMAIL=admin@example.com
 
 # Establece la variable de entorno para las configuraciones de Django
 ENV DJANGO_SETTINGS_MODULE=app.settings
+ENV PYTHONPATH="/app:${PYTHONPATH}"
 
 # Crear los archivos de migraciones, aplicar las migraciones y ejecutar el servidor de desarrollo
 #CMD ["python", "manage.py", "migrate"]
