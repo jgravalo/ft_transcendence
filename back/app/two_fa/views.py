@@ -31,18 +31,15 @@ def send_email_otp(user):
         two_fa = TwoFactorAuth.objects.create(user=user)#, secret_key=settings.SECRET_KEY)
         otp_code = two_fa.generate_otp()
         print("otp_code:", otp_code)
-        #print("BEFORE SEND MAIL")
-        # Envía el OTP por correo electrónico
         try:
             send_mail(
-                subject='Tu código OTP'.encode('utf-8').decode('utf-8'),
-                message=f'Tu código OTP es: {otp_code}'.encode('utf-8').decode('utf-8'),
-                from_email='no-reply@example.com',
-                recipient_list=[user.email],
+                'Tu código OTP'.encode('utf-8').decode('utf-8'), #subject=
+                f'Tu código OTP es: {otp_code}'.encode('utf-8').decode('utf-8'),#message=
+                'no-reply@example.com',#from_email=
+                [user.email]#recipient_list=
             )
         except Exception as e:
             logger.error(f"Error send_mail: {e}")
-        #print("AFTER SEND MAIL")
         two_fa.otp_code = otp_code
         two_fa.save()
         print("two_fa.otp_code:", two_fa.otp_code)
@@ -54,8 +51,7 @@ def send_email_otp(user):
         logger.error(f"Error inesperado: {e}")
 
 def email(request):
-    token = request.headers.get('Authorization').split(" ")[1]
-    user = User.objects.get(jwt=token)
+    user = User.get_user(request)
     send_email_otp(user)
     context = {
         'user': {
@@ -72,28 +68,25 @@ def email(request):
 def set_email(request):
     if request.method == "POST":
         try:
-            token = request.headers.get('Authorization').split(" ")[1]
+            user = User.get_user(request)
             data = json.loads(request.body)
             password = data.get('password')
             #print("jwt (login) = " + user.jwt)
-            user = User.objects.get(jwt=token)
             send_email_otp(user)
-            data = decode_token(token) # porque hago decode?
-            #data = {
-            data.update({
+            token = request.headers.get('Authorization').split(" ")[1]
+            data = {
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
                 "jwt": token,
                 "next_path": '/two_fa/verify/'
-            })
+            }
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
 def verify(request):
-    token = request.headers.get('Authorization').split(" ")[1]
-    user = User.objects.get(jwt=token)
+    user = User.get_user(request)
     send_email_otp(user)
     content = render_to_string('verify.html')
     data = {
@@ -112,16 +105,16 @@ def verify_otp(request): # email o SMS
     if request.method == 'POST':
         data = json.loads(request.body)
         otp_code = data.get('otp-code')
-        token = request.headers.get('Authorization').split(" ")[1]
-        print("token:", token)
-        two_fa = TwoFactorAuth.objects.get(user__jwt=token)
+        user = User.get_user(request)
+        two_fa = TwoFactorAuth.objects.get(user__user_id=user.user_id)
         print("otp_code:", otp_code)
         print("data.otp_code:", two_fa.otp_code)
         if (otp_code != two_fa.otp_code):
-            #User.objects.filter(jwt=token).delete()
+            #user.delete()
             return JsonResponse({'type': 'errorName', 'error': 'Your code is wrong.'})
         two_fa.delete()
         content = render_to_string('close_login.html') # online_bar
+        token = request.headers.get('Authorization').split(" ")[1]
         data = {
             "error": "Success",
             "jwt": token,
@@ -129,8 +122,6 @@ def verify_otp(request): # email o SMS
             "content": content,
             "next_path": '/users/profile/'
         }
-        #print(data)
-
         # OTP correcto, redirige al usuario al dashboard
         # return redirect('dashboard')
         return JsonResponse(data)

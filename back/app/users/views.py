@@ -59,23 +59,19 @@ def set_login(request):
                 return JsonResponse({'type': 'errorName', 'error': 'User does not exist.'})
             if password != user.password:
                 return JsonResponse({'type': 'errorPassword', 'error': 'Password is not correct'})
-            #print("jwt (login) = " + user.jwt)
-            data = decode_token(user.jwt) # porque hago decode?
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
             else:
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/'
-            #data = {
-            data.update({
+            data = {
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
                 "jwt": user.jwt,
                 "next_path": next_path
-            })
-            #print('data:', data)
+            }
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
@@ -122,7 +118,7 @@ def set_register(request):
                 password=password
                 )
             token = make_token(user)
-            User.objects.filter(username=user.username).update(jwt=token)
+            User.objects.filter(username=user.username).update(jwt=token) 
             user = User.objects.get(username=username)
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
@@ -250,7 +246,8 @@ def add_friend(request):
     print(user2.email)
     user1 = User.get_user(request)
     user1.friends.add(user2)
-    return None
+    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
+    return JsonResponse(data)
 
 @csrf_exempt
 def delete_friend(request):
@@ -262,7 +259,8 @@ def delete_friend(request):
         print(f"user {friends_name} does not exist")
     user1 = User.get_user(request)
     user1.friends.remove(user2)
-    return None
+    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
+    return JsonResponse(data)
 
 
 
