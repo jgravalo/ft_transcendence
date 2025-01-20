@@ -37,6 +37,8 @@ services:
       - "8443:443"
     networks:
       - pongnet
+    volumes:
+    - ./front/src:/usr/share/nginx/html
     # environment:
     #   - VIRTUAL_HOST=jgravalo.42.fr
     #   - LETSENCRYPT_HOST=jgravalo.42.fr
