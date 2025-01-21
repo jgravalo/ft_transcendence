@@ -29,6 +29,9 @@ echo "Aplicando migraciones..."
 python manage.py makemigrations
 python manage.py migrate
 
+# Compila los archivos de traducción (.po>.mo)
+python manage.py compilemessages
+
 # Crea un usuario administrador si es necesario (opcional)
 if [ "$CREATE_SUPERUSER" = "true" ]; then
     echo "Creando superusuario..."
