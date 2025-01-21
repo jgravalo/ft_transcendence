@@ -10,6 +10,13 @@ class TwoFactorAuth(models.Model):
     otp_code = models.CharField(max_length=6, unique=True)
     secret_key = models.CharField(max_length=32, unique=True)
     is_2fa_enabled = models.BooleanField(default=False)
+    method = models.CharField(max_length=20, choices=[('email', 'Email'), ('sms', 'SMS'), ('google_auth', 'Google Authenticator')])
+    email = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)  # Para SMS
+    google_auth_secret = models.CharField(max_length=32, null=True, blank=True)  # Para TOTP
+    email_code = models.CharField(max_length=6, null=True, blank=True)
+    sms_code = models.CharField(max_length=6, null=True, blank=True)
+    code_expiry = models.DateTimeField(null=True, blank=True)
     
     def save(self, *args, **kwargs):
         if not self.secret_key:

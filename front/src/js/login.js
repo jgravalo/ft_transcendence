@@ -102,10 +102,11 @@ function makePost(path)
                 //console.log("2:", getJWTToken())
                 if (path != '/users/update/')
                     document.getElementById('close').click();
-                var dest = `${data.element}`;
-                document.getElementById(dest).innerHTML = `${data.content}`;
-                //fetchLink('/two_fa/');
-                //fetchLink('/users/profile/');
+                if (`${data.element}`)
+                {
+                    var dest = `${data.element}`;
+                    document.getElementById(dest).innerHTML = `${data.content}`;
+                }
                 fetchLink(`${data.next_path}`);
                 handleLinks();
             }

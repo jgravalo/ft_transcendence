@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from .views import get_home
+from .health import health_check
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from your_app.views import EnableTOTPView, VerifyTOTPView, EnableEmailOTPView, VerifyEmailOTPView
@@ -28,6 +29,7 @@ urlpatterns = [
     path('game/', include('game.urls')),
     path('users/', include('users.urls')),
     path('two_fa/', include('two_fa.urls')),
+    path('health/', health_check, name='health_check'),
     path('get-translations/', include('language.urls')),
 ]
 
