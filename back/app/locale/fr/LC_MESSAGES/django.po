@@ -31,7 +31,7 @@ msgstr "S'inscrire"
 
 #: language/translations.py:7
 msgid "Welcome"
-msgstr "Bienvenue à Cosmic "
+msgstr "Bienvenue au cosmique "
 
 #: language/translations.py:8
 msgid "Start"
