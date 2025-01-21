@@ -28,6 +28,7 @@ urlpatterns = [
     path('game/', include('game.urls')),
     path('users/', include('users.urls')),
     path('two_fa/', include('two_fa.urls')),
+    path('get-translations/', include('language.urls')),
 ]
 
 # if settings.DEBUG:

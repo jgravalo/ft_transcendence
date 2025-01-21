@@ -31,10 +31,16 @@ body {
 }
 
 .bar-links {
-  padding: 15px;
+  padding: 15px 7px;
   font-weight: bold;
   --color: white;
   /* text-decoration: none; */
+}
+
+.bar-links a {
+  display: inline-block;
+  min-width: 100px; /* Adjust this value based on your longest text */
+  text-align: center; /* Center-align the text */
 }
 
 #page_links {
@@ -45,7 +51,6 @@ body {
 #log_links {
   display: flex;
   align-items: center; /* Align items vertically in the center */
-  gap: 10px; /* Add spacing between items */
 }
 
 #log_links .dropdown button {

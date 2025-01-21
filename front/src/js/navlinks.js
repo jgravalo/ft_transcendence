@@ -34,8 +34,12 @@ window.addEventListener('popstate', (event) => handlePopstate(event));
 function handlePopstate(event)
 {
     console.log("Se cambió la URL", event.state);
-    var path = window.location.href;
+    var path = window.location.pathname;
     console.log(path);
+    if (path.startsWith("/get-translations")) {
+        console.log("Ignoring language fetch in handlePopstate.");
+        return;
+    }
     handleLink(path);
 }
 

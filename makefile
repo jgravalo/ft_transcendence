@@ -43,8 +43,17 @@ clean:
 		docker network rm $$(docker network ls -q --filter type=custom); \
 	fi
 
+# Entrar en el contenedor con 'make enter SERVICE=front(o back)
+enter:
+	@CONTAINER_ID=$$(docker-compose -f docker-compose.yml ps -q $(SERVICE)); \
+	if [ -n "$$CONTAINER_ID" ]; then \
+		docker exec -it $$CONTAINER_ID /bin/sh; \
+	else \
+		echo "Container for service '$(SERVICE)' is not running"; \
+	fi
+
 re:
 	make clean
 	make all
 
-.PHONY: all down front back migrations dbshell ls clean
+.PHONY: all down front back migrations dbshell ls clean enter

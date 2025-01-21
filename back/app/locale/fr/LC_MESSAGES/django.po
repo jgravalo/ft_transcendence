@@ -1,0 +1,30 @@
+# Translation file for the French language.
+# Copyright (C) 2025 The PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Jean Dupont <jean.dupont@example.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: bugs@example.com\n"
+"POT-Creation-Date: 2025-01-21 10:51+0000\n"
+"PO-Revision-Date: 2025-01-21 11:00+0000\n"
+"Last-Translator: Jean Dupont <jean.dupont@example.com>\n"
+"Language-Team: Français <fr@example.com>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: language/translations.py:4
+msgid "Home"
+msgstr "Accueil"
+
+#: language/translations.py:5
+msgid "Login"
+msgstr "Connexion"
+
+#: language/translations.py:6
+msgid "Register"
+msgstr "Inscription"

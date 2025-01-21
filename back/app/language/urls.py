@@ -2,5 +2,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('get-translations/', views.get_translations, name='get_translations'),
+    path('', views.get_translations, name='get_translations'),
 ]
