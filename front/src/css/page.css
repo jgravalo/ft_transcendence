@@ -338,9 +338,15 @@ body {
 	background-color: rgb(0, 0, 0);
 	/* background-image: url('../img/stars.jpg'); */
 	animation: fadeIn 2s ease-out;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
 }
+
 #all {
   display: flex;
+  flex: 1;
   justify-content: center; /* Horizontal centering */
   align-items: center; /* Vertical centering */
 }
@@ -415,6 +421,25 @@ body {
 	color: white;
 }
 
+#content {
+  
+}
+
+#content a {
+	background: linear-gradient(to right, #b22633, #001695);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  padding: 4px 10px;
+  font-size: 38px;
+  font-weight: 800;
+}
+
+#content h1 {
+	margin: 0px;
+}
+
 a {
   /* color: white; */
   text-decoration: none;
@@ -427,7 +452,7 @@ button {
 	font-weight: bold;
 	color: white;
 	border: 4px solid white;
-	background-color: black;
+	background-color: #00000000;
 	border-radius: 10px;
 }
 
@@ -459,4 +484,14 @@ button:hover {
   vertical-align: middle;
   width: 25px;
   height: 20px;
+}
+
+footer {
+  background: linear-gradient(to right, #b22633, #001695);
+  color: white;
+  padding: 15px;
+  border-radius: 8px 8px 0 0;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
 }

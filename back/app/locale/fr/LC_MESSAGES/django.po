@@ -23,8 +23,24 @@ msgstr "Accueil"
 
 #: language/translations.py:5
 msgid "Login"
-msgstr "Connexion"
+msgstr "Se connecter"
 
 #: language/translations.py:6
 msgid "Register"
-msgstr "Inscription"
+msgstr "S'inscrire"
+
+#: language/translations.py:7
+msgid "Welcome"
+msgstr "Bienvenue à Cosmic "
+
+#: language/translations.py:8
+msgid "Start"
+msgstr "Commencez le jeu"
+
+#: language/translations.py:9
+msgid "Project"
+msgstr "© 2025 projet ft_transcendence par 42"
+
+#: language/translations.py:10
+msgid "Team"
+msgstr "Membres de l'équipe : Jésus, Manuel, David, Victor et Louis"
