@@ -36,29 +36,28 @@
 		<div id="bar">
 			<div id="page_links">
 				<div class="bar-links"><a id="Home" class="link" href="/" data-i18n="button.home">Home</a></div>
-				<!-- <div class="bar-links"><a id="testWebSocket" onclick="testWebSocket()">testWebSocket</a></div> -->
 			</div>
 			<div id="modalContainer"></div>
 			<div id="output"></div>
 			<div id="log_links">
 				<div class="dropdown">
 					<button class="btn" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-						<img id="currentFlag" src="./img/en.svg" alt="English">
+						<img id="currentFlag" src="/img/en.svg" alt="English">
 					</button>
 					<ul class="dropdown-menu" aria-labelledby="languageDropdown">
 						<li>
 							<a class="dropdown-item" href="#" onclick="changeLanguage('en'); return false;">
-								<img src="./img/en.svg" alt="English"> English
+								<img src="/img/en.svg" alt="English"> English
 							</a>
 						</li>
 						<li>
 							<a class="dropdown-item" href="#" onclick="changeLanguage('es'); return false">
-								<img src="./img/es.svg" alt="Español"> Español
+								<img src="/img/es.svg" alt="Español"> Español
 							</a>
 						</li>
 						<li>
 							<a class="dropdown-item" href="#" onclick="changeLanguage('fr'); return false">
-								<img src="./img/fr.svg" alt="Français"> Français
+								<img src="/img/fr.svg" alt="Français"> Français
 							</a>
 						</li>
 					</ul>
@@ -91,12 +90,12 @@
 
 		<!-- Scripts -->
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-		<script src="js/lang.js"></script>
 		<script src="js/navlinks.js"></script>
 		<script src="js/login.js"></script>
 		<script src="js/game.js"></script>
 		<script src="js/websocket.js"></script>
 		<script src="js/friends.js"></script>
 		<script src="js/jwt.js" type="module"></script>
+		<script src="js/lang.js"></script>
 	</body>
 </html>

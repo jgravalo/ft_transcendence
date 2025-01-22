@@ -44,3 +44,91 @@ msgstr "© 2025 proyecto ft_transcendence por 42"
 #: language/translations.py:10
 msgid "Team"
 msgstr "Miembros del equipo: Jesús, Manuel, David, Víctor y Luis"
+
+#: language/translations.py:11
+msgid "Logout"
+msgstr "Cerrar sesión"
+
+#: language/translations.py:12
+msgid "User List"
+msgstr "Lista de Usuarios"
+
+#: language/translations.py:13
+msgid "Search..."
+msgstr "Buscar..."
+
+#: language/translations.py:14
+msgid "Search"
+msgstr "Buscar"
+
+#: language/translations.py:15
+msgid "Friends"
+msgstr "Amigos"
+
+#: language/translations.py:16
+msgid "Username"
+msgstr "Nombre de Usuario"
+
+#: language/translations.py:17
+msgid "Email"
+msgstr "Correo Electrónico"
+
+#: language/translations.py:18
+msgid "Record"
+msgstr "Registro"
+
+#: language/translations.py:19
+msgid "-"
+msgstr "-"
+
+#: language/translations.py:20
+msgid "You haven't friends"
+msgstr "No tienes amigos"
+
+#: language/translations.py:21
+msgid "Other Users"
+msgstr "Otros Usuarios"
+
+#: language/translations.py:22
+msgid "#"
+msgstr "#"
+
+#: language/translations.py:23
+msgid "There are no users."
+msgstr "No hay usuarios."
+
+#: language/translations.py:24
+msgid "Start 1vs1"
+msgstr "Jugar 1vs1"
+
+#: language/translations.py:25
+msgid "Start online"
+msgstr "Jugar en linéa"
+
+#: language/translations.py:28
+msgid "Submit"
+msgstr "Ingresar"
+
+#: language/translations.py:29
+msgid "Phone"
+msgstr "Numero de teléfono"
+
+#: language/translations.py:30
+msgid "Username or Email Address"
+msgstr "Nombre de usuario o Correo electrónico"
+
+#: language/translations.py:31
+msgid "Password"
+msgstr "Contraseña"
+
+#: language/translations.py:32
+msgid "Please enter a valid password."
+msgstr "Por favor ingrese una contraseña válida."
+
+#: language/translations.py:33
+msgid "User does not exist."
+msgstr "El usuario no existe."
+
+#: language/translations.py:34
+msgid "Please enter a valid username or email address."
+msgstr "Por favor ingrese un nombre de usuario o correo electrónico válido."

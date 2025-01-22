@@ -1,16 +1,16 @@
-<h1 style="color: white;">Lista de Usuarios</h1>
+<h1 style="color: white;" data-i18n="friends.list.title">Lista de Usuarios</h1>
 <form class="search-bar" action="/search" method="get">
-	<input type="text" name="search" placeholder="Search..." />
+	<input type="text" name="search" placeholder="Search..." data-i18n="friends.search.placeholder" />
 	<button type="submit"><i class="fas fa-search"></i></button>
 </form>
-<h5 style="color: white;">Friends</h1>
+<h5 style="color: white;" data-i18n="friends.title">Friends</h1>
 	<table class="user">
 		<thead>
 			<tr>
-				<th>Username</th>
-				<th>Email</th>
-				<th>Record</th>
-				<th>-</th>
+				<th data-i18n="friends.table.username">Username</th>
+				<th data-i18n="friends.table.email">Email</th>
+				<th data-i18n="friends.table.record">Record</th>
+				<th data-i18n="friends.table.action">-</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -25,20 +25,20 @@
 			</tr>
 			{% empty %}
 			<tr>
-				<td colspan="4">Yo haven't friends</td>
+				<td colspan="4" data-i18n="friends.friends.empty">Yo haven't friends</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
-<h5 style="color: white;">Other users</h1>
+<h5 style="color: white;" data-i18n="friends.other.title">Other users</h1>
 	<table class="user">
 		<thead>
 			<tr>
-				<th>#</th>
-				<th>Username</th>
-				<th>Email</th>
-				<th>Record</th>
-				<th>-</th>
+				<th data-i18n="friends.table.index">#</th>
+				<th data-i18n="friends.table.username">Username</th>
+				<th data-i18n="friends.table.email">Email</th>
+				<th data-i18n="friends.table.record">Record</th>
+				<th data-i18n="friends.table.action">-</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -54,7 +54,7 @@
 			</tr>
 			{% empty %}
 			<tr>
-				<td colspan="4">There are not users.</td>
+				<td colspan="4" data-i18n="friends.other.empty">There are not users.</td>
 			</tr>
 			{% endfor %}
 		</tbody>

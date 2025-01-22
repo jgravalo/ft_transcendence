@@ -95,6 +95,9 @@ function fetchLink(path)
         //var dest = 'content';
         var dest = `${data.element}`;
         document.getElementById(dest).innerHTML = `${data.content}`;
+
+        //updating the newly added content with right language
+        changeLanguage(localStorage.getItem("selectedLanguage") || "en");
         if (dest == 'modalContainer' /*&& path != '/two_fa/'*/)
             //     path == "/users/login/" ||
             //     path == "/users/logout/" ||

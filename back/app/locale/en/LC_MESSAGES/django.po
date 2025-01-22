@@ -44,3 +44,91 @@ msgstr "© 2025 ft_transcendence project by 42"
 #: language/translations.py:10
 msgid "Team"
 msgstr "Team Members: Jesus, Manuel, David, Victor, and Louis"
+
+#: language/translations.py:11
+msgid "Logout"
+msgstr "Logout"
+
+#: language/translations.py:12
+msgid "User List"
+msgstr "User List"
+
+#: language/translations.py:13
+msgid "Search..."
+msgstr "Search..."
+
+#: language/translations.py:14
+msgid "Search"
+msgstr "Search"
+
+#: language/translations.py:15
+msgid "Friends"
+msgstr "Friends"
+
+#: language/translations.py:16
+msgid "Username"
+msgstr "Username"
+
+#: language/translations.py:17
+msgid "Email"
+msgstr "Email"
+
+#: language/translations.py:18
+msgid "Record"
+msgstr "Record"
+
+#: language/translations.py:19
+msgid "-"
+msgstr "-"
+
+#: language/translations.py:20
+msgid "You haven't friends"
+msgstr "You haven't friends"
+
+#: language/translations.py:21
+msgid "Other Users"
+msgstr "Other Users"
+
+#: language/translations.py:22
+msgid "#"
+msgstr "#"
+
+#: language/translations.py:23
+msgid "There are no users."
+msgstr "There are no users."
+
+#: language/translations.py:24
+msgid "Start 1vs1"
+msgstr "Start 1vs1"
+
+#: language/translations.py:25
+msgid "Start online"
+msgstr "Start online"
+
+#: language/translations.py:28
+msgid "Submit"
+msgstr "Submit"
+
+#: language/translations.py:29
+msgid "Phone"
+msgstr "Phone number"
+
+#: language/translations.py:30
+msgid "Username or Email Address"
+msgstr "Username or Email Address"
+
+#: language/translations.py:31
+msgid "Password"
+msgstr "Password"
+
+#: language/translations.py:32
+msgid "Please enter a valid password."
+msgstr "Please enter a valid password."
+
+#: language/translations.py:33
+msgid "User does not exist."
+msgstr "User does not exist."
+
+#: language/translations.py:34
+msgid "Please enter a valid username or email address."
+msgstr "Please enter a valid username or email address."

@@ -44,3 +44,91 @@ msgstr "© 2025 projet ft_transcendence par 42"
 #: language/translations.py:10
 msgid "Team"
 msgstr "Membres de l'équipe : Jésus, Manuel, David, Victor et Louis"
+
+#: language/translations.py:11
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: language/translations.py:12
+msgid "User List"
+msgstr "Liste des utilisateurs"
+
+#: language/translations.py:13
+msgid "Search..."
+msgstr "Rechercher..."
+
+#: language/translations.py:14
+msgid "Search"
+msgstr "Rechercher"
+
+#: language/translations.py:15
+msgid "Friends"
+msgstr "Amis"
+
+#: language/translations.py:16
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: language/translations.py:17
+msgid "Email"
+msgstr "Adresse e-mail"
+
+#: language/translations.py:18
+msgid "Record"
+msgstr "Enregistrement"
+
+#: language/translations.py:19
+msgid "-"
+msgstr "-"
+
+#: language/translations.py:20
+msgid "You haven't friends"
+msgstr "Vous n'avez pas d'amis"
+
+#: language/translations.py:21
+msgid "Other Users"
+msgstr "Autres Utilisateurs"
+
+#: language/translations.py:22
+msgid "#"
+msgstr "#"
+
+#: language/translations.py:23
+msgid "There are no users."
+msgstr "Il n'y a pas d'utilisateurs."
+
+#: language/translations.py:24
+msgid "Start 1vs1"
+msgstr "Jouer en 1vs1"
+
+#: language/translations.py:25
+msgid "Start online"
+msgstr "Jouer en ligne"
+
+#: language/translations.py:28
+msgid "Submit"
+msgstr "Envoyer"
+
+#: language/translations.py:29
+msgid "Phone"
+msgstr "Numéro de téléphone"
+
+#: language/translations.py:30
+msgid "Username or Email Address"
+msgstr "Nom d'utilisateur ou Email"
+
+#: language/translations.py:31
+msgid "Password"
+msgstr "Mot de passe"
+
+#: language/translations.py:32
+msgid "Please enter a valid password."
+msgstr "Veuillez utiliser un mot de passe valide."
+
+#: language/translations.py:33
+msgid "User does not exist."
+msgstr "L'utilisateur n'existe pas."
+
+#: language/translations.py:34
+msgif "Please enter a valid username or email address."
+msgstr "Veuillez utiliser un nom d'utilisateur ou une adresse email correcte."

@@ -2,7 +2,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
+                <h5 class="modal-title" id="loginModalLabel" data-i18n="login.title">Iniciar Sesión</h5>
                 <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -10,11 +10,11 @@
                 <!-- Formulario de Login -->
                 <form id="loginForm">
                     <div class="mb-3">
-                        <label for="number" class="form-label">Numero de telefono</label>
+                        <label for="number" class="form-label" data-i18n="login.phone.label">Numero de telefono</label>
                         <input type="text" class="form-control" name="number" id="number" required>
                         <span id="errorName" class="error"></span><br>
                     </div>
-                    <button type="submit" class="btn btn-primary">Ingresar</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="login.submit">Ingresar</button>
                 </form>
 
             </div>

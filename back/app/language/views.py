@@ -8,5 +8,4 @@ def get_translations(request):
     activate(lang)  # Activate the requested language
     current_lang = get_language()  # Get the current active language
     print(f"Activated language: {current_lang}")  # Debug output
-    print(f"Translations in current language: {TRANSLATION_KEYS}")
     return JsonResponse(TRANSLATION_KEYS)

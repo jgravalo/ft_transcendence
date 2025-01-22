@@ -3,7 +3,7 @@ function changeLanguage(lang) {
     
     // Update the flag in the dropdown button
     const currentFlag = document.getElementById("currentFlag");
-    currentFlag.src = `./img/${lang}.svg`;
+    currentFlag.src = `/img/${lang}.svg`;
 
     // Save the selected language in localStorage
     localStorage.setItem("selectedLanguage", lang);
@@ -32,7 +32,12 @@ function updateTexts(translations) {
     elements.forEach(element => {
         const key = element.getAttribute("data-i18n");
         if (translations[key]) {
-            element.innerText = translations[key];
+            //check for forms's placeholder texts
+            if (element.hasAttribute("placeholder")) {
+                element.setAttribute("placeholder", translations[key]);
+            } else {
+                element.innerText = translations[key];
+            }
         } else {
             console.warn(`No translation found for key: ${key}`);
         }

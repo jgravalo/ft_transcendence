@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 import json
 from .models import User
@@ -56,9 +57,9 @@ def set_login(request):
                 else:
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
-                return JsonResponse({'type': 'errorName', 'error': 'User does not exist.'})
+                return JsonResponse({'type': 'errorName', 'error': _('User does not exist.')})
             if password != user.password:
-                return JsonResponse({'type': 'errorPassword', 'error': 'Password is not correct'})
+                return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password.')})
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
