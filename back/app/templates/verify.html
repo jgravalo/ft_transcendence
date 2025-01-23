@@ -3,7 +3,7 @@
     <div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
+				<h5 class="modal-title" id="loginModalLabel" data-i18n="otp.title">Iniciar Sesión</h5>
                 <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -11,10 +11,10 @@
 				<!-- Formulario de Login -->
 				<form id="loginForm">
 					<!-- {% csrf_token %} -->
-					<label for="otp_code">Introduce tu código OTP:</label>
+					<label for="otp_code" data-i18n="otp.introduce">Introduce tu código OTP:</label>
 					<input type="text" id="otp-code" name="otp-code" required>
 					<span id="errorName" class="error"></span><br>
-					<button type="submit">Verificar</button>
+					<button type="submit" data-i18n="otp.verify">Verificar</button>
 					{% if error %}
 						<p style="color: red;">{{ error }}</p>
 					{% endif %}

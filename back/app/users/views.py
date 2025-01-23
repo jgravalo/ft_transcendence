@@ -62,9 +62,9 @@ def set_login(request):
                 else:
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
-                return JsonResponse({'type': 'errorName', 'error': _("User does not exist.")})
+                return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
             if password != user.password:
-                return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password.')})
+                return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -92,17 +92,17 @@ def register(request):
 
 def parse_data(username, email, password):
     if username == '':
-        return {'type': 'errorName', 'error': 'Empty fields.'}#, status=400)
+        return {'type': 'errorName', 'error': _("Empty fields")}#, status=400)
     if username[0:3] == "AI ":
-        return {'type': 'errorName', 'error': 'Username cannot start by \'AI \'.'}#, status=400)
+        return {'type': 'errorName', 'error': _("Username cannot start by \'AI \'")}#, status=400)
     if '@' in username:
-        return {'type': 'errorName', 'error': 'Username cannot include \'@\'.'}
+        return {'type': 'errorName', 'error': _("Username cannot include \'@\'")}
     if email == '':
-        return {'type': 'errorEmail', 'error': 'Empty fields.'}#, status=400)
+        return {'type': 'errorEmail', 'error': _("Empty fields")}#, status=400)
     if not '@' in email:
-        return {'type': 'errorEmail', 'error': 'The email must include \'@\'.'}#, status=400)
+        return {'type': 'errorEmail', 'error': _("The email must include \'@\'")}#, status=400)
     return None
-
+ 
 @csrf_exempt
 def set_register(request):
     if request.method == "POST":
@@ -112,9 +112,9 @@ def set_register(request):
             email = data.get('email')
             password = data.get('password')
             if User.objects.filter(username=username).exists():
-                return JsonResponse({'type': 'errorName', 'error': 'User already exists.'})
+                return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
             if len(password) < 6:
-                return JsonResponse({'type': 'errorPassword', 'error': 'The password must be at least 6 characters long.'})
+                return JsonResponse({'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")})
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)

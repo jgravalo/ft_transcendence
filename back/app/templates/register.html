@@ -2,7 +2,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="loginModalLabel">Regístrate</h5>
+                <h5 class="modal-title" id="loginModalLabel" data-i18n="register.title">Regístrate</h5>
                 <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -10,21 +10,21 @@
                 <!-- Formulario de Login -->
                 <form id="loginForm">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Nombre de usuario</label>
+                        <label for="username" class="form-label" data-i18n="register.username">Nombre de usuario</label>
                         <input type="text" class="form-control" name="username" id="username" required>
                         <span id="errorName" class="error"></span><br>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <label for="email" class="form-label" data-i18n="register.email">Correo Electrónico</label>
                         <input type="email" class="form-control" name="email" id="email" required>
                         <span id="errorEmail" class="error"></span><br>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
+                        <label for="password" class="form-label" data-i18n="register.password">Contraseña</label>
                         <input type="password" class="form-control" name="password" id="password" required>
                         <span id="errorPassword" class="error"></span><br>
                     </div>
-                    <button type="submit" class="btn btn-primary">Ingresar</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="register.submit">Ingresar</button>
                 </form>
 
             </div>

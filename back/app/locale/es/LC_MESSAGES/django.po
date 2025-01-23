@@ -82,7 +82,7 @@ msgid "-"
 msgstr "-"
 
 #: language/translations.py:20
-msgid "You haven't friends"
+msgid "You don't have friends"
 msgstr "No tienes amigos"
 
 #: language/translations.py:21
@@ -94,8 +94,8 @@ msgid "#"
 msgstr "#"
 
 #: language/translations.py:23
-msgid "There are no users."
-msgstr "No hay usuarios."
+msgid "There are no users"
+msgstr "No hay usuarios"
 
 #: language/translations.py:24
 msgid "Start 1vs1"
@@ -122,16 +122,16 @@ msgid "Password"
 msgstr "Contraseña"
 
 #: language/translations.py:32
-msgid "Please enter a valid password."
-msgstr "Por favor ingrese una contraseña válida."
+msgid "Please enter a valid password"
+msgstr "Por favor ingrese una contraseña válida"
 
 #: language/translations.py:33
-msgid "User does not exist."
-msgstr "El usuario no existe."
+msgid "User does not exist"
+msgstr "El usuario no existe"
 
 #: language/translations.py:34
-msgid "Please enter a valid username or email address."
-msgstr "Por favor ingrese un nombre de usuario o correo electrónico válido."
+msgid "Please enter a valid username or email address"
+msgstr "Por favor ingrese un nombre de usuario o correo electrónico válido"
 
 #: language/translations.py:35
 msgid "Close Session"
@@ -144,3 +144,83 @@ msgstr "Va a cerrar su sesión. ¿Está seguro?"
 #: language/translations.py:37
 msgid "Cancel"
 msgstr "Cancelar"
+
+#: language/translations.py:39
+msgid "Wins"
+msgstr "Victorias"
+
+#: language/translations.py:40
+msgid "Losses"
+msgstr "Derrotas"
+
+#: language/translations.py:41
+msgid "Matches"
+msgstr "Partidos"
+
+#: language/translations.py:44
+msgid "Tournament"
+msgstr "Torneo"
+
+#: language/translations.py:45
+msgid "Stats"
+msgstr "Estadísticas"
+
+#: language/translations.py:47
+msgid "Edit"
+msgstr "Editar perfil"
+
+#: language/translations.py:53
+msgid "User already exists"
+msgstr "El usuario ya existe"
+
+#: language/translations.py:54
+msgid "The password must be at least 6 characters long"
+msgstr "La contraseña debe tener al menos 6 caracteres"
+
+#: language/translations.py:55
+msgid "Empty field"
+msgstr "Campo vacío"
+
+#: language/translations.py:56
+msgid "Username cannot start by 'AI'"
+msgstr "El nombre de usuario no puede comenzar con 'AI'"
+
+#: language/translations.py:57
+msgid "Username cannot include '@'"
+msgstr "El nombre de usuario no puede incluir '@'"
+
+#: language/translations.py:59
+msgid "The email must include '@'"
+msgstr "El correo electrónico debe incluir '@'"
+
+#: language/translations.py:62
+msgid "SMS"
+msgstr "SMS"
+
+#: language/translations.py:63
+msgid "Google"
+msgstr "Google"
+
+#: language/translations.py:64
+msgid "Edit your profile information"
+msgstr "Edita la información de tu perfil"
+
+#: language/translations.py:67
+msgid "Current Password"
+msgstr "Contraseña actual"
+
+#: language/translations.py:68
+msgid "New Password"
+msgstr "Nueva contraseña"
+
+#: language/translations.py:69
+msgid "Enable Two-Factor Authentication"
+msgstr "Activar la autenticación en dos pasos (2FA)"
+
+#: language/translations.py:72
+msgid "Introduce your OTP code"
+msgstr "Introduce tu código OTP"
+
+#: language/translations.py:73
+msgid "Verify"
+msgstr "Verificar"
