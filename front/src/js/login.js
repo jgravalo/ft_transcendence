@@ -88,6 +88,7 @@ function makePost(path)
                 'Authorization': `Bearer ${getJWTToken()}`,
                 "Content-Type": "application/json",
                 'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
+                'Accept-Language': localStorage.getItem("selectedLanguage") || "en" //send the language to backend (set to en default)
             },
             body: JSON.stringify(info), 
         })

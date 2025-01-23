@@ -32,4 +32,8 @@ TRANSLATION_KEYS = {
     "login.password.error": _("Please enter a valid password."),
     "login.username.notexists": _("User does not exist."),
     "login.username.error": _("Please enter a valid username or email address."),
+    "logout.title": _("Close Session"),
+    "logout.confirm": _("You are going to close your session. Are you sure?"),
+    "logout.cancel": _("Cancel"),
+    "logout.exit": _("Logout"),
 }

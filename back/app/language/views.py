@@ -1,6 +1,5 @@
 from django.http import JsonResponse
-from django.utils.translation import activate
-from django.utils.translation import get_language
+from django.utils.translation import activate, get_language
 from .translations import TRANSLATION_KEYS
 
 def get_translations(request):

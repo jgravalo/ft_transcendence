@@ -4,8 +4,8 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.utils.translation import activate
 from django.utils.translation import gettext_lazy as _
-
 import json
 from .models import User
 from .token import decode_token, make_token
@@ -47,6 +47,11 @@ def close_logout(request):
 @csrf_exempt
 def set_login(request):
     if request.method == "POST":
+        
+        #Fetch and Activate the langage for embedded translations
+        selected_language = request.headers.get('Accept-Language', 'en')  # Default to English
+        activate(selected_language)
+        
         try:
             data = json.loads(request.body)
             username = data.get('username')
@@ -57,7 +62,7 @@ def set_login(request):
                 else:
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
-                return JsonResponse({'type': 'errorName', 'error': _('User does not exist.')})
+                return JsonResponse({'type': 'errorName', 'error': _("User does not exist.")})
             if password != user.password:
                 return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password.')})
             if not user.two_fa_enabled:

@@ -132,3 +132,15 @@ msgstr "User does not exist."
 #: language/translations.py:34
 msgid "Please enter a valid username or email address."
 msgstr "Please enter a valid username or email address."
+
+#: language/translations.py:35
+msgid "Close Session"
+msgstr "Close Session"
+
+#: language/translations.py:36
+msgid "You are going to close your session. Are you sure?"
+msgstr "You are going to close your session. Are you sure?"
+
+#: language/translations.py:37
+msgid "Cancel"
+msgstr "Cancel"
