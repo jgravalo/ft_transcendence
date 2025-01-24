@@ -75,9 +75,22 @@ function handleLink(event)
     fetchLink(path);
 }
 
+function isTokenExpired(token) {
+    const payloadBase64 = token.split('.')[1]; // Extraer el payload
+    const payload = JSON.parse(atob(payloadBase64)); // Decodificar Base64
+    const expiration = payload.exp * 1000; // Convertir a milisegundos
+    const now = Date.now(); // Hora actual en milisegundos
+
+    return now > expiration; // Devuelve true si ya expiró
+}
+
 function fetchLink(path)
 {
     // console.log("JWT before GET:", getJWTToken());
+    if (isTokenExpired(getJWTToken())) {
+        console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
+        //refresh_token();
+    }    
     fetch(base + ":8000" + path, {
         method: "GET",
         headers: {

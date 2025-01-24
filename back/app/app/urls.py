@@ -22,6 +22,12 @@ from .health import health_check
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from your_app.views import EnableTOTPView, VerifyTOTPView, EnableEmailOTPView, VerifyEmailOTPView
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+
 urlpatterns = [
     #path('admin/', admin.site.urls), #django admin
     #path('', home, name='home'),
@@ -31,6 +37,9 @@ urlpatterns = [
     path('two_fa/', include('two_fa.urls')),
     path('health/', health_check, name='health_check'),
     path('get-translations/', include('language.urls')),
+    path('token/access/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
 
 # if settings.DEBUG:

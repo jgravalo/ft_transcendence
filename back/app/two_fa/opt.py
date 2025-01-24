@@ -70,7 +70,7 @@ def generate_qr_code(user):
 	# Codificar la imagen en Base64
 	image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
 	data = {
-		"status": "success",
+		"error": "success",
 		"image": image_base64,
 		"message": "QR Code generado correctamente"
 	}

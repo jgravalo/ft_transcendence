@@ -1,18 +1,5 @@
 //import { getInfo2FA } from './two_fa.js';
 
-function getCSRFToken() {
-    const cookies = document.cookie.split(';');
-    // console.log("how many cookies");
-    for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'csrftoken') {
-            // console.log("CookieValue = <" + value + ">");
-            return value;
-        }
-    }
-    return null;
-}
-
 function make2FA()
 {
     handleLinks();
@@ -143,18 +130,3 @@ function getInfo()
     console.log("formDataObject =", formDataObject);
     return (formDataObject)
 }
-/* 
-function getInfo2FA()
-{
-    const userData = decodeToken(getJWTToken());
-    console.log("Datos del usuario:", userData);
-    fetchLink('/users/profile/');
-}
- */
-const saveJWTToken = (token) => {
-    sessionStorage.setItem('token', token);
-};
-
-const getJWTToken = () => {
-    return sessionStorage.getItem('token');
-};
