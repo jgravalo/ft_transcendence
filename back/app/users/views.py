@@ -6,11 +6,31 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.translation import activate
 from django.utils.translation import gettext_lazy as _
+from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
 from .token import decode_token, make_token
 
+
 @csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend
+
+def refresh(request):
+    data = json.loads(request.body)
+    token = data.get('refresh')
+    try:
+        # 2. Validar el refresh token
+        print("token al empezar:", token)
+        refresh = RefreshToken(token)
+        print("aqui")
+        # 3. Crear un nuevo access token desde el refresh token
+        new_access_token = str(refresh.access_token)
+        data = {
+            "access": new_access_token
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({'error': "Invalid refresh token:" + str(e)}, status=400)
+
 def delete_user(request):
     if request.method == "DELETE":
         user = User.get_user(request)
@@ -75,7 +95,7 @@ def set_login(request):
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
-                "jwt": user.jwt,
+                #"jwt": user.jwt,
                 "next_path": next_path
             }
             return JsonResponse(data)
@@ -113,6 +133,8 @@ def set_register(request):
             password = data.get('password')
             if User.objects.filter(username=username).exists():
                 return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
             if len(password) < 6:
                 return JsonResponse({'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")})
             error = parse_data(username, email, password)
@@ -123,9 +145,10 @@ def set_register(request):
                 email=email,
                 password=password
                 )
-            token = make_token(user)
-            User.objects.filter(username=user.username).update(jwt=token) 
-            user = User.objects.get(username=username)
+            token = make_token(user, 'access')
+            refresh = make_token(user, 'refresh')
+            #User.objects.filter(username=user.username).update(jwt=token)
+            #user = User.objects.get(username=username)
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -133,7 +156,9 @@ def set_register(request):
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/'
             data = {
-                "jwt": user.jwt,
+                #"jwt": user.jwt,
+                "access": token,
+                "refresh": refresh,
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
@@ -216,7 +241,7 @@ def set_update(request):
             user.save()
             content = render_to_string('close_login.html') # online_bar
             data = {
-                "jwt": user.jwt,
+                #"jwt": user.jwt,
                 "error": "Success",
                 "element": 'bar',
                 "content": content,

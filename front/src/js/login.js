@@ -84,8 +84,14 @@ function makePost(path)
             console.log("data POST:", data);
             if (`${data.error}` == "Success")// CAMBIAR POR STATUS !!
             {
-                console.log("JWT after POST:", getJWTToken());
-                saveJWTToken(`${data.jwt}`);
+                //console.log("JWT after POST:", getJWTToken());
+                if (path.slice(0, 8) !== '/two_fa/')
+                {
+                    //getJWTPair(info);
+                    //saveJWTToken(`${data.access}`);
+                    saveStorage('access', `${data.access}`);
+                    saveStorage('refresh', `${data.refresh}`);
+                }
                 // console.log("JWT from POST:",`${data.jwt}`);
                 //console.log("2:", getJWTToken())
                 if (path != '/users/update/')

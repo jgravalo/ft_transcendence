@@ -75,23 +75,19 @@ function handleLink(event)
     fetchLink(path);
 }
 
-function isTokenExpired(token) {
-    const payloadBase64 = token.split('.')[1]; // Extraer el payload
-    const payload = JSON.parse(atob(payloadBase64)); // Decodificar Base64
-    const expiration = payload.exp * 1000; // Convertir a milisegundos
-    const now = Date.now(); // Hora actual en milisegundos
-
-    return now > expiration; // Devuelve true si ya expiró
-}
-
-function fetchLink(path)
+/* async */ function fetchLink(path)
 {
+    let token = getJWTToken();
     // console.log("JWT before GET:", getJWTToken());
-    if (isTokenExpired(getJWTToken())) {
+    //console.log("token =", token);
+    if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
         console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
-        //refresh_token();
+        /* await */ refreshJWT(path);
+        console.log("El token ha renovado");
+        return ;
     }    
-    fetch(base + ":8000" + path, {
+    console.log("token before fetch =", getJWTToken());
+    /* await */ fetch(base + ":8000" + path, {
         method: "GET",
         headers: {
             'Authorization': `Bearer ${getJWTToken()}`,
@@ -101,20 +97,11 @@ function fetchLink(path)
     })
     .then(response => response.json()) // Convertir la respuesta a JSON
     .then(data => {
-        //console.log("esta en handleLink");
-        // console.log("data GET:", data); // Ver los datos en consola
-        // console.log("JWT after GET:", getJWTToken());
-        // console.log("JWT from GET:", `${data.jwt}`);
-        //var dest = 'content';
         var dest = `${data.element}`;
         document.getElementById(dest).innerHTML = `${data.content}`;
-
         //updating the newly added content with right language
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
-        if (dest == 'modalContainer' /*&& path != '/two_fa/'*/)
-            //     path == "/users/login/" ||
-            //     path == "/users/logout/" ||
-            // path == "/users/register/"
+        if (dest == 'modalContainer')
             makeModal(path);
         else if (path == '/users/update/')
             makePost(path);
