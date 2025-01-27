@@ -31,9 +31,10 @@ services:
     container_name: waf
     build:
       context: ./waf
-    ports:
-      - "8080:80"
-      - "8443:443"
+    image: waf
+    # ports:
+    #   - "8080:80"
+    #   - "8443:443"
     depends_on:
       - front
       - back
