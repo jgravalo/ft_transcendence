@@ -9,7 +9,7 @@ function changeLanguage(lang) {
     localStorage.setItem("selectedLanguage", lang);
 
     // Fetch translations from the backend
-    fetch(base + ":8000" + `/get-translations?lang=${lang}`)
+    fetch(base + "/api" + `/get-translations?lang=${lang}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

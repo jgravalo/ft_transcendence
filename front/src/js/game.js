@@ -4,7 +4,7 @@
 function startAsyncGame()
 {
     // PLAYER
-    const route = 'ws://' + base.slice(7) + ':8000/ws/game/async/';
+    const route = 'ws://' + base.slice(7) + '/ws/game/async/';
     console.log('ruta: ', route);
     const socket = new WebSocket(route);
     
@@ -42,7 +42,7 @@ function startAsyncGame()
 function startGame()
 {
     // PLAYER
-    const route = 'ws://' + base.slice(7) + ':8000/ws/game/';
+    const route = 'ws://' + base.slice(7) + '/ws/game/';
     console.log('ruta: ', route);
     const socket = new WebSocket(route);
     

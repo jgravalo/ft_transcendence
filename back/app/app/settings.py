@@ -78,8 +78,8 @@ CORS_ALLOW_ALL_ORIGINS = True # cors-headers
 #]
 
 CSRF_TRUSTED_ORIGINS = [#'http://*']
-    'http://localhost:8080',  # Dominio del frontend
-    'http://127.0.0.1:8080',  # También si se usa con IP
+    'http://localhost',  # Dominio del frontend
+    'http://127.0.0.1',  # También si se usa con IP
 ]
 
 MEDIA_URL = '/img/'
@@ -129,7 +129,6 @@ DATABASES = {
         'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
         'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
         'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
-
     }
 }
 

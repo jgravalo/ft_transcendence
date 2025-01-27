@@ -23,14 +23,15 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from your_app.views import EnableTOTPView, VerifyTOTPView, EnableEmailOTPView, VerifyEmailOTPView
 
 urlpatterns = [
-    #path('admin/', admin.site.urls), #django admin
-    #path('', home, name='home'),
-    path('', get_home, name='get_home'),
-    path('game/', include('game.urls')),
-    path('users/', include('users.urls')),
-    path('two_fa/', include('two_fa.urls')),
-    path('health/', health_check, name='health_check'),
-    path('get-translations/', include('language.urls')),
+    # Base API routes
+    path('api/', include([
+        path('', get_home, name='get_home'),
+        path('game/', include('game.urls')),
+        path('users/', include('users.urls')),
+        path('two_fa/', include('two_fa.urls')),
+        path('health/', health_check, name='health_check'),
+        path('get-translations/', include('language.urls')),
+    ])),
 ]
 
 # if settings.DEBUG:

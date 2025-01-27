@@ -78,7 +78,7 @@ function handleLink(event)
 function fetchLink(path)
 {
     // console.log("JWT before GET:", getJWTToken());
-    fetch(base + ":8000" + path, {
+    fetch(base + "/api" + path, {
         method: "GET",
         headers: {
             'Authorization': `Bearer ${getJWTToken()}`,

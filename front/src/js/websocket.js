@@ -2,7 +2,7 @@ function testWebSocket()
 {
     //const ruta = "ws://" + window.location.host + "/ws/game/"; // wss:// si usamos https
     
-    const socket = new WebSocket('ws://localhost:8000/ws/game/');
+    const socket = new WebSocket('ws://localhost/ws/game/');
     
     // Escuchar eventos de conexión
     socket.onopen = function (event) {

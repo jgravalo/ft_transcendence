@@ -31,9 +31,9 @@ RUN pip install --upgrade pip \
 COPY ./app/ /app/
 
 # Exponer el puerto en el que Django se ejecuta por defecto (8000)
-EXPOSE 8000
+#EXPOSE 8000
 # Expone el puerto en el que Daphne estará escuchando (por ejemplo, 8001)
-EXPOSE 8001
+#EXPOSE 8001
 
 # Definir las variables de entorno necesarias (por ejemplo, si usas PostgreSQL)
 ENV PYTHONDONTWRITEBYTECODE=1
