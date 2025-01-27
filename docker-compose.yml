@@ -26,6 +26,20 @@ services:
   #     - ./vhost.d:/etc/nginx/vhost.d
   #     - ./html:/usr/share/nginx/html
 
+#Reverse-proxy + WAF
+  waf:
+    container_name: waf
+    build:
+      context: ./waf
+    ports:
+      - "8080:80"
+      - "8443:443"
+    depends_on:
+      - front
+      - back
+    networks:
+      - pongnet
+
   front:
     container_name: front
     build:
