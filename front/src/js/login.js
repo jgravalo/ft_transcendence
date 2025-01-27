@@ -34,7 +34,7 @@ function deleteUser(path)
 {
     if (path.slice(8) == "/two_fa/")
         //remove_user();
-        fetch(base + "/api" + '/users/delete/', {
+        fetch(base + '/api/users/delete/', {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${getJWTToken()}`,
@@ -82,7 +82,7 @@ function makePost(path)
         post += "set/";
         console.log("post =", post);
         console.log("info =", info);
-        fetch(base + "/api" + post, {
+        fetch(base + '/api' + post, {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${getJWTToken()}`,

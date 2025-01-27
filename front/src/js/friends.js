@@ -12,7 +12,7 @@ function deleteFriend(id, user)
 
 function fetchFriend(user, rule)
 {
-	fetch(base + "/api" + '/users/friends/' + rule + '/?' + rule + '=' + user, {
+	fetch(base + 'api' + '/users/friends/' + rule + '/?' + rule + '=' + user, {
 		method: "POST",
 		headers: {
 			'Authorization': `Bearer ${getJWTToken()}`,

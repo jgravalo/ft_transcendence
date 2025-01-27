@@ -55,7 +55,7 @@ function handleLinks()
 }
 
 //var base = window.location.origin;
-var base = window.location.origin.slice(0, -5);
+var base = window.location.origin;
 console.log("base: ", base);
 //var base = "http://localhost";
 //console.log("base after: ", base);
@@ -78,7 +78,7 @@ function handleLink(event)
 function fetchLink(path)
 {
     // console.log("JWT before GET:", getJWTToken());
-    fetch(base + "/api" + path, {
+    fetch(base + 'api' + path, {
         method: "GET",
         headers: {
             'Authorization': `Bearer ${getJWTToken()}`,
