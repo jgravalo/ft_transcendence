@@ -82,10 +82,12 @@ function handleLink(event)
     //console.log("token =", token);
     if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
         console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
-        /* await */ refreshJWT(path);
+        refreshJWT(path/* , path => {
+            fetchLink(path);
+        } */);
         console.log("El token ha renovado");
         return ;
-    }    
+    }
     console.log("token before fetch =", getJWTToken());
     /* await */ fetch(base + ":8000" + path, {
         method: "GET",

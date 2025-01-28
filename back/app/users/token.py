@@ -23,8 +23,9 @@ def make_token(user, mode):
 
 def decode_token(token):
     try:
+        print("Token válido:", token)
         decoded_payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        print("Token válido:", decoded_payload)
+        print("Token válido decoded:", decoded_payload)
         return decoded_payload
     except jwt.ExpiredSignatureError:
         print("El token ha expirado.")

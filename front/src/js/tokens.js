@@ -40,6 +40,9 @@ const saveStorage = (key, token/* , previous */) => {
 const getStorage = (key) => {
     return sessionStorage.getItem(key);
 };
+const removeStorage = (key) => {
+    sessionStorage.removeItem(key);
+};
 
 function getJWTPair(info) {
 	console.log("Entra en getJWTPair");
@@ -75,7 +78,11 @@ function fetchJWT(rule, info, path) {
 		//console.log('data =', data);
 		saveStorage('access', `${data.access}`);
 		//console.log('new_token =', `${data.access}`);
-		fetchLink(path);
+		/* if (path == '/users/update/')
+			makePost(path);
+		else */
+			fetchLink(path);
+		//func(path);
 	})
 	.catch(error => {
 		console.log("fetch login catch");

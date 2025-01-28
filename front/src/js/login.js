@@ -9,6 +9,8 @@ function makeLogout()
 {
     document.getElementById('close-session').addEventListener('click', () => {
         // console.log('El botón de cerrar sesion ha sido pulsado');
+        removeStorage('access');
+        removeStorage('refresh');
         document.getElementById('cancel-logout').click();
         fetchLink('/users/logout/close/');
         // no llega a hacer el siguinte fetch
@@ -49,6 +51,9 @@ function makeModal(path) //modalHTML)
 
 function makePost(path)
 {
+    let token = getJWTToken();
+    // console.log("JWT before GET:", getJWTToken());
+    //console.log("token =", token);
     const form =  document.getElementById('loginForm');
     form.addEventListener('submit', function(event) {
         event.preventDefault();
@@ -62,13 +67,20 @@ function makePost(path)
         //console.log("hace fetch con data");
         // console.log("JWT before POST:", getJWTToken());
         let post = path;
-        /* if (path.slice(0, 8) == '/two_fa/')
-            post = "/two_fa/verify/";
-        else */
-            //if (path.slice(-5) != '/set/')
         post += "set/";
         console.log("post =", post);
         console.log("info =", info);
+        if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
+            console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
+            refreshJWT(post/* , data => {
+                //if (path == '/users/update/')
+                makePost(data);
+                // else
+                //     makeModal(path);
+            } */);
+            console.log("El token ha renovado");
+            return ;
+        }
         fetch(base + ":8000" + post, {
             method: "POST",
             headers: {
@@ -85,7 +97,7 @@ function makePost(path)
             if (`${data.error}` == "Success")// CAMBIAR POR STATUS !!
             {
                 //console.log("JWT after POST:", getJWTToken());
-                if (path.slice(0, 8) !== '/two_fa/')
+                if (path == '/users/login/' || path == '/users/register/')
                 {
                     //getJWTPair(info);
                     //saveJWTToken(`${data.access}`);

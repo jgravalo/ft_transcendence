@@ -85,6 +85,8 @@ def set_login(request):
                 return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
             if password != user.password:
                 return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
+            token = make_token(user, 'access')
+            refresh = make_token(user, 'refresh')
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -92,10 +94,11 @@ def set_login(request):
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/'
             data = {
+                "access": token,
+                "refresh": refresh,
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
-                #"jwt": user.jwt,
                 "next_path": next_path
             }
             return JsonResponse(data)
@@ -241,7 +244,6 @@ def set_update(request):
             user.save()
             content = render_to_string('close_login.html') # online_bar
             data = {
-                #"jwt": user.jwt,
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
