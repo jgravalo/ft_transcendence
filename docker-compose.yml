@@ -7,8 +7,10 @@ services:
       context: ./waf
     image: waf
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "80:8080"
+      - "8443:8443"
+    env_file:
+      - ./waf/.env
     depends_on:
       - front
       - back
