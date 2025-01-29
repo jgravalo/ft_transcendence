@@ -105,6 +105,7 @@ def set_login(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
+@csrf_exempt
 def register(request):
     content = render_to_string('register.html')
     data = {

@@ -1,8 +1,5 @@
 const saveJWTToken = (token) => {
-	console.log("en saveJWTToken");
-	console.log("token =", getStorage('access'));
     sessionStorage.setItem('access', token);
-	console.log("new_token =", getStorage('access'));
 };
 
 const getJWTToken = () => {
@@ -31,10 +28,10 @@ function getCSRFToken() {
 }
 
 const saveStorage = (key, token/* , previous */) => {
-	console.log("en saveStorage from");//,  previous);
-	console.log("token =", getStorage('access'));
+	//console.log("en saveStorage from");//,  previous);
+	//console.log("token =", getStorage('access'));
     sessionStorage.setItem(key, token);
-	console.log("new_token =", getStorage('access'));
+	//console.log("new_token =", getStorage('access'));
 };
 
 const getStorage = (key) => {
@@ -53,17 +50,11 @@ function getJWTPair(info) {
 function refreshJWT(path) {
 	//console.log("SE HACE REFRESH");
 	const info = {};
-	//console.log("token =", getJWTToken());
-	//console.log("token =", getStorage('access'));
 	info['refresh'] = getStorage('refresh');
 	fetchJWT('refresh/', info, path);
-	//console.log("new_token =", getJWTToken());
-	//console.log("new_token =", getStorage('access'));
 }
 
 function fetchJWT(rule, info, path) {
-	//console.log('old_token =', getJWTToken());
-	//console.log('info =', info);
 	fetch(base + ':8000/users/' + rule, {
 		method: "POST",
 		headers: {
@@ -75,13 +66,24 @@ function fetchJWT(rule, info, path) {
 	})
 	.then(response => response.json())
     .then(data => {
-		//console.log('data =', data);
+		console.log('path from refresh =', path);
 		saveStorage('access', `${data.access}`);
 		//console.log('new_token =', `${data.access}`);
-		/* if (path == '/users/update/')
-			makePost(path);
-		else */
+		if (path == '/users/update/set/')
+		{
+			console.log('entra en makePost');
+			makeSubmit(path.slice(0, -4));
+		}
+		else if (path.slice(-5) == "/set/")
+		{
+			console.log('entra en makeModal');
+			makeModal(path.slice(0, -4));
+		}
+		else
+		{
+			console.log('entra en fetchLink');
 			fetchLink(path);
+		}
 		//func(path);
 	})
 	.catch(error => {

@@ -88,7 +88,9 @@ function handleLink(event)
         console.log("El token ha renovado");
         return ;
     }
-    console.log("token before fetch =", getJWTToken());
+    //console.log("token before fetch =", getJWTToken());
+	console.log('path for GET =', path);
+
     /* await */ fetch(base + ":8000" + path, {
         method: "GET",
         headers: {
@@ -99,6 +101,7 @@ function handleLink(event)
     })
     .then(response => response.json()) // Convertir la respuesta a JSON
     .then(data => {
+        //directions(path,`${data.element}`, `${data.content}`);
         var dest = `${data.element}`;
         document.getElementById(dest).innerHTML = `${data.content}`;
         //updating the newly added content with right language
@@ -125,6 +128,32 @@ function handleLink(event)
     .catch(error => {
             console.error('Error al obtener productos:', error);
     });
+}
+
+function directions(path, element, content)
+{
+    var dest = element;
+    document.getElementById(dest).innerHTML = content;
+    //updating the newly added content with right language
+    changeLanguage(localStorage.getItem("selectedLanguage") || "en");
+    if (dest == 'modalContainer')
+        makeModal(path);
+    else if (path == '/users/update/')
+        makePost(path);
+    else
+    {
+        if (path != '/users/logout/close/')
+        {
+            var title = path.slice(1, -1);
+            // console.log("pushState = <" + title + ">");
+            window.history.pushState(
+                { page: title},
+                title,
+                "/" + title
+            );
+        }
+        handleLinks();
+    }
 }
 
 

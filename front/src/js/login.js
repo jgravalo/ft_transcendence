@@ -51,14 +51,24 @@ function makeModal(path) //modalHTML)
 
 function makePost(path)
 {
-    let token = getJWTToken();
+	console.log('hace makePost');
     // console.log("JWT before GET:", getJWTToken());
     //console.log("token =", token);
     const form =  document.getElementById('loginForm');
+	console.log('entra en submit');
     form.addEventListener('submit', function(event) {
+        console.log('hace event default');
         event.preventDefault();
-        // Obtener los valores de los inputs
-        console.log("id =", path.slice(path.slice(1, -1).indexOf('/') + 2, -1));
+        console.log('hizo event default');
+        makeSubmit(path);
+    })
+}
+
+function makeSubmit(path)
+{
+    let token = getJWTToken();
+    // Obtener los valores de los inputs
+        //console.log("id =", path.slice(path.slice(1, -1).indexOf('/') + 2, -1));
         if (path === '/users/login/' ||
         path === '/users/register/' ||
         path === '/users/update/' ||
@@ -67,9 +77,10 @@ function makePost(path)
         //console.log("hace fetch con data");
         // console.log("JWT before POST:", getJWTToken());
         let post = path;
-        post += "set/";
-        console.log("post =", post);
-        console.log("info =", info);
+        //if (path.slice(-5) !== "/set/")
+            post += "set/";
+        //console.log("post =", post);
+        //console.log("info =", info);
         if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
             console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
             refreshJWT(post/* , data => {
@@ -81,6 +92,7 @@ function makePost(path)
             console.log("El token ha renovado");
             return ;
         }
+    	console.log('path for POST =', post);
         fetch(base + ":8000" + post, {
             method: "POST",
             headers: {
@@ -127,8 +139,7 @@ function makePost(path)
             console.log("fetch login catch");
             console.error('Error:', error);
         });
-        
-    })
+   // })
 }
 
 function getInfo()
@@ -143,8 +154,8 @@ function getInfo()
             formDataObject[key] = value; // Agregar el archivo (imagen) seleccionada
         else
             formDataObject[key] = value;
-        console.log("key =", key, "value =", value);
+        //console.log("key =", key, "value =", value);
     });
-    console.log("formDataObject =", formDataObject);
+    //console.log("formDataObject =", formDataObject);
     return (formDataObject)
 }
