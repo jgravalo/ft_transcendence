@@ -67,9 +67,23 @@ function fetchJWT(rule, info, path) {
 	.then(response => response.json())
     .then(data => {
 		console.log('path from refresh =', path);
+		console.log('path sliced =', path.slice(0, 15));
 		saveStorage('access', `${data.access}`);
 		//console.log('new_token =', `${data.access}`);
-		if (path == '/users/update/set/')
+		if (path !== '/users/friends/' &&
+			path.slice(0, 15) == '/users/friends/')// + rule + '/?' + rule + '=' + user
+		{
+			console.log('entra en fetchFriend');
+			let n_rule = path.indexOf("?");
+			let n_user = path.indexOf("=");
+			let rule = path.slice(n_rule + 1, n_user);
+			let user = path.slice(n_user + 1);
+			// console.log(n_rule, ' rule =', rule);
+			// console.log(n_user, ' user =', user);
+			// console.log("path =", '/users/friends/' + rule + '/?' + rule + '=' + user);
+			fetchFriend(user, rule);
+		}
+		else if (path == '/users/update/set/')
 		{
 			console.log('entra en makePost');
 			makeSubmit(path.slice(0, -4));

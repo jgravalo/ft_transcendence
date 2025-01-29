@@ -12,6 +12,18 @@ function deleteFriend(id, user)
 
 function fetchFriend(user, rule)
 {
+	let token = getJWTToken();
+	if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
+		console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
+		refreshJWT('/users/friends/' + rule + '/?' + rule + '=' + user/* , data => {
+			//if (path == '/users/update/')
+			makePost(data);
+			// else
+			//     makeModal(path);
+		} */);
+		console.log("El token ha renovado");
+		return ;
+	}
 	fetch(base + ':8000/users/friends/' + rule + '/?' + rule + '=' + user, {
 		method: "POST",
 		headers: {
