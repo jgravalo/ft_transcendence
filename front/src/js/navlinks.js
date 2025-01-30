@@ -28,6 +28,9 @@ window.addEventListener('custom-navigation', () => {
 });
  */
 
+//Detects the url of the base app (http://localhost:8080 or http://pong42.com )
+var base = window.location.origin;
+console.log("base: ", base);
 
 window.addEventListener('popstate', (event) => handlePopstate(event));
 
@@ -53,12 +56,6 @@ function handleLinks()
         link.addEventListener('click', handleLink);
     });
 }
-
-//var base = window.location.origin;
-var base = window.location.origin;
-console.log("base: ", base);
-//var base = "http://localhost";
-//console.log("base after: ", base);
 
 function handleLink(event)
 {

@@ -71,15 +71,11 @@ ROOT_URLCONF = 'app.urls'
 
 CORS_ALLOW_ALL_ORIGINS = True # cors-headers
 
-#CORS_ALLOWED_ORIGINS = [
-#    "http://localhost:8000",
-#    "http://127.0.0.1:8000",
-#    "http://jgravalo.42.fr:8000",
-#]
-
 CSRF_TRUSTED_ORIGINS = [#'http://*']
     'http://localhost',  # Dominio del frontend
     'http://127.0.0.1',  # También si se usa con IP
+    'http://pong42.com',  # Dominio del frontend
+    'https://pong42.com',  # También si se usa con IP
 ]
 
 MEDIA_URL = '/img/'

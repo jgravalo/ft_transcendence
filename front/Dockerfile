@@ -5,9 +5,7 @@ FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 
 # Copia el archivo de configuración personalizado a la ubicación predeterminada de Nginx
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./certs/nginx.crt /etc/nginx/certs/
-COPY ./certs/nginx.key /etc/nginx/certs/
+COPY ./conf/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expone el puerto 80 para el tráfico HTTP
 #EXPOSE 80

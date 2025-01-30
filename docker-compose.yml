@@ -5,42 +5,38 @@ services:
     container_name: waf
     build:
       context: ./waf
+    env_file:
+      - ./waf/.env.${ENVIRONMENT}
     image: waf
     ports:
-      - "80:8080"
-      - "8443:8443"
-    env_file:
-      - ./waf/.env
+      - "${EXTERNAL_PORT}:8080"
+      - "${SSL_EXTERNAL_PORT}:8443"
     depends_on:
       - front
       - back
     networks:
       - pongnet
+    volumes:
+      - ./waf/conf/nginx.modsecurity.conf.template:/etc/nginx/templates/conf.d/modsecurity.conf.template
+      - ./waf/conf/setup.conf.template:/etc/nginx/templates/modsecurity.d/setup.conf.template
 
   front:
     container_name: front
     build:
       context: ./front
+    env_file:
+      - ./waf/.env.${ENVIRONMENT}
     image: front
-    # ports:
-    #   - "8080:80"
-    #   - "8443:443"
     networks:
       - pongnet
     volumes:
     - ./front/src:/usr/share/nginx/html
-    # environment:
-    #   - VIRTUAL_HOST=jgravalo.42.fr
-    #   - LETSENCRYPT_HOST=jgravalo.42.fr
-    #   - LETSENCRYPT_EMAIL=jgravalo@student.42barcelona.com
 
   back:
     container_name: back
     build:
       context: ./back
     image: back
-    # ports:
-    #   - "8000:8000"
     environment:
       - DJANGO_DB_NAME=postgres
       - DJANGO_DB_USER=postgres
@@ -54,7 +50,7 @@ services:
       - pongnet
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/"]
+      test: ["CMD", "curl", "-f", "http://${HOSTNAME}:8080/api/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
