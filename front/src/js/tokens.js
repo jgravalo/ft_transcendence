@@ -55,7 +55,8 @@ function refreshJWT(path) {
 }
 
 function fetchJWT(rule, info, path) {
-	fetch(base + ':8000/users/' + rule, {
+	fetch(base + '/api/users/' + rule, {
+	//fetch(base + ':8000/users/' + rule, {
 		method: "POST",
 		headers: {
 			'Authorization': `Bearer ${getJWTToken()}`,

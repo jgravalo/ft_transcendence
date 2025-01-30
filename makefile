@@ -6,11 +6,11 @@ down:
 
 front:
 	docker build -t front ./front
-	docker run -d -p 8080:80 front
+	docker run -d front
 
 back:
 	docker build -t back ./back
-	docker run -d -p 8000:8000 back
+	docker run -d back
 
 db:
 	docker build -t db ./db

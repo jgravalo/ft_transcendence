@@ -55,7 +55,7 @@ function handleLinks()
 }
 
 //var base = window.location.origin;
-var base = window.location.origin.slice(0, -5);
+var base = window.location.origin;
 console.log("base: ", base);
 //var base = "http://localhost";
 //console.log("base after: ", base);
@@ -91,7 +91,8 @@ function handleLink(event)
     //console.log("token before fetch =", getJWTToken());
 	console.log('path for GET =', path);
 
-    /* await */ fetch(base + ":8000" + path, {
+    // fetch(base + ":8000" + path, {
+    fetch(base + '/api' + path, {
         method: "GET",
         headers: {
             'Authorization': `Bearer ${getJWTToken()}`,
@@ -128,32 +129,6 @@ function handleLink(event)
     .catch(error => {
             console.error('Error al obtener productos:', error);
     });
-}
-
-function directions(path, element, content)
-{
-    var dest = element;
-    document.getElementById(dest).innerHTML = content;
-    //updating the newly added content with right language
-    changeLanguage(localStorage.getItem("selectedLanguage") || "en");
-    if (dest == 'modalContainer')
-        makeModal(path);
-    else if (path == '/users/update/')
-        makePost(path);
-    else
-    {
-        if (path != '/users/logout/close/')
-        {
-            var title = path.slice(1, -1);
-            // console.log("pushState = <" + title + ">");
-            window.history.pushState(
-                { page: title},
-                title,
-                "/" + title
-            );
-        }
-        handleLinks();
-    }
 }
 
 

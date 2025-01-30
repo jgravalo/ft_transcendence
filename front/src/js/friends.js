@@ -24,7 +24,8 @@ function fetchFriend(user, rule)
 		console.log("El token ha renovado");
 		return ;
 	}
-	fetch(base + ':8000/users/friends/' + rule + '/?' + rule + '=' + user, {
+	//fetch(base + ':8000/users/friends/' + rule + '/?' + rule + '=' + user, {
+	fetch(base + '/api' + '/users/friends/' + rule + '/?' + rule + '=' + user, {
 		method: "POST",
 		headers: {
 			'Authorization': `Bearer ${getJWTToken()}`,
