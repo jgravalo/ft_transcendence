@@ -85,8 +85,6 @@ def set_login(request):
                 return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
             if password != user.password:
                 return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
-            token = make_token(user, 'access')
-            refresh = make_token(user, 'refresh')
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -94,8 +92,8 @@ def set_login(request):
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/'
             data = {
-                "access": token,
-                "refresh": refresh,
+                "access": make_token(user, 'access'),
+                "refresh": make_token(user, 'refresh'),
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
@@ -144,15 +142,7 @@ def set_register(request):
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
-            user = User.objects.create(
-                username=username,
-                email=email,
-                password=password
-                )
-            token = make_token(user, 'access')
-            refresh = make_token(user, 'refresh')
-            #User.objects.filter(username=user.username).update(jwt=token)
-            #user = User.objects.get(username=username)
+            user = User.objects.create(username=username, email=email, password=password)
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -160,9 +150,8 @@ def set_register(request):
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/'
             data = {
-                #"jwt": user.jwt,
-                "access": token,
-                "refresh": refresh,
+                "access": make_token(user, 'access'),
+                "refresh": make_token(user, 'refresh'),
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
