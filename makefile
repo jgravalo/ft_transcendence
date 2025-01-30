@@ -3,24 +3,37 @@ ENVIRONMENT ?= development
 ENV_FILE = .env.$(ENVIRONMENT)
 export ENVIRONMENT
 
+# Global environment (default: development).
+ENVIRONMENT ?= development
+ENV_FILE = .env.$(ENVIRONMENT)
+export ENVIRONMENT
+
 all:
+	@echo "Starting containers with environment: $(ENVIRONMENT)"
+	docker compose --env-file $(ENV_FILE) -f docker-compose.yml up -d --build
 	@echo "Starting containers with environment: $(ENVIRONMENT)"
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml up -d --build
 
 down:
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
+	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
 
 front:
+	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t front ./front
 	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t front ./front
 	docker run -d front
 
 back:
 	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t back ./back
+	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t back ./back
 	docker run -d back
 
 db:
-	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t db ./db
+	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) --build-arg ENVIRONMENT=$(ENVIRONMENT) -t db ./db
 	docker run -d -p 5432:5432 db
+
+restart-waf:
+	docker compose --env-file $(ENV_FILE) -f docker-compose.yml restart waf
 
 restart-waf:
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml restart waf
@@ -45,6 +58,7 @@ ls:
 clean:
 	@echo "Deteniendo y eliminando contenedores..."
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
+	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
 	@if [ ! -z "$$(docker ps -aq)" ]; then \
 		docker stop $$(docker ps -aq); \
 		docker rm $$(docker ps -aq); \
@@ -58,7 +72,7 @@ clean:
 
 # Entrar en el contenedor con 'make enter SERVICE=front(o back)
 enter:
-	@CONTAINER_ID=$$(docker compose --env-file $(ENV_FILE) -f docker-compose.yml ps -q $(SERVICE)); \
+	@CONTAINER_ID=$$(docker compose --env-file $(ENV_FILE) --env-file $(ENV_FILE) -f docker-compose.yml ps -q $(SERVICE)); \
 	if [ -n "$$CONTAINER_ID" ]; then \
 		docker exec -it --user root $$CONTAINER_ID /bin/sh; \
 	else \
