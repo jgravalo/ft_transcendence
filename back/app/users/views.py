@@ -10,6 +10,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
 from .token import decode_token, make_token
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import requests
 
 
 @csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend
@@ -284,6 +288,26 @@ def delete_friend(request):
     user1.friends.remove(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
+
+@csrf_exempt
+def fortytwo_auth(request):
+    if request.method == "GET":
+        # URL de autorización de 42
+        auth_url = "https://api.intra.42.fr/oauth/authorize"
+        
+        # Parámetros necesarios para la autenticación
+        params = {
+            'client_id': 'u-s4t2ud-4ad9a1ce69e23747c027b7b53f5b5de35b81cc856464134f2b45e6a6b19060fa',
+            'client_secret': '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',
+            'redirect_uri': 'http://localhost:8080',
+            'response_type': 'code',
+            'scope': 'public'
+        }
+        
+        # Construir la URL de autorización
+        auth_uri = f"{auth_url}?client_id={params['client_id']}&redirect={params['redirect_uri']}&response_type={params['response_type']}&scope={params['scope']}"
+        
+        return JsonResponse({'auth_url': auth_uri}, status=200)
 
 
 

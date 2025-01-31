@@ -234,3 +234,8 @@ LOGGING = {
     },
 }
  """
+
+# Configuración de 42 OAuth
+FORTYTWO_CLIENT_ID = 'tu_client_id'
+FORTYTWO_CLIENT_SECRET = 'tu_client_secret'
+FORTYTWO_REDIRECT_URI = 'http://localhost:8000/api/users/auth/42/callback/'

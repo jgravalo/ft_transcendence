@@ -17,4 +17,5 @@ urlpatterns = [
     path('friends/add/', views.add_friend, name='add_friend'),
     path('friends/delete/', views.delete_friend, name='delete_friend'),
     path('refresh/', views.refresh, name='refresh'),
+    path('auth/42/login/', views.fortytwo_auth, name='fortytwo-login'),
 ]
