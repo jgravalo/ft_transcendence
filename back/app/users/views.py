@@ -90,7 +90,7 @@ def set_login(request):
                 next_path = '/users/profile/'
             else:
                 content = render_to_string('close_logout.html') # offline_bar
-                next_path = '/two_fa/'
+                next_path = '/two_fa/verify/'
             data = {
                 "access": make_token(user, 'access'),
                 "refresh": make_token(user, 'refresh'),
@@ -148,7 +148,7 @@ def set_register(request):
                 next_path = '/users/profile/'
             else:
                 content = render_to_string('close_logout.html') # offline_bar
-                next_path = '/two_fa/'
+                next_path = '/two_fa/verify/'
             data = {
                 "access": make_token(user, 'access'),
                 "refresh": make_token(user, 'refresh'),
