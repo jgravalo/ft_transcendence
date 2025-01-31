@@ -305,7 +305,7 @@ def fortytwo_auth(request):
         }
         
         # Construir la URL de autorización
-        auth_uri = f"{auth_url}?client_id={params['client_id']}&redirect={params['redirect_uri']}&response_type={params['response_type']}&scope={params['scope']}"
+        auth_uri = f"{auth_url}?client_id={params['client_id']}&redirect_uri={params['redirect_uri']}&response_type={params['response_type']}&scope={params['scope']}"
         
         return JsonResponse({'auth_url': auth_uri}, status=200)
 
