@@ -1,20 +1,23 @@
-# Usa la imagen oficial de Nginx como base
+# Use the official OWASP ModSecurity CRS image as the base
 FROM owasp/modsecurity-crs:4.10.0-nginx-202501270601
 
-# Copia el template del fichero de configuration para el "block" principal
-COPY ./conf/default.conf.template /etc/nginx/templates/conf.d/default.conf.template
-COPY ./conf/proxy_backend.conf.template /etc/nginx/templates/includes/proxy_backend.conf.template
+# Set the working directory to /etc/nginx (avoids long paths)
+WORKDIR /etc/nginx
 
-#COPY ./conf/modsecurity.conf.template /etc/nginx/templates/conf.d/modsecurity.conf.template
+# Copy the template configuration files into the correct locations
+COPY ./conf/default.conf templates/conf.d/default.conf.template
+COPY ./conf/proxy_frontend.conf templates/includes/proxy_frontend.conf.template
+COPY ./conf/proxy_api.conf templates/includes/proxy_api.conf.template
+COPY ./conf/proxy_websocket.conf templates/includes/proxy_websocket.conf.template
+COPY ./conf/proxy_static_files.conf templates/includes/proxy_static_files.conf.template
+COPY ./conf/ssl_settings.conf templates/includes/ssl_settings.conf.template
 
-#Copia los cerificatos para el ssl
-COPY ./certs/nginx.crt /etc/nginx/conf/server.crt
-COPY ./certs/nginx.key /etc/nginx/conf/server.key
+# Copy SSL certificates
+COPY ./certs/nginx.crt conf/server.crt
+COPY ./certs/nginx.key conf/server.key
 
-# Expone el puerto 80/443 para el tráfico HTTP/HTTPS
-EXPOSE 80
-EXPOSE 4
+# Expose ports for HTTP (80) and HTTPS (443)
+EXPOSE 80 443
 
-# Comando por defecto para iniciar Nginx
+# Default command to start Nginx
 CMD ["nginx", "-g", "daemon off;"]
-# CMD ["sh", "docker-entrypoint.sh"]

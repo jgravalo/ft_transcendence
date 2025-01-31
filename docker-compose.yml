@@ -16,9 +16,6 @@ services:
       - back
     networks:
       - pongnet
-    volumes:
-      - ./waf/conf/nginx.modsecurity.conf.template:/etc/nginx/templates/conf.d/modsecurity.conf.template
-      - ./waf/conf/setup.conf.template:/etc/nginx/templates/modsecurity.d/setup.conf.template
 
   front:
     container_name: front
