@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import requests
+from django.http import HttpResponseRedirect
 
 
 @csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend
@@ -292,22 +293,76 @@ def delete_friend(request):
 @csrf_exempt
 def fortytwo_auth(request):
     if request.method == "GET":
-        # URL de autorización de 42
         auth_url = "https://api.intra.42.fr/oauth/authorize"
-        
-        # Parámetros necesarios para la autenticación
         params = {
-            'client_id': 'u-s4t2ud-4ad9a1ce69e23747c027b7b53f5b5de35b81cc856464134f2b45e6a6b19060fa',
-            'client_secret': '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',
-            'redirect_uri': 'http://localhost:8080',
+            'client_id': 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d',
+            'client_secret': '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',
+            'redirect_uri': 'http://localhost:8080/api/users/auth/42/callback/',
             'response_type': 'code',
             'scope': 'public'
         }
         
-        # Construir la URL de autorización
         auth_uri = f"{auth_url}?client_id={params['client_id']}&redirect_uri={params['redirect_uri']}&response_type={params['response_type']}&scope={params['scope']}"
         
-        return JsonResponse({'auth_url': auth_uri}, status=200)
+        return HttpResponseRedirect(auth_uri)
+
+@csrf_exempt
+def fortytwo_callback(request):
+    print("Callback recibido!")
+    if request.method == "GET":
+        print("Método GET confirmado")
+        code = request.GET.get('code')
+        print(f"Código recibido: {code}")
+        if not code:
+            return JsonResponse({'error': 'No se recibió código de autorización'}, status=400)
+
+        # Obtener el token de acceso
+        token_url = "https://api.intra.42.fr/oauth/token"
+        token_data = {
+            'grant_type': 'authorization_code',
+            'client_id': 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d',
+            'client_secret': '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',
+            'code': code,
+            'redirect_uri': 'http://localhost:8080/api/users/auth/42/callback/'
+        }
+
+        try:
+            # Obtener token de acceso
+            token_response = requests.post(token_url, data=token_data)
+            token_response.raise_for_status()
+            access_token = token_response.json().get('access_token')
+
+            # Obtener información del usuario
+            user_url = "https://api.intra.42.fr/v2/me"
+            headers = {'Authorization': f'Bearer {access_token}'}
+            user_response = requests.get(user_url, headers=headers)
+            user_response.raise_for_status()
+            user_data = user_response.json()
+
+            # Crear o actualizar usuario
+            try:
+                user = User.objects.get(email=user_data['email'])
+            except User.DoesNotExist:
+                user = User.objects.create(
+                    username=user_data['login'],
+                    email=user_data['email'],
+                    password='42auth'  # Considera usar un método más seguro
+                )
+
+            # Generar tokens JWT
+            data = {
+                "access": make_token(user, 'access'),
+                "refresh": make_token(user, 'refresh'),
+                "error": "Success",
+                "element": 'bar',
+                "content": render_to_string('close_login.html'),
+                "next_path": '/users/profile/'
+            }
+            
+            return JsonResponse(data)
+
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': f'Error en la autenticación: {str(e)}'}, status=400)
 
 
 

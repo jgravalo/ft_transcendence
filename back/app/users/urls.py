@@ -18,4 +18,5 @@ urlpatterns = [
     path('friends/delete/', views.delete_friend, name='delete_friend'),
     path('refresh/', views.refresh, name='refresh'),
     path('auth/42/login/', views.fortytwo_auth, name='fortytwo-login'),
+    path('auth/42/callback/', views.fortytwo_callback, name='fortytwo_callback'),
 ]

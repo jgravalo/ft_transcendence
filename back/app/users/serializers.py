@@ -11,18 +11,3 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user 
-
-class IntraUserSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    login = serializers.CharField()
-    # Otros campos que quieras obtener de la API de 42
-    
-    def create(self, validated_data):
-        user, created = User.objects.get_or_create(
-            email=validated_data['email'],
-            defaults={
-                'username': validated_data['login'],
-                'password': 'intra42auth'  # Password temporal/aleatorio
-            }
-        )
-        return user 
