@@ -14,6 +14,7 @@ services:
     depends_on:
       - front
       - back
+    restart: always
     networks:
       - pongnet
 
@@ -69,6 +70,21 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  vault:
+    image: vault
+    build:
+      context: ./vault
+    env_file:
+      - ./vault/.env.${ENVIRONMENT}
+    container_name: vault
+    ports:
+      - "8200:8200"
+    restart: always
+    networks:
+      - pongnet
+    cap_add:
+      - IPC_LOCK
 
 volumes:
   pgdata:
