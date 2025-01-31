@@ -84,7 +84,7 @@ function fetchJWT(rule, info, path) {
 			// console.log("path =", '/users/friends/' + rule + '/?' + rule + '=' + user);
 			fetchFriend(user, rule);
 		}
-		else if (path == '/users/update/set/')
+		else if (path == '/users/update/set/' || path == '/two_fa/verify/set/')
 		{
 			console.log('entra en makePost');
 			makeSubmit(path.slice(0, -4));

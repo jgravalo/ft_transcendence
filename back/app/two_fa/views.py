@@ -59,17 +59,17 @@ def set_phone(request):
 
 @csrf_exempt
 def verify(request):
-    way = request.GET.get('way', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-    print(way)
+    #way = request.GET.get('way', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
+    #print(way)
     user = User.get_user(request)
-    if way == 'email/':
-        send_email_otp(user)
-    elif way == 'sms/':
-        send_sms_code(user)
-    elif way == 'google/':
-        generate_qr_code(user)
-    else:
-        return JsonResponse({'error': 'Query inválida'}, status=404)
+    #if way == 'email/':
+    send_email_otp(user)
+    # elif way == 'sms/':
+    #     send_sms_code(user)
+    # elif way == 'google/':
+    #     generate_qr_code(user)
+    # else:
+    #     return JsonResponse({'error': 'Query inválida'}, status=404)
     content = render_to_string('verify.html')
     data = {
         #"opt_code": opt_code,
