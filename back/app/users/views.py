@@ -316,7 +316,6 @@ def fortytwo_callback(request):
         if not code:
             return JsonResponse({'error': 'No se recibió código de autorización'}, status=400)
 
-        # Obtener el token de acceso
         token_url = "https://api.intra.42.fr/oauth/token"
         token_data = {
             'grant_type': 'authorization_code',
@@ -327,29 +326,25 @@ def fortytwo_callback(request):
         }
 
         try:
-            # Obtener token de acceso
             token_response = requests.post(token_url, data=token_data)
             token_response.raise_for_status()
             access_token = token_response.json().get('access_token')
 
-            # Obtener información del usuario
             user_url = "https://api.intra.42.fr/v2/me"
             headers = {'Authorization': f'Bearer {access_token}'}
             user_response = requests.get(user_url, headers=headers)
             user_response.raise_for_status()
             user_data = user_response.json()
 
-            # Crear o actualizar usuario
             try:
                 user = User.objects.get(email=user_data['email'])
             except User.DoesNotExist:
                 user = User.objects.create(
                     username=user_data['login'],
                     email=user_data['email'],
-                    password='42auth'  # Considera usar un método más seguro
+                    password='42auth'
                 )
 
-            # Generar tokens JWT
             data = {
                 "access": make_token(user, 'access'),
                 "refresh": make_token(user, 'refresh'),
