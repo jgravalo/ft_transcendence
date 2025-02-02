@@ -8,7 +8,7 @@ from .models import TwoFactorAuth
 from users.models import User
 from users.views import decode_token
 
-from .opt import send_email_otp
+from .opt import send_email_otp, generate_qr_code
 
 # Create your views here.
 
@@ -70,15 +70,15 @@ def verify(request):
     two_fa.otp_code = totp.now()
     two_fa.save()
     #if way == 'email/':
-    send_email_otp(user, totp)
+    #send_email_otp(two_fa, totp)
     # elif way == 'sms/':
     #     send_sms_code(user)
     # elif way == 'google/':
-    #qr = generate_qr_code(user, totp):
+    qr = generate_qr_code(two_fa, totp)
     # else:
     #     return JsonResponse({'error': 'Query inválida'}, status=404)
     print("two_fa.otp_code after send:", two_fa.otp_code)
-    content = render_to_string('verify.html')#, {"qr": qr})
+    content = render_to_string('verify.html', {"qr": qr["image"]})
     data = {
         "element": 'modalContainer',
         "content": content
@@ -98,7 +98,8 @@ def verify_otp(request): # email o SMS
         two_fa = TwoFactorAuth.objects.get(user__user_id=user.user_id)
         print("otp_code:", otp_code)
         print("two_fa.otp_code:", two_fa.otp_code)
-        if (otp_code != two_fa.otp_code):
+        #if (otp_code != two_fa.otp_code):
+        if not two_fa.verify_otp(otp_code):
             #user.delete()
             return JsonResponse({'type': 'errorName', 'error': 'Your code is wrong.'})
         two_fa.delete()

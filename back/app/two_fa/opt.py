@@ -65,7 +65,7 @@ def generate_qr_code(two_fa, totp):
 	# Datos para el QR
 	#data = "https://www.ejemplo.com"
 	#totp = pyotp.TOTP(secret) # Crea un objeto TOTP (Time-based One-Time Password) usando la clave secreta 
-	uri = totp.provisioning_uri(name=two_fa.user.email, issuer_name="TuApp") # Genera un URI de configuración para Google Authenticator u otra app 2FA
+	uri = totp.provisioning_uri(name=two_fa.user.email, issuer_name="TestPong42") # Genera un URI de configuración para Google Authenticator u otra app 2FA
     # El usuario escaneará este código QR con su aplicación
 	qr = qrcode.make(uri) # Genera el código QR con la URI del autenticador
 	buffer = BytesIO() # Crea un buffer en memoria para almacenar la imagen del QR
@@ -77,4 +77,4 @@ def generate_qr_code(two_fa, totp):
 		"image": image_base64,
 		"message": "QR Code generado correctamente"
 	}
-	return JsonResponse(data)
+	return data
