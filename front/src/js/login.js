@@ -67,8 +67,6 @@ function makePost(path)
 function makeSubmit(path)
 {
     let token = getJWTToken();
-    
-
     // Obtener los valores de los inputs
         //console.log("id =", path.slice(path.slice(1, -1).indexOf('/') + 2, -1));
         if (path === '/users/login/' ||
