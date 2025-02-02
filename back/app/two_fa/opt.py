@@ -3,20 +3,38 @@ from django.core.mail import send_mail
 from smtplib import SMTPException
 from django.core.mail import BadHeaderError
 import logging
+from django.core.mail import EmailMessage
 
 logger = logging.getLogger(__name__)
 
 def send_email_otp(user):
-	two_fa = TwoFactorAuth.objects.create(user=user)#, secret_key=settings.SECRET_KEY)
+	if TwoFactorAuth.objects.filter(user=user).exists():
+		two_fa = TwoFactorAuth.objects.get(user=user)
+	else:
+		two_fa = TwoFactorAuth.objects.create(user=user)#, secret_key=settings.SECRET_KEY)
 	otp_code = two_fa.generate_otp()
 	print("otp_code:", otp_code)
 	try:
-		send_mail(
-			'Tu código OTP'.encode('utf-8').decode('utf-8'), #subject=
-			f'Tu código OTP es: {otp_code}'.encode('utf-8').decode('utf-8'),#message=
-			'no-reply@example.com',#from_email=
-			[user.email]#recipient_list=
+		# send_mail(
+		# 	'Tu codigo OTP', #.encode('utf-8').decode('utf-8'), #subject=
+		# 	f'Tu codigo OTP es: {otp_code}', #.encode('utf-8').decode('utf-8'),#message=
+		# 	'no-reply@example.com',#from_email=
+		# 	[user.email],#recipient_list=
+		# 	fail_silently=False,  # Para mostrar errores si hay problemas
+		# )
+
+		subject = "Tu código OTP"
+		message = f"Tu código OTP es: {otp_code}"
+
+		email = EmailMessage(
+			subject=subject,
+			body=message,
+			from_email="no-reply@example.com",
+			to=[user.email]
 		)
+		email.content_subtype = "plain"  # Asegura que sea texto sin formato (UTF-8)
+		email.send()
+		print('LO HIZO!!')
 	except BadHeaderError:
 		logger.error("Se detectó un encabezado no válido al intentar enviar el correo.")
 	except SMTPException as e:

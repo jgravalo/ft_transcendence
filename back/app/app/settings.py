@@ -210,9 +210,10 @@ EMAIL_HOST = 'smtp.gmail.com'  # Servidor SMTP (puede variar)
 EMAIL_PORT = 587  # Puerto para TLS (465 para SSL)
 EMAIL_USE_TLS = True  # True para usar TLS
 EMAIL_USE_SSL = False  # Asegúrate de no usar ambos al mismo tiempo
-EMAIL_HOST_USER = 'tu_correo@example.com'  # Tu dirección de correo
-EMAIL_HOST_PASSWORD = 'tu_contraseña'  # Tu contraseña o clave para aplicaciones
+EMAIL_HOST_USER = 'trascendente78@gmail.com'  # Tu dirección de correo
+EMAIL_HOST_PASSWORD = '12345!@#$%qwerty'  # Tu contraseña o clave para aplicaciones
 DEFAULT_FROM_EMAIL = 'no-reply@example.com'  # Dirección de remitente por defecto
+
 """ 
 LOGGING = {
     'version': 1,
