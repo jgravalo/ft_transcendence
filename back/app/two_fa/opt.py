@@ -7,13 +7,7 @@ from django.core.mail import EmailMessage
 
 logger = logging.getLogger(__name__)
 
-def send_email_otp(user):
-	if TwoFactorAuth.objects.filter(user=user).exists():
-		two_fa = TwoFactorAuth.objects.get(user=user)
-	else:
-		two_fa = TwoFactorAuth.objects.create(user=user)#, secret_key=settings.SECRET_KEY)
-	otp_code = two_fa.generate_otp()
-	print("otp_code:", otp_code)
+def send_email_otp(two_fa, totp):
 	try:
 		# send_mail(
 		# 	'Tu codigo OTP', #.encode('utf-8').decode('utf-8'), #subject=
@@ -30,7 +24,7 @@ def send_email_otp(user):
 			subject=subject,
 			body=message,
 			from_email="no-reply@example.com",
-			to=[user.email]
+			to=[two_fa.user.email]
 		)
 		email.content_subtype = "plain"  # Asegura que sea texto sin formato (UTF-8)
 		email.send()
@@ -41,9 +35,6 @@ def send_email_otp(user):
 		logger.error(f"Error al enviar correo: {e}")
 	except Exception as e:
 		logger.error(f"Error send_mail: {e}")
-	two_fa.otp_code = otp_code
-	two_fa.save()
-	print("two_fa.otp_code:", two_fa.otp_code)
 
 from twilio.rest import Client
 
@@ -69,24 +60,18 @@ from io import BytesIO
 import base64
 from django.http import JsonResponse
 
-def generate_qr_code(user):
-	secret = pyotp.random_base32()
+def generate_qr_code(two_fa, totp):
+	#secret = pyotp.random_base32()
 	# Datos para el QR
 	#data = "https://www.ejemplo.com"
-	totp = pyotp.TOTP(secret)
-	uri = totp.provisioning_uri(name=user.email, issuer_name="TuApp")
-
-	# Generar el código QR
-	#qr = qrcode.make(data)
-	qr = qrcode.make(uri)
-	
-	# Almacenar el código QR en un flujo de memoria
-	buffer = BytesIO()
-	qr.save(buffer, format="PNG")
-	buffer.seek(0)  # Asegurarse de que el puntero esté al inicio del buffer
-
-	# Codificar la imagen en Base64
-	image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+	#totp = pyotp.TOTP(secret) # Crea un objeto TOTP (Time-based One-Time Password) usando la clave secreta 
+	uri = totp.provisioning_uri(name=two_fa.user.email, issuer_name="TuApp") # Genera un URI de configuración para Google Authenticator u otra app 2FA
+    # El usuario escaneará este código QR con su aplicación
+	qr = qrcode.make(uri) # Genera el código QR con la URI del autenticador
+	buffer = BytesIO() # Crea un buffer en memoria para almacenar la imagen del QR
+	qr.save(buffer, format="PNG") # Guarda la imagen del código QR en el buffer en formato PNG
+	buffer.seek(0) # Mueve el puntero del buffer al inicio para poder leerlo correctamente
+	image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8') # Codifica la imagen en Base64 para poder enviarla en un formato JSON
 	data = {
 		"error": "success",
 		"image": image_base64,
