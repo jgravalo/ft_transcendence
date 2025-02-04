@@ -32,7 +32,7 @@ function deleteUser(path)
             },
         });
 }
-
+    
 function makeModal(path) //modalHTML)
 {
     // Mostrar el modal
@@ -80,7 +80,10 @@ function makeSubmit(path)
         //if (path.slice(-5) !== "/set/")
             post += "set/";
         //console.log("post =", post);
-        //console.log("info =", info);
+        console.log("username:", info.get("username"));
+        console.log("email:", info.get("email"));
+        console.log("password:", info.get("password"));
+        console.log("info =", info);
         if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
             console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
             refreshJWT(post/* , data => {
@@ -94,15 +97,16 @@ function makeSubmit(path)
         }
     	console.log('path for POST =', post);
         // fetch(base + ":8000" + post, {
+            //"Content-Type": "application/json",
         fetch(base + '/api' + post, {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${getJWTToken()}`,
-                "Content-Type": "application/json",
                 'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
                 'Accept-Language': localStorage.getItem("selectedLanguage") || "en" //send the language to backend (set to en default)
             },
-            body: JSON.stringify(info), 
+            body: info,
+            //body: JSON.stringify(info), 
         })
         .then(response => response.json())
         .then(data => {
@@ -145,14 +149,20 @@ function makeSubmit(path)
 
 function getInfo()
 {
-    //const form = document.getElementById('loginForm'); // Selecciona el formulario
-    const form = document.querySelector('#loginForm');
+    const form = document.getElementById('loginForm'); // Selecciona el formulario
+    //const form = document.querySelector('#loginForm');
     const formData = new FormData(form);
-    const formDataObject = {};
+    console.log("formData:", formData);
+    //const formDataObject = {};
+    return (formData)
 
     formData.forEach((value, key) => {
         if (key === 'image' && value instanceof File)
-            formDataObject[key] = value; // Agregar el archivo (imagen) seleccionada
+        {
+            let fileInput = document.getElementById("fileInput");
+            formDataObject[key] = fileInput.files[0];
+            //formDataObject[key] = value; // Agregar el archivo (imagen) seleccionada
+        }
         else
             formDataObject[key] = value;
         //console.log("key =", key, "value =", value);

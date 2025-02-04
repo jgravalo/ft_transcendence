@@ -73,9 +73,11 @@ def set_login(request):
         activate(selected_language)
         
         try:
-            data = json.loads(request.body)
-            username = data.get('username')
-            password = data.get('password')
+            # data = json.loads(request.body)
+            # username = data.get('username')
+            # password = data.get('password')
+            username = request.POST.get('username')
+            password = request.POST.get('password')
             try:
                 if not '@' in username:
                     user = User.objects.get(username=username)
@@ -124,21 +126,31 @@ def parse_data(username, email, password):
     if not '@' in email:
         return {'type': 'errorEmail', 'error': _("The email must include \'@\'")}#, status=400)
     return None
- 
+
 @csrf_exempt
 def set_register(request):
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            username = data.get('username')
-            email = data.get('email')
-            password = data.get('password')
+            #print("hace json.loads")
+            #data = json.loads(request.body)
+            #print("hizo json.loads")
+            print("POST data:", request.POST)
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            # username = data.get('username')
+            # email = data.get('email')
+            # password = data.get('password')
+            print("pillo los datos")
+            print('username: ', username)
+            print('email: ', email)
+            print('password: ', password)
             if User.objects.filter(username=username).exists():
                 return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
             if User.objects.filter(email=email).exists():
                 return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
             if len(password) < 6:
-                return JsonResponse({'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")})
+                return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
@@ -200,25 +212,31 @@ def set_update(request):
     if request.method == "POST":
         try:
             user = User.get_user(request)
-            data = json.loads(request.body)
             try:
                 #image = data.get('image')
                 # Acceder al archivo 'image' desde request.FILES
-                image = request.FILES['image']
+                file = request.FILES['image']
+                print('funciono request.FILES')
                 # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
-                image_name = default_storage.save(f'uploads/{image.name}', image)
-                image_url = default_storage.url(image_name)
-                if user.image != image:
-                    user.image=image
+                user.image.save(file.name, file)
+                print('funciono image.save')
             except:
                 print("fallo al subir image")
-            username = data.get('username')
-            email = data.get('email')
-            old_password = data.get('old-password')
-            new_password = data.get('new-password')
-            two_fa_enabled = data.get('two_fa_enabled')
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            old_password = request.POST.get('old-password')
+            new_password = request.POST.get('new-password')
+            two_fa_enabled = request.POST.get('two_fa_enabled')
+            if username != user.username and User.objects.filter(username=username).exists():
+                return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
+            if email != user.email and User.objects.filter(email=email).exists():
+                return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
             if old_password != '' and old_password != user.password:
                 return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
+            if old_password == '' and new_password != '':
+                return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
+            if old_password != '' and len(password) < 6:
+                return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}
             error = parse_data(username, email, new_password)
             if error != None:
                 return JsonResponse(error)
