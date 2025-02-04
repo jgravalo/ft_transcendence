@@ -16,17 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
 from .views import get_home
 from .health import health_check
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from your_app.views import EnableTOTPView, VerifyTOTPView, EnableEmailOTPView, VerifyEmailOTPView
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
+# from rest_framework_simplejwt.views import (
+#     TokenObtainPairView,
+#     TokenRefreshView,
+#     TokenVerifyView,
+# )
 
 urlpatterns = [
     # Base API routes
@@ -37,8 +39,8 @@ urlpatterns = [
         path('two_fa/', include('two_fa.urls')),
         path('health/', health_check, name='health_check'),
         path('get-translations/', include('language.urls')),
-    ])),
-]
+    ])), 
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:
 #     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

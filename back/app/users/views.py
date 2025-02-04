@@ -183,6 +183,7 @@ def logout(request):
 
 def profile(request):
     user = User.get_user(request)
+    print("url =", user.image.url)
     context = {
         'user': user
     }
@@ -215,10 +216,15 @@ def set_update(request):
             try:
                 #image = data.get('image')
                 # Acceder al archivo 'image' desde request.FILES
-                file = request.FILES['image']
+                # file = request.FILES['image']
+                # user.image.save(file.name, file)
+                file = request.FILES.get('image')  # Asegúrate de obtener la imagen correctamente
+                if file:
+                    #file_path = default_storage.save('profile_images/' + file.name, file)
+                    user.image = file#_path  # Asigna el archivo al campo image
+                    user.save()  # Guarda el usuario con la imagen
                 print('funciono request.FILES')
                 # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
-                user.image.save(file.name, file)
                 print('funciono image.save')
             except:
                 print("fallo al subir image")

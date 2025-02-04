@@ -26,6 +26,7 @@ services:
     networks:
       - pongnet
     volumes:
+    - media:/usr/share/nginx/html/img
     - ./front/src:/usr/share/nginx/html
     # environment:
     #   - VIRTUAL_HOST=jgravalo.42.fr
@@ -37,8 +38,8 @@ services:
     build:
       context: ./back
     image: back
-    # ports:
-    #   - "8000:8000"
+    ports:
+      - "8000:8000"
     environment:
       - DJANGO_DB_NAME=postgres
       - DJANGO_DB_USER=postgres
@@ -50,6 +51,8 @@ services:
         condition: service_healthy
     networks:
       - pongnet
+    volumes:
+      - media:/app/img
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/"]
@@ -78,6 +81,8 @@ services:
 volumes:
   pgdata:
     name: pgdata
+  media:
+    name: media
 
 networks:
   pongnet:
