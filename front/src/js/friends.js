@@ -10,6 +10,17 @@ function deleteFriend(id, user)
 	fetchFriend(user, 'delete');
 }
 
+function blockUser(id, user)
+{
+	document.getElementById(id).innerHTML = '<i class="fas fa-lock-open friend-icon" onclick="unlockUser(\'' + id + '\', \'' + user + '\')"></i>';
+	//fetchFriend(user, 'block');
+}
+function unlockUser(id, user)
+{
+	document.getElementById(id).innerHTML = '<i class="fas fa-ban friend-icon" onclick="blockUser(\'' + id + '\', \'' + user + '\')" style="color: brown;"></i>';
+	//fetchFriend(user, 'unlock');
+}
+
 function fetchFriend(user, rule)
 {
 	let token = getJWTToken();
