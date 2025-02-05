@@ -16,6 +16,7 @@ class User(models.Model):
 	two_fa_enabled = models.BooleanField(default=False)
 	#jwt = models.CharField(max_length=512, null=True, blank=True)
 	friends = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
+	blocked = models.ManyToManyField('self', symmetrical=False, related_name='blocked_by', blank=True)
 #
 #	def __str__(self):
 #       return self.username  # Representación amigable del objeto

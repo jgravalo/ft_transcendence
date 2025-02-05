@@ -270,11 +270,16 @@ def set_update(request):
 @csrf_exempt
 def friends(request):
     user = User.get_user(request)
+    blocked = user.blocked.all()
+    blocked_by = user.blocked_by.all()
+    for block in blocked:
+        print('blocked =', block.username)
     friends = user.friends.all()
-    non_friends = set(User.objects.all()) - set(friends) - {user}
+    non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked)  - set(blocked_by)
     context = {
-        'users': non_friends,
         'friends': friends,
+        'blockeds': blocked,
+        'users': non_friends,
     }
     content = render_to_string('friends.html', context)
     data = {
@@ -306,6 +311,32 @@ def delete_friend(request):
         print(f"user {friends_name} does not exist")
     user1 = User.get_user(request)
     user1.friends.remove(user2)
+    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
+    return JsonResponse(data)
+
+@csrf_exempt
+def block_user(request):
+    blocked_name = request.GET.get('block', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    try:
+        user2 = User.objects.get(username=blocked_name)
+    except: #Does not exist
+        print(f"user {blocked_name} does not exist")
+    print(user2.email)
+    user1 = User.get_user(request)
+    user1.blocked.add(user2)
+    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
+    return JsonResponse(data)
+
+@csrf_exempt
+def unlock_user(request):
+    blocked_name = request.GET.get('unlock', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    try:
+        user2 = User.objects.get(username=blocked_name)
+    except: #Does not exist
+        print(f"user {blocked_name} does not exist")
+    print(user2.email)
+    user1 = User.get_user(request)
+    user1.blocked.remove(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
 

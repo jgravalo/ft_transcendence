@@ -16,5 +16,7 @@ urlpatterns = [
     path('friends/', views.friends, name='friends'),
     path('friends/add/', views.add_friend, name='add_friend'),
     path('friends/delete/', views.delete_friend, name='delete_friend'),
+    path('friends/block/', views.block_user, name='block_user'),
+    path('friends/unlock/', views.unlock_user, name='unlock_user'),
     path('refresh/', views.refresh, name='refresh'),
 ]
