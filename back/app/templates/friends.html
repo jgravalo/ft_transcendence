@@ -25,10 +25,10 @@
 				<td>{{ friend.email }}</td>
 				<td>{{ friend.wins }}-{{ friend.losses }}</td>
 				<td id="follow-{{ friend.username }}">
-					<i class="fas fa-check friend-icon" onclick="deleteFriend('follow-{{ friend.username }}', '{{ friend.username }}')"></i>
+					<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.username }}')"></i>
 				</td>
 				<td id="block-{{ friend.username }}">
-					<i class="fas fa-ban friend-icon" onclick="blockUser('block-{{ friend.username }}', '{{ friend.username }}')" style="color: brown;"></i>
+					<i class="fas fa-ban friend-icon" onclick="blockUser('{{ friend.username }}')" style="color: brown;"></i>
 				</td>
 			</tr>
 			{% empty %}
@@ -62,7 +62,7 @@
 				<td>{{ blocked.wins }}-{{ blocked.losses }}</td>
 				<td id="follow-{{ blocked.username }}"> </td>
 				<td id="block-{{ blocked.username }}">
-					<i class="fas fa-lock-open friend-icon" onclick="unlockUser('block-{{ blocked.username }}', '{{ blocked.username }}')"></i>
+					<i class="fas fa-lock-open friend-icon" onclick="unlockUser('{{ blocked.username }}')"></i>
 				</td>
 			</tr>
 			{% empty %}
@@ -95,10 +95,10 @@
 				<td>{{ user.email }}</td>
 				<td>{{ user.wins }}-{{ user.losses }}</td>
 				<td id="follow-{{ user.username }}">
-					<i class="fas fa-plus friend-icon" onclick="addFriend('follow-{{ user.username }}', '{{ user.username }}')"></i>
+					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ user.username }}')"></i>
 				</td>
 				<td id="block-{{ user.username }}">
-					<i class="fas fa-ban friend-icon" onclick="blockUser('block-{{ user.username }}', '{{ user.username }}')" style="color: brown;"></i>
+					<i class="fas fa-ban friend-icon" onclick="blockUser('{{ user.username }}')" style="color: brown;"></i>
 				</td>
 			</tr>
 			{% empty %}

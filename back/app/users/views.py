@@ -323,6 +323,8 @@ def block_user(request):
         print(f"user {blocked_name} does not exist")
     print(user2.email)
     user1 = User.get_user(request)
+    if user1.friends.filter(username=user2.username).exists():
+        user1.friends.remove(user2)
     user1.blocked.add(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)

@@ -1,23 +1,27 @@
-function addFriend(id, user)
+function addFriend(user)
 {
-	document.getElementById(id).innerHTML = '<i class="fas fa-check friend-icon" onclick="deleteFriend(\'' + id + '\', \'' + user + '\')"></i>';
+	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-check friend-icon" onclick="deleteFriend(\'' + user + '\')"></i>';
 	fetchFriend(user, 'add');
 }
 
-function deleteFriend(id, user)
+function deleteFriend(user)
 {
-	document.getElementById(id).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + id + '\', \'' + user + '\')"></i>';
+	alert("Do you want to unfollow " + user + "?");
+	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + user + '\')"></i>';
 	fetchFriend(user, 'delete');
 }
 
-function blockUser(id, user)
+function blockUser(user)
 {
-	document.getElementById(id).innerHTML = '<i class="fas fa-lock-open friend-icon" onclick="unlockUser(\'' + id + '\', \'' + user + '\')"></i>';
+	alert("Do you want to block " + user + "?");
+	document.getElementById("follow-" + user).innerHTML = ' ';
+	document.getElementById("block-" + user).innerHTML = '<i class="fas fa-lock-open friend-icon" onclick="unlockUser(\'' + user + '\')"></i>';
 	fetchFriend(user, 'block');
 }
-function unlockUser(id, user)
+function unlockUser(user)
 {
-	document.getElementById(id).innerHTML = '<i class="fas fa-ban friend-icon" onclick="blockUser(\'' + id + '\', \'' + user + '\')" style="color: brown;"></i>';
+	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + user + '\')"></i>';
+	document.getElementById("block-" + user).innerHTML = '<i class="fas fa-ban friend-icon" onclick="blockUser(\'' + user + '\')" style="color: brown;"></i>';
 	fetchFriend(user, 'unlock');
 }
 
