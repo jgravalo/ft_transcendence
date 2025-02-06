@@ -362,3 +362,10 @@ def fortytwo_callback(request):
 
 
 
+# Verificar en la primera vista si el usuario está autenticado
+@csrf_exempt
+def check_auth(request):
+    if request.method == "GET":
+        user = User.get_user(request)
+        if user:
+            return JsonResponse({"authenticated": True})
