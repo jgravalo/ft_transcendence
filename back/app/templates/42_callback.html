@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>42 Authentication</title>
+    <script src="/js/login.js"></script>
+    <script>
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code) {
+                fetch('/api/users/auth/42/callback/?code=' + code, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error === "Success") {
+                        // Local o session storage?
+                        sessionStorage.setItem('access', data.access);
+                        sessionStorage.setItem('refresh', data.refresh);
+                        
+                        window.location.href = '/users/profile/';
+                    } else {
+                        console.error('Error en la autenticación:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        };
+    </script>
+</head>
+<body>
+    <div>Procesando autenticación de 42...</div>
+</body>
+</html> 
