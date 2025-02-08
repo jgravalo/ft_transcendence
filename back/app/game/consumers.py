@@ -1,65 +1,55 @@
 import json
-import time
-from channels.generic.websocket import WebsocketConsumer
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-async def do_match():
-    print("from match")
-    time.sleep(1)
-    print("from match")
+class Match(AsyncWebsocketConsumer):
+    players = {}  # Diccionario para almacenar jugadores conectados
 
-class AsyncMatch(AsyncWebsocketConsumer):
     async def connect(self):
-        # Aceptar la conexión WebSocket
         await self.accept()
-        await do_match()
-        print("form connect")
-        await self.send(text_data=json.dumps({"message": "Conexión Async WebSocket exitosa from Django"}))
-
-    def disconnect(self, close_code):
-        # Desconectar el WebSocket
-        pass
+        print("✅ Cliente conectado al WebSocket.")
 
     async def receive(self, text_data):
-        # Recibir un mensaje desde el WebSocket
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        self.send(text_data=json.dumps({
-                'message': message
-            }))
+        data = json.loads(text_data)
+        print(f"Mensaje recibido: {data}")
 
+        if data.get("type") == "join":
+            player_id = data.get("player", f"player{len(self.players) + 1}")
+            self.players[player_id] = {"x": 200}  # Posición inicial del jugador
+            print(f"{player_id} se ha unido al juego. Total de jugadores: {len(self.players)}")
 
-class Match(WebsocketConsumer):
-    def connect(self):
-        # Aceptar la conexión WebSocket
-        self.accept()
-        self.send(text_data=json.dumps({"message": "Conexión WebSocket exitosa from Django"}))
+            # Si hay menos de 2 jugadores, enviar mensaje de espera
+            if len(self.players) < 2:
+                waiting_message = {
+                    "type": "waiting",
+                    "message": "Esperando a otro jugador..."
+                }
+                print(f"Enviando mensaje de espera: {waiting_message}")
+                await self.send(text_data=json.dumps(waiting_message))
 
-    def disconnect(self, close_code):
-        # Desconectar el WebSocket
-        pass
+    async def broadcast_game_state(self):
+        """Envia la actualización del estado del juego a todos los clientes."""
+        message = json.dumps({
+            "type": "update",
+            "players": self.players,
+        })
+        await self.send_to_all(json.loads(message))
 
-    def receive(self, text_data):
-        # Recibir un mensaje desde el WebSocket
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        try:
-            player1 = text_data_json['player1']
-            player2 = text_data_json['player2']
-            ballLeft = text_data_json['ballLeft']
-            ballTop = text_data_json['ballTop']
-            print("player1:", text_data_json['player1'])
-            print("player2:", text_data_json['player2'])
-            # Enviar un mensaje de vuelta al WebSocket
-            self.send(text_data=json.dumps({
-                'message': 'exito',
-                'player1': player1,
-                'player2': player2,
-                'ballLeft': ballLeft,
-                'ballTop': ballTop
-            }))
-        except:
-            self.send(text_data=json.dumps({
-                'message': 'error'
-            }))
-        
+    async def send_to_all(self, data):
+        """Envía un mensaje a todos los jugadores conectados."""
+        message = json.dumps(data)
+        for player in self.players.values():
+            await self.send(text_data=message)
+
+    async def disconnect(self, close_code):
+        print(f"Cliente desconectado. Código: {close_code}")
+
+        if close_code == 1001:
+            print("⚠ La conexión WebSocket se cerró inesperadamente. Verifica si el cliente está perdiendo la conexión.")
+
+        if self.players:
+            for player_id in list(self.players.keys()):
+                if self.players[player_id] == self:
+                    del self.players[player_id]
+                    print(f"Jugador {player_id} eliminado de la lista.")
+                    break
+

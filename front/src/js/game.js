@@ -8,6 +8,74 @@ canvas.height = 800;
 ctx.fillStyle = '#000';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+/*
+ * @section: Remote Mode:
+ */
+const socket = new WebSocket('ws://localhost:8000/ws/game/');
+
+const remoteModeButton = document.getElementById('remote-mode');
+
+remoteModeButton.addEventListener('click', () => {
+    startRemoteGame();
+});
+
+function startRemoteGame() {
+    console.log("🌐 Modo Remoto Activado");
+    gameMode = "remote";
+
+    document.getElementById("canvas-container").style.display = "block";
+    document.getElementById("menu-message").innerText = "Conectando al servidor...";
+
+    socket.onopen = () => {
+        console.log("✅ Conectado al servidor WebSocket");
+
+        // Esperar un pequeño tiempo antes de enviar el mensaje de unión para evitar desconexiones
+        setTimeout(() => {
+            socket.send(JSON.stringify({ type: 'join', player: 'player1' }));
+        }, 500);
+    };
+
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log("📩 Mensaje recibido:", data);
+
+        if (data.type === 'waiting') {
+            console.log("⌛ Esperando a otro jugador...");
+            document.getElementById("menu-message").innerText = data.message;
+        }
+
+        if (data.type === 'start') {
+            console.log("🚀 Juego comenzando...");
+            document.getElementById("menu-message").innerText = data.message;
+            isGameRunning = true;
+            drawGame();
+            gameLoop();
+        }
+
+        if (data.type === 'update') {
+            console.log("🔄 Actualizando posiciones:", data.players);
+            if (data.players['player1']) {
+                player.x = data.players['player1'].x;
+            }
+            if (data.players['player2']) {
+                ai.x = data.players['player2'].x;
+            }
+        }
+    };
+
+    socket.onclose = (event) => {
+        console.warn("⚠ WebSocket cerrado:", event);
+        if (event.code === 1001) {
+            console.warn("⚠ La conexión fue cerrada inesperadamente. Posible problema en el backend.");
+        }
+    };
+}
+
+
+
+
+
+
 // @brief: Paddles sizes
 const paddleWidth = 100, paddleHeight = 15;
 const player = { x: canvas.width / 2 - paddleWidth / 2, y: canvas.height - 80, width: paddleWidth, height: paddleHeight, color: '#fff', powerUp: null, speedModifier: 1 };
@@ -464,10 +532,20 @@ function movePlayerTwo() {
 
 // Listeners para el control de ambos jugadores
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') movingLeftPlayer = true;
-    if (e.key === 'ArrowRight') movingRightPlayer = true;
-    if (e.key === 'a') movingLeftAi = true;
-    if (e.key === 'd') movingRightAi = true;
+    let movement = 0;
+
+    if (e.key === 'ArrowLeft') movement = -10;
+    if (e.key === 'ArrowRight') movement = 10;
+
+    if (movement !== 0) {
+        player.x = Math.max(0, Math.min(player.x + movement, canvas.width - player.width));
+        console.log(`⬅➡ Movimiento local: ${player.x}`);
+
+        // 🏓 Si estamos en modo remoto, enviamos el movimiento al WebSocket
+        if (gameMode === 'remote' && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: "move", player: "player1", x: player.x }));
+        }
+    }
 });
 
 document.addEventListener('keyup', (e) => {
@@ -504,6 +582,7 @@ function drawGame() {
 */
 function gameLoop() {
     if (isGameRunning) {
+        console.log("Game Loop");
         updateGame();
         drawGame();
         requestAnimationFrame(gameLoop);

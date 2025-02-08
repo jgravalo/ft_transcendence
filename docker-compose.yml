@@ -37,8 +37,8 @@ services:
     build:
       context: ./back
     image: back
-    # ports:
-    #   - "8000:8000"
+    ports:
+      - "8000:8000"
     environment:
       - DJANGO_DB_NAME=postgres
       - DJANGO_DB_USER=postgres
