@@ -343,4 +343,71 @@ def unlock_user(request):
     return JsonResponse(data)
 
 
+@csrf_exempt
+def fortytwo_auth(request):
+    if request.method == "GET":
+        auth_url = "https://api.intra.42.fr/oauth/authorize"
+        params = {
+            'client_id': 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d',
+            'client_secret': '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',
+            'redirect_uri': 'http://localhost:8080/api/users/auth/42/callback/',
+            'response_type': 'code',
+            'scope': 'public'
+        }
+        
+        auth_uri = f"{auth_url}?client_id={params['client_id']}&redirect_uri={params['redirect_uri']}&response_type={params['response_type']}&scope={params['scope']}"
+        
+        return HttpResponseRedirect(auth_uri)
+
+
+# 42 callback, devuelve JSON y redirige a profile o html
+@csrf_exempt
+def fortytwo_callback(request):
+    print("Callback recibido!")
+    if request.method == "GET":
+        code = request.GET.get('code')
+        # Si la petición viene con el header de JSON, procesar como API
+        if request.headers.get('Content-Type') == 'application/json':
+            try:
+                token_url = "https://api.intra.42.fr/oauth/token"
+                token_data = {
+                    'grant_type': 'authorization_code',
+                    'client_id': 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d',
+                    'client_secret': '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',
+                    'code': code,
+                    'redirect_uri': 'http://localhost:8080/api/users/auth/42/callback/'
+                }
+
+                token_response = requests.post(token_url, data=token_data)
+                token_response.raise_for_status()
+                access_token = token_response.json().get('access_token')
+
+                user_url = "https://api.intra.42.fr/v2/me"
+                headers = {'Authorization': f'Bearer {access_token}'}
+                user_response = requests.get(user_url, headers=headers)
+                user_response.raise_for_status()
+                user_data = user_response.json()
+
+                try:
+                    user = User.objects.get(email=user_data['email'])
+                except User.DoesNotExist:
+                    user = User.objects.create(
+                        username=user_data['login'],
+                        email=user_data['email'],
+                        password='42auth'
+                    )
+
+                data = {
+                    "access": make_token(user, 'access'),
+                    "refresh": make_token(user, 'refresh'),
+                    "error": "Success",
+                    "element": 'bar',
+                    "content": render_to_string('close_login.html'),
+                    "next_path": '/users/profile/'
+                }
+                return JsonResponse(data)
+            except requests.exceptions.RequestException as e:
+                return JsonResponse({'error': f'Error en la autenticación: {str(e)}'}, status=400)
+        else:
+            return render(request, '42_callback.html')
 
