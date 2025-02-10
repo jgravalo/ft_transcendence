@@ -19,4 +19,6 @@ urlpatterns = [
     path('friends/block/', views.block_user, name='block_user'),
     path('friends/unlock/', views.unlock_user, name='unlock_user'),
     path('refresh/', views.refresh, name='refresh'),
+    path('auth/42/login/', views.fortytwo_auth, name='fortytwo-login'),
+    path('auth/42/callback/', views.fortytwo_callback, name='fortytwo_callback'),
 ]
