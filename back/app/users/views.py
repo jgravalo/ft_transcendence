@@ -10,6 +10,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
 from .token import decode_token, make_token
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import requests
+from django.http import HttpResponseRedirect
 
 
 @csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend

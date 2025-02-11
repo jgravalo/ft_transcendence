@@ -1,35 +1,4 @@
-//const origin = 'http://127.0.0.1:8000/game/';// /game/json/';
-/*
-console.log("host: <" + window.location.host + ">");
-console.log("hostname: <" + window.location.hostname + ">");
-console.log("origin: <" + window.location.origin + ">");
-console.log("pathname: <" + window.location.pathname + ">");
-console.log("");
-*/
-/* // averiguar para que sirve
-(function() {
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function (...args) {
-        originalPushState.apply(this, args);
-        window.dispatchEvent(new Event('custom-navigation'));
-    };
-
-    history.replaceState = function (...args) {
-        originalReplaceState.apply(this, args);
-        window.dispatchEvent(new Event('custom-navigation'));
-    };
-})();
-
-// Detectar la navegación personalizada
-window.addEventListener('custom-navigation', () => {
-    console.log('La URL cambió en la SPA:', window.location.href);
-});
- */
-
-
-window.addEventListener('popstate', (event) => handlePopstate(event));
+//window.addEventListener('popstate', (event) => handlePopstate(event));
 
 function handlePopstate(event)
 {
@@ -90,6 +59,7 @@ function handleLink(event)
     }
     //console.log("token before fetch =", getJWTToken());
 	console.log('path for GET =', path);
+	console.log('fetch for GET =', base + '/api' + path);
 
     // fetch(base + ":8000" + path, {
     fetch(base + '/api' + path, {
@@ -127,7 +97,8 @@ function handleLink(event)
         }
     })
     .catch(error => {
-            console.error('Error al obtener productos:', error);
+        console.error('fallo el 42 auth');
+        console.error('Error al obtener productos:', error);
     });
 }
 
