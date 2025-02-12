@@ -80,6 +80,8 @@ services:
     container_name: vault
     ports:
       - "8200:8200"
+    volumes:
+      - ./vault/data:/vault/data
     restart: always
     networks:
       - pongnet

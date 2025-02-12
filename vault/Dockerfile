@@ -6,5 +6,9 @@ RUN apk add bash
 
 EXPOSE 8200
 
-# Run Vault in dev mode
-CMD ["vault", "server", "-dev"]
+COPY conf/config.hcl /vault/config/config.hcl
+COPY tool/init.sh /vault/init.sh
+
+RUN chmod +x /vault/init.sh
+
+CMD ["sh", "/vault/init.sh"]

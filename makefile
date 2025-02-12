@@ -60,7 +60,7 @@ clean:
 enter:
 	@CONTAINER_ID=$$(docker compose --env-file $(ENV_FILE) -f docker-compose.yml ps -q $(SERVICE)); \
 	if [ -n "$$CONTAINER_ID" ]; then \
-		docker exec -it --user root $$CONTAINER_ID /bin/bash; \
+		docker exec -it --user root $$CONTAINER_ID /bin/sh; \
 	else \
 		echo "Container for service '$(SERVICE)' is not running"; \
 	fi
