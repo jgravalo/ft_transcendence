@@ -7,7 +7,7 @@
 .error-container h1 {
     font-size: 72px;
     margin: 0;
-    color: #ff4444;
+    /* color: #ff4444; */
 }
 
 .error-container p {

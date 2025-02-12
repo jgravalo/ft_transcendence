@@ -72,7 +72,7 @@ function handleLink(event)
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw { status: response.status, message: response.statusText };
         }
         return response.json();
     }) // Convertir la respuesta a JSON
@@ -104,14 +104,16 @@ function handleLink(event)
     .catch(error => {
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
-        console.log('error.slice(-3) =', error.slice(-3));
+        //console.log('error.slice(-3) =', error);//.slice(-3));
         //error(error.slice(-3));
-        error('404');
+        setError(error);
+        //setError('500');
     });
 }
 
-function error(error_code)
+function setError(error)
 {
+    error_code = `${error.status}`
     console.log('error_code =', error_code);
     fetch(base + '/api/error/?error=' + error_code)
     .then(response => {
@@ -126,7 +128,7 @@ function error(error_code)
     .catch(error => {
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
-        error(error.slice(-3));
+        //error(error.slice(-3));
     });
 }
 
