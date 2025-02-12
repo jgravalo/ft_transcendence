@@ -90,13 +90,14 @@ function handleLink(event)
         {
             if (path != '/users/logout/close/')
             {
-                var title = path.slice(1, -1);
+                pushState(path);
+                /* var title = path.slice(1, -1);
                 // console.log("pushState = <" + title + ">");
                 window.history.pushState(
                     { page: title},
                     title,
                     "/" + title
-                );
+                ); */
             }
             handleLinks();
         }
@@ -104,10 +105,7 @@ function handleLink(event)
     .catch(error => {
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
-        //console.log('error.slice(-3) =', error);//.slice(-3));
-        //error(error.slice(-3));
         setError(error);
-        //setError('500');
     });
 }
 

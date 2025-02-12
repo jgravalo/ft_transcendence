@@ -46,5 +46,23 @@ fetch(window.location.href)
 }); */
 
 window.addEventListener("popstate", (event) => {
-    console.log("Nueva URL:", window.location.pathname);
+    path = window.location.pathname;
+    console.log("Nueva URL:", path);
+    fetchLink(path);
 });
+
+function pushState(path)
+{
+    //path = path.slice(1, -1);
+    path = path.slice(1);
+    if (path.slice(-1) == '/')
+        path = path.slice(0, -1);
+    /* if (path.slice(-1) != '/')
+        path += '/'; */
+    // console.log("pushState = <" + title + ">");
+    window.history.pushState(
+        { page: path},
+        path,
+        "/" + path
+    );
+}
