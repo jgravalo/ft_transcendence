@@ -84,16 +84,17 @@ function fetchJWT(rule, info, path) {
 			// console.log("path =", '/users/friends/' + rule + '/?' + rule + '=' + user);
 			fetchFriend(user, rule);
 		}
-		else if (path == '/users/update/set/' || path == '/two_fa/verify/set/')
+		else if (path.slice(-5) == "/set/")
+		//else if (path == '/users/update/set/' || path == '/two_fa/verify/set/')
 		{
 			console.log('entra en makePost');
 			makeSubmit(path.slice(0, -4));
 		}
-		else if (path.slice(-5) == "/set/")
+		/* else if (path.slice(-5) == "/set/")
 		{
 			console.log('entra en makeModal');
 			makeModal(path.slice(0, -4));
-		}
+		} */
 		else
 		{
 			console.log('entra en fetchLink');

@@ -21,7 +21,7 @@ fetch(window.location.href)
 	fetchLink(window.PATH.currentPath);
 }; */
 
-loadConfig();
+//loadConfig();
 
 (function() {
     const originalPushState = history.pushState;
@@ -39,11 +39,11 @@ loadConfig();
 })();
 
 // Detectar la navegación personalizada
-window.addEventListener('custom-navigation', () => {
+/* window.addEventListener('custom-navigation', () => {
 	var href = window.location.href
     console.log('La URL cambió en la SPA:', href);
 	fetchLink(href);
-});
+}); */
 
 window.addEventListener("popstate", (event) => {
     console.log("Nueva URL:", window.location.pathname);

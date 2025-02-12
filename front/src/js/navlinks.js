@@ -70,7 +70,12 @@ function handleLink(event)
             'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
         },
     })
-    .then(response => response.json()) // Convertir la respuesta a JSON
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    }) // Convertir la respuesta a JSON
     .then(data => {
         //directions(path,`${data.element}`, `${data.content}`);
         var dest = `${data.element}`;
@@ -99,9 +104,31 @@ function handleLink(event)
     .catch(error => {
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
+        console.log('error.slice(-3) =', error.slice(-3));
+        //error(error.slice(-3));
+        error('404');
     });
 }
 
+function error(error_code)
+{
+    console.log('error_code =', error_code);
+    fetch(base + '/api/error/?error=' + error_code)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    }) // Convertir la respuesta a JSON
+    .then(data => {
+        document.getElementById('content').innerHTML = `${data.content}`;
+    })
+    .catch(error => {
+        console.error('fallo el 42 auth');
+        console.error('Error al obtener productos:', error);
+        error(error.slice(-3));
+    });
+}
 
 
 
