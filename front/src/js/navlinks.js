@@ -1,38 +1,4 @@
-//const origin = 'http://127.0.0.1:8000/game/';// /game/json/';
-/*
-console.log("host: <" + window.location.host + ">");
-console.log("hostname: <" + window.location.hostname + ">");
-console.log("origin: <" + window.location.origin + ">");
-console.log("pathname: <" + window.location.pathname + ">");
-console.log("");
-*/
-/* // averiguar para que sirve
-(function() {
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function (...args) {
-        originalPushState.apply(this, args);
-        window.dispatchEvent(new Event('custom-navigation'));
-    };
-
-    history.replaceState = function (...args) {
-        originalReplaceState.apply(this, args);
-        window.dispatchEvent(new Event('custom-navigation'));
-    };
-})();
-
-// Detectar la navegación personalizada
-window.addEventListener('custom-navigation', () => {
-    console.log('La URL cambió en la SPA:', window.location.href);
-});
- */
-
-//Detects the url of the base app (http://localhost:8080 or http://pong42.com )
-var base = window.location.origin;
-console.log("base: ", base);
-
-window.addEventListener('popstate', (event) => handlePopstate(event));
+//window.addEventListener('popstate', (event) => handlePopstate(event));
 
 function handlePopstate(event)
 {
@@ -72,9 +38,24 @@ function handleLink(event)
     fetchLink(path);
 }
 
-function fetchLink(path)
+/* async */ function fetchLink(path)
 {
+    let token = getJWTToken();
     // console.log("JWT before GET:", getJWTToken());
+    //console.log("token =", token);
+    if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
+        console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
+        refreshJWT(path/* , path => {
+            fetchLink(path);
+        } */);
+        console.log("El token ha renovado");
+        return ;
+    }
+    //console.log("token before fetch =", getJWTToken());
+	console.log('path for GET =', path);
+	console.log('fetch for GET =', base + '/api' + path);
+
+    // fetch(base + ":8000" + path, {
     fetch(base + '/api' + path, {
         method: "GET",
         headers: {
@@ -83,22 +64,19 @@ function fetchLink(path)
             'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
         },
     })
-    .then(response => response.json()) // Convertir la respuesta a JSON
+    .then(response => {
+        if (!response.ok) {
+            throw { status: response.status, message: response.statusText };
+        }
+        return response.json();
+    }) // Convertir la respuesta a JSON
     .then(data => {
-        //console.log("esta en handleLink");
-        // console.log("data GET:", data); // Ver los datos en consola
-        // console.log("JWT after GET:", getJWTToken());
-        // console.log("JWT from GET:", `${data.jwt}`);
-        //var dest = 'content';
+        //directions(path,`${data.element}`, `${data.content}`);
         var dest = `${data.element}`;
         document.getElementById(dest).innerHTML = `${data.content}`;
-
         //updating the newly added content with right language
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
-        if (dest == 'modalContainer' /*&& path != '/two_fa/'*/)
-            //     path == "/users/login/" ||
-            //     path == "/users/logout/" ||
-            // path == "/users/register/"
+        if (dest == 'modalContainer')
             makeModal(path);
         else if (path == '/users/update/')
             makePost(path);
@@ -106,22 +84,45 @@ function fetchLink(path)
         {
             if (path != '/users/logout/close/')
             {
-                var title = path.slice(1, -1);
+                pushState(path);
+                /* var title = path.slice(1, -1);
                 // console.log("pushState = <" + title + ">");
                 window.history.pushState(
                     { page: title},
                     title,
                     "/" + title
-                );
+                ); */
             }
             handleLinks();
         }
     })
     .catch(error => {
-            console.error('Error al obtener productos:', error);
+        console.error('fallo el 42 auth');
+        console.error('Error al obtener productos:', error);
+        setError(error);
     });
 }
 
+function setError(error)
+{
+    error_code = `${error.status}`
+    console.log('error_code =', error_code);
+    fetch(base + '/api/error/?error=' + error_code)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    }) // Convertir la respuesta a JSON
+    .then(data => {
+        document.getElementById('content').innerHTML = `${data.content}`;
+    })
+    .catch(error => {
+        console.error('fallo el 42 auth');
+        console.error('Error al obtener productos:', error);
+        //error(error.slice(-3));
+    });
+}
 
 
 

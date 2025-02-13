@@ -7,20 +7,28 @@
 	<table class="user">
 		<thead>
 			<tr>
+				<th data-i18n="friends.table.index">#</th>
 				<th data-i18n="friends.table.username">Username</th>
 				<th data-i18n="friends.table.email">Email</th>
 				<th data-i18n="friends.table.record">Record</th>
+				<th data-i18n="friends.table.action">-</th>
 				<th data-i18n="friends.table.action">-</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for friend in friends %}
 			<tr>
+				<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
+					<img src="{{ friend.image.url }}">
+				</div></td>
 				<td>{{ friend.username }}</td>
 				<td>{{ friend.email }}</td>
 				<td>{{ friend.wins }}-{{ friend.losses }}</td>
-				<td id="friend{{ forloop.counter }}">
-					<i class="fas fa-check friend-icon" onclick="deleteFriend('friend{{ forloop.counter }}', '{{ friend.username }}')"></i>
+				<td id="follow-{{ friend.username }}">
+					<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.username }}')"></i>
+				</td>
+				<td id="block-{{ friend.username }}">
+					<i class="fas fa-ban friend-icon" onclick="blockUser('{{ friend.username }}')" style="color: brown;"></i>
 				</td>
 			</tr>
 			{% empty %}
@@ -30,6 +38,41 @@
 			{% endfor %}
 		</tbody>
 	</table>
+
+<h5 style="color: white;" data-i18n="friends.blocked.title">blocked users</h1>
+	<table class="user">
+		<thead>
+			<tr>
+				<th data-i18n="friends.table.index">#</th>
+				<th data-i18n="friends.table.username">Username</th>
+				<th data-i18n="friends.table.email">Email</th>
+				<th data-i18n="friends.table.record">Record</th>
+				<th data-i18n="friends.table.action">-</th>
+				<th data-i18n="friends.table.action">-</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for blocked in blockeds %}
+			<tr>
+				<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
+					<img src="{{ blocked.image.url }}">
+				</div></td>
+				<td>{{ blocked.username }}</td>
+				<td>{{ blocked.email }}</td>
+				<td>{{ blocked.wins }}-{{ blocked.losses }}</td>
+				<td id="follow-{{ blocked.username }}"> </td>
+				<td id="block-{{ blocked.username }}">
+					<i class="fas fa-lock-open friend-icon" onclick="unlockUser('{{ blocked.username }}')"></i>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="4" data-i18n="friends.blocked.empty">There are not blocked users.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
 <h5 style="color: white;" data-i18n="friends.other.title">Other users</h1>
 	<table class="user">
 		<thead>
@@ -39,17 +82,23 @@
 				<th data-i18n="friends.table.email">Email</th>
 				<th data-i18n="friends.table.record">Record</th>
 				<th data-i18n="friends.table.action">-</th>
+				<th data-i18n="friends.table.action">-</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for user in users %}
 			<tr>
-				<td>{{ forloop.counter }}</td>
+				<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
+					<img src="{{ user.image.url }}">
+				</div></td>
 				<td>{{ user.username }}</td>
 				<td>{{ user.email }}</td>
 				<td>{{ user.wins }}-{{ user.losses }}</td>
-				<td id="user{{ forloop.counter }}">
-					<i class="fas fa-plus friend-icon" onclick="addFriend('user{{ forloop.counter }}', '{{ user.username }}')"></i>
+				<td id="follow-{{ user.username }}">
+					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ user.username }}')"></i>
+				</td>
+				<td id="block-{{ user.username }}">
+					<i class="fas fa-ban friend-icon" onclick="blockUser('{{ user.username }}')" style="color: brown;"></i>
 				</td>
 			</tr>
 			{% empty %}

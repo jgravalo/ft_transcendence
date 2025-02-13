@@ -192,7 +192,7 @@ REST_FRAMEWORK = {
 # Configuración de SimpleJWT
 from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=5),#timedelta(minutes=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -206,9 +206,10 @@ EMAIL_HOST = 'smtp.gmail.com'  # Servidor SMTP (puede variar)
 EMAIL_PORT = 587  # Puerto para TLS (465 para SSL)
 EMAIL_USE_TLS = True  # True para usar TLS
 EMAIL_USE_SSL = False  # Asegúrate de no usar ambos al mismo tiempo
-EMAIL_HOST_USER = 'tu_correo@example.com'  # Tu dirección de correo
-EMAIL_HOST_PASSWORD = 'tu_contraseña'  # Tu contraseña o clave para aplicaciones
+EMAIL_HOST_USER = 'trascendente78@gmail.com'  # Tu dirección de correo
+EMAIL_HOST_PASSWORD = '12345!@#$%qwerty'  # Tu contraseña o clave para aplicaciones
 DEFAULT_FROM_EMAIL = 'no-reply@example.com'  # Dirección de remitente por defecto
+
 """ 
 LOGGING = {
     'version': 1,
@@ -230,3 +231,8 @@ LOGGING = {
     },
 }
  """
+
+# Configuración de 42 OAuth
+FORTYTWO_CLIENT_ID = 'tu_client_id'
+FORTYTWO_CLIENT_SECRET = 'tu_client_secret'
+FORTYTWO_REDIRECT_URI = 'http://localhost:8000/api/users/auth/42/callback/'

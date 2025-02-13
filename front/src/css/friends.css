@@ -57,3 +57,19 @@
     line-height: 16px;     /* Alinea el icono verticalmente */
     font-size: 16px;       /* Tamaño del icono */
 }
+
+.user-photo {
+	width: 45px;
+	height: 45px;
+	border-radius: 50%;
+	overflow: hidden; /* Oculta el exceso de la imagen si es necesario */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.user-photo img {
+	width: 100%;
+    height: 100%;
+    object-fit: cover; /* Hace que la imagen llene completamente el contenedor */
+}

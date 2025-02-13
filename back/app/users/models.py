@@ -14,8 +14,9 @@ class User(models.Model):
 	matches = models.IntegerField(default=0)
 	logged = models.BooleanField(default=False)
 	two_fa_enabled = models.BooleanField(default=False)
-	jwt = models.CharField(max_length=512, null=True, blank=True)
+	#jwt = models.CharField(max_length=512, null=True, blank=True)
 	friends = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
+	blocked = models.ManyToManyField('self', symmetrical=False, related_name='blocked_by', blank=True)
 #
 #	def __str__(self):
 #       return self.username  # Representación amigable del objeto
@@ -25,6 +26,7 @@ class User(models.Model):
 		token = request.headers.get('Authorization').split(" ")[1]
 		#if token == 'empty':
 		data = decode_token(token)
+		print("data =", data)
 		return cls.objects.get(user_id=data["user_id"])
 
 	def num_friends(self):

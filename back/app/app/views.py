@@ -19,8 +19,17 @@ def get_home(request):
         "element": 'content',
         "content": content
     }
-    #print(data)
     return JsonResponse(data)
+
+def get_error(request):
+    error_code = request.GET.get('error', '404')
+    content = render_to_string(f'{error_code}.html')
+    data = {
+        #"element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
+    #print(data)
     #match = Match(id_match=54643, player1="jgravalo",  player2="IA")
     #match.save()
     #serializer = MatchSerializer(match)
