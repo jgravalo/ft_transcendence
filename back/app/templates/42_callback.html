@@ -15,10 +15,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
             
-            if (!code) {
-                showError('No se recibió código de autorización');
-                return;
-            }
+
 
 
 
@@ -29,14 +26,26 @@
             // console.log("code =", code);
             // console.log("urlParams =", urlParams);
             // console.log("window.location.search =", window.location.search);
-            // setTimeout(function() {
+            setTimeout(function() {
                 fetch('/api/users/auth/42/callback/?code=' + code, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         // 'X-CSRFToken': getCSRFToken(),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        // 'X-CSRFToken': getCSRFToken(),
                     }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Error en la autenticación');
+                        });
+                    }
+
+                    return response.json();
                 })
                 .then(response => {
                     if (!response.ok) {
@@ -53,15 +62,18 @@
                         sessionStorage.setItem('refresh', data.refresh);
                         // localStorage.setItem('access', data.access);
                         // localStorage.setItem('refresh', data.refresh);
+                        // localStorage.setItem('access', data.access);
+                        // localStorage.setItem('refresh', data.refresh);
                         window.location.href = '/users/profile/';
                     } else {
+                        showError(data.error || 'Error desconocido en la autenticación');
                         showError(data.error || 'Error desconocido en la autenticación');
                     }
                 })
                 .catch(error => {
                     showError(error.message || 'Error en la conexión');
                 });
-            // }, 2000); // 6 segungos de prueba
+            }, 6000); // 6 segungos de prueba
         };
 
         function showError(message) {
@@ -87,10 +99,28 @@
             display: none;
         }
     </style>
+
+
+    <style>
+        .message {
+            padding: 20px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+
+        }
+        #error {
+            color: red;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div id="loading" class="message">Procesando autenticación de 42...</div>
     <div id="error" class="message"></div>
+    <div id="loading" class="message">Procesando autenticación de 42...</div>
+    <div id="error" class="message"></div>
 </body>
 
+
 </html> 
+
