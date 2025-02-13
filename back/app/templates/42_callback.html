@@ -8,7 +8,10 @@
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
             
-
+            if (!code) {
+                showError('No se recibió código de autorización');
+                return;
+            }
 
 
 
