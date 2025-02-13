@@ -384,8 +384,11 @@ def fortytwo_callback(request):
                 }
 
                 token_response = requests.post(token_url, data=token_data)
-                token_response.raise_for_status()
+                token_response.raise_for_status()  # Esto lanzará una excepción si hay error
                 access_token = token_response.json().get('access_token')
+
+                if not access_token:
+                    return JsonResponse({'error': 'No se pudo obtener el token de acceso'}, status=400)
 
                 user_url = "https://api.intra.42.fr/v2/me"
                 headers = {'Authorization': f'Bearer {access_token}'}
@@ -393,8 +396,8 @@ def fortytwo_callback(request):
                 user_response.raise_for_status()
                 user_data = user_response.json()
 
-                print("user_data =", user_data)
-                print("user_data['image_url'] =", user_data['image_url'])
+                # print("user_data =", user_data)
+                # print("user_data['image_url'] =", user_data['image_url'])
                 try:
                     user = User.objects.get(email=user_data['email'])
                 except User.DoesNotExist:
@@ -414,8 +417,11 @@ def fortytwo_callback(request):
                     "next_path": '/users/profile/'
                 }
                 return JsonResponse(data)
+            
             except requests.exceptions.RequestException as e:
-                return JsonResponse({'error': f'Error en la autenticación: {str(e)}'}, status=400)
+                return JsonResponse({'error': str(e)}, status=400)
+            except Exception as e:
+                return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
         else:
             return render(request, '42_callback.html')
 
