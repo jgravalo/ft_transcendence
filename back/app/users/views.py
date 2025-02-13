@@ -393,13 +393,16 @@ def fortytwo_callback(request):
                 user_response.raise_for_status()
                 user_data = user_response.json()
 
+                print("user_data =", user_data)
+                print("user_data['image_url'] =", user_data['image_url'])
                 try:
                     user = User.objects.get(email=user_data['email'])
                 except User.DoesNotExist:
                     user = User.objects.create(
                         username=user_data['login'],
                         email=user_data['email'],
-                        password='42auth'
+                        password='42auth',
+                        # image=user_data['image_url']
                     )
 
                 data = {
