@@ -43,7 +43,6 @@ def delete_user(request):
         return JsonResponse({"message": "Usuario borrado con éxito."}, status=200)
     return JsonResponse({"error": "Método no permitido."}, status=405)
 
-
 # Create your views here.
 def login(request):
     content = render_to_string('login.html')
@@ -88,7 +87,8 @@ def set_login(request):
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
                 return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
-            if password != user.password:
+            # if password != user.password: # unhashed
+            if user.check_password(password): # hashed
                 return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
@@ -159,7 +159,9 @@ def set_register(request):
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
-            user = User.objects.create(username=username, email=email, password=password)
+            # user = User.objects.create(username=username, email=email, password=password) # unhashed
+            user = User.objects.create_user(username=username, email=email, password=password) # hashed
+            print("password hashed:", user.password)
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -245,24 +247,24 @@ def set_update(request):
                 return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
             if email != user.email and User.objects.filter(email=email).exists():
                 return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
-            if old_password != '' and old_password != user.password:
+            # if old_password != '' and old_password != user.password: # unhashed
+            if old_password != '' and user.check_password(old_password): # hashed
                 return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
             if old_password == '' and new_password != '':
-                return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
+                return JsonResponse({'type': 'errorOldPassword', 'error': 'You need to enter your current password'})
             if old_password != '' and len(password) < 6:
                 return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}
             error = parse_data(username, email, new_password)
             if error != None:
                 return JsonResponse(error)
-            #user.update(
             if user.username != username:
                 user.username=username
             if user.email != email:
                 user.email=email
             if old_password != '' or new_password != '':
-                user.password=new_password
+                # user.password=new_password # unhashed
+                user.set_password(new_password) # hashed
             user.two_fa_enabled=two_fa_enabled
-            #)
             user.save()
             content = render_to_string('close_login.html') # online_bar
             data = {
