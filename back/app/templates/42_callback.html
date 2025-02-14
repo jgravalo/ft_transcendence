@@ -29,7 +29,7 @@
             // console.log("code =", code);
             // console.log("urlParams =", urlParams);
             // console.log("window.location.search =", window.location.search);
-            setTimeout(function() {
+            // setTimeout(function() {
                 fetch('/api/users/auth/42/callback/?code=' + code, {
                     method: 'GET',
                     headers: {
@@ -76,7 +76,7 @@
                 .catch(error => {
                     showError(error.message || 'Error en la conexión');
                 });
-            }, 6000); // 6 segungos de prueba
+            // }, 2000); // 6 segungos de prueba
         };
 
         function showError(message) {
