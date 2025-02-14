@@ -1,5 +1,7 @@
 //window.addEventListener('popstate', (event) => handlePopstate(event));
 
+
+
 function handlePopstate(event)
 {
     console.log("Se cambió la URL", event.state);
