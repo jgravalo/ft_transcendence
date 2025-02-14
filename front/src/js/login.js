@@ -12,8 +12,8 @@ function makeLogout()
         removeStorage('access');
         removeStorage('refresh');
         document.getElementById('cancel-logout').click();
+        //socket.close();
         fetchLink('/users/logout/close/');
-        // no llega a hacer el siguinte fetch
         fetchLink('/');
         handleLinks();
     });
@@ -170,3 +170,33 @@ function getInfo()
     //console.log("formDataObject =", formDataObject);
     return (formDataObject)
 }
+/* 
+function loginSock() // por definir
+{
+    // CREATE SOCKET
+    const route = 'ws://' + base.slice(7, -5) + ':8000/ws/connect/';
+    console.log('ruta: ', route);
+    const socket = new WebSocket(route);
+    // Escuchar eventos de conexión
+    socket.onopen = function (event) {
+        console.log("WebSocket conectado");
+        const data = JSON.parse(event.data);
+        document.getElementById('bar').innerHTML = data.content;
+        socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
+    };
+    // Escuchar mensajes desde el servidor
+    socket.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        console.log(data.message);
+    };
+    // Manejar desconexión
+    socket.onclose = function (event) {
+        const data = JSON.parse(event.data);
+        document.getElementById('bar').innerHTML = data.content;
+        console.log("WebSocket desconectado");
+    };
+    // Manejar errores
+    socket.onerror = function (error) {
+        console.error("WebSocket error:", error);
+    };
+} */

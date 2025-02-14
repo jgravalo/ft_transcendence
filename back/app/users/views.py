@@ -72,11 +72,9 @@ def close_logout(request):
 @csrf_exempt
 def set_login(request):
     if request.method == "POST":
-        
         #Fetch and Activate the langage for embedded translations
         selected_language = request.headers.get('Accept-Language', 'en')  # Default to English
         activate(selected_language)
-        
         try:
             # data = json.loads(request.body)
             # username = data.get('username')
@@ -95,6 +93,8 @@ def set_login(request):
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
+                user.is_active=True
+                user.save()
             else:
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/verify/'
@@ -179,6 +179,9 @@ def set_register(request):
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
 def logout(request):
+    user = User.get_user(request)
+    user.is_active=False
+    user.save()
     content = render_to_string('logout.html')
     data = {
         "element": 'modalContainer',
