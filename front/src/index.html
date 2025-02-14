@@ -99,5 +99,27 @@
 		<script src="/js/lang.js"></script>
 		<script src="/js/tokens.js"></script>
 		<script src="/js/status.js"></script>
+		<script>
+			// Cargar la barra de usuario autenticado, 42 auth
+		window.onload = function() {
+			// Si hay un token de acceso, cargar la barra de usuario autenticado
+			if (sessionStorage.getItem('access')) {
+				fetch('/api/users/login/close/', {
+					headers: {
+						'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
+						'Content-Type': 'application/json',
+						// 'X-CSRFToken': getCSRFToken()
+					}
+				})
+				// .then(response => response.json())
+				.then(response => response.json())
+				.then(data => {
+					if (data.content) {
+						document.getElementById('bar').innerHTML = data.content;
+					}
+				});
+			}
+		}
+		</script>
 	</body>
 </html>
