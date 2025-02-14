@@ -26,8 +26,4 @@ VOLUME ["/var/lib/postgresql/data"]
 #Change to postgres user
 USER postgresuser
 
-# Set the necessary environment variables
-ENV POSTGRES_DB=postgres
-ENV POSTGRES_USER=postgres
-
 ENTRYPOINT ["/home/postgresuser/entrypoint.sh"]

@@ -67,6 +67,8 @@ services:
     build:
       context: ./db
     container_name: db
+    env_file:
+      - ./vault/.env.${ENVIRONMENT}
     networks:
       - pongnet
     ports:
