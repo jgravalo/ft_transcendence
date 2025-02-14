@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+AUTH_USER_MODEL = 'users.User'
+
 LANGUAGE_CODE = 'es-es'  # Español
 TIME_ZONE = 'Europe/Madrid'  # Cambia según tu ubicación
 
