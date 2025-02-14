@@ -13,6 +13,8 @@ from pathlib import Path
 import hvac
 import os
 
+AUTH_USER_MODEL = 'users.User'
+
 LANGUAGE_CODE = 'es-es'  # Español
 TIME_ZONE = 'Europe/Madrid'  # Cambia según tu ubicación
 
