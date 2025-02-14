@@ -10,7 +10,7 @@ def make_token(user, mode):
     elif mode == 'refresh':
         time = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
     payload = {
-        "user_id": str(user.user_id),
+        #"user_id": str(user.user_id),
         "username": user.username,
         #"role": "admin",
         "exp": datetime.datetime.utcnow() + time, # Expiración
