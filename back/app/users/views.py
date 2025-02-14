@@ -183,11 +183,10 @@ def set_register(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
-def get_logout(request):
+def logout(request):
     user = User.get_user(request)
     user.is_active=False
     user.save()
-    logout(request)  # Aquí Django desasigna `request.user`
     content = render_to_string('logout.html')
     data = {
         "element": 'modalContainer',

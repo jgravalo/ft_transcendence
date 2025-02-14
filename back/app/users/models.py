@@ -17,6 +17,7 @@ class User(AbstractUser):
 	wins = models.IntegerField(default=0)
 	losses = models.IntegerField(default=0)
 	matches = models.IntegerField(default=0)
+	is_active = models.BooleanField(default=True)
 	two_fa_enabled = models.BooleanField(default=False)
 	#history = models.ManyToManyField(Match, symmetrical=False, related_name='players', blank=True)
 	friends = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
