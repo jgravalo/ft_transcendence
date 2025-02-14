@@ -94,6 +94,8 @@ def set_login(request):
                 return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
             # if password != user.password: # unhashed
             if user.check_password(password): # hashed
+            # if password != user.password: # unhashed
+            if user.check_password(password): # hashed
                 return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
             #user = authenticate(username=username, password=password)
             #if user:
@@ -164,7 +166,6 @@ def set_register(request):
             # user = User.objects.create(username=username, email=email, password=password) # unhashed
             user = User.objects.create_user(username=username, email=email, password=password) # hashed
             print("password hashed:", user.password)
-            login(request, user)  # Aquí Django asigna `request.user`
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -252,8 +253,11 @@ def set_update(request):
                 return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
             # if old_password != '' and old_password != user.password: # unhashed
             if old_password != '' and user.check_password(old_password): # hashed
+            # if old_password != '' and old_password != user.password: # unhashed
+            if old_password != '' and user.check_password(old_password): # hashed
                 return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
             if old_password == '' and new_password != '':
+                return JsonResponse({'type': 'errorOldPassword', 'error': 'You need to enter your current password'})
                 return JsonResponse({'type': 'errorOldPassword', 'error': 'You need to enter your current password'})
             if old_password != '' and len(password) < 6:
                 return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}
@@ -265,6 +269,8 @@ def set_update(request):
             if user.email != email:
                 user.email=email
             if old_password != '' or new_password != '':
+                # user.password=new_password # unhashed
+                user.set_password(new_password) # hashed
                 # user.password=new_password # unhashed
                 user.set_password(new_password) # hashed
             user.two_fa_enabled=two_fa_enabled
