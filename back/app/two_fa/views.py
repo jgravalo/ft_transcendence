@@ -103,6 +103,8 @@ def verify_otp(request): # email o SMS
             #user.delete()
             return JsonResponse({'type': 'errorName', 'error': 'Your code is wrong.'})
         two_fa.delete()
+        user.is_active=True
+        user.save()
         content = render_to_string('close_login.html') # online_bar
         token = request.headers.get('Authorization').split(" ")[1]
         data = {

@@ -9,8 +9,12 @@ from django.contrib.auth import get_user_model
 class Connection(WebsocketConsumer):
     def connect(self):
         # Aceptar la conexión WebSocket
+        username = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
         self.accept()
-        self.send(text_data=json.dumps({"message": "Conexión WebSocket exitosa from Django"}))
+        self.send(text_data=json.dumps({
+            "message": "Conexión WebSocket exitosa from Django",
+            "content": render_to_string("close_login.html");
+            }))
 
     def disconnect(self, close_code):
         pass
@@ -18,14 +22,8 @@ class Connection(WebsocketConsumer):
     def receive(self, text_data):
         # Recibir un mensaje desde el WebSocket
         text_data_json = json.loads(text_data)
-        # message = text_data_json['message']
         try:
-            # player1 = text_data_json['player1']
-            # player2 = text_data_json['player2']
-            # ballLeft = text_data_json['ballLeft']
-            # ballTop = text_data_json['ballTop']
-            # print("player1:", text_data_json['player1'])
-            # print("player2:", text_data_json['player2'])
+            # message = text_data_json['message']
             # Enviar un mensaje de vuelta al WebSocket
             self.send(text_data=json.dumps({
             }))
@@ -33,4 +31,3 @@ class Connection(WebsocketConsumer):
             self.send(text_data=json.dumps({
                 'message': 'error'
             }))
-        

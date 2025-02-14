@@ -7,13 +7,31 @@ console.log("pathname: <" + window.location.pathname + ">");
 console.log("");
 */
 // Esperar a que se cargue el archivo antes de usarlo
+/* 
+function isActive()
+{
+    try
+        return getJWTToken();
+    catch
+        return null
+} */
 
-fetch(window.location.href)
+fetchPage(window.location.href);
+
+function fetchPage(href)
+{
+    /* if (href == '/' || href == '/users/profile/')
+    if (isActive())
+    {
+      fetchLink('')
+    } */
+    fetch(href)
     .then(response => {
         var ref = response.headers.get("X-Current-Path");
         console.log("ref =", ref);  // "/ruta/actual"
         fetchLink(ref);
     });
+}
 
 /* const loadConfig = async () => {
     await import("/config.js");
@@ -61,7 +79,7 @@ function pushState(path)
         path += '/'; */
     // console.log("pushState = <" + title + ">");
     window.history.pushState(
-        { page: path},
+        {page: path},
         path,
         "/" + path
     );

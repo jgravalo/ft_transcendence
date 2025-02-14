@@ -143,6 +143,8 @@ function setError(error)
 {
     error_code = `${error.status}`
     console.log('error_code =', error_code);
+    if (error == undefined)
+        return ;
     fetch(base + '/api/error/?error=' + error_code)
     .then(response => {
         if (!response.ok) {
