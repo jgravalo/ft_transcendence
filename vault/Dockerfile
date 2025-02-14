@@ -7,8 +7,8 @@ RUN apk add bash
 EXPOSE 8200
 
 COPY conf/config.hcl /vault/config/config.hcl
-COPY tool/init.sh /vault/init.sh
+COPY tool/entrypoint.sh /vault/entrypoint.sh
 
-RUN chmod +x /vault/init.sh
+RUN chmod +x /vault/entrypoint.sh
 
-CMD ["sh", "/vault/init.sh"]
+ENTRYPOINT ["/vault/entrypoint.sh"]
