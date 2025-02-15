@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+#from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -15,7 +15,15 @@ from rest_framework.response import Response
 from rest_framework import status
 import requests
 from django.http import HttpResponseRedirect
+from django.contrib.auth import authenticate, login, logout
 
+# def iniciar_sesion(request):
+#     usuario = authenticate(username="juan", password="secreto123")
+#     if usuario:
+#         login(request, usuario)  # Aquí Django asigna `request.user`
+#         return HttpResponse("Usuario autenticado con éxito")
+#     else:
+#         return HttpResponse("Error en las credenciales")
 
 @csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend
 
@@ -44,7 +52,7 @@ def delete_user(request):
     return JsonResponse({"error": "Método no permitido."}, status=405)
 
 # Create your views here.
-def login(request):
+def get_login(request):
     content = render_to_string('login.html')
     data = {
         "element": 'modalContainer',
@@ -75,9 +83,6 @@ def set_login(request):
         selected_language = request.headers.get('Accept-Language', 'en')  # Default to English
         activate(selected_language)
         try:
-            # data = json.loads(request.body)
-            # username = data.get('username')
-            # password = data.get('password')
             username = request.POST.get('username')
             password = request.POST.get('password')
             try:
@@ -90,6 +95,9 @@ def set_login(request):
             # if password != user.password: # unhashed
             if user.check_password(password): # hashed
                 return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
+            #user = authenticate(username=username, password=password)
+            #if user:
+            login(request, user)  # Aquí Django asigna `request.user`
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -111,7 +119,7 @@ def set_login(request):
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
 @csrf_exempt
-def register(request):
+def get_register(request):
     content = render_to_string('register.html')
     data = {
         "element": 'modalContainer',
@@ -136,16 +144,10 @@ def parse_data(username, email, password):
 def set_register(request):
     if request.method == "POST":
         try:
-            #print("hace json.loads")
-            #data = json.loads(request.body)
-            #print("hizo json.loads")
             print("POST data:", request.POST)
             username = request.POST.get('username')
             email = request.POST.get('email')
             password = request.POST.get('password')
-            # username = data.get('username')
-            # email = data.get('email')
-            # password = data.get('password')
             print("pillo los datos")
             print('username: ', username)
             print('email: ', email)
@@ -162,6 +164,7 @@ def set_register(request):
             # user = User.objects.create(username=username, email=email, password=password) # unhashed
             user = User.objects.create_user(username=username, email=email, password=password) # hashed
             print("password hashed:", user.password)
+            login(request, user)  # Aquí Django asigna `request.user`
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -180,10 +183,11 @@ def set_register(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
-def logout(request):
+def get_logout(request):
     user = User.get_user(request)
     user.is_active=False
     user.save()
+    logout(request)  # Aquí Django desasigna `request.user`
     content = render_to_string('logout.html')
     data = {
         "element": 'modalContainer',

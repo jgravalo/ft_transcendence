@@ -68,35 +68,25 @@ function makeSubmit(path)
 {
     let token = getJWTToken();
     // Obtener los valores de los inputs
-        //console.log("id =", path.slice(path.slice(1, -1).indexOf('/') + 2, -1));
         if (path === '/users/login/' ||
         path === '/users/register/' ||
         path === '/users/update/' ||
         path === '/two_fa/verify/')
             info = getInfo();
-        //console.log("hace fetch con data");
-        // console.log("JWT before POST:", getJWTToken());
-        let post = path;
-        //if (path.slice(-5) !== "/set/")
-            post += "set/";
-        //console.log("post =", post);
+        /* if (path != '/users/update/')
+            info = JSON.stringify(info) */
+        let post = path + "set/";
         console.log("username:", info.get("username"));
         console.log("email:", info.get("email"));
         console.log("password:", info.get("password"));
         console.log("info =", info);
         if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
             console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
-            refreshJWT(post/* , data => {
-                //if (path == '/users/update/')
-                makePost(data);
-                // else
-                //     makeModal(path);
-            } */);
+            refreshJWT(post);
             console.log("El token ha renovado");
             return ;
         }
     	console.log('path for POST =', post);
-        // fetch(base + ":8000" + post, {
             //"Content-Type": "application/json",
         fetch(base + '/api' + post, {
             method: "POST",
@@ -106,7 +96,6 @@ function makeSubmit(path)
                 'Accept-Language': localStorage.getItem("selectedLanguage") || "en" //send the language to backend (set to en default)
             },
             body: info,
-            //body: JSON.stringify(info), 
         })
         .then(response => response.json())
         .then(data => {
