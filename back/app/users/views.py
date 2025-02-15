@@ -166,6 +166,7 @@ def set_register(request):
             # user = User.objects.create(username=username, email=email, password=password) # unhashed
             user = User.objects.create_user(username=username, email=email, password=password) # hashed
             print("password hashed:", user.password)
+            login(request, user)  # Aquí Django asigna `request.user`
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
@@ -184,10 +185,11 @@ def set_register(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
-def logout(request):
+def get_logout(request):
     user = User.get_user(request)
     user.is_active=False
     user.save()
+    logout(request)  # Aquí Django desasigna `request.user`
     content = render_to_string('logout.html')
     data = {
         "element": 'modalContainer',
