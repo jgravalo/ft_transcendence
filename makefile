@@ -35,9 +35,6 @@ db:
 restart-waf:
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml restart waf
 
-restart-waf:
-	docker compose --env-file $(ENV_FILE) -f docker-compose.yml restart waf
-
 migrations:
 	docker exec -it back python manage.py makemigrations
 	docker exec -it back python manage.py migrate

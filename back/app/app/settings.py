@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from pathlib import Path
+import hvac
 import os
 
 LANGUAGE_CODE = 'es-es'  # Español
@@ -114,15 +115,10 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        # Old database, commented just in case of emergency
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-
-        # New database
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
         'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
+        'PASSWORD': get_vault_secret('secret/data/postgres', 'db_password'),
         'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
         'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
     }
@@ -236,3 +232,19 @@ LOGGING = {
 FORTYTWO_CLIENT_ID = 'tu_client_id'
 FORTYTWO_CLIENT_SECRET = 'tu_client_secret'
 FORTYTWO_REDIRECT_URI = 'http://localhost:8000/api/users/auth/42/callback/'
+
+
+# Vault configuration and password retrieval function
+VAULT_ADDR = os.getenv('VAULT_ADDR', 'http://vault:8200')
+VAULT_TOKEN = os.getenv('VAULT_TOKEN', 'root')
+
+client = hvac.Client(url=VAULT_ADDR, token=VAULT_TOKEN)
+
+def get_vault_secret(path, key):
+    """ Fetch secret from HC vault container """
+    try:
+        response = client.secrets.kv.v2.read_secret_version(path=path)
+        return response['data']['data'].get(key, None)
+    except Exception as e:
+        print(f"Error retrieving secret from Vault: {e}")
+        return None
