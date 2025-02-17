@@ -109,6 +109,7 @@ function makeSubmit(path)
                     //saveJWTToken(`${data.access}`);
                     saveStorage('access', `${data.access}`);
                     saveStorage('refresh', `${data.refresh}`);
+                    loginSock();
                 }
                 // console.log("JWT from POST:",`${data.jwt}`);
                 //console.log("2:", getJWTToken())
@@ -159,7 +160,7 @@ function getInfo()
     //console.log("formDataObject =", formDataObject);
     return (formDataObject)
 }
-/* 
+
 function loginSock() // por definir
 {
     // CREATE SOCKET
@@ -181,11 +182,12 @@ function loginSock() // por definir
     // Manejar desconexión
     socket.onclose = function (event) {
         const data = JSON.parse(event.data);
-        document.getElementById('bar').innerHTML = data.content;
+        fetchLink('/users/logout/close/')
+        // document.getElementById('bar').innerHTML = data.content;
         console.log("WebSocket desconectado");
     };
     // Manejar errores
     socket.onerror = function (error) {
         console.error("WebSocket error:", error);
     };
-} */
+}

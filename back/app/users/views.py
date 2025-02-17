@@ -26,7 +26,6 @@ from django.contrib.auth import authenticate, login, logout
 #         return HttpResponse("Error en las credenciales")
 
 @csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend
-
 def refresh(request):
     data = json.loads(request.body)
     token = data.get('refresh')
@@ -184,9 +183,6 @@ def set_register(request):
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
 def get_logout(request):
-    user = User.get_user(request)
-    user.is_active=False
-    user.save()
     logout(request)  # Aquí Django desasigna `request.user`
     content = render_to_string('logout.html')
     data = {

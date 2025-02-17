@@ -9,7 +9,9 @@ from django.contrib.auth import get_user_model
 class Connection(WebsocketConsumer):
     def connect(self):
         # Aceptar la conexión WebSocket
-        username = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+        # username = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+        user = self.scope['user']
+        print("username from ws:", user.username)
         self.accept()
         self.send(text_data=json.dumps({
             "message": "Conexión WebSocket exitosa from Django",
@@ -17,7 +19,12 @@ class Connection(WebsocketConsumer):
             }))
 
     def disconnect(self, close_code):
-        pass
+        user = self.scope['user']
+        user.is_active=False
+        user.save()
+        # logout(request)
+        self.close()
+        # pass
 
     def receive(self, text_data):
         # Recibir un mensaje desde el WebSocket
