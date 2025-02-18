@@ -26,7 +26,7 @@ services:
     build:
       context: ./front
     env_file:
-      - ./waf/.env.${ENVIRONMENT}
+      - ./front/.env.${ENVIRONMENT}
     image: front
     networks:
       - pongnet
@@ -64,7 +64,7 @@ services:
       context: ./db
     container_name: db
     env_file:
-      - ./vault/.env.${ENVIRONMENT}
+      - ./db/.env
     networks:
       - pongnet
     ports:

@@ -17,7 +17,7 @@ LANGUAGE_CODE = 'es-es'  # Español
 TIME_ZONE = 'Europe/Madrid'  # Cambia según tu ubicación
 
 # Clave secreta para firmar el token
-SECRET_KEY = "mi_clave_secreta"
+# SECRET_KEY = "mi_clave_secreta"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -118,7 +118,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
         'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
-        'PASSWORD': get_vault_secret('secret/data/postgres', 'db_password'),
+        'PASSWORD': get_vault_secret('secret/django', 'pg_db_password'),
         'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
         'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
     }
@@ -235,16 +235,31 @@ FORTYTWO_REDIRECT_URI = 'http://localhost:8000/api/users/auth/42/callback/'
 
 
 # Vault configuration and password retrieval function
-VAULT_ADDR = os.getenv('VAULT_ADDR', 'http://vault:8200')
-VAULT_TOKEN = os.getenv('VAULT_TOKEN', 'root')
+VAULT_ADDR = os.getenv('VAULT_ADDR')
+ROLE_ID = os.getenv('VAULT_ROLE_ID')
+SECRET_ID = os.getenv('VAULT_SECRET_ID')
 
-client = hvac.Client(url=VAULT_ADDR, token=VAULT_TOKEN)
+client = hvac.Client(url=VAULT_ADDR)
+
+def authenticate_with_vault():
+    """ Authenticate with Vault using AppRole """
+    try:
+        response = client.auth.approle.login(
+            role_id=ROLE_ID,
+            secret_id=SECRET_ID
+        )
+        client.token = response['auth']['client_token']
+    except Exception as e:
+        print(f"Vault Authentication Failed: {e}")
 
 def get_vault_secret(path, key):
-    """ Fetch secret from HC vault container """
+    """ Fetch a secret from Vault """
     try:
         response = client.secrets.kv.v2.read_secret_version(path=path)
         return response['data']['data'].get(key, None)
     except Exception as e:
         print(f"Error retrieving secret from Vault: {e}")
         return None
+
+# Authenticate and Fetch Secrets
+authenticate_with_vault()
