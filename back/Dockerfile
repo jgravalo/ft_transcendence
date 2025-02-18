@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     bash \
     gettext \
+    jq \
+    curl \
     && rm -rf /var/lib/apt/lists/* \
 	&& apt-get clean
 

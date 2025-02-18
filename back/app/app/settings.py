@@ -16,6 +16,36 @@ import os
 LANGUAGE_CODE = 'es-es'  # Español
 TIME_ZONE = 'Europe/Madrid'  # Cambia según tu ubicación
 
+# Vault configuration and password retrieval function
+VAULT_ADDR = os.getenv('VAULT_ADDR')
+ROLE_ID = os.getenv('VAULT_ROLE_ID')
+SECRET_ID = os.getenv('VAULT_SECRET_ID')
+
+client = hvac.Client(url=VAULT_ADDR)
+
+def authenticate_with_vault():
+    """ Authenticate with Vault using AppRole """
+    try:
+        response = client.auth.approle.login(
+            role_id=ROLE_ID,
+            secret_id=SECRET_ID
+        )
+        client.token = response['auth']['client_token']
+    except Exception as e:
+        print(f"Vault Authentication Failed: {e}")
+
+def get_vault_secret(path, key):
+    """ Fetch a secret from Vault """
+    try:
+        response = client.secrets.kv.v2.read_secret_version(path=path)
+        return response['data']['data'].get(key, None)
+    except Exception as e:
+        print(f"Error retrieving secret from Vault: {e}")
+        return None
+
+# Authenticate and Fetch Secrets
+authenticate_with_vault()
+
 # Clave secreta para firmar el token
 # SECRET_KEY = "mi_clave_secreta"
 
@@ -26,7 +56,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2tl!jw4)_*9-ti+%cahe3d(!sd74$4xqjmrnk$rq$s+#oue31j'
+SECRET_KEY = get_vault_secret('django', 'django_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -118,7 +148,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
         'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
-        'PASSWORD': get_vault_secret('secret/django', 'pg_db_password'),
+        'PASSWORD': get_vault_secret('django', 'pg_db_password'),
         'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
         'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
     }
@@ -203,7 +233,7 @@ EMAIL_PORT = 587  # Puerto para TLS (465 para SSL)
 EMAIL_USE_TLS = True  # True para usar TLS
 EMAIL_USE_SSL = False  # Asegúrate de no usar ambos al mismo tiempo
 EMAIL_HOST_USER = 'trascendente78@gmail.com'  # Tu dirección de correo
-EMAIL_HOST_PASSWORD = '12345!@#$%qwerty'  # Tu contraseña o clave para aplicaciones
+EMAIL_HOST_PASSWORD = get_vault_secret('django', 'email_host_password') # Tu contraseña o clave para aplicaciones
 DEFAULT_FROM_EMAIL = 'no-reply@example.com'  # Dirección de remitente por defecto
 
 """ 
@@ -232,34 +262,3 @@ LOGGING = {
 FORTYTWO_CLIENT_ID = 'tu_client_id'
 FORTYTWO_CLIENT_SECRET = 'tu_client_secret'
 FORTYTWO_REDIRECT_URI = 'http://localhost:8000/api/users/auth/42/callback/'
-
-
-# Vault configuration and password retrieval function
-VAULT_ADDR = os.getenv('VAULT_ADDR')
-ROLE_ID = os.getenv('VAULT_ROLE_ID')
-SECRET_ID = os.getenv('VAULT_SECRET_ID')
-
-client = hvac.Client(url=VAULT_ADDR)
-
-def authenticate_with_vault():
-    """ Authenticate with Vault using AppRole """
-    try:
-        response = client.auth.approle.login(
-            role_id=ROLE_ID,
-            secret_id=SECRET_ID
-        )
-        client.token = response['auth']['client_token']
-    except Exception as e:
-        print(f"Vault Authentication Failed: {e}")
-
-def get_vault_secret(path, key):
-    """ Fetch a secret from Vault """
-    try:
-        response = client.secrets.kv.v2.read_secret_version(path=path)
-        return response['data']['data'].get(key, None)
-    except Exception as e:
-        print(f"Error retrieving secret from Vault: {e}")
-        return None
-
-# Authenticate and Fetch Secrets
-authenticate_with_vault()

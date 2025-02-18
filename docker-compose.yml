@@ -46,6 +46,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      vault:
+        condition: service_healthy
     networks:
       - pongnet
     volumes:

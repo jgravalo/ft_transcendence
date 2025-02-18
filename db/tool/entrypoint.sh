@@ -2,6 +2,8 @@
 
 set -ex
 
+curl -X POST -H "Content-Type: application/json" --data '{"role_id": "6d40c02e-0532-b346-f321-f32b6a241d88", "secret_id": "878a456d-3888-4059-0e1e-c6ec5f68937b"}' "http://vault:8200/v1/auth/approle/login"
+
 # Vault Configuration
 VAULT_ADDR="http://vault:8200"
 VAULT_AUTH_URL="$VAULT_ADDR/v1/auth/approle/login"
