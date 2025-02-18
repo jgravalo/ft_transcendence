@@ -46,5 +46,12 @@ fi
 # Export the password for PostgreSQL
 export POSTGRES_PASSWORD
 
+#Making sure the postgres volume has the right permissions
+echo "Fixing permissions for /var/lib/postgresql/data..."
+mkdir -p /var/lib/postgresql/data
+chown -R postgresuser:postgresgroup /var/lib/postgresql/data
+chmod 700 /var/lib/postgresql/data
+
+echo "Starting PostgreSQL..."
 # Start PostgreSQL with the retrieved password
 exec docker-entrypoint.sh postgres

@@ -15,15 +15,16 @@ WORKDIR /home/postgresuser
 # Copy entrypoint script
 COPY ./tool/entrypoint.sh entrypoint.sh
 
+
 # Grant execution permissions (while still root)
 RUN chmod +x entrypoint.sh && chown postgresuser:postgresgroup entrypoint.sh
 
 EXPOSE 5432
 
-#Docker internal volume creation (resets when cleaned)
-VOLUME ["/var/lib/postgresql/data"]
-
 #Change to postgres user
 USER postgresuser
+
+#Docker internal volume creation (resets when cleaned)
+VOLUME ["/var/lib/postgresql/data"]
 
 ENTRYPOINT ["/home/postgresuser/entrypoint.sh"]
