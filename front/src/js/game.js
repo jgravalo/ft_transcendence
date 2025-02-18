@@ -10,7 +10,15 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 // @brief: Paddles sizes
 const paddleWidth = 100, paddleHeight = 15;
-const player = { x: canvas.width / 2 - paddleWidth / 2, y: canvas.height - 80, width: paddleWidth, height: paddleHeight, color: '#fff', powerUp: null, speedModifier: 1 };
+const player = {
+    speed: 0,
+    x: canvas.width / 2 - paddleWidth / 2,
+    y: canvas.height - 80, width: paddleWidth,
+    height: paddleHeight,
+    color: '#fff',
+    powerUp: null,
+    speedModifier: 1
+};
 const ai = { x: canvas.width / 2 - paddleWidth / 2, y: 60, width: paddleWidth, height: paddleHeight, color: '#fff', powerUp: null, speedModifier: 1 };
 
 // @brief: Ball section
@@ -472,12 +480,13 @@ function checkPowerUpCollisions() {
 function updateGame() {
     if (!isGameRunning) return;
 
-    movePlayer();
+    playerSpeed = movePaddle(player, movingLeftPlayer, movingRightPlayer, playerSpeed);
 
-    if (gameMode === 'local') {
-        movePlayerTwo();
-    } else if (gameMode === 'local-ai') {
+    if (gameMode === 'local-ai') {
         moveAI();
+        aiSpeed = movePaddle(ai, movingLeftAi, movingRightAi, aiSpeed);
+    } else if (gameMode === 'local') {
+        aiSpeed = movePaddle(ai, movingLeftAi, movingRightAi, aiSpeed);
     }
 
     moveBall();
@@ -508,6 +517,22 @@ function movePlayer() {
     }
 
     player.x = Math.max(0, Math.min(player.x, canvas.width - player.width));
+}
+
+function movePaddle(paddle, movingLeft, movingRight, speed) {
+    if (movingLeft) {
+        speed = Math.min(speed + acceleration, maxSpeed);
+        paddle.x -= speed;
+    } else if (movingRight) {
+        speed = Math.min(speed + acceleration, maxSpeed);
+        paddle.x += speed;
+    } else {
+        speed = Math.max(speed - deceleration, 0);
+    }
+
+    paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
+
+    return speed;
 }
 
 /*
