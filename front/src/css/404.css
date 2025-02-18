@@ -8,11 +8,13 @@
     font-size: 72px;
     margin: 0;
     /* color: #ff4444; */
+    color: white;
 }
 
 .error-container p {
     font-size: 24px;
     margin: 20px 0;
+    color: white;
 }
 
 .home-button {

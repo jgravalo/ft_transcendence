@@ -45,7 +45,10 @@ def refresh(request):
 
 def delete_user(request):
     if request.method == "DELETE":
-        user = User.get_user(request)
+        try:
+            user = User.get_user(request)
+        except:
+            return JsonResponse({'error': 'Forbidden'}, status=403)
         user.delete()
         return JsonResponse({"message": "Usuario borrado con éxito."}, status=200)
     return JsonResponse({"error": "Método no permitido."}, status=405)
@@ -192,7 +195,10 @@ def get_logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    user = User.get_user(request)
+    try:
+        user = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     print("url =", user.image.url)
     context = {
         'user': user
@@ -205,7 +211,10 @@ def profile(request):
     return JsonResponse(data)
 
 def update(request):
-    user = User.get_user(request)
+    try:
+        user = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     context = {
         'user': user
     }
@@ -222,7 +231,10 @@ from django.core.files.storage import default_storage
 def set_update(request):
     if request.method == "POST":
         try:
-            user = User.get_user(request)
+            try:
+                user = User.get_user(request)
+            except:
+                return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
                 #image = data.get('image')
                 # Acceder al archivo 'image' desde request.FILES
@@ -279,7 +291,10 @@ def set_update(request):
 
 @csrf_exempt
 def friends(request):
-    user = User.get_user(request)
+    try:
+        user = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     blocked = user.blocked.all()
     blocked_by = user.blocked_by.all()
     for block in blocked:
@@ -306,7 +321,10 @@ def add_friend(request):
     except: #Does not exist
         print(f"user {friends_name} does not exist")
     print(user2.email)
-    user1 = User.get_user(request)
+    try:
+        user1 = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     user1.friends.add(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
@@ -319,7 +337,10 @@ def delete_friend(request):
         user2 = User.objects.get(username=friends_name)
     except: #Does not exist
         print(f"user {friends_name} does not exist")
-    user1 = User.get_user(request)
+    try:
+        user1 = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     user1.friends.remove(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
@@ -332,7 +353,10 @@ def block_user(request):
     except: #Does not exist
         print(f"user {blocked_name} does not exist")
     print(user2.email)
-    user1 = User.get_user(request)
+    try:
+        user1 = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     if user1.friends.filter(username=user2.username).exists():
         user1.friends.remove(user2)
     user1.blocked.add(user2)
@@ -347,11 +371,13 @@ def unlock_user(request):
     except: #Does not exist
         print(f"user {blocked_name} does not exist")
     print(user2.email)
-    user1 = User.get_user(request)
+    try:
+        user1 = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     user1.blocked.remove(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
-
 
 @csrf_exempt
 def fortytwo_auth(request):
@@ -409,10 +435,9 @@ def fortytwo_callback(request):
                     user = User.objects.create(
                         username=user_data['login'],
                         email=user_data['email'],
-                        password='42auth',
-                        image=user_data['image']['link']
+                        password='42auth'
+                        #image=user_data['image']['link']
                     )
-
                 data = {
                     "access": make_token(user, 'access'),
                     "refresh": make_token(user, 'refresh'),
