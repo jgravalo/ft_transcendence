@@ -35,7 +35,7 @@ function handleLink(event)
     var path = event.currentTarget.getAttribute('href');
     if (path == "/")
         path = "";
-    else
+    else if (!path.includes('?'))
         path += "/";
     var state = base + path;
     console.log("path = " + path);
@@ -84,21 +84,17 @@ function handleLink(event)
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
         if (dest == 'modalContainer')
             makeModal(path);
-        else if (path == '/users/update/')
-            makePost(path);
+        /* {
+            pushState(path);
+        } */
         else
         {
             if (path != '/users/logout/close/')
-            {
                 pushState(path);
-                /* var title = path.slice(1, -1);
-                // console.log("pushState = <" + title + ">");
-                window.history.pushState(
-                    { page: title},
-                    title,
-                    "/" + title
-                ); */
-            }
+            if (path == '/users/update/')
+                makePost(path);
+            else if (path == '/chat/')
+                chat();
             handleLinks();
         }
     })

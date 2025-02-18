@@ -13,6 +13,7 @@
 				<th data-i18n="friends.table.record">Record</th>
 				<th data-i18n="friends.table.action">-</th>
 				<th data-i18n="friends.table.action">-</th>
+				<th data-i18n="friends.table.action">-</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -24,6 +25,10 @@
 				<td>{{ friend.username }}</td>
 				<td>{{ friend.email }}</td>
 				<td>{{ friend.wins }}-{{ friend.losses }}</td>
+				<td id="chat-{{ friend.username }}">
+					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i> -->
+					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.username }}" ></i>
+				</td>
 				<td id="follow-{{ friend.username }}">
 					<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.username }}')"></i>
 				</td>
