@@ -413,8 +413,8 @@ def fortytwo_callback(request):
                     user = User.objects.create(
                         username=user_data['login'],
                         email=user_data['email'],
-                        password='42auth',
-                        image=user_data['image']['link']
+                        password='42auth'
+                        #image=user_data['image']['link']
                     )
 
                 data = {

@@ -1,0 +1,23 @@
+name: Deploy on Remote Server
+
+#Trigger deployment when main branch is updated (push event)
+on:
+  push:
+    branches:
+      - waf_vault
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into server and deploy
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 95.216.55.157
+          username: pong42
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/pong42/
+            git checkout waf_vault
+            git pull
+            make all
