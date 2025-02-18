@@ -42,7 +42,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./back/.env
+      - ./back/.env.${ENVIRONMENT}
     depends_on:
       db:
         condition: service_healthy

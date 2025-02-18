@@ -48,9 +48,6 @@ def get_vault_secret(path, key):
 # Authenticate and Fetch Secrets
 authenticate_with_vault()
 
-# Clave secreta para firmar el token
-# SECRET_KEY = "mi_clave_secreta"
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -61,9 +58,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = get_vault_secret('django', 'django_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*'] # CAMBIAR!!! por el dominio
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
 # Application definition
 
