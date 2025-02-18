@@ -1,55 +1,74 @@
 import json
+import uuid
+import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class Match(AsyncWebsocketConsumer):
     players = {}  # Diccionario para almacenar jugadores conectados
-
     async def connect(self):
         await self.accept()
+        self.player_id = None  # Se asignará cuando el jugador se una
         print("✅ Cliente conectado al WebSocket.")
+
+    async def testIA(self):
+        count = 0
+        while count < 3:
+            time.sleep(1)
+            count += 1
+            await self.send(text_data=json.dumps({
+                "step": "ia",
+                "hello": "hola"
+            }))
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        print(f"Mensaje recibido: {data}")
 
-        if data.get("type") == "join":
-            player_id = data.get("player", f"player{len(self.players) + 1}")
-            self.players[player_id] = {"x": 200}  # Posición inicial del jugador
-            print(f"{player_id} se ha unido al juego. Total de jugadores: {len(self.players)}")
+        if data.get("step") == "join":
+            # Crear log para el join... otros procesos no deberían ser necesarios.
+            # Asigna un ID al jugador si no tiene
+            self.player_id = str(uuid.uuid4())
+            self.username = data.get("username")
+            if self.username == 'unregistered':
+                self.username = f'noName_{self.player_id}'
+            self.game_mode = data.get("mode")
+            # self.player_id = "player1" if "player1" not in self.players else "player2"
+            self.players[self.player_id] = {"x": 200, "consumer": self}
+            # print(f"{self.player_id} se ha unido al juego.")
+            await self.send(text_data=json.dumps({
+                "step": "wait",
+                "player_name": self.username,
+                "player_id": self.player_id
+            }))
+            if self.game_mode == 'remote-ia':
+                await self.testIA()
+            # Envía el estado actual al cliente
+            # await self.send(text_data=json.dumps({
+            #     "type": "update",
+            #     "players": {player: {"x": info["x"]} for player, info in self.players.items()}
+            # }))
 
-            # Si hay menos de 2 jugadores, enviar mensaje de espera
-            if len(self.players) < 2:
-                waiting_message = {
-                    "type": "waiting",
-                    "message": "Esperando a otro jugador..."
-                }
-                print(f"Enviando mensaje de espera: {waiting_message}")
-                await self.send(text_data=json.dumps(waiting_message))
+        elif data.get("type") == "move":
+            player_id = data.get("player")
+            if player_id in self.players:
+                self.players[player_id]["x"] = data["x"]
+                await self.broadcast_game_state()
 
     async def broadcast_game_state(self):
-        """Envia la actualización del estado del juego a todos los clientes."""
-        message = json.dumps({
+        """Envía la actualización del estado del juego a todos los clientes."""
+        message = {
             "type": "update",
-            "players": self.players,
-        })
-        await self.send_to_all(json.loads(message))
+            "players": {player: {"x": info["x"]} for player, info in self.players.items()}
+        }
+        await self.broadcast(message)
 
-    async def send_to_all(self, data):
+    async def broadcast(self, data):
         """Envía un mensaje a todos los jugadores conectados."""
         message = json.dumps(data)
         for player in self.players.values():
-            await self.send(text_data=message)
+            await player["consumer"].send(text_data=message)
 
     async def disconnect(self, close_code):
-        print(f"Cliente desconectado. Código: {close_code}")
-
-        if close_code == 1001:
-            print("⚠ La conexión WebSocket se cerró inesperadamente. Verifica si el cliente está perdiendo la conexión.")
-
-        if self.players:
-            for player_id in list(self.players.keys()):
-                if self.players[player_id] == self:
-                    del self.players[player_id]
-                    print(f"Jugador {player_id} eliminado de la lista.")
-                    break
-
+        print(f"Cliente desconectado: {self.player_id}")
+        if self.player_id and self.player_id in self.players:
+            del self.players[self.player_id]
+            print(f"Jugador {self.player_id} eliminado del juego.")
