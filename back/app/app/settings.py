@@ -37,6 +37,8 @@ ALLOWED_HOSTS = ['*'] # CAMBIAR!!! por el dominio
 # Application definition
 
 INSTALLED_APPS = [
+    'authy',
+    'chat',
     'game',
     'users',
     'two_fa',

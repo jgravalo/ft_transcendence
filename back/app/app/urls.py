@@ -35,6 +35,8 @@ urlpatterns = [
     path('api/', include([
         path('', get_home, name='get_home'),
         path('error/', get_error, name='get_error'),
+        path('auth/', include('authy.urls')),
+        path('chat/', include('chat.urls')),
         path('game/', include('game.urls')),
         path('users/', include('users.urls')),
         path('two_fa/', include('two_fa.urls')),
