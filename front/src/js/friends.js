@@ -47,7 +47,7 @@ function fetchFriend(user, rule)
 			"Content-Type": "application/json",
 			'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
 		},
-		body: JSON.stringify(info), 
+		body: JSON.stringify({'user': user}), 
 	})
 	.then(response => response.json())
     .then(data => {

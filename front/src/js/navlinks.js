@@ -93,7 +93,7 @@ function handleLink(event)
                 pushState(path);
             if (path == '/users/update/')
                 makePost(path);
-            else if (path == '/chat/')
+            else if (path.slice(0, 6) == '/chat/')
                 chat();
             handleLinks();
         }
