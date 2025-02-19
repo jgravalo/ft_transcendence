@@ -1,5 +1,9 @@
 /*
- * @section: Define variables and const to use along the game.
+* @section: HTML elements to catch and use.
+*
+*   pongCanvas: to draw the game.
+*   ctx: to use context if is necessary.
+*   set the size of the game.
 */
 const canvas = document.getElementById('pongCanvas');
 const ctx = canvas.getContext('2d');
@@ -7,9 +11,125 @@ canvas.width = 400;
 canvas.height = 800;
 ctx.fillStyle = '#000';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
+const menu = document.getElementById('game-menu');
+const canvasContainer = document.getElementById('canvas-container');
+// TODO: User name should be placed properly
+const playerName = document.getElementById('playerName').textContent;
 
-// @brief: Paddles sizes
-const paddleWidth = 100, paddleHeight = 15;
+/*
+* @brief: General function to draw a rectangle.
+*
+* @param {x}: x position of the rectangle.
+* @param {y}: y position of the rectangle.
+* @param {width}: width of the rectangle.
+* @param {height}: height of the rectangle.
+* @param {color}: color of the rectangle.
+*/
+function drawRect(x, y, width, height, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, width, height);
+}
+
+/*
+* @section: Drawers.
+*
+* drawDashedLine: Draw the middle line of the game.
+* drawScore: Draw the score of the current game.
+* drawPowerUps: Draw the generated Power Ups.
+*/
+function drawDashedLine() {
+    ctx.strokeStyle = "#fff";
+    ctx.setLineDash([15, 15]);
+    ctx.lineWidth = 15;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+function drawScore() {
+    ctx.font = "70px Silkscreen";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "right";
+
+    ctx.fillText(playerScore, canvas.width - 20, canvas.height / 2 + 140);
+    ctx.fillText(opponentScore, canvas.width - 20, canvas.height / 2 - 100);
+}
+
+function drawPowerUps() {
+    for (const powerUp of powerUps) {
+        ctx.fillStyle = powerUpColors[powerUp.type];
+        ctx.font = '20px Silkscreen';
+        ctx.textAlign = 'center';
+        ctx.fillText(powerUp.type, powerUp.x + powerUpSize / 2, powerUp.y + powerUpSize / 1.5);
+        drawRect(powerUp.x, powerUp.y, powerUpSize, powerUpSize, powerUpColors[powerUp.type]);
+    }
+}
+
+/*
+* @section: Buttons and listeners to start the game using different modes.
+*
+* The game can be started as:
+*   Local: Multiplayer, using arrows and a - s to move the paddles.
+*   AI-mode: Remote game, against code.
+*   Remote-mode: Game against another user.
+*/
+
+const localModeButton = document.getElementById('local-mode');
+const localAiModeButton = document.getElementById('ai-mode');
+const remoteMode = document.getElementById('remote-mode');
+
+localModeButton.addEventListener('click', () => {
+    gameMode = 'local';
+    startGame();
+});
+
+localAiModeButton.addEventListener('click', () => {
+    gameMode = 'local-ai';
+    startGame();
+});
+
+remoteMode.addEventListener('click', () => {
+    gameMode = 'remote-ai';
+    remoteModeGame();
+});
+
+
+// ---------------------------------------------------------------------
+
+/*
+* @section: Variables and objects used through the game workflow
+*
+* Paddle Sizes.
+* Player Object.
+* Opponent Object.
+* Ball ...
+* @TODO: Complete comment
+* */
+const paddleWidth = 100
+const paddleHeight = 15;
+const minPaddleWidth = 45;
+const maxPaddleWidth = canvas.width - 45;
+let playerScore = 0;
+let opponentScore = 0;
+let playerSpeed = 0;
+const maxPlayerSpeed = 20;
+const acceleration = 2;
+const deceleration = 1;
+let movingUp = false;
+let movingDown = false;
+let movingLeftPlayer = false;
+let movingRightPlayer = false;
+let movingLeftOpponent = false;
+let movingRightOpponent = false;
+let opponentSpeed = 0;
+const maxSpeed = 20;
+let isGameRunning = false;
+let gameWinner = null;
+let gameMode = null;
+
+
 const player = {
     left: false,
     right: false,
@@ -21,6 +141,7 @@ const player = {
     powerUp: null,
     speedModifier: 1
 };
+
 const opponent = {
     left: false,
     right: false,
@@ -30,10 +151,18 @@ const opponent = {
     height: paddleHeight,
     color: '#fff',
     powerUp: null,
-    speedModifier: 1 };
+    speedModifier: 1
+};
 
-// @brief: Ball section
-const ball = { x: canvas.width / 2, y: canvas.height / 2, size: 15, speedX: 4, speedY: 4, baseSpeed: 4, color: '#fff' };
+const ball = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    size: 15,
+    speedX: 4,
+    speedY: 4,
+    baseSpeed: 4,
+    color: '#fff'
+};
 
 // @brief: Power up section. Ready to include new power ups.
 let powerUps = []; // Lista de power-ups activos
@@ -45,54 +174,6 @@ const powerUpColors = {
     '>>': 'green',
     '<<': 'red'
 };
-// @brief: min and max paddle size.
-const minPaddleWidth = 45;
-const maxPaddleWidth = canvas.width - 45;
-
-// @brief Score
-let playerScore = 0;
-let opponentScore = 0;
-
-/*
- * @section: Values to ensure smooth move of paddles.
- * The Paddle accelerate and deccelerate depending of
- * how constant the key.
-*/
-let playerSpeed = 0;
-const maxPlayerSpeed = 20;
-const acceleration = 2;
-const deceleration = 1;
-let movingUp = false;
-let movingDown = false;
-
-let movingLeftPlayer = false;
-let movingRightPlayer = false;
-let movingLeftOpponent = false;
-let movingRightOpponent = false;
-
-
-
-// Movimiento de los jugadores
-let opponentSpeed = 0;
-const maxSpeed = 20;
-
-
-/*
- * @section: Game status
-*/
-let isGameRunning = false;
-let gameWinner = null;
-let gameMode = null;
-
-/*
- * @section: Menu and buttons
-*/
-const menu = document.getElementById('game-menu');
-const canvasContainer = document.getElementById('canvas-container');
-const localModeButton = document.getElementById('local-mode');
-const localAiModeButton = document.getElementById('local-ai-mode');
-const remoteMode = document.getElementById('remote-mode');
-const playerName = document.getElementById('playerName').textContent;
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOTE
 
@@ -107,15 +188,7 @@ function connect() {
 
 function remoteModeGame() {
     connect();
-    // let hasGameStarted = false; // Flag para asegurarnos de que el juego inicia correctamente
-    // isGameRunning = true;
-    // playerScore = 0;
-    // opponentScore = 0;
-    // menu.style.display = 'none';
     canvasContainer.style.display = 'block';
-    // resetBall()
-    // drawGame()
-
 
     socket.onopen = () => {
         console.log("✅ Conectado al servidor WebSocket");
@@ -127,10 +200,9 @@ function remoteModeGame() {
             player: player,
             opponent: opponent,
             canvas: {'width': canvas.width, 'height': canvas.height},
-            mode: 'remote-ia'}
+            mode: 'remote-ai'}
         ));
 
-        // Mostrar el canvas
         document.getElementById("canvas-container").style.display = "block";
         document.getElementById("menu-message").innerText = "Esperando respuesta del servidor...";
     };
@@ -194,38 +266,12 @@ function listener() {
     }))
 }
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOTE
 /*
- * @section: Menu listeners
+* @section: Game related functions.
+*
+*
 */
 
-/*
- * @brief: Start a full local game (two players, one keyboard).
-*/
-localModeButton.addEventListener('click', () => {
-    gameMode = 'local';
-    startGame();
-});
-
-/*
- * @brief: Start a local game against a AI.
-*/
-localAiModeButton.addEventListener('click', () => {
-    gameMode = 'local-ai';
-    startGame();
-});
-
-remoteMode.addEventListener('click', () => {
-    gameMode = 'remote-ia';
-    remoteModeGame();
-});
-
-/*
- * @brief: Controls the end of a given game. Close the pong interface
- * and back to the start screen.
- *
- * @param: winner. Player that win the game, to use it at winner message.
-*/
 function endGame(winner) {
     isGameRunning = false;
     menu.style.display = 'flex';
@@ -234,12 +280,6 @@ function endGame(winner) {
     document.getElementById('menu-message').innerText = message;
 }
 
-/*
- * @brief: Start a game, starting the game loop.
- *
- * This method set the varibles needed to control the game,
- * and shows the canvas.
-*/
 function startGame() {
     isGameRunning = true;
     playerScore = 0;
@@ -249,60 +289,8 @@ function startGame() {
     gameLoop();
 }
 
-/*
- * @brief: General function, draw a rectangle.
- *
- * @param: x x-pixel.
- * @param: y y-pixel.
- * @param: width of the rectangle.
- * @param: height of the rectangle.
- * @param: color of the rectangle.
-*/
-function drawRect(x, y, width, height, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, width, height);
-}
 
-/*
- * @brief: Draw dashed line at the middle of the field
- *
-*/
-function drawDashedLine() {
-    ctx.strokeStyle = "#fff";
-    ctx.setLineDash([15, 15]);
-    ctx.lineWidth = 15;
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height / 2);
-    ctx.lineTo(canvas.width, canvas.height / 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-}
 
-/*
- * @brief: Draw score
- *
-*/
-function drawScore() {
-    ctx.font = "70px Silkscreen";
-    ctx.fillStyle = "#fff";
-    ctx.textAlign = "right";
-
-    ctx.fillText(playerScore, canvas.width - 20, canvas.height / 2 + 140);
-    ctx.fillText(opponentScore, canvas.width - 20, canvas.height / 2 - 100);
-}
-
-/*
- * @brief: Draw power ups.
-*/
-function drawPowerUps() {
-    for (const powerUp of powerUps) {
-        ctx.fillStyle = powerUpColors[powerUp.type];
-        ctx.font = '20px Silkscreen';
-        ctx.textAlign = 'center';
-        ctx.fillText(powerUp.type, powerUp.x + powerUpSize / 2, powerUp.y + powerUpSize / 1.5);
-        drawRect(powerUp.x, powerUp.y, powerUpSize, powerUpSize, powerUpColors[powerUp.type]);
-    }
-}
 
 /*
  * @brief: Move power ups function.
@@ -535,7 +523,7 @@ function updateGame() {
         opponentSpeed = movePaddle(opponent, opponentSpeed);
     } else if (gameMode === 'local') {
         opponentSpeed = movePaddle(opponent, opponentSpeed);
-    } else if (gameMode === 'remote-ia') {
+    } else if (gameMode === 'remote-ai') {
         listener();
         opponentSpeed = movePaddle(opponent, opponentSpeed);
     }

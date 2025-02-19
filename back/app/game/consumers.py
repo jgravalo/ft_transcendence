@@ -56,7 +56,7 @@ class Match(AsyncWebsocketConsumer):
                     "step": "start",
                     "opponentName": 'HAL-42',
                 }))
-            if self.game_mode != 'remote-ia':
+            if self.game_mode != 'remote-ai':
                 # ENCONTRAR USUARIO EN WAITING LIST O PONERLO EN WAITING LIST
                 if (len(waiting_list) > 0):
                     matches.append([self, waiting_list[0]])
@@ -65,7 +65,7 @@ class Match(AsyncWebsocketConsumer):
                     waiting_list.append(self)
 
         elif data.get("step") == "move":
-            if self.game_mode == 'remote-ia':
+            if self.game_mode == 'remote-ai':
                 await self.opponentIA(data.get("position"), data.get("ball"))
             # player_id = data.get("player")
             # if player_id in self.players:
