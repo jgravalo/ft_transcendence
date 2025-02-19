@@ -20,4 +20,4 @@ jobs:
             cd /home/pong42/ft_transcendence
             git checkout waf_vault
             git pull
-            make all
+            make all ENVIRONMENT=production
