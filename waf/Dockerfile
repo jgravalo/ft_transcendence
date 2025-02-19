@@ -16,8 +16,5 @@ COPY ./conf/ssl_settings.conf templates/includes/ssl_settings.conf.template
 COPY ./certs/nginx.crt conf/server.crt
 COPY ./certs/nginx.key conf/server.key
 
-# Expose ports for HTTP (80) and HTTPS (443)
-EXPOSE 80 443
-
 # Default command to start Nginx
 CMD ["nginx", "-g", "daemon off;"]
