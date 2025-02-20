@@ -1,18 +1,5 @@
 //import { getInfo2FA } from './two_fa.js';
 
-function getCSRFToken() {
-    const cookies = document.cookie.split(';');
-    // console.log("how many cookies");
-    for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'csrftoken') {
-            // console.log("CookieValue = <" + value + ">");
-            return value;
-        }
-    }
-    return null;
-}
-
 function make2FA()
 {
     handleLinks();
@@ -22,9 +9,11 @@ function makeLogout()
 {
     document.getElementById('close-session').addEventListener('click', () => {
         // console.log('El botón de cerrar sesion ha sido pulsado');
+        removeStorage('access');
+        removeStorage('refresh');
         document.getElementById('cancel-logout').click();
+        //socket.close();
         fetchLink('/users/logout/close/');
-        // no llega a hacer el siguinte fetch
         fetchLink('/');
         handleLinks();
     });
@@ -43,7 +32,7 @@ function deleteUser(path)
             },
         });
 }
-
+    
 function makeModal(path) //modalHTML)
 {
     // Mostrar el modal
@@ -62,43 +51,65 @@ function makeModal(path) //modalHTML)
 
 function makePost(path)
 {
+	console.log('hace makePost');
+    // console.log("JWT before GET:", getJWTToken());
+    //console.log("token =", token);
     const form =  document.getElementById('loginForm');
+	console.log('entra en submit');
     form.addEventListener('submit', function(event) {
+        console.log('hace event default');
         event.preventDefault();
-        // Obtener los valores de los inputs
-        console.log("id =", path.slice(path.slice(1, -1).indexOf('/') + 2, -1));
+        console.log('hizo event default');
+        makeSubmit(path);
+    })
+}
+
+function makeSubmit(path)
+{
+    let token = getJWTToken();
+    // Obtener los valores de los inputs
         if (path === '/users/login/' ||
         path === '/users/register/' ||
         path === '/users/update/' ||
         path === '/two_fa/verify/')
             info = getInfo();
-        //console.log("hace fetch con data");
-        // console.log("JWT before POST:", getJWTToken());
-        let post = path;
-        /* if (path.slice(0, 8) == '/two_fa/')
-            post = "/two_fa/verify/";
-        else */
-            //if (path.slice(-5) != '/set/')
-        post += "set/";
-        console.log("post =", post);
+        /* if (path != '/users/update/')
+            info = JSON.stringify(info) */
+        let post = path + "set/";
+        console.log("username:", info.get("username"));
+        console.log("email:", info.get("email"));
+        console.log("password:", info.get("password"));
         console.log("info =", info);
+        if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
+            console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
+            refreshJWT(post);
+            console.log("El token ha renovado");
+            return ;
+        }
+    	console.log('path for POST =', post);
+            //"Content-Type": "application/json",
         fetch(base + '/api' + post, {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${getJWTToken()}`,
-                "Content-Type": "application/json",
                 'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
                 'Accept-Language': localStorage.getItem("selectedLanguage") || "en" //send the language to backend (set to en default)
             },
-            body: JSON.stringify(info), 
+            body: info,
         })
         .then(response => response.json())
         .then(data => {
             console.log("data POST:", data);
             if (`${data.error}` == "Success")// CAMBIAR POR STATUS !!
             {
-                console.log("JWT after POST:", getJWTToken());
-                saveJWTToken(`${data.jwt}`);
+                //console.log("JWT after POST:", getJWTToken());
+                if (path == '/users/login/' || path == '/users/register/')
+                {
+                    //getJWTPair(info);
+                    //saveJWTToken(`${data.access}`);
+                    saveStorage('access', `${data.access}`);
+                    saveStorage('refresh', `${data.refresh}`);
+                }
                 // console.log("JWT from POST:",`${data.jwt}`);
                 //console.log("2:", getJWTToken())
                 if (path != '/users/update/')
@@ -122,39 +133,59 @@ function makePost(path)
             console.log("fetch login catch");
             console.error('Error:', error);
         });
-        
-    })
+   // })
 }
 
 function getInfo()
 {
-    //const form = document.getElementById('loginForm'); // Selecciona el formulario
-    const form = document.querySelector('#loginForm');
+    const form = document.getElementById('loginForm'); // Selecciona el formulario
+    //const form = document.querySelector('#loginForm');
     const formData = new FormData(form);
-    const formDataObject = {};
+    console.log("formData:", formData);
+    //const formDataObject = {};
+    return (formData)
 
     formData.forEach((value, key) => {
         if (key === 'image' && value instanceof File)
-            formDataObject[key] = value; // Agregar el archivo (imagen) seleccionada
+        {
+            let fileInput = document.getElementById("fileInput");
+            formDataObject[key] = fileInput.files[0];
+            //formDataObject[key] = value; // Agregar el archivo (imagen) seleccionada
+        }
         else
             formDataObject[key] = value;
-        console.log("key =", key, "value =", value);
+        //console.log("key =", key, "value =", value);
     });
-    console.log("formDataObject =", formDataObject);
+    //console.log("formDataObject =", formDataObject);
     return (formDataObject)
 }
 /* 
-function getInfo2FA()
+function loginSock() // por definir
 {
-    const userData = decodeToken(getJWTToken());
-    console.log("Datos del usuario:", userData);
-    fetchLink('/users/profile/');
-}
- */
-const saveJWTToken = (token) => {
-    sessionStorage.setItem('token', token);
-};
-
-const getJWTToken = () => {
-    return sessionStorage.getItem('token');
-};
+    // CREATE SOCKET
+    const route = 'ws://' + base.slice(7, -5) + ':8000/ws/connect/';
+    console.log('ruta: ', route);
+    const socket = new WebSocket(route);
+    // Escuchar eventos de conexión
+    socket.onopen = function (event) {
+        console.log("WebSocket conectado");
+        const data = JSON.parse(event.data);
+        document.getElementById('bar').innerHTML = data.content;
+        socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
+    };
+    // Escuchar mensajes desde el servidor
+    socket.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        console.log(data.message);
+    };
+    // Manejar desconexión
+    socket.onclose = function (event) {
+        const data = JSON.parse(event.data);
+        document.getElementById('bar').innerHTML = data.content;
+        console.log("WebSocket desconectado");
+    };
+    // Manejar errores
+    socket.onerror = function (error) {
+        console.error("WebSocket error:", error);
+    };
+} */

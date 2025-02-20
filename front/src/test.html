@@ -66,14 +66,50 @@
 	</div>
 	<div id="all">
 		<div id="content">
+			<!-- <h5 style="color: white;" data-i18n="friends.other.title">Other users</h1>
+				<table class="user">
+					<thead>
+						<tr>
+							<th data-i18n="friends.table.index">#</th>
+							<th data-i18n="friends.table.username">Username</th>
+							<th data-i18n="friends.table.email">Email</th>
+							<th data-i18n="friends.table.record">Record</th>
+							<th data-i18n="friends.table.action">-</th>
+							<th data-i18n="friends.table.action">-</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for user in users %}
+						<tr>
+							<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
+								<img src="img/España.webp">
+							</div></td>
+							<td>{{ user.username }}</td>
+							<td>{{ user.email }}</td>
+							<td>{{ user.wins }}-{{ user.losses }}</td>
+							<td id="user{{ forloop.counter }}-follow">
+								<i class="fas fa-plus friend-icon" onclick="addFriend('user{{ forloop.counter }}', '{{ user.username }}')"></i>
+							</td>
+							<td id="user{{ forloop.counter }}-block">
+								<i class="fas fa-ban friend-icon" onclick="BlockUser('user{{ forloop.counter }}', '{{ user.username }}')" style="color: brown;"></i>
+							</td>
+						</tr>
+						{% empty %}
+						<tr>
+							<td colspan="4" data-i18n="friends.other.empty">There are not users.</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table> -->
+
 			<div class="chat-profile">
 				<div class="chat-photo">
-					<img src="img/España.webp"> <!-- src="img/España.webp"> -->
+					<img src="img/España.webp">
 				</div>
 				<div class="chat-info">
 					<h1 id="username">{{ user.username }}</h1>
 					<div>
-						<h2>wins: {{ user.wins }}<!--span id="wins">0</span--></h2>
+						<h2>wins: {{ user.wins }}</h2>
 					</div>
 				</div>
 			</div>

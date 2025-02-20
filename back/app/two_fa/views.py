@@ -8,7 +8,7 @@ from .models import TwoFactorAuth
 from users.models import User
 from users.views import decode_token
 
-from .opt import send_email_otp
+from .opt import send_email_otp, generate_qr_code
 
 # Create your views here.
 
@@ -59,20 +59,27 @@ def set_phone(request):
 
 @csrf_exempt
 def verify(request):
-    way = request.GET.get('way', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-    print(way)
+    #way = request.GET.get('way', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
+    #print(way)
     user = User.get_user(request)
-    if way == 'email/':
-        send_email_otp(user)
-    elif way == 'sms/':
-        send_sms_code(user)
-    elif way == 'google/':
-        generate_qr_code(user)
+    if TwoFactorAuth.objects.filter(user=user).exists():
+        two_fa = TwoFactorAuth.objects.get(user=user)
     else:
-        return JsonResponse({'error': 'Query inválida'}, status=404)
-    content = render_to_string('verify.html')
+        two_fa = TwoFactorAuth.objects.create(user=user)#, secret_key=settings.SECRET_KEY)
+    totp = two_fa.generate_totp()
+    two_fa.otp_code = totp.now()
+    two_fa.save()
+    #if way == 'email/':
+    #send_email_otp(two_fa, totp)
+    # elif way == 'sms/':
+    #     send_sms_code(user)
+    # elif way == 'google/':
+    qr = generate_qr_code(two_fa, totp)
+    # else:
+    #     return JsonResponse({'error': 'Query inválida'}, status=404)
+    print("two_fa.otp_code after send:", two_fa.otp_code)
+    content = render_to_string('verify.html', {"qr": qr["image"]})
     data = {
-        #"opt_code": opt_code,
         "element": 'modalContainer',
         "content": content
     }
@@ -88,13 +95,16 @@ def verify_otp(request): # email o SMS
         data = json.loads(request.body)
         otp_code = data.get('otp-code')
         user = User.get_user(request)
-        two_fa = TwoFactorAuth.objects.get(user__user_id=user.user_id)
+        two_fa = TwoFactorAuth.objects.get(user=user)
         print("otp_code:", otp_code)
-        print("data.otp_code:", two_fa.otp_code)
-        if (otp_code != two_fa.otp_code):
+        print("two_fa.otp_code:", two_fa.otp_code)
+        #if (otp_code != two_fa.otp_code):
+        if not two_fa.verify_otp(otp_code):
             #user.delete()
             return JsonResponse({'type': 'errorName', 'error': 'Your code is wrong.'})
         two_fa.delete()
+        user.is_active=True
+        user.save()
         content = render_to_string('close_login.html') # online_bar
         token = request.headers.get('Authorization').split(" ")[1]
         data = {
