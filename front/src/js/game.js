@@ -128,15 +128,8 @@ const maxPaddleWidth = canvas.width - 45;
 let playerScore = 0;
 let opponentScore = 0;
 let playerSpeed = 0;
-const maxPlayerSpeed = 20;
 const acceleration = 2;
 const deceleration = 1;
-let movingUp = false;
-let movingDown = false;
-let movingLeftPlayer = false;
-let movingRightPlayer = false;
-let movingLeftOpponent = false;
-let movingRightOpponent = false;
 let opponentSpeed = 0;
 const maxSpeed = 20;
 let isGameRunning = false;
@@ -307,8 +300,6 @@ function startGame() {
 }
 
 
-
-
 /*
  * @brief: Move power ups function.
 */
@@ -440,21 +431,6 @@ function resetBall() {
 }
 
 /*
- * @brief: Move AI
-*/
-function moveAI() {
-    const centerAI = opponent.x + opponent.width / 2;
-
-    if (centerAI < ball.x - 10) {
-        opponent.x += 3;
-    } else if (centerAI > ball.x + 10) {
-        opponent.x -= 3;
-    }
-
-    opponent.x = Math.max(0, Math.min(opponent.x, canvas.width - opponent.width));
-}
-
-/*
  * @brief: Check ball - paddle collision.
  *
  * @param: ball. Ball object.
@@ -534,10 +510,7 @@ function updateGame() {
     if (!isGameRunning) return;
 
     playerSpeed = movePaddle(player, playerSpeed);
-    if (gameMode === 'local-ai') {
-        moveAI();
-        opponentSpeed = movePaddle(opponent, opponentSpeed);
-    } else if (gameMode === 'local') {
+    if (gameMode === 'local') {
         opponentSpeed = movePaddle(opponent, opponentSpeed);
     } else if (gameMode === 'remote-ai') {
         listener();
@@ -553,25 +526,6 @@ function updateGame() {
     } else if (opponentScore >= 5) {
         endGame('opponent');
     }
-}
-
-/*
- * @brief: Move main player
- *
- * Main player is the one that is show at the botton of the field.
-*/
-function movePlayer() {
-    if (movingLeftPlayer) {
-        playerSpeed = Math.min(playerSpeed + acceleration, maxSpeed);
-        player.x -= playerSpeed;
-    } else if (movingRightPlayer) {
-        playerSpeed = Math.min(playerSpeed + acceleration, maxSpeed);
-        player.x += playerSpeed;
-    } else {
-        playerSpeed = Math.max(playerSpeed - deceleration, 0);
-    }
-
-    player.x = Math.max(0, Math.min(player.x, canvas.width - player.width));
 }
 
 function movePaddle(paddle, speed) {
@@ -590,43 +544,6 @@ function movePaddle(paddle, speed) {
     return speed;
 }
 
-// function movePaddle(paddle, movingLeft, movingRight, speed) {
-//     if (movingLeft) {
-//         speed = Math.min(speed + acceleration, maxSpeed);
-//         paddle.x -= speed;
-//     } else if (movingRight) {
-//         speed = Math.min(speed + acceleration, maxSpeed);
-//         paddle.x += speed;
-//     } else {
-//         speed = Math.max(speed - deceleration, 0);
-//     }
-//
-//     paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
-//
-//     return speed;
-// }
-
-/*
- * @brief: Move Player Two
- *
- * Player two is defined as the top one.
- * TODO: Player two is local so far. This method should be fixed
- * when remote player is implemented.
-*/
-function movePlayerTwo() {
-    if (opponent.left) {
-        opponentSpeed = Math.min(opponentSpeed + acceleration, maxSpeed);
-        opponent.x -= opponentSpeed;
-    } else if (opponent.right) {
-        opponentSpeed = Math.min(opponentSpeed + acceleration, maxSpeed);
-        opponent.x += opponentSpeed;
-    } else {
-        opponentSpeed = Math.max(opponentSpeed - deceleration, 0);
-    }
-
-    opponent.x = Math.max(0, Math.min(opponent.x, canvas.width - opponent.width));
-}
-
 // Listeners para el control de ambos jugadores
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') player.left = true;
@@ -634,12 +551,6 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'a') opponent.left = true;
     if (e.key === 'd') opponent.right = true;
 });
-// document.addEventListener('keydown', (e) => {
-//     if (e.key === 'ArrowLeft') movingLeftPlayer = true;
-//     if (e.key === 'ArrowRight') movingRightPlayer = true;
-//     if (e.key === 'a') movingLeftOpponent = true;
-//     if (e.key === 'd') movingRightOpponent = true;
-// });
 
 document.addEventListener('keyup', (e) => {
     if (e.key === 'ArrowLeft') player.left = false;
