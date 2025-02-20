@@ -59,10 +59,13 @@ function handleLink(event)
     }
     //console.log("token before fetch =", getJWTToken());
 	console.log('path for GET =', path);
-	console.log('fetch for GET =', base + '/api' + path);
-
+    
     // fetch(base + ":8000" + path, {
-    fetch(base + '/api' + path, {
+        var get = '/api' + path;
+        if (path == "")
+            get = path;
+    console.log('fetch for GET =', base + get);
+    fetch(base + get, {
         method: "GET",
         headers: {
             'Authorization': `Bearer ${getJWTToken()}`,
@@ -94,7 +97,7 @@ function handleLink(event)
             if (path == '/users/update/')
                 makePost(path);
             else if (path.slice(0, 6) == '/chat/')
-                chat();
+                chat(base + get);
             handleLinks();
         }
     })

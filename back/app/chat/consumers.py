@@ -15,6 +15,12 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         self.user1 = self.scope['user'].id  # Usuario actual
         self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # ID del otro usuario
 
+        print('user1:', self.user1)
+        print('user2:', self.user2)
+
+        self.user1 = int(self.user1)
+        self.user2 = int(self.user2)
+
         # Asegurar que el ID más bajo siempre va primero para que la sala sea única
         self.room_name = f'chat_{min(self.user1, self.user2)}_{max(self.user1, self.user2)}'
         self.room_group_name = f'private_{self.room_name}'

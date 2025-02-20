@@ -9,8 +9,8 @@ def chat(request):
     print('entra en chat')
     try:
         # user = User.get_user(request)
-        username = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-        user = User.objects.get(username=username)
+        id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+        user = User.objects.get(id=id)
     except:
         return JsonResponse({'error': 'Forbidden'}, status=403)
     context = {

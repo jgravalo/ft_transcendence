@@ -164,7 +164,7 @@ function getInfo()
 function loginSock() // por definir
 {
     // CREATE SOCKET
-    const route = 'ws://' + base.slice(7, -5) + ':8000/ws/connect/';
+    const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/';
     console.log('ruta: ', route);
     const socket = new WebSocket(route);
     // Escuchar eventos de conexión

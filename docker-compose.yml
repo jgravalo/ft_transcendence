@@ -78,6 +78,15 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:latest
+    container_name: chat-redis
+    ports:
+      - "8379:6379"
+    networks:
+      - pongnet
+    restart: always
+
 volumes:
   pgdata:
     name: pgdata

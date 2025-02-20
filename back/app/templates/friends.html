@@ -27,7 +27,7 @@
 				<td>{{ friend.wins }}-{{ friend.losses }}</td>
 				<td id="chat-{{ friend.username }}">
 					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i> -->
-					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.username }}" ></i>
+					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.id }}" ></i>
 				</td>
 				<td id="follow-{{ friend.username }}">
 					<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.username }}')"></i>
@@ -102,7 +102,7 @@
 				<td>{{ user.wins }}-{{ user.losses }}</td>
 				<td id="chat-{{ user.username }}">
 					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ user.username }}')"></i> -->
-					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ user.username }}" ></i>
+					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ user.id }}" ></i>
 				</td>
 				<td id="follow-{{ user.username }}">
 					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ user.username }}')"></i>
