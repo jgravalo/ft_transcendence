@@ -31,6 +31,7 @@ matches = []
 
 class Match(AsyncWebsocketConsumer):
     players = {}
+    active_match = []
 
     async def connect(self):
         await self.accept()
@@ -38,8 +39,14 @@ class Match(AsyncWebsocketConsumer):
         logger.info("Connection Received.")
 
     async def receive(self, text_data):
+        """
+        Process received message.
+
+        :param self: connection instance.
+        :param text_data: json object received.
+        """
         data = json.loads(text_data)
-        # JOIN TO REM
+        # Join to remote mode
         if data.get("step") == "join":
             logger.info("Join game request.")
             self.status = 'wait'
@@ -47,11 +54,9 @@ class Match(AsyncWebsocketConsumer):
             self.player_info = data.get("player")
             self.player_id = str(uuid.uuid4())
             self.username = data.get("username")
-            if self.username == 'unregistered':
-                self.username = f'noName_{self.player_id}'
             self.game_mode = data.get("mode")
             logger.info(self.game_mode)
-            # MODE REMOTE IA:
+            # Remote AI mode
             if self.game_mode == 'remote-ai':
                 print("llegamos aquí??")
                 logger.info("Response remote-ai request. Start.")
@@ -59,12 +64,14 @@ class Match(AsyncWebsocketConsumer):
                     "step": "start",
                     "opponentName": 'HAL-42',
                 }))
-            if self.game_mode != 'remote-ai':
-                # ENCONTRAR USUARIO EN WAITING LIST O PONERLO EN WAITING LIST
+            if self.game_mode == 'remote':
                 if (len(waiting_list) > 0):
                     matches.append([self, waiting_list[0]])
                     waiting_list.remove(waiting_list[0])
                 else:
+                    await self.send(text_data=json.dumps({
+                        "step": "wait"
+                    }))
                     waiting_list.append(self)
 
         elif data.get("step") == "move":

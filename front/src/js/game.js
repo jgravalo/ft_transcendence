@@ -62,6 +62,16 @@ function drawOpponentName() {
     ctx.fillText(opponent.playerName, canvas.width, 35);
 }
 
+function drawMessage(message) {
+    menu.style.display = 'none';
+    canvasContainer.style.display = 'block';
+    drawRect(0, 0, canvas.width, canvas.height, '#000');
+    ctx.font = "30px Silkscreen";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText(message, canvas.width / 2, canvas.height / 2 + 140, canvas.width - 10);
+}
+
 function drawScore() {
     ctx.font = "70px Silkscreen";
     ctx.fillStyle = "#fff";
@@ -135,10 +145,11 @@ const maxSpeed = 20;
 let isGameRunning = false;
 let gameWinner = null;
 let gameMode = null;
-
+let userName = "noName"
+let opponentName = "noName";
 
 const player = {
-    playerName: 'player1',
+    playerName: userName,
     left: false,
     right: false,
     x: canvas.width / 2 - paddleWidth / 2,
@@ -151,7 +162,7 @@ const player = {
 };
 
 const opponent = {
-    playerName: 'opponent',
+    playerName: opponentName,
     left: false,
     right: false,
     x: canvas.width / 2 - paddleWidth / 2,
@@ -207,7 +218,6 @@ function remoteModeGame() {
             step: 'join',
             username: playerName,
             player: player,
-            opponent: opponent,
             canvas: {'width': canvas.width, 'height': canvas.height},
             mode: gameMode}
         ));
@@ -220,7 +230,8 @@ function remoteModeGame() {
         const data = JSON.parse(event.data);
         // console.log("📩 Mensaje recibido:", data);
         if (data.step === 'wait') {
-            document.getElementById("menu-message").innerText = data.player_id;
+            resetBall();
+            waitingLoop();
         }
         if (data.step === 'start') {
             opponent.playerName = data.opponentName;
@@ -266,6 +277,16 @@ function remoteModeGame() {
             }
         }
     };
+}
+
+function waitingLoop() {
+    if (!isGameRunning) {
+        drawMessage("Waiting for a victim!");
+        ballPlay();
+        ballBounce();
+        drawRect(ball.x - ball.size / 2, ball.y - ball.size / 2, ball.size, ball.size, ball.color);
+        requestAnimationFrame(waitingLoop);
+    }
 }
 
 function listener() {
@@ -380,22 +401,7 @@ function resetPowerUp(player) {
  * This function move the ball, and control collisions.
 */
 function moveBall() {
-    ball.x += ball.speedX;
-    ball.y += ball.speedY;
-
-    // Border collision to avoid 'trapped' behaviour.
-    if (ball.x - ball.size / 2 <= 0) {
-        ball.x = ball.size / 2;
-        // The ball speed is modify by the power up, if applies.
-        ball.speedX = Math.abs(ball.baseSpeed * player.speedModifier);
-        collisionCount++;
-    }
-    if (ball.x + ball.size / 2 >= canvas.width) {
-        ball.x = canvas.width - ball.size / 2;
-        ball.speedX = -Math.abs(ball.baseSpeed * opponent.speedModifier); // Ajustar según el modificador de la IA
-        collisionCount++;
-    }
-
+    ballPlay();
     if (ball.y - ball.size / 2 <= 0) {
         playerScore++;
         resetBall();
@@ -413,6 +419,32 @@ function moveBall() {
         ball.speedY = Math.abs(ball.baseSpeed * opponent.speedModifier);
     }
     generatePowerUp();
+}
+
+function ballPlay() {
+    ball.x += ball.speedX;
+    ball.y += ball.speedY;
+
+    // Border collision to avoid 'trapped' behaviour.
+    if (ball.x - ball.size / 2 <= 0) {
+        ball.x = ball.size / 2;
+        ball.speedX = Math.abs(ball.baseSpeed * player.speedModifier);
+        collisionCount++;
+    }
+    if (ball.x + ball.size / 2 >= canvas.width) {
+        ball.x = canvas.width - ball.size / 2;
+        ball.speedX = -Math.abs(ball.baseSpeed * opponent.speedModifier);
+    }
+}
+
+function ballBounce() {
+    if (ball.y - ball.size <= 0) {
+        ball.y = ball.size;
+        ball.speedY = Math.abs(ball.baseSpeed);
+    } else if (ball.y + ball.size >= canvas.height) {
+        ball.y = canvas.height - ball.size;
+        ball.speedY = -Math.abs(ball.baseSpeed);
+    }
 }
 
 /*
