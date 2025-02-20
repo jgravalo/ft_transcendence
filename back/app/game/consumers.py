@@ -50,8 +50,11 @@ class Match(AsyncWebsocketConsumer):
             if self.username == 'unregistered':
                 self.username = f'noName_{self.player_id}'
             self.game_mode = data.get("mode")
+            logger.info(self.game_mode)
             # MODE REMOTE IA:
-            if self.game_mode == 'remote-ia':
+            if self.game_mode == 'remote-ai':
+                print("llegamos aquí??")
+                logger.info("Response remote-ai request. Start.")
                 await self.send(text_data=json.dumps({
                     "step": "start",
                     "opponentName": 'HAL-42',

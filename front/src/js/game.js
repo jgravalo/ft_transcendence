@@ -48,6 +48,20 @@ function drawDashedLine() {
     ctx.setLineDash([]);
 }
 
+function drawPlayerName() {
+    ctx.font = "40px Silkscreen";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "left";
+    ctx.fillText("player1", 0, canvas.height - 5);
+}
+
+function drawOpponentName() {
+    ctx.font = "40px Silkscreen";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "right";
+    ctx.fillText(opponent.playerName, canvas.width, 35);
+}
+
 function drawScore() {
     ctx.font = "70px Silkscreen";
     ctx.fillStyle = "#fff";
@@ -86,12 +100,12 @@ localModeButton.addEventListener('click', () => {
 });
 
 localAiModeButton.addEventListener('click', () => {
-    gameMode = 'local-ai';
-    startGame();
+    gameMode = 'remote-ai';
+    remoteModeGame();
 });
 
 remoteMode.addEventListener('click', () => {
-    gameMode = 'remote-ai';
+    gameMode = 'remote';
     remoteModeGame();
 });
 
@@ -131,6 +145,7 @@ let gameMode = null;
 
 
 const player = {
+    playerName: 'player1',
     left: false,
     right: false,
     x: canvas.width / 2 - paddleWidth / 2,
@@ -143,6 +158,7 @@ const player = {
 };
 
 const opponent = {
+    playerName: 'opponent',
     left: false,
     right: false,
     x: canvas.width / 2 - paddleWidth / 2,
@@ -200,7 +216,7 @@ function remoteModeGame() {
             player: player,
             opponent: opponent,
             canvas: {'width': canvas.width, 'height': canvas.height},
-            mode: 'remote-ai'}
+            mode: gameMode}
         ));
 
         document.getElementById("canvas-container").style.display = "block";
@@ -209,11 +225,12 @@ function remoteModeGame() {
 
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("📩 Mensaje recibido:", data);
+        // console.log("📩 Mensaje recibido:", data);
         if (data.step === 'wait') {
             document.getElementById("menu-message").innerText = data.player_id;
         }
         if (data.step === 'start') {
+            opponent.playerName = data.opponentName;
             startGame();
         }
         if (data.step === 'move') {
@@ -399,12 +416,11 @@ function moveBall() {
     // Paddle collisions
     if (checkCollision(ball, player)) {
         ball.y = player.y - ball.size / 2;
-        ball.speedY = -Math.abs(ball.baseSpeed * player.speedModifier); // Aplica el modificador pero reinicia el cálculo base
+        ball.speedY = -Math.abs(ball.baseSpeed * player.speedModifier);
     } else if (checkCollision(ball, opponent)) {
         ball.y = opponent.y + opponent.height + ball.size / 2;
-        ball.speedY = Math.abs(ball.baseSpeed * opponent.speedModifier); // Aplica el modificador pero reinicia el cálculo base
+        ball.speedY = Math.abs(ball.baseSpeed * opponent.speedModifier);
     }
-
     generatePowerUp();
 }
 
@@ -650,6 +666,8 @@ function drawGame() {
     drawRect(ball.x - ball.size / 2, ball.y - ball.size / 2, ball.size, ball.size, ball.color);
     drawPowerUps();
     drawScore();
+    drawPlayerName();
+    drawOpponentName();
 }
 
 /*
