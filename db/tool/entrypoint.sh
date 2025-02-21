@@ -2,16 +2,12 @@
 
 set -ex
 
-# Vault Configuration
-VAULT_ADDR="http://vault:8200"
+# Vault URLs
 VAULT_AUTH_URL="$VAULT_ADDR/v1/auth/approle/login"
 VAULT_SECRET_URL="$VAULT_ADDR/v1/secret/data/postgres"
 
-ROLE_ID="6d40c02e-0532-b346-f321-f32b6a241d88"
-SECRET_ID="878a456d-3888-4059-0e1e-c6ec5f68937b"
-
 # Prepare JSON payload for authentication
-AUTH_PAYLOAD=$(jq -n --arg role_id "$ROLE_ID" --arg secret_id "$SECRET_ID" \
+AUTH_PAYLOAD=$(jq -n --arg role_id "$VAULT_ROLE_ID" --arg secret_id "$VAULT_SECRET_ID" \
     '{role_id: $role_id, secret_id: $secret_id}')
 
 # ---------------------------------------------------------------
@@ -50,9 +46,7 @@ fi
 # ---------------------------------------------------------------
 # 3) Fetch the PostgreSQL password from Vault
 # ---------------------------------------------------------------
-SECRET_RESPONSE=$(curl -fs -X GET \
-    -H "X-Vault-Token: $VAULT_TOKEN" \
-    "$VAULT_SECRET_URL" || true)
+SECRET_RESPONSE=$(curl -fs -X GET -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_SECRET_URL")
 
 # If curl fails, SECRET_RESPONSE is empty. Check that:
 if [ -z "$SECRET_RESPONSE" ]; then
