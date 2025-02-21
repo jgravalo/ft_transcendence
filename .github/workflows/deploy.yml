@@ -4,7 +4,7 @@ name: Deploy on Remote Server
 on:
   push:
     branches:
-      - waf_vault
+      - main
 
 jobs:
   deploy:
@@ -18,6 +18,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/pong42/ft_transcendence
-            git checkout waf_vault
+            git checkout main
             git pull
             make all ENVIRONMENT=production
