@@ -2,8 +2,6 @@
 
 set -ex
 
-curl -X POST -H "Content-Type: application/json" --data '{"role_id": "6d40c02e-0532-b346-f321-f32b6a241d88", "secret_id": "878a456d-3888-4059-0e1e-c6ec5f68937b"}' "http://vault:8200/v1/auth/approle/login"
-
 # Vault Configuration
 VAULT_ADDR="http://vault:8200"
 VAULT_AUTH_URL="$VAULT_ADDR/v1/auth/approle/login"
@@ -16,11 +14,30 @@ SECRET_ID="878a456d-3888-4059-0e1e-c6ec5f68937b"
 AUTH_PAYLOAD=$(jq -n --arg role_id "$ROLE_ID" --arg secret_id "$SECRET_ID" \
     '{role_id: $role_id, secret_id: $secret_id}')
 
-# Authenticate with Vault and fetch the token
-VAULT_RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
-    --data "$AUTH_PAYLOAD" "$VAULT_AUTH_URL")
+# ---------------------------------------------------------------
+# 1) Retry loop for Vault login
+# ---------------------------------------------------------------
+MAX_ATTEMPTS=5
+ATTEMPT=0
+SLEEP_SECS=3
 
-# Extract the Vault token
+until VAULT_RESPONSE=$(curl -fs -X POST \
+    -H "Content-Type: application/json" \
+    --data "$AUTH_PAYLOAD" \
+    "$VAULT_AUTH_URL")
+do
+    ATTEMPT=$((ATTEMPT+1))
+    if [ $ATTEMPT -gt $MAX_ATTEMPTS ]; then
+        echo "Vault login still failing after $MAX_ATTEMPTS attempts."
+        exit 1
+    fi
+    echo "Vault not ready (attempt $ATTEMPT). Retrying in ${SLEEP_SECS}s..."
+    sleep $SLEEP_SECS
+done
+
+# ---------------------------------------------------------------
+# 2) Extract the Vault token
+# ---------------------------------------------------------------
 VAULT_TOKEN=$(echo "$VAULT_RESPONSE" | jq -r '.auth.client_token')
 
 # Debug: Print full response if token extraction fails
@@ -30,28 +47,29 @@ if [ -z "$VAULT_TOKEN" ] || [ "$VAULT_TOKEN" = "null" ]; then
     exit 1
 fi
 
-# Fetch the PostgreSQL password from Vault
-SECRET_RESPONSE=$(curl -s -X GET -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_SECRET_URL")
+# ---------------------------------------------------------------
+# 3) Fetch the PostgreSQL password from Vault
+# ---------------------------------------------------------------
+SECRET_RESPONSE=$(curl -fs -X GET \
+    -H "X-Vault-Token: $VAULT_TOKEN" \
+    "$VAULT_SECRET_URL" || true)
 
-# Extract the password from the JSON response
+# If curl fails, SECRET_RESPONSE is empty. Check that:
+if [ -z "$SECRET_RESPONSE" ]; then
+    echo "Error: Could not get a response from Vault for the secret."
+    exit 1
+fi
+
 POSTGRES_PASSWORD=$(echo "$SECRET_RESPONSE" | jq -r '.data.data.db_password')
-
-# Debug: Print full response if password extraction fails
 if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "null" ]; then
     echo "Error: Failed to retrieve PostgreSQL password from Vault!"
     echo "Vault Response: $SECRET_RESPONSE"
     exit 1
 fi
 
-# Export the password for PostgreSQL
+# ---------------------------------------------------------------
+# 4) Export the password and start PostgreSQL
+# ---------------------------------------------------------------
 export POSTGRES_PASSWORD
-
-#Making sure the postgres volume has the right permissions
-echo "Fixing permissions for /var/lib/postgresql/data..."
-mkdir -p /var/lib/postgresql/data
-chown -R postgresuser:postgresgroup /var/lib/postgresql/data
-chmod 700 /var/lib/postgresql/data
-
 echo "Starting PostgreSQL..."
-# Start PostgreSQL with the retrieved password
 exec docker-entrypoint.sh postgres
