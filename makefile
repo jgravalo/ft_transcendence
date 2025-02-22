@@ -11,20 +11,15 @@ export ENVIRONMENT
 all:
 	@echo "Starting containers with environment: $(ENVIRONMENT)"
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml up -d --build
-	@echo "Starting containers with environment: $(ENVIRONMENT)"
-	docker compose --env-file $(ENV_FILE) -f docker-compose.yml up -d --build
 
 down:
-	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
 
 front:
 	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t front ./front
-	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t front ./front
 	docker run -d front
 
 back:
-	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t back ./back
 	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) -t back ./back
 	docker run -d back
 
@@ -54,7 +49,6 @@ ls:
 
 clean:
 	@echo "Deteniendo y eliminando contenedores..."
-	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
 	@if [ ! -z "$$(docker ps -aq)" ]; then \
 		docker stop $$(docker ps -aq); \
