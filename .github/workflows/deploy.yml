@@ -1,0 +1,23 @@
+name: Deploy on Remote Server
+
+#Trigger deployment when main branch is updated (push event)
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into server and deploy
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 95.216.55.157
+          username: pong42
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/pong42/ft_transcendence
+            git checkout main
+            git pull
+            make all ENVIRONMENT=production

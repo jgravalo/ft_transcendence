@@ -1,16 +1,20 @@
-# Usa la imagen oficial de Nginx como base
-FROM nginx:alpine
+# Use the official OWASP ModSecurity CRS image as the base
+FROM owasp/modsecurity-crs:4.10.0-nginx-202501270601
 
-# Copia el fichero de configuration para el "block" principal
-COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
+# Set the working directory to /etc/nginx (avoids long paths)
+WORKDIR /etc/nginx
 
-#Copia los cerificatos para el ssl
-COPY ./certs/nginx.crt /etc/nginx/certs/
-COPY ./certs/nginx.key /etc/nginx/certs/
+# Copy the template configuration files into the correct locations
+COPY ./conf/default.conf templates/conf.d/default.conf.template
+COPY ./conf/proxy_frontend.conf templates/includes/proxy_frontend.conf.template
+COPY ./conf/proxy_api.conf templates/includes/proxy_api.conf.template
+COPY ./conf/proxy_websocket.conf templates/includes/proxy_websocket.conf.template
+COPY ./conf/proxy_static_files.conf templates/includes/proxy_static_files.conf.template
+COPY ./conf/ssl_settings.conf templates/includes/ssl_settings.conf.template
 
-# Expone el puerto 80/443 para el tráfico HTTP/HTTPS
-EXPOSE 80
-EXPOSE 443
+# Copy SSL certificates
+COPY ./certs/nginx.crt conf/server.crt
+COPY ./certs/nginx.key conf/server.key
 
-# Comando por defecto para iniciar Nginx
+# Default command to start Nginx
 CMD ["nginx", "-g", "daemon off;"]

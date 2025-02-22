@@ -5,33 +5,34 @@ services:
     container_name: waf
     build:
       context: ./waf
+    env_file:
+      - ./waf/.env.${ENVIRONMENT}
     image: waf
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "${EXTERNAL_PORT}:8080"
+      - "${SSL_EXTERNAL_PORT}:8443"
     depends_on:
       - front
       - back
+    restart: always
     networks:
       - pongnet
+    volumes:
+      - ./waf/conf/nginx.modsecurity.conf.template:/etc/nginx/templates/conf.d/modsecurity.conf.template
+      - ./waf/conf/setup.conf.template:/etc/nginx/templates/modsecurity.d/setup.conf.template
 
   front:
     container_name: front
     build:
       context: ./front
+    env_file:
+      - ./front/.env.${ENVIRONMENT}
     image: front
-    # ports:
-    #   - "8080:80"
-    #   - "8443:443"
     networks:
       - pongnet
     volumes:
     - media:/usr/share/nginx/html/img
     - ./front/src:/usr/share/nginx/html
-    # environment:
-    #   - VIRTUAL_HOST=jgravalo.42.fr
-    #   - LETSENCRYPT_HOST=jgravalo.42.fr
-    #   - LETSENCRYPT_EMAIL=jgravalo@student.42barcelona.com
 
   back:
     container_name: back
@@ -40,14 +41,12 @@ services:
     image: back
     ports:
       - "8000:8000"
-    environment:
-      - DJANGO_DB_NAME=postgres
-      - DJANGO_DB_USER=postgres
-      - DJANGO_DB_PASSWORD=Jesus20022
-      - DJANGO_DB_HOST=db
-      - DJANGO_DB_PORT=5432
+    env_file:
+      - ./back/.env.${ENVIRONMENT}
     depends_on:
       db:
+        condition: service_healthy
+      vault:
         condition: service_healthy
     networks:
       - pongnet
@@ -55,7 +54,7 @@ services:
       - media:/app/img
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/"]
+      test: ["CMD", "curl", "-f", "http://${HOSTNAME}:8080/api/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -66,17 +65,45 @@ services:
     build:
       context: ./db
     container_name: db
+    env_file:
+      - ./db/.env
     networks:
       - pongnet
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    depends_on:
+      vault:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  vault:
+    image: vault
+    build:
+      context: ./vault
+    env_file:
+      - ./vault/.env.${ENVIRONMENT}
+    container_name: vault
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./vault/data:/vault/data
+    restart: always
+    networks:
+      - pongnet
+    cap_add:
+      - IPC_LOCK
+    healthcheck:
+      test: ["CMD-SHELL", "sh", "-c", "vault status | grep -q 'Sealed.*false'"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 
   redis:
     image: redis:latest

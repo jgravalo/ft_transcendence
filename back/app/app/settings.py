@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from pathlib import Path
+import hvac
 import os
 
 AUTH_USER_MODEL = 'users.User'
@@ -17,8 +18,35 @@ AUTH_USER_MODEL = 'users.User'
 LANGUAGE_CODE = 'es-es'  # Español
 TIME_ZONE = 'Europe/Madrid'  # Cambia según tu ubicación
 
-# Clave secreta para firmar el token
-SECRET_KEY = "mi_clave_secreta"
+# Vault configuration and password retrieval function
+VAULT_ADDR = os.getenv('VAULT_ADDR')
+ROLE_ID = os.getenv('VAULT_ROLE_ID')
+SECRET_ID = os.getenv('VAULT_SECRET_ID')
+
+client = hvac.Client(url=VAULT_ADDR)
+
+def authenticate_with_vault():
+    """ Authenticate with Vault using AppRole """
+    try:
+        response = client.auth.approle.login(
+            role_id=ROLE_ID,
+            secret_id=SECRET_ID
+        )
+        client.token = response['auth']['client_token']
+    except Exception as e:
+        print(f"Vault Authentication Failed: {e}")
+
+def get_vault_secret(path, key):
+    """ Fetch a secret from Vault """
+    try:
+        response = client.secrets.kv.v2.read_secret_version(path=path)
+        return response['data']['data'].get(key, None)
+    except Exception as e:
+        print(f"Error retrieving secret from Vault: {e}")
+        return None
+
+# Authenticate and Fetch Secrets
+authenticate_with_vault()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,12 +55,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2tl!jw4)_*9-ti+%cahe3d(!sd74$4xqjmrnk$rq$s+#oue31j'
+SECRET_KEY = get_vault_secret('django', 'django_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*'] # CAMBIAR!!! por el dominio
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
 # Application definition
 
@@ -76,15 +104,11 @@ ROOT_URLCONF = 'app.urls'
 
 CORS_ALLOW_ALL_ORIGINS = True # cors-headers
 
-#CORS_ALLOWED_ORIGINS = [
-#    "http://localhost:8000",
-#    "http://127.0.0.1:8000",
-#    "http://jgravalo.42.fr:8000",
-#]
-
 CSRF_TRUSTED_ORIGINS = [#'http://*']
     'http://localhost',  # Dominio del frontend
     'http://127.0.0.1',  # También si se usa con IP
+    'http://pong42.com',  # Dominio del frontend
+    'https://pong42.com',  # También si se usa con IP
 ]
 
 MEDIA_URL = '/img/'
@@ -127,15 +151,10 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        # Old database, commented just in case of emergency
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-
-        # New database
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
         'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'Jesus20022'),
+        'PASSWORD': get_vault_secret('django', 'pg_db_password'),
         'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
         'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
     }
@@ -220,7 +239,7 @@ EMAIL_PORT = 587  # Puerto para TLS (465 para SSL)
 EMAIL_USE_TLS = True  # True para usar TLS
 EMAIL_USE_SSL = False  # Asegúrate de no usar ambos al mismo tiempo
 EMAIL_HOST_USER = 'trascendente78@gmail.com'  # Tu dirección de correo
-EMAIL_HOST_PASSWORD = '12345!@#$%qwerty'  # Tu contraseña o clave para aplicaciones
+EMAIL_HOST_PASSWORD = get_vault_secret('django', 'email_host_password') # Tu contraseña o clave para aplicaciones
 DEFAULT_FROM_EMAIL = 'no-reply@example.com'  # Dirección de remitente por defecto
 
 """ 

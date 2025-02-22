@@ -1,4 +1,40 @@
-//window.addEventListener('popstate', (event) => handlePopstate(event));
+//const origin = 'http://127.0.0.1:8000/game/';// /game/json/';
+/*
+console.log("host: <" + window.location.host + ">");
+console.log("hostname: <" + window.location.hostname + ">");
+console.log("origin: <" + window.location.origin + ">");
+console.log("pathname: <" + window.location.pathname + ">");
+console.log("");
+*/
+/* // averiguar para que sirve
+(function() {
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    history.pushState = function (...args) {
+        originalPushState.apply(this, args);
+        window.dispatchEvent(new Event('custom-navigation'));
+    };
+
+    history.replaceState = function (...args) {
+        originalReplaceState.apply(this, args);
+        window.dispatchEvent(new Event('custom-navigation'));
+    };
+})();
+
+// Detectar la navegación personalizada
+window.addEventListener('custom-navigation', () => {
+    console.log('La URL cambió en la SPA:', window.location.href);
+});
+ */
+
+//Detects the url of the base app (http://localhost:8080 or http://pong42.com )
+var base = window.location.origin;
+console.log("base: ", base);
+
+window.addEventListener('popstate', (event) => handlePopstate(event));
+
+
 
 function handlePopstate(event)
 {
@@ -22,12 +58,6 @@ function handleLinks()
         link.addEventListener('click', handleLink);
     });
 }
-
-//var base = window.location.origin;
-var base = window.location.origin;
-console.log("base: ", base);
-//var base = "http://localhost";
-//console.log("base after: ", base);
 
 function handleLink(event)
 {
