@@ -41,7 +41,7 @@ vault kv get secret/django
 vault kv get secret/postgres
 ```
 
-## 2. Configuring Roles and Policies (Only for new services)
+## 2. Configuring Roles and Policies (only for new services)
 If you want a new service to use vault, you need to create a new role, attach a new policy to it, and then generate **role_id** and **secret_id** tokens that will be used in the containers to authenticate with Vault.
 
 ### Step 1: Create a New Policy for a Service
