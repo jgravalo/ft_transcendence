@@ -15,7 +15,7 @@ make all
 make enter SERVICE=vault
 ```
 
-### Step 2: Authenticate with vault
+### Step 2: Authenticate with Vault
 Check that vault is running and use the root token from /vault/conf/keys.backup to authenticate.
 
 ```sh
