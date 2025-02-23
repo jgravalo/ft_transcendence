@@ -12,6 +12,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         - Se une al usuario a la sala.
         """
         print('conecta socket')
+        print('user =', self.scope['user'])
         self.user1 = self.scope['user'].id  # Usuario actual
         self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # ID del otro usuario
 
