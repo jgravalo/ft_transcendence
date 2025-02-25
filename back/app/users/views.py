@@ -71,6 +71,11 @@ def close_login(request):
     return JsonResponse(data)
 
 def close_logout(request):
+    try:
+        logout(request)  # Aquí Django desasigna `request.user`
+        print('unlogged')
+    except:
+        None
     content = render_to_string('close_logout.html')
     data = {
         "element": 'bar',
@@ -181,7 +186,6 @@ def set_register(request):
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
 def get_logout(request):
-    logout(request)  # Aquí Django desasigna `request.user`
     content = render_to_string('logout.html')
     data = {
         "element": 'modalContainer',
