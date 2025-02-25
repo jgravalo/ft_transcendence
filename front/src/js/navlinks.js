@@ -128,6 +128,8 @@ function handleLink(event)
                 makePost(path);
             else if (path.slice(0, 6) == '/chat/')
                 chat(base + get);
+            else if (path.slice(0, 6) == '/game/')
+                game();
             handleLinks();
         }
     })

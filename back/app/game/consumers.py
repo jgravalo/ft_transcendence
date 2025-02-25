@@ -1,65 +1,115 @@
 import json
+import uuid
 import time
-from channels.generic.websocket import WebsocketConsumer
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-async def do_match():
-    print("from match")
-    time.sleep(1)
-    print("from match")
+import logging
+import json
+import sys
+# TODO: make it a module
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        log_record = {
+            "timestamp": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
+            "level": record.levelname,
+            "message": record.getMessage(),
+            "logger": record.name,
+            "filename": record.filename,
+            "funcName": record.funcName,
+            "lineno": record.lineno
+        }
+        return json.dumps(log_record)
+logger = logging.getLogger("game-back")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(JSONFormatter())
+logger.addHandler(handler)
 
-class AsyncMatch(AsyncWebsocketConsumer):
+waiting_list = []
+playing_list = []
+matches = []
+
+class Match(AsyncWebsocketConsumer):
+    players = {}
+    active_match = []
+
     async def connect(self):
-        # Aceptar la conexión WebSocket
         await self.accept()
-        await do_match()
-        print("form connect")
-        await self.send(text_data=json.dumps({"message": "Conexión Async WebSocket exitosa from Django"}))
-
-    def disconnect(self, close_code):
-        # Desconectar el WebSocket
-        pass
+        self.player_id = None
+        logger.info("Connection Received.")
 
     async def receive(self, text_data):
-        # Recibir un mensaje desde el WebSocket
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        self.send(text_data=json.dumps({
-                'message': message
-            }))
+        """
+        Process received message.
 
+        :param self: connection instance.
+        :param text_data: json object received.
+        """
+        data = json.loads(text_data)
+        # Join to remote mode
+        if data.get("step") == "join":
+            logger.info("Join game request.")
+            self.status = 'wait'
+            self.canvas = data.get("canvas")
+            self.player_info = data.get("player")
+            self.player_id = str(uuid.uuid4())
+            self.username = data.get("username")
+            self.game_mode = data.get("mode")
+            logger.info(self.game_mode)
+            # Remote AI mode
+            if self.game_mode == 'remote-ai':
+                print("llegamos aquí??")
+                logger.info("Response remote-ai request. Start.")
+                await self.send(text_data=json.dumps({
+                    "step": "start",
+                    "opponentName": 'HAL-42',
+                }))
+            if self.game_mode == 'remote':
+                if (len(waiting_list) > 0):
+                    matches.append([self, waiting_list[0]])
+                    waiting_list.remove(waiting_list[0])
+                else:
+                    await self.send(text_data=json.dumps({
+                        "step": "wait"
+                    }))
+                    waiting_list.append(self)
 
-class Match(WebsocketConsumer):
-    def connect(self):
-        # Aceptar la conexión WebSocket
-        self.accept()
-        self.send(text_data=json.dumps({"message": "Conexión WebSocket exitosa from Django"}))
+        elif data.get("step") == "move":
+            if self.game_mode == 'remote-ai':
+                await self.opponentIA(data.get("position"), data.get("ball"))
+            # player_id = data.get("player")
+            # if player_id in self.players:
+            #     self.players[player_id]["x"] = data["x"]
+            #     await self.broadcast_game_state()
 
-    def disconnect(self, close_code):
-        # Desconectar el WebSocket
-        pass
+    async def broadcast_game_state(self):
+        """Envía la actualización del estado del juego a todos los clientes."""
+        message = {
+            "type": "update",
+            "players": {player: {"x": info["x"]} for player, info in self.players.items()}
+        }
+        await self.broadcast(message)
 
-    def receive(self, text_data):
-        # Recibir un mensaje desde el WebSocket
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        try:
-            player1 = text_data_json['player1']
-            player2 = text_data_json['player2']
-            ballLeft = text_data_json['ballLeft']
-            ballTop = text_data_json['ballTop']
-            print("player1:", text_data_json['player1'])
-            print("player2:", text_data_json['player2'])
-            # Enviar un mensaje de vuelta al WebSocket
-            self.send(text_data=json.dumps({
-                'message': 'exito',
-                'player1': player1,
-                'player2': player2,
-                'ballLeft': ballLeft,
-                'ballTop': ballTop
-            }))
-        except:
-            self.send(text_data=json.dumps({
-                'message': 'error'
-            }))
-        
+    async def broadcast(self, data):
+        """Envía un mensaje a todos los jugadores conectados."""
+        message = json.dumps(data)
+        for player in self.players.values():
+            await player["consumer"].send(text_data=message)
+
+    async def disconnect(self, close_code):
+        print(f"Cliente desconectado: {self.player_id}")
+        if self.player_id and self.player_id in self.players:
+            del self.players[self.player_id]
+            print(f"Jugador {self.player_id} eliminado del juego.")
+
+    async def opponentIA(self, position, ball):
+        centerIA = position['x'] + position['width'] / 2
+        if centerIA < ball['x'] - 10:
+            position['x'] = position['x'] + 3
+        elif centerIA > ball['x'] + 10:
+            position['x'] = position['x'] - 3
+        position['x'] = max(0, min(position['x'], self.canvas['width'] - position['width']))
+        await self.send(text_data=json.dumps({
+            "step": "move",
+            "position": position['x']
+        }))

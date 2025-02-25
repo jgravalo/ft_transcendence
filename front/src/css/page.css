@@ -464,7 +464,7 @@ button:hover {
 
 @keyframes fadeIn {
   from {
-    opacity: 0; 
+    opacity: 0;
   }
   to {
     opacity: 1;
@@ -487,7 +487,8 @@ footer {
   color: white;
   padding: 15px;
   border-radius: 8px 8px 0 0;
-  position: sticky;
+  /* position: sticky; */
+  position: relative;
   bottom: 0;
   width: 100%;
 }

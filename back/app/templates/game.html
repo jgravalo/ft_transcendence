@@ -1,15 +1,17 @@
-<div id="game">
-    <div class="start-div">
-        <button id="offline-button" onclick="startGame()" data-i18n="game.start.1vs1">Start 1VS1</button>
-        <button id="online-button" onclick="startAsyncGame()" data-i18n="game.start.online">Start ONLINE</button>
-    </div>
-    <div id="table" class="table">
-        <div class="goal"><div class="figure" id="left"></div></div>
-        <div class="marcador">
-            <div id="score1" class="score"></div>
-            <div id="score2" class="score"></div>
+<div id="main-container">
+    <div class="site-container"></div>
+    <div id="game-container">
+        <h3 id="playerName" style="visibility: hidden;">unregistered</h3>
+        <div id="game-menu">
+            <h2 id="menu-message">Welcome to Pong</h2>
+            <button id="local-mode">Local Multiplayer</button>
+            <button id="ai-mode">IA mode</button>
+            <button id="remote-mode">Remote</button>
         </div>
-        <div id="ball"></div>
-        <div class="goal"><div class="figure" id="right"></div>
+
+        <div id="canvas-container">
+            <canvas id="pongCanvas"></canvas>
+        </div>
     </div>
+    <div class="site-container"></div>
 </div>

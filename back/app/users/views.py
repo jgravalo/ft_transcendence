@@ -430,12 +430,12 @@ def fortytwo_callback(request):
                 try:
                     user = User.objects.get(email=user_data['email'])
                 except User.DoesNotExist:
-                    user = User.objects.create(
+                    user = User.objects.create_user(
                         username=user_data['login'],
                         email=user_data['email'],
                         password='42auth'
-                        #image=user_data['image']['link']
                     )
+                login(request, user)  # Aquí Django asigna `request.user`
                 data = {
                     "access": make_token(user, 'access'),
                     "refresh": make_token(user, 'refresh'),
