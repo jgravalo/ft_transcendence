@@ -87,6 +87,7 @@ def set_login(request):
         try:
             username = request.POST.get('username')
             password = request.POST.get('password')
+            print('password:', password)
             try:
                 if not '@' in username:
                     user = User.objects.get(username=username)
@@ -94,8 +95,7 @@ def set_login(request):
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
                 return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
-            # if password != user.password: # unhashed
-            if user.check_password(password): # hashed
+            if not user.check_password(password): # hashed
                 return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
             #user = authenticate(username=username, password=password)
             #if user:
@@ -146,14 +146,10 @@ def parse_data(username, email, password):
 def set_register(request):
     if request.method == "POST":
         try:
-            # print("POST data:", request.POST)
             username = request.POST.get('username')
             email = request.POST.get('email')
             password = request.POST.get('password')
-            # print("pillo los datos")
-            # print('username: ', username)
-            # print('email: ', email)
-            # print('password: ', password)
+            print('password:', password)
             if User.objects.filter(username=username).exists():
                 return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
             if User.objects.filter(email=email).exists():
@@ -163,9 +159,8 @@ def set_register(request):
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
-            # user = User.objects.create(username=username, email=email, password=password) # unhashed
             user = User.objects.create_user(username=username, email=email, password=password) # hashed
-            # print("password hashed:", user.password)
+            print("password hashed:", user.password)
             login(request, user)  # Aquí Django asigna `request.user`
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar

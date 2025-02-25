@@ -10,6 +10,7 @@ def chat(request):
     try:
         # user = User.get_user(request)
         id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+        user = User.get_user(request)
         user = User.objects.get(id=id)
     except:
         return JsonResponse({'error': 'Forbidden'}, status=403)

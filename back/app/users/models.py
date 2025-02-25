@@ -44,7 +44,7 @@ class User(AbstractUser):
 		#if token == 'empty':
 		data = decode_token(token)
 		print("data =", data)
-		return cls.objects.get(username=data["username"])
+		return cls.objects.get(id=data["id"])
 
 	def num_friends(self):
 		return self.friends.count()
