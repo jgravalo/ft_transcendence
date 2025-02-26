@@ -246,6 +246,11 @@ EMAIL_HOST_USER = 'trascendente78@gmail.com'  # Tu dirección de correo
 EMAIL_HOST_PASSWORD = get_vault_secret('django', 'email_host_password') # Tu contraseña o clave para aplicaciones
 DEFAULT_FROM_EMAIL = 'no-reply@example.com'  # Dirección de remitente por defecto
 
+# Configuración de 42 OAuth
+FORTYTWO_CLIENT_ID = 'tu_client_id'
+FORTYTWO_CLIENT_SECRET = 'tu_client_secret'
+FORTYTWO_REDIRECT_URI = 'http://localhost:8000/api/users/auth/42/callback/'
+
 """ 
 LOGGING = {
     'version': 1,
@@ -267,8 +272,25 @@ LOGGING = {
     },
 }
  """
-
-# Configuración de 42 OAuth
-FORTYTWO_CLIENT_ID = 'tu_client_id'
-FORTYTWO_CLIENT_SECRET = 'tu_client_secret'
-FORTYTWO_REDIRECT_URI = 'http://localhost:8000/api/users/auth/42/callback/'
+""" 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "channels": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
+} """

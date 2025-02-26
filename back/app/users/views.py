@@ -209,6 +209,23 @@ def profile(request):
     }
     return JsonResponse(data)
 
+def foreign_profile(request):
+    try:
+        username = request.GET.get('user', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
+        user = User.objects.get(username=username)
+    except:
+       return JsonResponse({'error': 'Forbidden'}, status=403)
+    # print("url =", user.image.url)
+    context = {
+        'user': user
+    }
+    content = render_to_string('foreign.html', context)
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
+
 def update(request):
     try:
         user = User.get_user(request)

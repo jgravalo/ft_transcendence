@@ -25,19 +25,23 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         # Asegurar que el ID más bajo siempre va primero para que la sala sea única
         self.room_name = f'chat_{min(self.user1, self.user2)}_{max(self.user1, self.user2)}'
         self.room_group_name = f'private_{self.room_name}'
+        print(f"🔗 Conectando a la sala {self.room_group_name}")
 
         # Unir el canal WebSocket del usuario al grupo en Redis
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
+
         await self.accept()
+        print(f"✅ Conexión aceptada para {self.channel_name}")
 
     async def disconnect(self, close_code):
         """
         Se ejecuta cuando un usuario se desconecta.
         - Se elimina del grupo de chat en Redis.
         """
+        print(f"❌ Desconectando de {self.room_group_name}")
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -61,16 +65,23 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
                 'sender': sender
             }
         )
+        print(f"📤 Mensaje enviado al grupo {self.room_group_name}")
 
     async def chat_message(self, event):
         """
         Se ejecuta cuando un mensaje llega desde el grupo en Redis.
         - Envía el mensaje al frontend.
         """
+        print(f"📬 Mensaje recibido en grupo: {event}")
         message = event['message']
         sender = event['sender']
-
+        if sender == self.scope['user'].username:
+            role = 'me'
+        else:
+            role = 'user'
         await self.send(text_data=json.dumps({
             'message': message,
-            'sender': sender
+            'sender': sender,
+            'role': role
         }))
+        print(f"➡️ Mensaje enviado a cliente WebSocket")

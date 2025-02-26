@@ -14,8 +14,19 @@ function chat(url)
     chatSocket.onmessage = function(e) {
         console.log("mensaje recibido");
         const data = JSON.parse(e.data);
-        const chatLog = document.getElementById('chat-log');
-        chatLog.value += data.username + ': ' + data.message + '\n';
+        /* const chatLog = document.getElementById('chat-log');
+        chatLog.value += data.sender + ': ' + data.message + '\n'; */
+
+        let chatBox = document.getElementById("chat-log");
+        let messageDiv = document.createElement("div");
+        // messageDiv.classList.add("message", sender);
+        console.log("sender:", data.sender);
+        console.log("message:", data.message);
+        messageDiv.classList.add("message", data.role);
+        messageDiv.innerText = data.message;
+        console.log("messageDiv:", messageDiv);
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
     };
 
     chatSocket.onclose = function(e) {

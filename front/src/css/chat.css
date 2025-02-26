@@ -69,3 +69,41 @@
 	background-color: #e0e0e0;
 	color: black;
 }
+
+.chat-container {
+	width: 350px;
+	height: 500px;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	background: white;
+	overflow: hidden;
+}
+
+.chat-log {
+	flex: 1;
+	padding: 10px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.message {
+	max-width: 80%;
+	padding: 8px 12px;
+	margin: 5px;
+	border-radius: 8px;
+	word-wrap: break-word;
+}
+
+.me {
+	background: #007bff;
+	color: white;
+	align-self: flex-end;
+}
+.user {
+	background: #7e7e7e;
+	color: white;
+	align-self: flex-start;
+}

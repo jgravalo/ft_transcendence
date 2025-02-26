@@ -136,6 +136,7 @@ function handleLink(event)
     .catch(error => {
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
+        console.error('path error:', path);
         setError(error);
     });
 }
@@ -159,7 +160,6 @@ function setError(error)
     .catch(error => {
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
-        //error(error.slice(-3));
     });
 }
 
