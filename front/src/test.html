@@ -102,7 +102,43 @@
 					</tbody>
 				</table> -->
 
-			<div class="chat-profile">
+				<div class="modal-body">
+
+					<!-- Formulario de Login -->
+					<form id="loginForm">
+						<div class="mb-3">
+							<label for="username" class="form-label" data-i18n="register.username">Nombre de usuario</label>
+							<input type="text" class="form-control" name="username" id="username" required>
+							<span id="errorName" class="error"></span><br>
+						</div>
+						<div class="mb-3">
+							<label for="email" class="form-label" data-i18n="register.email">Correo Electrónico</label>
+							<input type="email" class="form-control" name="email" id="email" required>
+							<span id="errorEmail" class="error"></span><br>
+						</div>
+						<div class="mb-3">
+							<label for="password" class="form-label" data-i18n="register.password">Contraseña</label>
+							<input type="password" class="form-control" name="password" id="password" required>
+							<span id="errorPassword" class="error"></span><br>
+						</div>
+						<div class="mt-3">
+							<button type="submit" class="btn btn-primary w-100" data-i18n="login.submit">Ingresar</button>
+						</div>
+					</form>
+					<div class="separator">
+						<div ></div>
+						<span>O</span>
+						<div ></div>
+					</div>
+					<!-- Botón de login con 42 -->
+					<div class="mt-3">
+						<a href="/api/users/auth/42/login/" class="btn btn-primary w-100">
+							<i class="fas"></i> Login with 42
+						</a>
+					</div>
+				</div>
+
+			<!-- <div class="chat-profile">
 				<div class="chat-photo">
 					<img src="img/España.webp">
 				</div>
@@ -113,12 +149,12 @@
 					</div>
 				</div>
 			</div>
-			<!-- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> -->
+			<!- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> ->
 			<div class="chat-box" id="chatBox"></div>
 			<form class="message-bar" action="/search" method="get">
 				<input id="message-input" type="text" size="80" type="text" name="message" placeholder="Write..." />
 				<button onclick="sendMessage()" type="submit"><i class="fas fa-paper-plane"></i></button>
-			</form>
+			</form> -->
 		</div>
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

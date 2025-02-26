@@ -492,3 +492,21 @@ footer {
   bottom: 0;
   width: 100%;
 }
+
+.separator {
+  /* color: white; */
+  color: grey;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 10px 0px;
+}
+.separator span {
+  margin: 0px 10px;
+}
+.separator div {
+  /* background-color: white; */
+  background-color: grey;
+  height: 1px;
+  width: 100%;
+}
