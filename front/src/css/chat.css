@@ -95,6 +95,7 @@
 	margin: 5px;
 	border-radius: 8px;
 	word-wrap: break-word;
+	display: inline-block;  /* Permite que el div crezca con el texto */
 }
 
 .me {
@@ -102,7 +103,8 @@
 	color: white;
 	align-self: flex-end;
 }
-.user {
+
+.sender {
 	background: #7e7e7e;
 	color: white;
 	align-self: flex-start;

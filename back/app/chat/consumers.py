@@ -78,7 +78,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         if sender == self.scope['user'].username:
             role = 'me'
         else:
-            role = 'user'
+            role = 'sender'
         await self.send(text_data=json.dumps({
             'message': message,
             'sender': sender,
