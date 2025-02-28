@@ -28,6 +28,7 @@ TRANSLATION_KEYS = {
     "login.title": _("Login"),
     "login.email.label": _("Email"),
     "login.submit": _("Submit"),
+    "login.42": _("Login with 42"),
     "login.phone.label": _("Phone"),
     "login.username.label": _("Username or Email Address"),
     "login.password.label": _("Password"),
@@ -73,4 +74,5 @@ TRANSLATION_KEYS = {
     "otp.title": _("Login"),
     "otp.introduce": _("Introduce your OTP code"),
     "otp.verify": _("Verify"),
+    "otp.42": _("Login with 42"),
 }
