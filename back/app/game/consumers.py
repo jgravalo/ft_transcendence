@@ -94,12 +94,6 @@ class GameSession:
         self.collision_count = 0
         self.collision_threshold = 5  # Número de colisiones para generar un power-up
 
-    # async def start_game_loop(self):
-    #     while True:
-    #         self.game.update_ball_position()
-    #         await self.send_game_state()
-    #         await asyncio.sleep(0.016)
-
     async def send_start_screen(self):
         init_time = time.time()
         while time.time() < init_time + 60:
@@ -146,13 +140,13 @@ class GameSession:
 
         # Colisión con la paleta del jugador
         if self.check_collision(self.ball, self.paddles['player1']):
-            self.ball["y"] = self.paddles['player1']["y"] - self.ball["size"]
+            self.ball["y"] = self.paddles['player1']["y"] - self.ball["size"] / 2
             self.ball["speedY"] = -abs(self.ball["baseSpeed"] * self.paddles['player1']["speedModifier"])
             self.collision_count += 1
 
         # Colisión con la paleta del oponente
         elif self.check_collision(self.ball, self.paddles['player2']):
-            self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"]
+            self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"] + self.ball['size'] / 2
             self.ball["speedY"] = abs(self.ball["baseSpeed"] * self.paddles['player2']["speedModifier"])
             self.collision_count += 1
 
@@ -194,7 +188,7 @@ class GameSession:
                 "active": False
             }
             self.power_ups.append(power_up)
-            self.collision_count = 0  # Reiniciar el contador
+            self.collision_count = 0
 
     def apply_power_up(self, player_id, power_up_type):
         """Aplica un power-up a un jugador."""
@@ -226,30 +220,10 @@ class GameSession:
         """ Retorna el estado del juego """
         return self.paddles
 
-    async def start_game_loop(self):
-        while True:
-            game_info = matches[self.match_id]
-            paddles = game_info["game"].get_game_state()
-            for role in PLAYER_ROLES:
-                opp = 'player1' if role == 'player2' else 'player2'
-                await game_info["players"][role].send(text_data=json.dumps({
-                    "step": "update",
-                    "playerRole": role,
-                    "player": paddles[role],
-                    "opponent": paddles[opp]
-                }))
-                # self.playing = True
-                # self.game.update_ball_position()
-                # await self.send_game_state()
-                await asyncio.sleep(0.016)
-
-    # def get_game_state(self):
-    #     """Devuelve el estado actual del juego para ser enviado al frontend."""
-    #     return {
-    #         "ball": self.ball,
-    #         "players": self.players,
-    #         "powerUps": self.power_ups
-    #     }
+    def update_game(self):
+        self.update_ball_position()
+        self.check_power_up_collisions()
+        return self.paddles, self.power_ups, self.ball
 
 
 class Match(AsyncWebsocketConsumer):
@@ -343,8 +317,9 @@ class Match(AsyncWebsocketConsumer):
             role = data.get("role")
             matches[self.match_id]['game'].update_paddle_position(role, data.get('position'))
             game_info = matches[self.match_id]
-            paddles = game_info["game"].get_game_state()
-            ball = game_info["game"].update_ball_position()
+            # paddles = game_info["game"].get_game_state()
+            # ball = game_info["game"].update_ball_position()
+            paddles, power_ups, ball = game_info['game'].update_game()
             for role in PLAYER_ROLES:
                 opp = 'player1' if role == 'player2' else 'player2'
                 await game_info["players"][role].send(text_data=json.dumps({
@@ -352,7 +327,8 @@ class Match(AsyncWebsocketConsumer):
                     "playerRole": role,
                     "player": paddles[role],
                     "opponent": paddles[opp],
-                    "ball": ball
+                    "ball": ball,
+                    "powerUps": power_ups
                 }))
 
     async def start_game_loop(self):
