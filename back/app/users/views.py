@@ -158,7 +158,7 @@ def set_register(request):
             if User.objects.filter(email=email).exists():
                 return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
             if len(password) < 6:
-                return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}
+                return JsonResponse({'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")})
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
