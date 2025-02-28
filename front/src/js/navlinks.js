@@ -32,7 +32,7 @@ window.addEventListener('custom-navigation', () => {
 var base = window.location.origin;
 console.log("base: ", base);
 
-window.addEventListener('popstate', (event) => handlePopstate(event));
+/* window.addEventListener('popstate', (event) => handlePopstate(event));
 
 
 
@@ -46,7 +46,7 @@ function handlePopstate(event)
         return;
     }
     handleLink(path);
-}
+} */
 
 handleLinks();
 

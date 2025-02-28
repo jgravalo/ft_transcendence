@@ -11,3 +11,7 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.content[:20]}"
+
+# class Group(models.Model):
+#     room = models.TextField()
+#     history = models.ManyToManyField(Message, symmetrical=False, related_name='message_for', blank=True)

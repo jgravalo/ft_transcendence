@@ -1,10 +1,11 @@
+let chatSocket = null;
 
 function chat(url)
 {
     const params = new URLSearchParams(new URL(url).search);
     console.log("hace chatsocket");
     //const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/ws/chat/');
-    const chatSocket = new WebSocket('ws://' + base.slice(7, -5) + ':8080/ws/chat/' + params.get("user") + '/');
+    chatSocket = new WebSocket('ws://' + base.slice(7, -5) + ':8080/ws/chat/' + params.get("user") + '/');
     console.log("hizo chatsocket");
 
     chatSocket.onopen = function () {
