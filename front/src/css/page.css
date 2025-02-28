@@ -4,7 +4,7 @@ html, body {
   background-image: radial-gradient(ellipse at top, #080e21 0%, #1b2735 95%);
 }
 
-/* .star {
+.star {
   width: 1px;
   height: 1px;
   background: transparent;
@@ -310,7 +310,7 @@ html, body {
   margin-top: -2px;
   background: rgba(255, 255, 255, 0.7);
   box-shadow: 0 0 15px 3px #fff;
-} */
+}
 
 
 @keyframes meteor {
