@@ -270,6 +270,7 @@ function game()
             } else if (data.step === 'update') {
                 Object.assign(opponent, data.opponent);
                 Object.assign(ball, data.ball);
+                Object.assign(powerUps, data.powerUps);
             } else if (data.step === 'join-ia') {
                 socket.send(JSON.stringify({
                     step: 'start',
