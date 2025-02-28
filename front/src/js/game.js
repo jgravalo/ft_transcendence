@@ -160,7 +160,7 @@ function game()
         y: canvas.height - 80,
         width: paddleWidth,
         height: paddleHeight,
-        color: '#fff',
+        color: '#4ac1f7',
         powerUp: null,
         score: 0,
         speedModifier: 1
@@ -222,8 +222,7 @@ function game()
         canvasContainer.style.display = 'block';
 
         socket.onopen = () => {
-            console.log("✅ Conectado al servidor WebSocket");
-
+            // Join to remote game
             socket.send(JSON.stringify({
                 step: 'join',
                 username: playerName,
@@ -241,7 +240,6 @@ function game()
                 resetBall();
                 waitingLoop('Waiting for a victim!');
             } else if (data.step === 'ready') {
-                isGameRunning = true;
                 if (data.playerRole === 'player1') {
                     Object.assign(player, data.player1);
                     playerName = player.playerName;
@@ -252,30 +250,27 @@ function game()
                     opponentName = player.playerName;
                 }
                 startingLoop(data.message);
-            }
-            if (data.step === 'start') {
-                if (gameMode === 'remote-ai') {
-                    opponentName = data.opponentName;
-                    opponent.playerName = data.opponentName;
-                    startGame();
-                } else {
-                    gameLoop()
-                }
-            }
-            if (data.step === 'move') {
-                console.log(data)
-                opponent.x = data.position;
-            }
-            if (data.step === 'update') {
-                if (data.playerRole === 'player1') {
-                    Object.assign(player, data.player1);
+            } else if (data.step === 'start') {
+                opponentName = data.opponentName;
+                opponent.playerName = data.opponentName;
+                startGame();
+            } else if (data.step === 'go') {
+                if (player.role === 'player1') {
                     Object.assign(opponent, data.player2);
+                    Object.assign(player, data.player1);
                 } else {
-                    Object.assign(player, data.player2);
                     Object.assign(opponent, data.player1);
+                    Object.assign(player, data.player2);
                 }
-            }
-            if (data.step === 'join-ia') {
+                Object.assign(ball, data.ball);
+                isGameRunning = true;
+                gameLoop()
+            } else if (data.step === 'move') {
+                opponent.x = data.position;
+            } else if (data.step === 'update') {
+                Object.assign(opponent, data.opponent);
+                Object.assign(ball, data.ball);
+            } else if (data.step === 'join-ia') {
                 socket.send(JSON.stringify({
                     step: 'start',
                     player: player,
@@ -283,9 +278,6 @@ function game()
                     ball: ball,
                     canvas: canvas }
                 ));
-            }
-            if (data.step === 'update') {
-
             }
         };
     }
@@ -302,6 +294,7 @@ function game()
         } else {
             socket.send(JSON.stringify({
                 'step': 'update',
+                'role': player.role,
                 'position': player.x
             }))
         }
@@ -353,7 +346,6 @@ function game()
             }
 
             if (powerUp.y > canvas.height || powerUp.y < 0) {
-                console.log("Power-Up perdido!");
                 powerUps.splice(i, 1);
             }
         }
@@ -365,7 +357,6 @@ function game()
     */
     function generatePowerUp() {
         if (collisionCount >= collisionThreshold && powerUps.length === 0) {
-            console.log("Generando Power-Up..."); // Depuración
             const fromPlayer = Math.random() > 0.5;
             const paddle = fromPlayer ? player : opponent;
             const directionY = fromPlayer ? -3 : 3;
@@ -558,14 +549,7 @@ function game()
     */
     function updateGame() {
         if (!isGameRunning) return;
-
         playerSpeed = movePaddle(player, playerSpeed);
-        if (gameMode === 'remote') {
-            socket.send(JSON.stringify({
-                'step': 'update',
-                'position': player.x
-            }))
-        }
 
         if (gameMode === 'local' || gameMode === 'remote') {
             opponentSpeed = movePaddle(opponent, opponentSpeed);
@@ -584,6 +568,16 @@ function game()
                 endGame('opponent');
             }
         }
+    }
+
+    function updateRemoteGame() {
+        playerSpeed = movePaddle(player, playerSpeed);
+        console.log(player.role)
+        socket.send(JSON.stringify({
+            'step': 'update',
+            'role': player.role,
+            'position': player.x
+        }))
     }
 
     function movePaddle(paddle, speed) {
@@ -648,7 +642,11 @@ function game()
     */
     function gameLoop() {
         if (isGameRunning) {
-            updateGame();
+            if (gameMode !== 'remote') {
+                updateGame();
+            } else {
+                updateRemoteGame();
+            }
             drawGame();
             requestAnimationFrame(gameLoop);
         }
@@ -665,13 +663,15 @@ function game()
     }
 
     function startingLoop(msg) {
-        playerSpeed = movePaddle(player, playerSpeed);
-        drawMessage(msg);
-        drawDashedLine();
-        drawRect(player.x, player.y, player.width, player.height, player.color);
-        drawPlayerName();
-        drawOpponentName();
-        requestAnimationFrame(() => startingLoop(msg));
+        if (!isGameRunning) {
+            playerSpeed = movePaddle(player, playerSpeed);
+            drawMessage(msg);
+            drawDashedLine();
+            drawRect(player.x, player.y, player.width, player.height, player.color);
+            drawPlayerName();
+            drawOpponentName();
+            requestAnimationFrame(() => startingLoop(msg));
+        }
     }
 
     /*

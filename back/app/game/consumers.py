@@ -66,6 +66,8 @@ class GameSession:
     player1 = None
     player2 = None
     players = []
+    paddles = {}
+    playing = False
     def __init__(self, match_id, players, width=400, height=800):
         self.canvas = {'width': width, 'height': height}
         random.shuffle(self.roles)
@@ -85,8 +87,8 @@ class GameSession:
             'baseSpeed': 4
         }
         self.paddles = {
-            "player1": {"x": width / 2 - 50, "y": height - 80, "width": 100, "height": 15, "score": 0, "speedModifier": 1},
-            "player2": {"x": width / 2 - 50, "y": 60, "width": 100, "height": 15, "score": 0, "speedModifier": 1}
+            "player1": {"role": "player1", "x": width / 2 - 50, "y": height - 80, "width": 100, "height": 15, "score": 0, "speedModifier": 1},
+            "player2": {"role": "player2", "x": width / 2 - 50, "y": 60, "width": 100, "height": 15, "score": 0, "speedModifier": 1}
         }
         self.power_ups = []
         self.collision_count = 0
@@ -131,6 +133,7 @@ class GameSession:
         self.ball["speedX"] = self.ball["baseSpeed"] * math.sin(angle)
         self.ball["speedY"] = self.ball["baseSpeed"] * math.cos(angle) * (1 if random.random() > 0.5 else -1)
         self.collision_count = 0
+        return self.ball
 
     def update_ball_position(self):
         """Mueve la pelota y gestiona colisiones con paredes y paletas."""
@@ -142,38 +145,44 @@ class GameSession:
             self.ball["speedX"] *= -1
 
         # Colisión con la paleta del jugador
-        if self.check_collision(self.ball, self.players["player1"]):
-            self.ball["y"] = self.players["player1"]["y"] - self.ball["size"]
-            self.ball["speedY"] = -abs(self.ball["baseSpeed"] * self.players["player1"]["speedModifier"])
+        if self.check_collision(self.ball, self.paddles['player1']):
+            self.ball["y"] = self.paddles['player1']["y"] - self.ball["size"]
+            self.ball["speedY"] = -abs(self.ball["baseSpeed"] * self.paddles['player1']["speedModifier"])
             self.collision_count += 1
 
         # Colisión con la paleta del oponente
-        elif self.check_collision(self.ball, self.players["player2"]):
-            self.ball["y"] = self.players["player2"]["y"] + self.players["player2"]["height"]
-            self.ball["speedY"] = abs(self.ball["baseSpeed"] * self.players["player2"]["speedModifier"])
+        elif self.check_collision(self.ball, self.paddles['player2']):
+            self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"]
+            self.ball["speedY"] = abs(self.ball["baseSpeed"] * self.paddles['player2']["speedModifier"])
             self.collision_count += 1
 
         # Punto para el oponente
         if self.ball["y"] >= self.canvas["height"]:
-            self.players["player2"]["score"] += 1
+            self.paddles['player2']["score"] += 1
             self.reset_ball()
 
         # Punto para el jugador
         elif self.ball["y"] <= 0:
-            self.players["player1"]["score"] += 1
+            self.paddles['player1']["score"] += 1
             self.reset_ball()
 
         # Generar power-ups si se cumplen las condiciones
         self.generate_power_up()
+        return self.ball
 
     def check_collision(self, ball, paddle):
         """Verifica si la pelota colisiona con una paleta."""
-        return (
+        collision = (
                 ball["x"] > paddle["x"] and
                 ball["x"] < paddle["x"] + paddle["width"] and
                 ball["y"] + ball["size"] / 2 > paddle["y"] and
                 ball["y"] - ball["size"] / 2 < paddle["y"] + paddle["height"]
         )
+        if collision:
+            hit_point = ball['x'] - (paddle['x'] + paddle['width'] / 2)
+            normalized_hp = hit_point / (paddle['x'] / 2)
+            ball['speedX'] = normalized_hp * 6
+        return collision
 
     def generate_power_up(self):
         """Genera un power-up después de cierta cantidad de colisiones."""
@@ -210,17 +219,30 @@ class GameSession:
                 self.power_ups.remove(power_up)
 
     def update_paddle_position(self, role, position):
-        """ Actualiza la posición de la paleta del jugador """
-        # self.players[role]['x'] = new_x
-        self.paddles[role].update(position)
-        # if player in self.players:
-        #     self.players[player]["x"] = max(0, min(new_x, self.canvas["width"] - self.players[player]["width"]))
+        logger.warning(f"updating {role}")
+        self.paddles[role]['x'] = position
 
     def get_game_state(self):
         """ Retorna el estado del juego """
-        return {
-            "players": self.paddles
-        }
+        return self.paddles
+
+    async def start_game_loop(self):
+        while True:
+            game_info = matches[self.match_id]
+            paddles = game_info["game"].get_game_state()
+            for role in PLAYER_ROLES:
+                opp = 'player1' if role == 'player2' else 'player2'
+                await game_info["players"][role].send(text_data=json.dumps({
+                    "step": "update",
+                    "playerRole": role,
+                    "player": paddles[role],
+                    "opponent": paddles[opp]
+                }))
+                # self.playing = True
+                # self.game.update_ball_position()
+                # await self.send_game_state()
+                await asyncio.sleep(0.016)
+
     # def get_game_state(self):
     #     """Devuelve el estado actual del juego para ser enviado al frontend."""
     #     return {
@@ -303,12 +325,12 @@ class Match(AsyncWebsocketConsumer):
                 logger.info(f'Random roles assigned', extra={"corr": self.match_id})
                 matches[self.match_id] = {
                     "players": {
-                        self.opponent.player_role : self.opponent,
-                        self.player_role : self },
+                        "player1": self if self.player_role == "player1" else self.opponent,
+                        "player2": self if self.player_role == "player2" else self.opponent
+                    },
                     "game": game
                 }
-                await self.send_start_screen()
-                await self.start_game_loop()
+                await self.send_start_screen(game)
             else:
                 await self.send(text_data=json.dumps({
                     "step": "wait",
@@ -317,48 +339,64 @@ class Match(AsyncWebsocketConsumer):
                 waiting_list.append(self)
 
         elif data.get("step") == "update":
-            matches[self.match_id]['game'].update_paddle_position(self.player_role, data.get('position'))
-
-    async def start_game_loop(self):
-        while True:
+            logger.info(f"hello {data}")
+            role = data.get("role")
+            matches[self.match_id]['game'].update_paddle_position(role, data.get('position'))
             game_info = matches[self.match_id]
-            players_default = game_info["game"].get_game_state()
+            paddles = game_info["game"].get_game_state()
+            ball = game_info["game"].update_ball_position()
             for role in PLAYER_ROLES:
                 opp = 'player1' if role == 'player2' else 'player2'
                 await game_info["players"][role].send(text_data=json.dumps({
                     "step": "update",
-                    "playerRole": game_info["players"][role].player_role,
-                    "player1": players_default["players"]["player1"],
-                    "player2": players_default["players"]["player2"],
+                    "playerRole": role,
+                    "player": paddles[role],
+                    "opponent": paddles[opp],
+                    "ball": ball
                 }))
+
+    async def start_game_loop(self):
+        while True:
+            game_info = matches[self.match_id]
+            paddles = game_info["game"].get_game_state()
+            for role in PLAYER_ROLES:
+                opp = 'player1' if role == 'player2' else 'player2'
+                await game_info["players"][role].send(text_data=json.dumps({
+                    "step": "update",
+                    "playerRole": role,
+                    "player": paddles[role],
+                    "opponent": paddles[opp]
+                }))
+                # self.playing = True
                 # self.game.update_ball_position()
                 # await self.send_game_state()
                 await asyncio.sleep(0.016)
 
-    async def send_start_screen(self):
+    async def send_start_screen(self, game):
         logger.info('Send start screen messages', extra={"corr": self.match_id})
         await self.broadcast_message("Be prepare to fight!")
         await asyncio.sleep(3)
         await self.broadcast_message("2 seconds to go!")
         await asyncio.sleep(2)
-        await self.broadcast_message("GO!")
+        ball = game.reset_ball()
+        await self.broadcast_message("GO!", "go")
         await asyncio.sleep(0.2)
-        await self.broadcast_message("GO!", "start")
         logger.info('Prepare message sent.', extra={"corr": self.match_id})
 
 
-    async def broadcast_message(self, message, step="ready"):
+    async def broadcast_message(self, message, step="ready", ball=None):
         game_info = matches[self.match_id]
         players_default = game_info["game"].get_game_state()
         for role in PLAYER_ROLES:
             opp = 'player1' if role == 'player2' else 'player2'
             await game_info["players"][role].send(text_data=json.dumps({
-                "step": "ready",
+                "step": step,
                 "message": message,
                 "playerRole": game_info["players"][role].player_role,
                 "opponentName": game_info["players"][opp].username,
-                "player1": {'y': players_default["players"]["player1"]["y"]},
-                "player2": {'y': players_default["players"]["player2"]["y"]},
+                "player1": players_default["player1"],
+                "player2": players_default["player2"],
+                "ball": ball
             }))
 
 
