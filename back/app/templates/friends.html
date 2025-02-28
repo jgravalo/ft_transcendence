@@ -11,6 +11,7 @@
 				<th data-i18n="friends.table.username">Username</th>
 				<th data-i18n="friends.table.email">Email</th>
 				<th data-i18n="friends.table.record">Record</th>
+				<th data-i18n="friends.table.action">State</th>
 				<th data-i18n="friends.table.action">-</th>
 				<th data-i18n="friends.table.action">-</th>
 				<th data-i18n="friends.table.action">-</th>
@@ -25,6 +26,7 @@
 				<td>{{ friend.username }}</td>
 				<td>{{ friend.email }}</td>
 				<td>{{ friend.wins }}-{{ friend.losses }}</td>
+				<td>{% if friend.is_active %}Active{% else %}Unavailable{% endif %}</td>
 				<td id="chat-{{ friend.username }}">
 					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i> -->
 					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.id }}" ></i>

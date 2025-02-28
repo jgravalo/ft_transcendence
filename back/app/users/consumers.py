@@ -16,8 +16,11 @@ class Connection(WebsocketConsumer):
         print("username from ws:", user.username)
         self.accept()
         print('llego a accept')
+        user.is_active=True
+        user.save()
         self.send(text_data=json.dumps({
             "message": "Conexión WebSocket exitosa from Django",
+            "status": user.is_active,
             "content": render_to_string("close_login.html")
             }))
 
