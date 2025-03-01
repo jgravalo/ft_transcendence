@@ -80,8 +80,8 @@ function game()
         ctx.fillStyle = "#fff";
         ctx.textAlign = "right";
 
-        ctx.fillText(playerScore, canvas.width - 20, canvas.height / 2 + 140);
-        ctx.fillText(opponentScore, canvas.width - 20, canvas.height / 2 - 100);
+        ctx.fillText(player.score, canvas.width - 20, canvas.height / 2 + 140);
+        ctx.fillText(opponent.score, canvas.width - 20, canvas.height / 2 - 100);
     }
 
     function drawPowerUps() {
@@ -138,12 +138,8 @@ function game()
     const paddleHeight = 15;
     const minPaddleWidth = 45;
     const maxPaddleWidth = canvas.width - 45;
-    let playerScore = 0;
-    let opponentScore = 0;
-    let playerSpeed = 0;
     const acceleration = 2;
     const deceleration = 1;
-    let opponentSpeed = 0;
     const maxSpeed = 20;
     let isGameRunning = false;
     let gameWinner = null;
@@ -163,6 +159,8 @@ function game()
         color: '#4ac1f7',
         powerUp: null,
         score: 0,
+        points: 0,
+        speed: 0,
         speedModifier: 1
     };
 
@@ -178,6 +176,8 @@ function game()
         color: '#fff',
         powerUp: null,
         score: 0,
+        points: 0,
+        speed: 0,
         speedModifier: 1
     };
 
@@ -208,7 +208,6 @@ function game()
      * @section: Remote Mode
      */
     let socket = null;
-    let playerId = null;
     function connect() {
         if (gameMode === 'remote-ai') {
             socket = new WebSocket('ws://localhost:8000/ws/gamehal/');
@@ -269,8 +268,9 @@ function game()
                 opponent.x = data.position;
             } else if (data.step === 'update') {
                 Object.assign(opponent, data.opponent);
+                Object.assign(player, data.player);
                 Object.assign(ball, data.ball);
-                Object.assign(powerUps, data.powerUps);
+                powerUps = data.powerUps;
             } else if (data.step === 'join-ia') {
                 socket.send(JSON.stringify({
                     step: 'start',
@@ -315,8 +315,8 @@ function game()
         if (gameMode === 'remote-ai') {
             socket.send(JSON.stringify({
                 'step': 'end',
-                'player_score': playerScore,
-                'opponent_score': opponentScore
+                'player_score': player.score,
+                'opponent_score': opponent.score
             }))
         }
         const message = winner === 'player' ? 'You win!' : 'You lost!';
@@ -325,8 +325,8 @@ function game()
 
     function startGame() {
         isGameRunning = true;
-        playerScore = 0;
-        opponentScore = 0;
+        player.score = 0;
+        opponent.score = 0;
         menu.style.display = 'none';
         canvasContainer.style.display = 'block';
         gameLoop();
@@ -397,13 +397,6 @@ function game()
         }
     }
 
-    /*
-     * @brief: Reset Power Up. Reroll power up.
-    */
-    function resetPowerUp(player) {
-        player.powerUp = null;
-        player.speedModifier = 1;
-    }
 
     /*
      * @brief: Move ball function.
@@ -413,10 +406,10 @@ function game()
     function moveBall() {
         ballPlay();
         if (ball.y - ball.size / 2 <= 0) {
-            playerScore++;
+            player.score++;
             resetBall();
         } else if (ball.y + ball.size / 2 >= canvas.height) {
-            opponentScore++;
+            opponent.score++;
             resetBall();
         }
 
@@ -516,7 +509,6 @@ function game()
             ) {
                 ball.speedY = -ball.speedY;
                 ball.speedX = -ball.speedX;
-                console.log("¡Power-Up impactado por la pelota!");
                 powerUps.splice(i, 1);
                 continue;
             }
@@ -527,7 +519,6 @@ function game()
                 powerUp.y < player.y + player.height &&
                 powerUp.y + powerUpSize > player.y
             ) {
-                console.log("Power-Up capturado por el jugador!");
                 applyPowerUp(player, powerUp.type);
                 powerUps.splice(i, 1);
             } else if (
@@ -536,7 +527,6 @@ function game()
                 powerUp.y < opponent.y + opponent.height &&
                 powerUp.y + powerUpSize > opponent.y
             ) {
-                console.log("Power-Up capturado por la IA!");
                 applyPowerUp(opponent, powerUp.type);
                 powerUps.splice(i, 1);
             }
@@ -550,30 +540,29 @@ function game()
     */
     function updateGame() {
         if (!isGameRunning) return;
-        playerSpeed = movePaddle(player, playerSpeed);
+        movePaddle(player);
 
-        if (gameMode === 'local' || gameMode === 'remote') {
-            opponentSpeed = movePaddle(opponent, opponentSpeed);
+        if (gameMode === 'local') {
+            movePaddle(opponent);
         } else if (gameMode === 'remote-ai') {
             listener();
-            opponentSpeed = movePaddle(opponent, opponentSpeed);
+            movePaddle(opponent);
         }
         if (gameMode !== 'remote') {
             moveBall();
             movePowerUps();
             checkPowerUpCollisions();
 
-            if (playerScore >= 5) {
+            if (player.score >= 5) {
                 endGame('player');
-            } else if (opponentScore >= 5) {
+            } else if (opponent.score >= 5) {
                 endGame('opponent');
             }
         }
     }
 
     function updateRemoteGame() {
-        playerSpeed = movePaddle(player, playerSpeed);
-        console.log(player.role)
+        movePaddle(player);
         socket.send(JSON.stringify({
             'step': 'update',
             'role': player.role,
@@ -581,20 +570,18 @@ function game()
         }))
     }
 
-    function movePaddle(paddle, speed) {
+    function movePaddle(paddle) {
         if (paddle.left) {
-            speed = Math.min(speed + acceleration, maxSpeed);
-            paddle.x -= speed;
+            paddle.speed = Math.min(paddle.speed + acceleration, maxSpeed);
+            paddle.x -= paddle.speed;
         } else if (paddle.right) {
-            speed = Math.min(speed + acceleration, maxSpeed);
-            paddle.x += speed;
+            paddle.speed = Math.min(paddle.speed + acceleration, maxSpeed);
+            paddle.x += paddle.speed;
         } else {
-            speed = Math.max(speed - deceleration, 0);
+            paddle.speed = Math.max(paddle.speed - deceleration, 0);
         }
 
         paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
-
-        return speed;
     }
 
 // Listeners para el control de ambos jugadores
@@ -654,7 +641,7 @@ function game()
     }
 
     function waitingLoop(msg) {
-        playerSpeed = movePaddle(player, playerSpeed);
+        movePaddle(player);
         updateGame();
         drawMessage(msg);
         ballPlay();
@@ -665,7 +652,7 @@ function game()
 
     function startingLoop(msg) {
         if (!isGameRunning) {
-            playerSpeed = movePaddle(player, playerSpeed);
+            movePaddle(player);
             drawMessage(msg);
             drawDashedLine();
             drawRect(player.x, player.y, player.width, player.height, player.color);
