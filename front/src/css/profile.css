@@ -8,11 +8,14 @@
 	justify-content: center;
 	align-items: center;
 	z-index: 1000;
+	position: relative;
 }
 
 .fila {
 	display: flex;
 	justify-content: center;
+	position: relative;
+	z-index: 1000;
 }
 
 .item {
@@ -28,6 +31,8 @@
 	justify-content: center;
 	align-items: center; /* Centrado vertical */
 	text-align: center; /* Opcional si el texto ocupa varias líneas */
+	position: relative;
+	z-index: 1000;
 }
 
 .item:hover {

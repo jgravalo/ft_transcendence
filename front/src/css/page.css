@@ -14,7 +14,7 @@ html, body {
   left: 0;
   background: transparent;
   overflow: visible;
-  z-index: 1;
+  z-index: 0;
   box-shadow: none;
 }
 
@@ -44,6 +44,7 @@ html, body {
   transform: rotate(-45deg);
   background-image: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
   animation: meteor 60.6s linear infinite;
+  z-index: 1;
 }
 .meteor-1:before {
   content: "";
@@ -64,6 +65,7 @@ html, body {
   transform: rotate(-45deg);
   background-image: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
   animation: meteor 4.4s linear infinite;
+  z-index: 1;
 }
 .meteor-2:before {
   content: "";
@@ -84,6 +86,7 @@ html, body {
   transform: rotate(-45deg);
   background-image: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
   animation: meteor 4.3s linear infinite;
+  z-index: 1;
 }
 .meteor-3:before {
   content: "";
@@ -104,6 +107,7 @@ html, body {
   transform: rotate(-45deg);
   background-image: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
   animation: meteor 18s linear infinite;
+  z-index: 1;
 }
 .meteor-4:before {
   content: "";
@@ -124,6 +128,7 @@ html, body {
   transform: rotate(-45deg);
   background-image: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
   animation: meteor 9.5s linear infinite;
+  z-index: 1;
 }
 .meteor-5:before {
   content: "";
@@ -144,6 +149,7 @@ html, body {
   transform: rotate(-45deg);
   background-image: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
   animation: meteor 13.7s linear infinite;
+  z-index: 1;
 }
 .meteor-6:before {
   content: "";
@@ -164,6 +170,7 @@ html, body {
   transform: rotate(-45deg);
   background-image: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
   animation: meteor 5.1s linear infinite;
+  z-index: 1;
 }
 .meteor-7:before {
   content: "";
@@ -184,6 +191,7 @@ html, body {
   transform: rotate(-45deg);
   background-image: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
   animation: meteor 40.2s linear infinite;
+  z-index: 1;
 }
 .meteor-8:before {
   content: "";
@@ -195,8 +203,6 @@ html, body {
   background: rgba(255, 255, 255, 0.7);
   box-shadow: 0 0 15px 3px #fff;
 }
-
-
 
 @keyframes meteor {
   0% {
@@ -217,8 +223,6 @@ html, body {
   }
 }
 
-
-
 body {
 	background-color: rgb(0, 0, 0);
 	/* background-image: url('../img/stars.jpg'); */
@@ -234,6 +238,7 @@ body {
   flex: 1;
   justify-content: center; /* Horizontal centering */
   align-items: center; /* Vertical centering */
+  z-index: 1000;
 }
 
 #content {
