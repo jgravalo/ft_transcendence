@@ -46,27 +46,21 @@
 			<div id="modalContainer"></div>
 			<div id="output"></div>
 			<div id="log_links">
-				<div class="dropdown">
-					<button class="btn" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-						<img id="currentFlag" src="/img/en.svg" alt="English">
+				<div class="language-menu">
+					<button class="language-button">
+						<img id="currentFlag" src="/img/en.svg" alt="English" width="24" height="18">
 					</button>
-					<ul class="dropdown-menu" aria-labelledby="languageDropdown">
-						<li>
-							<a class="dropdown-item" href="#" onclick="changeLanguage('en'); return false;">
-								<img src="/img/en.svg" alt="English"> English
-							</a>
-						</li>
-						<li>
-							<a class="dropdown-item" href="#" onclick="changeLanguage('es'); return false">
-								<img src="/img/es.svg" alt="Español"> Español
-							</a>
-						</li>
-						<li>
-							<a class="dropdown-item" href="#" onclick="changeLanguage('fr'); return false">
-								<img src="/img/fr.svg" alt="Français"> Français
-							</a>
-						</li>
-					</ul>
+					<div class="language-options">
+						<a href="#" onclick="changeLanguage('en'); return false;">
+							<img src="/img/en.svg" alt="English"> English
+						</a>
+						<a href="#" onclick="changeLanguage('es'); return false;">
+							<img src="/img/es.svg" alt="Español"> Español
+						</a>
+						<a href="#" onclick="changeLanguage('fr'); return false;">
+							<img src="/img/fr.svg" alt="Français"> Français
+						</a>
+					</div>
 				</div>
 				<div class="bar-links"><a class="link" href="/users/login" data-i18n="button.login">Log in</a></div>
 				<div class="bar-links"><a class="link" href="/users/register" data-i18n="button.register">Sign up</a></div>
