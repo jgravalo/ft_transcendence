@@ -371,3 +371,92 @@ footer {
   height: 1px;
   width: 100%;
 }
+
+/* Responsive first page */
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  #bar {
+    flex-direction: column;
+    padding: 10px 5px;
+  }
+  
+  #page_links, #log_links {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+  
+  .bar-links {
+    padding: 8px 5px;
+  }
+  
+  .bar-links a {
+    min-width: auto;
+    padding: 5px;
+  }
+  
+  #content a {
+    /* font-size: 32px; */
+    font-size: 28px;
+    padding: 2px 5px;
+  }
+  
+  #content h1 {
+    /* font-size: 28px; */
+    font-size: 24px;
+  }
+  
+  button {
+    padding: 4px 10px;
+    font-size: large;
+    border-width: 2px;
+    /* font-size: 16px; */
+  }
+  
+  footer {
+    padding: 10px;
+    font-size: 12px;
+  }
+  
+  .meteor-1, .meteor-2, .meteor-3, .meteor-4, 
+  .meteor-5, .meteor-6, .meteor-7, .meteor-8 {
+    width: 150px;
+    /* width: 350px; */
+
+  }
+}
+
+@media (max-width: 480px) {
+  #bar {
+    padding: 5px 2px;
+  }
+  
+  .bar-links {
+    padding: 5px 2px;
+  }
+  
+  #content a {
+    font-size: 22px;
+  }
+  
+  button {
+    font-size: medium;
+    /* font-size: 16px; */
+  }
+
+  /* button {
+    font-size: large;
+  } */
+  
+  .meteor-5, .meteor-6, .meteor-7, .meteor-8 {
+    display: none;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
