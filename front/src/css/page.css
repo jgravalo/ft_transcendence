@@ -365,6 +365,10 @@ button:hover {
   animation: fadeIn 2s ease-in-out;
 }
 
+.dropdown {
+  z-index: 1000;
+}
+
 .dropdown img {
   margin-right: 8px;
   vertical-align: middle;
