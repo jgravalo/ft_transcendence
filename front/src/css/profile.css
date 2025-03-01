@@ -286,4 +286,8 @@
 	.settings-icon {
 		margin-left: 5px;
 	}
+
+	.stat-card {
+		width: 100%;
+	}
 }
