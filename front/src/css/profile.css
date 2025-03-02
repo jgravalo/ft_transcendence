@@ -250,6 +250,106 @@
 	color: white;
 }
 
+@media (min-width: 769px) and (max-width: 1024px) {
+	.profile-container {
+		width: 95%;
+	}
+	
+	.profile {
+		padding: 25px;
+	}
+	
+	.profile-photo {
+		width: 100px;
+		height: 100px;
+	}
+	
+	.info {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	
+	.username-container {
+		width: 100%;
+		justify-content: space-between;
+	}
+	
+	.username {
+		font-size: 1.8rem;
+	}
+	
+	.actions {
+		margin-left: 0;
+		margin-top: 10px;
+	}
+	
+	.challenge-btn {
+		padding: 8px 15px;
+		font-size: 0.9rem;
+	}
+	
+	.stats {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 15px;
+		width: 100%;
+		box-sizing: border-box;
+	}
+	
+	.stat-card {
+		width: calc(50% - 8px);
+		padding: 15px;
+		flex: 0 0 calc(50% - 8px);
+		box-sizing: border-box;
+		margin: 0 0 15px 0;
+	}
+	
+	.stat-icon {
+		font-size: 1.8rem;
+	}
+	
+	.stat-value {
+		font-size: 1.6rem;
+	}
+	
+	.fila {
+		flex-wrap: wrap;
+		justify-content: space-between;
+		width: 100%;
+	}
+	
+	.item {
+		height: 150px;
+		width: calc(50% - 8px);
+		flex: 0 0 calc(50% - 8px);
+		min-width: auto;
+		box-sizing: border-box;
+	}
+	
+	.tabs {
+		justify-content: center;
+	}
+	
+	.tab {
+		padding: 8px 15px;
+		font-size: 0.9rem;
+	}
+	
+	.match-item {
+		padding: 12px;
+	}
+	
+	.match-players {
+		font-size: 1.1rem;
+	}
+	
+	.match-score {
+		font-size: 1.3rem;
+	}
+}
+
 @media (max-width: 768px) {
 	.profile-container {
 		width: 95%;
