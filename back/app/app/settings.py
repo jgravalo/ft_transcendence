@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'users',
     'two_fa',
     'language',
+    'chat',
 
     'rest_framework', # REST framework
     'corsheaders', # cors-headers

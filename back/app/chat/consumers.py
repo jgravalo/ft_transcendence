@@ -1,5 +1,8 @@
-import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+import json
+#from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async
+from django.apps import apps
 
 class PrivateChatConsumer(AsyncWebsocketConsumer):
     """
@@ -36,6 +39,52 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
         print(f"✅ Conexión aceptada para {self.channel_name}")
 
+        try:
+            # Obtener modelos dinámicamente
+            print('obteniendo modelos')
+            Group = apps.get_model('chat', 'Group')
+            Message = apps.get_model('chat', 'Message')
+
+            # Buscar o crear la sala de chat
+            print('instanciando grupo')
+            from django.core.exceptions import ObjectDoesNotExist
+            try:
+                group = await sync_to_async(Group.objects.get)(room=self.room_group_name)
+            except ObjectDoesNotExist:
+                group = await sync_to_async(Group.objects.create)(room=self.room_group_name)
+
+            print('instanciando lista de mensajes')
+            # Obtener los mensajes de la sala
+            messages = await sync_to_async(lambda: list(group.history.all()))()
+
+            print('instanciando bucle de mensajes')
+            # Enviar los mensajes anteriores al usuario
+            for msg in messages:
+                print('es el message')
+                message = msg.message
+                print('es el username')
+                sender = await sync_to_async(lambda: msg.user.username)()
+                print('es el role')
+                role = 'me' if sender == self.scope['user'].username else 'sender'
+                print('old message: >>>', message)
+                await self.send(text_data=json.dumps({
+                    'message': message,
+                    'sender': sender,
+                    'role': role
+                }))
+            print('✅chat recuperado')
+        except Exception as e:
+            print("❌ Error al obtener mensajes:", e)
+
+    # @database_sync_to_async
+    # def get_or_create_group(self):
+    #     group, created = Group.objects.get_or_create(room=self.room_group_name)
+    #     return group
+
+    # @database_sync_to_async
+    # def get_messages(self, group):
+    #     return list(group.history.all())
+
     async def disconnect(self, close_code):
         """
         Se ejecuta cuando un usuario se desconecta.
@@ -56,6 +105,24 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         message = data['message']
         sender = self.scope['user'].username  # Obtener el nombre del usuario actual
 
+        # Guardar mensaje en la base de datos de forma asíncrona
+        try:
+            Group = apps.get_model('chat', 'Group')
+            Message = apps.get_model('chat', 'Message')
+            print('modelos extraidos')
+
+            # Usar sync_to_async para consultas a la base de datos
+            group = await sync_to_async(Group.objects.get)(room=self.room_group_name)
+            chat = await sync_to_async(Message.objects.create)(user=self.scope['user'], message=message)
+            print('modelos guardados')
+
+            # Relación ManyToMany hay que usar `.add()` dentro de `sync_to_async`
+            await sync_to_async(group.history.add)(chat)
+
+            print('✅chat guardado')
+        except Exception as e:
+            print("❌ Error al obtener mensajes:", e)
+
         # Enviar el mensaje a la otra persona en el chat
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -66,6 +133,18 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             }
         )
         print(f"📤 Mensaje enviado al grupo {self.room_group_name}")
+    
+    # @database_sync_to_async
+    # def get_group(self):
+    #     return Group.objects.get(room=self.room_group_name)
+
+    # @database_sync_to_async
+    # def create_message(self, message):
+    #     return Message.objects.create(user=self.scope['user'], content=message)
+
+    # @database_sync_to_async
+    # def add_message_to_group(self, group, chat):
+    #     group.history.add(chat)
 
     async def chat_message(self, event):
         """

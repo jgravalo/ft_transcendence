@@ -108,8 +108,6 @@ def set_login(request):
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
-                user.is_active=True
-                user.save()
             else:
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/verify/'
