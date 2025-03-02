@@ -1,13 +1,13 @@
-/*
-* @section: HTML elements to catch and use.
-*
-*   pongCanvas: to draw the game.
-*   ctx: to use context if is necessary.
-*   set the size of the game.
-*/
+
 function game()
 {
-
+    /*
+    * @section: HTML elements to catch and use.
+    *
+    *   pongCanvas: to draw the game.
+    *   ctx: to use context if is necessary.
+    *   set the size of the game.
+    */
     const canvas = document.getElementById('pongCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = 400;
@@ -16,8 +16,8 @@ function game()
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const menu = document.getElementById('game-menu');
     const canvasContainer = document.getElementById('canvas-container');
-    // TODO: User name should be placed properly
-    const playerName = document.getElementById('playerName').textContent;
+// TODO: User name should be placed properly
+    // const playerName = document.getElementById('playerName').textContent;
 
     /*
     * @brief: General function to draw a rectangle.
@@ -55,24 +55,24 @@ function game()
         ctx.font = "40px Silkscreen";
         ctx.fillStyle = "#fff";
         ctx.textAlign = "left";
-        ctx.fillText("player1", 0, canvas.height - 5);
+        ctx.fillText(playerName, 0, canvas.height - 5);
     }
 
     function drawOpponentName() {
         ctx.font = "40px Silkscreen";
         ctx.fillStyle = "#fff";
         ctx.textAlign = "right";
-        ctx.fillText(opponent.playerName, canvas.width, 35);
+        ctx.fillText(opponentName, canvas.width, 35);
     }
 
-    function drawMessage(message) {
+    function drawMessage(announce) {
         menu.style.display = 'none';
         canvasContainer.style.display = 'block';
         drawRect(0, 0, canvas.width, canvas.height, '#000');
         ctx.font = "30px Silkscreen";
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
-        ctx.fillText(message, canvas.width / 2, canvas.height / 2 + 140, canvas.width - 10);
+        ctx.fillText(announce, canvas.width / 2, canvas.height / 2 + 140, canvas.width - 10);
     }
 
     function drawScore() {
@@ -80,8 +80,8 @@ function game()
         ctx.fillStyle = "#fff";
         ctx.textAlign = "right";
 
-        ctx.fillText(playerScore, canvas.width - 20, canvas.height / 2 + 140);
-        ctx.fillText(opponentScore, canvas.width - 20, canvas.height / 2 - 100);
+        ctx.fillText(player.score, canvas.width - 20, canvas.height / 2 + 140);
+        ctx.fillText(opponent.score, canvas.width - 20, canvas.height / 2 - 100);
     }
 
     function drawPowerUps() {
@@ -122,7 +122,8 @@ function game()
         remoteModeGame();
     });
 
-    // ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
 
     /*
     * @section: Variables and objects used through the game workflow
@@ -137,34 +138,35 @@ function game()
     const paddleHeight = 15;
     const minPaddleWidth = 45;
     const maxPaddleWidth = canvas.width - 45;
-    let playerScore = 0;
-    let opponentScore = 0;
-    let playerSpeed = 0;
     const acceleration = 2;
     const deceleration = 1;
-    let opponentSpeed = 0;
     const maxSpeed = 20;
     let isGameRunning = false;
     let gameWinner = null;
     let gameMode = null;
-    let userName = "noName"
-    let opponentName = "noName";
+    let playerName = "unregistered"
+    let opponentName = "unregistered";
 
     const player = {
-        playerName: userName,
+        playerName: playerName,
+        role: 'player1',
         left: false,
         right: false,
         x: canvas.width / 2 - paddleWidth / 2,
         y: canvas.height - 80,
         width: paddleWidth,
         height: paddleHeight,
-        color: '#fff',
+        color: '#4ac1f7',
         powerUp: null,
+        score: 0,
+        points: 0,
+        speed: 0,
         speedModifier: 1
     };
 
     const opponent = {
         playerName: opponentName,
+        role: 'player2',
         left: false,
         right: false,
         x: canvas.width / 2 - paddleWidth / 2,
@@ -173,6 +175,9 @@ function game()
         height: paddleHeight,
         color: '#fff',
         powerUp: null,
+        score: 0,
+        points: 0,
+        speed: 0,
         speedModifier: 1
     };
 
@@ -186,7 +191,7 @@ function game()
         color: '#fff'
     };
 
-    // @brief: Power up section. Ready to include new power ups.
+// @brief: Power up section. Ready to include new power ups.
     let powerUps = []; // Lista de power-ups activos
     const powerUpSize = ball.size * 1.5; // 50% más grande que la pelota
     let collisionCount = 0; // Contador de colisiones
@@ -197,15 +202,18 @@ function game()
         '<<': 'red'
     };
 
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOTE
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> REMOTE
 
     /*
-    * @section: Remote Mode
-    */
+     * @section: Remote Mode
+     */
     let socket = null;
-    let playerId = null;
     function connect() {
-        socket = new WebSocket('ws://localhost:8000/ws/game/');
+        if (gameMode === 'remote-ai') {
+            socket = new WebSocket('ws://localhost:8000/ws/gamehal/');
+        } else {
+            socket = new WebSocket('ws://localhost:8000/ws/game/');
+        }
     }
 
     function remoteModeGame() {
@@ -213,14 +221,11 @@ function game()
         canvasContainer.style.display = 'block';
 
         socket.onopen = () => {
-            console.log("✅ Conectado al servidor WebSocket");
-
-            // Enviar solicitud de unión al juego
+            // Join to remote game
             socket.send(JSON.stringify({
                 step: 'join',
                 username: playerName,
                 player: player,
-                canvas: {'width': canvas.width, 'height': canvas.height},
                 mode: gameMode}
             ));
 
@@ -230,20 +235,43 @@ function game()
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            // console.log("📩 Mensaje recibido:", data);
             if (data.step === 'wait') {
                 resetBall();
-                waitingLoop();
-            }
-            if (data.step === 'start') {
+                waitingLoop('Waiting for a victim!');
+            } else if (data.step === 'ready') {
+                if (data.playerRole === 'player1') {
+                    Object.assign(player, data.player1);
+                    playerName = player.playerName;
+                    opponentName = data.opponentName;
+                } else {
+                    Object.assign(player, data.player2);
+                    playerName = data.opponentName;
+                    opponentName = player.playerName;
+                }
+                startingLoop(data.message);
+            } else if (data.step === 'start') {
+                opponentName = data.opponentName;
                 opponent.playerName = data.opponentName;
                 startGame();
-            }
-            if (data.step === 'move') {
-                console.log(data)
+            } else if (data.step === 'go') {
+                if (player.role === 'player1') {
+                    Object.assign(opponent, data.player2);
+                    Object.assign(player, data.player1);
+                } else {
+                    Object.assign(opponent, data.player1);
+                    Object.assign(player, data.player2);
+                }
+                Object.assign(ball, data.ball);
+                isGameRunning = true;
+                gameLoop()
+            } else if (data.step === 'move') {
                 opponent.x = data.position;
-            }
-            if (data.step === 'join-ia') {
+            } else if (data.step === 'update') {
+                Object.assign(opponent, data.opponent);
+                Object.assign(player, data.player);
+                Object.assign(ball, data.ball);
+                powerUps = data.powerUps;
+            } else if (data.step === 'join-ia') {
                 socket.send(JSON.stringify({
                     step: 'start',
                     player: player,
@@ -252,51 +280,26 @@ function game()
                     canvas: canvas }
                 ));
             }
-            if (data.step === 'update') {
-                console.log("🔄 Recibida actualización de posiciones:", data.players);
-
-                if (!playerId) {
-                    playerId = data.players.hasOwnProperty("player1") ? "player1" : "player2";
-                    console.log(`🎮 Jugador asignado: ${playerId}`);
-                }
-
-                const opponentId = playerId === "player1" ? "player2" : "player1";
-
-                if (data.players[playerId]) {
-                    player.x = data.players[playerId].x;
-                }
-                if (data.players[opponentId]) {
-                    opponent.x = data.players[opponentId].x;
-                }
-
-                // 🏓 Asegurar que el juego se dibuje
-                if (!hasGameStarted) {
-                    hasGameStarted = true;
-                    isGameRunning = true;
-                    document.getElementById("menu-message").innerText = "Juego en marcha!";
-                    drawGame();
-                    gameLoop();
-                }
-            }
         };
     }
 
-    function waitingLoop() {
-        if (!isGameRunning) {
-            drawMessage("Waiting for a victim!");
-            ballPlay();
-            ballBounce();
-            drawRect(ball.x - ball.size / 2, ball.y - ball.size / 2, ball.size, ball.size, ball.color);
-            requestAnimationFrame(waitingLoop);
-        }
-    }
+
 
     function listener() {
-        socket.send(JSON.stringify({
-            'step': 'move',
-            'position': opponent,
-            'ball': ball
-        }))
+        if (gameMode === 'remote-ai') {
+            socket.send(JSON.stringify({
+                'step': 'move',
+                'position': opponent,
+                'ball': ball
+            }))
+        } else {
+            socket.send(JSON.stringify({
+                'step': 'update',
+                'role': player.role,
+                'position': player.x
+            }))
+        }
+
     }
 
     /*
@@ -309,14 +312,21 @@ function game()
         isGameRunning = false;
         menu.style.display = 'flex';
         canvasContainer.style.display = 'none';
+        if (gameMode === 'remote-ai') {
+            socket.send(JSON.stringify({
+                'step': 'end',
+                'player_score': player.score,
+                'opponent_score': opponent.score
+            }))
+        }
         const message = winner === 'player' ? 'You win!' : 'You lost!';
         document.getElementById('menu-message').innerText = message;
     }
 
     function startGame() {
         isGameRunning = true;
-        playerScore = 0;
-        opponentScore = 0;
+        player.score = 0;
+        opponent.score = 0;
         menu.style.display = 'none';
         canvasContainer.style.display = 'block';
         gameLoop();
@@ -324,7 +334,7 @@ function game()
 
 
     /*
-    * @brief: Move power ups function.
+     * @brief: Move power ups function.
     */
     function movePowerUps() {
         for (let i = powerUps.length - 1; i >= 0; i--) {
@@ -337,19 +347,17 @@ function game()
             }
 
             if (powerUp.y > canvas.height || powerUp.y < 0) {
-                console.log("Power-Up perdido!");
                 powerUps.splice(i, 1);
             }
         }
     }
 
     /*
-    * @brief: Generate a random power when collision counter
-    * arrives to collisionThreshold value.
+     * @brief: Generate a random power when collision counter
+     * arrives to collisionThreshold value.
     */
     function generatePowerUp() {
         if (collisionCount >= collisionThreshold && powerUps.length === 0) {
-            console.log("Generando Power-Up..."); // Depuración
             const fromPlayer = Math.random() > 0.5;
             const paddle = fromPlayer ? player : opponent;
             const directionY = fromPlayer ? -3 : 3;
@@ -370,10 +378,10 @@ function game()
     }
 
     /*
-    * @brief: Apply power up after it is cought by a paddle.
-    *
-    * @param: player that cought the power up.
-    * @param: powerUpType Power up that was cought.
+     * @brief: Apply power up after it is cought by a paddle.
+     *
+     * @param: player that cought the power up.
+     * @param: powerUpType Power up that was cought.
     */
     function applyPowerUp(player, powerUpType) {
         if (powerUpType === '>>') {
@@ -389,26 +397,19 @@ function game()
         }
     }
 
-    /*
-    * @brief: Reset Power Up. Reroll power up.
-    */
-    function resetPowerUp(player) {
-        player.powerUp = null;
-        player.speedModifier = 1;
-    }
 
     /*
-    * @brief: Move ball function.
-    *
-    * This function move the ball, and control collisions.
+     * @brief: Move ball function.
+     *
+     * This function move the ball, and control collisions.
     */
     function moveBall() {
         ballPlay();
         if (ball.y - ball.size / 2 <= 0) {
-            playerScore++;
+            player.score++;
             resetBall();
         } else if (ball.y + ball.size / 2 >= canvas.height) {
-            opponentScore++;
+            opponent.score++;
             resetBall();
         }
 
@@ -450,10 +451,10 @@ function game()
     }
 
     /*
-    * @brief: Reset Ball when it get lost by the end of the field.
-    *
-    * Position and angle of first deliver is random, and collision count (for power ups)
-    * is back to 0.
+     * @brief: Reset Ball when it get lost by the end of the field.
+     *
+     * Position and angle of first deliver is random, and collision count (for power ups)
+     * is back to 0.
     */
     function resetBall() {
         ball.x = canvas.width / 2;
@@ -465,10 +466,10 @@ function game()
     }
 
     /*
-    * @brief: Check ball - paddle collision.
-    *
-    * @param: ball. Ball object.
-    * @param: paddle. Paddle object.
+     * @brief: Check ball - paddle collision.
+     *
+     * @param: ball. Ball object.
+     * @param: paddle. Paddle object.
     */
     function checkCollision(ball, paddle) {
         const collision =
@@ -487,10 +488,10 @@ function game()
     }
 
     /*
-    * @brief: Check Power Up Collision.
-    *
-    * This method check the power up collision with borders, ball and paddle.
-    * TODO: Some logs should be deleted, included for dev pourpose.
+     * @brief: Check Power Up Collision.
+     *
+     * This method check the power up collision with borders, ball and paddle.
+     * TODO: Some logs should be deleted, included for dev pourpose.
     */
     function checkPowerUpCollisions() {
         for (let i = powerUps.length - 1; i >= 0; i--) {
@@ -508,7 +509,6 @@ function game()
             ) {
                 ball.speedY = -ball.speedY;
                 ball.speedX = -ball.speedX;
-                console.log("¡Power-Up impactado por la pelota!");
                 powerUps.splice(i, 1);
                 continue;
             }
@@ -519,7 +519,6 @@ function game()
                 powerUp.y < player.y + player.height &&
                 powerUp.y + powerUpSize > player.y
             ) {
-                console.log("Power-Up capturado por el jugador!");
                 applyPowerUp(player, powerUp.type);
                 powerUps.splice(i, 1);
             } else if (
@@ -528,7 +527,6 @@ function game()
                 powerUp.y < opponent.y + opponent.height &&
                 powerUp.y + powerUpSize > opponent.y
             ) {
-                console.log("Power-Up capturado por la IA!");
                 applyPowerUp(opponent, powerUp.type);
                 powerUps.splice(i, 1);
             }
@@ -536,49 +534,57 @@ function game()
     }
 
     /*
-    * @brief: Update Game
-    *
-    * Update game, after a point is scored.
+     * @brief: Update Game
+     *
+     * Update game, after a point is scored.
     */
     function updateGame() {
         if (!isGameRunning) return;
+        movePaddle(player);
 
-        playerSpeed = movePaddle(player, playerSpeed);
         if (gameMode === 'local') {
-            opponentSpeed = movePaddle(opponent, opponentSpeed);
+            movePaddle(opponent);
         } else if (gameMode === 'remote-ai') {
             listener();
-            opponentSpeed = movePaddle(opponent, opponentSpeed);
+            movePaddle(opponent);
         }
+        if (gameMode !== 'remote') {
+            moveBall();
+            movePowerUps();
+            checkPowerUpCollisions();
 
-        moveBall();
-        movePowerUps();
-        checkPowerUpCollisions();
-
-        if (playerScore >= 5) {
-            endGame('player');
-        } else if (opponentScore >= 5) {
-            endGame('opponent');
+            if (player.score >= 5) {
+                endGame('player');
+            } else if (opponent.score >= 5) {
+                endGame('opponent');
+            }
         }
     }
 
-    function movePaddle(paddle, speed) {
+    function updateRemoteGame() {
+        movePaddle(player);
+        socket.send(JSON.stringify({
+            'step': 'update',
+            'role': player.role,
+            'position': player.x
+        }))
+    }
+
+    function movePaddle(paddle) {
         if (paddle.left) {
-            speed = Math.min(speed + acceleration, maxSpeed);
-            paddle.x -= speed;
+            paddle.speed = Math.min(paddle.speed + acceleration, maxSpeed);
+            paddle.x -= paddle.speed;
         } else if (paddle.right) {
-            speed = Math.min(speed + acceleration, maxSpeed);
-            paddle.x += speed;
+            paddle.speed = Math.min(paddle.speed + acceleration, maxSpeed);
+            paddle.x += paddle.speed;
         } else {
-            speed = Math.max(speed - deceleration, 0);
+            paddle.speed = Math.max(paddle.speed - deceleration, 0);
         }
 
         paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
-
-        return speed;
     }
 
-    // Listeners para el control de ambos jugadores
+// Listeners para el control de ambos jugadores
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') player.left = true;
         if (e.key === 'ArrowRight') player.right = true;
@@ -596,14 +602,13 @@ function game()
 
 
     /*
-    * @brief: Draw Game.
-    *
-    * Make the game elements visibles, draw the field, paddles
-    * and score
+     * @brief: Draw Game.
+     *
+     * Make the game elements visibles, draw the field, paddles
+     * and score
     */
     function drawGame() {
         if (!isGameRunning) return;
-
         drawRect(0, 0, canvas.width, canvas.height, '#000');
         drawDashedLine();
         drawRect(player.x, player.y, player.width, player.height, player.color);
@@ -616,23 +621,54 @@ function game()
     }
 
     /*
-    * @brief: Game loop
-    *
-    * Game loop start the game workflow.
+     * @section: Game Loops.
+     *
+     * @note:
+     *  - gameLoop
+     *  - waitingLoop
+     *  - startLoop
     */
     function gameLoop() {
         if (isGameRunning) {
-            updateGame();
+            if (gameMode !== 'remote') {
+                updateGame();
+            } else {
+                updateRemoteGame();
+            }
             drawGame();
             requestAnimationFrame(gameLoop);
         }
     }
 
+    function waitingLoop(msg) {
+        movePaddle(player);
+        updateGame();
+        drawMessage(msg);
+        ballPlay();
+        ballBounce();
+        drawRect(ball.x - ball.size / 2, ball.y - ball.size / 2, ball.size, ball.size, ball.color);
+        requestAnimationFrame(() => waitingLoop(msg));
+    }
+
+    function startingLoop(msg) {
+        if (!isGameRunning) {
+            movePaddle(player);
+            drawMessage(msg);
+            drawDashedLine();
+            drawRect(player.x, player.y, player.width, player.height, player.color);
+            drawPlayerName();
+            drawOpponentName();
+            requestAnimationFrame(() => startingLoop(msg));
+        }
+    }
+
     /*
-    * @section: Main screen.
-    *
-    * Show the main screen to start the game workflow.
+     * @section: Main screen.
+     *
+     * Show the main screen to start the game workflow.
     */
     menu.style.display = 'flex';
     canvasContainer.style.display = 'none';
 }
+
+game();
