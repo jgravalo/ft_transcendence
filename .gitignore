@@ -2,3 +2,6 @@
 #front/src/css/chat.css
 .idea/
 .DS_Store
+vault/data/sys/token/id/*
+vault/data/sys/token/accessor/*
+vault/data/sys/expire/id/auth/approle/login/*
