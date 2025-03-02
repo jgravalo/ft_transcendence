@@ -76,12 +76,6 @@ function handleLink(event)
 
 /* async */ function fetchLink(path)
 {
-
-    if (path == "")
-    {
-        console.log("path is empty");
-        return ;
-    }
     let token = getJWTToken();
     // console.log("JWT before GET:", getJWTToken());
     //console.log("token =", token);
