@@ -69,12 +69,12 @@ window.addEventListener("popstate", (event) => {
         chatSocket.close();
     path = window.location.pathname;
     console.log("Nueva URL(path):", path);
-    console.log("Se cambió la URL(event.state):", event.state);
+    console.log("Se cambió la URL(event.state):", event.state.page);
     if (path.startsWith("/get-translations")) {
         console.log("Ignoring language fetch in handlePopstate.");
         return;
     }
-    fetchLink(path);
+    fetchLink('/' + event.state.page);
 });
 
 function pushState(path)
@@ -87,7 +87,7 @@ function pushState(path)
         path = path.slice(0, -1);
     /* if (path.slice(-1) != '/')
         path += '/'; */
-    // console.log("pushState = <" + title + ">");
+    console.log("pushState = <" + path + ">");
     window.history.pushState(
         {page: path},
         path,

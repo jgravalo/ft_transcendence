@@ -14,6 +14,7 @@ urlpatterns = [
     path('update/', views.update, name='update'),
     path('update/set/', views.set_update, name='set_update'),
     path('delete/', views.delete_user, name='delete_user'),
+    path('history/', views.history, name='history'),
     path('friends/', views.friends, name='friends'),
     path('friends/add/', views.add_friend, name='add_friend'),
     path('friends/delete/', views.delete_friend, name='delete_friend'),

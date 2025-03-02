@@ -6,8 +6,8 @@ import uuid
 
 class Match(models.Model):
     id_match = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
-    player1 = models.ForeignKey(User, related_name="matches_as_player1", on_delete=models.CASCADE)
-    player2 = models.ForeignKey(User, related_name="matches_as_player2", on_delete=models.CASCADE)
+    player1 = models.ForeignKey(User, related_name="matches_as_1", on_delete=models.CASCADE)
+    player2 = models.ForeignKey(User, related_name="matches_as_2", on_delete=models.CASCADE)
     winner = models.ForeignKey(User, related_name="matches_won", on_delete=models.SET_NULL, null=True, blank=True)
     date_played = models.DateTimeField(auto_now_add=True)
     score_player1 = models.IntegerField(default=0)

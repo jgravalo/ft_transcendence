@@ -1,0 +1,49 @@
+<h1 style="color: white;" data-i18n="friends.list.title">Lista de Usuarios</h1>
+<div class="profile">
+	<div class="profile-photo">
+		<img src="{{ user.image.url }}"> <!-- src="img/España.webp"> -->
+	</div>
+	<div class="info">
+		<h1 id="username">{{ user.username }}</h1>
+		<div class="stats">
+			<h2><a data-i18n="profile.dash.wins">wins</a>: {{ user.wins }}<!--span id="wins">0</span--></h2>
+			<h2><a data-i18n="profile.dash.losses">losses</a>: {{ user.losses }}<!--span id="losses">0</span--></h2>
+			<h2><a data-i18n="profile.dash.matches">matches</a>: {{ user.matches }}<!--span id="matches">0</span--></h2>
+		</div>
+	</div>
+</div>
+<!-- <form class="search-bar" action="/search" method="get">
+	<input type="text" name="search" placeholder="Search..." data-i18n="friends.search.placeholder" />
+	<button type="submit"><i class="fas fa-search"></i></button>
+</form> -->
+<h5 style="color: white;" data-i18n="friends.other.title">Other users</h1>
+	<table class="user">
+		<thead>
+			<tr>
+				<th data-i18n="friends.table.index">#</th>
+				<th data-i18n="friends.table.username">Opponent</th>
+				<th data-i18n="friends.table.username">Result</th>
+				<th data-i18n="friends.table.action">Date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for match in matches %}
+			<tr>
+				<td>
+					{% if friend.is_active %}
+						<i class="fas fa-check friend-icon"></i>
+					{% else %}
+						<i class="fas fa-xmark friend-icon"></i>
+					{% endif %}
+				</td>
+				<td>{{ match.opponent }}</td>
+				<td>{{ match.result }}</td>
+				<td>{{ match.date }}</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="4" data-i18n="friends.other.empty">There are not users.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>

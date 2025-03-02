@@ -55,11 +55,11 @@ function makePost(path)
     // console.log("JWT before GET:", getJWTToken());
     //console.log("token =", token);
     const form =  document.getElementById('loginForm');
-	console.log('entra en submit');
+	// console.log('entra en submit');
     form.addEventListener('submit', function(event) {
-        console.log('hace event default');
+        // console.log('hace event default');
         event.preventDefault();
-        console.log('hizo event default');
+        // console.log('hizo event default');
         makeSubmit(path);
     })
 }
@@ -76,10 +76,10 @@ function makeSubmit(path)
         /* if (path != '/users/update/')
             info = JSON.stringify(info) */
         let post = path + "set/";
-        console.log("username:", info.get("username"));
-        console.log("email:", info.get("email"));
-        console.log("password:", info.get("password"));
-        console.log("info =", info);
+        // console.log("username:", info.get("username"));
+        // console.log("email:", info.get("email"));
+        // console.log("password:", info.get("password"));
+        // console.log("info =", info);
         if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
             console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
             refreshJWT(post);
@@ -99,7 +99,7 @@ function makeSubmit(path)
         })
         .then(response => response.json())
         .then(data => {
-            console.log("data POST:", data);
+            // console.log("data POST:", data);
             if (`${data.error}` == "Success")// CAMBIAR POR STATUS !!
             {
                 //console.log("JWT after POST:", getJWTToken());
@@ -131,8 +131,8 @@ function makeSubmit(path)
             }
         })
         .catch(error => {
-            console.log("fetch login catch");
-            console.error('Error:', error);
+            // console.log("fetch login catch");
+            // console.error('Error:', error);
         });
    // })
 }
@@ -142,7 +142,7 @@ function getInfo()
     const form = document.getElementById('loginForm'); // Selecciona el formulario
     //const form = document.querySelector('#loginForm');
     const formData = new FormData(form);
-    console.log("formData:", formData);
+    //console.log("formData:", formData);
     //const formDataObject = {};
     return (formData)
 
@@ -171,8 +171,9 @@ function loginSock() // por definir
     // Escuchar eventos de conexión
     socket.onopen = function (event) {
         console.log("WebSocket conectado");
-        const data = JSON.parse(event.data);
-        document.getElementById('bar').innerHTML = data.content;
+    
+        //console.log(data.message);
+        //document.getElementById('bar').innerHTML = data.content;
         socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
     };
     // Escuchar mensajes desde el servidor
@@ -184,7 +185,7 @@ function loginSock() // por definir
     socket.onclose = function (event) {
         const data = JSON.parse(event.data);
         fetchLink('/users/logout/close/')
-        // document.getElementById('bar').innerHTML = data.content;
+        //document.getElementById('bar').innerHTML = data.content;
         console.log("WebSocket desconectado");
     };
     // Manejar errores

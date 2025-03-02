@@ -13,9 +13,9 @@ class Connection(WebsocketConsumer):
         # username = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
         print('llego a WebSocket Connect')
         user = self.scope['user']
-        print("username from ws:", user.username)
+        print("🔗username from ws:", user.username)
         self.accept()
-        print('llego a accept')
+        # print('llego a accept')
         user.is_active=True
         user.save()
         self.send(text_data=json.dumps({

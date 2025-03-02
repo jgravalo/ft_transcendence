@@ -15,7 +15,8 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         - Se une al usuario a la sala.
         """
         print('conecta socket')
-        print('user =', self.scope['user'])
+        print('🔗scope =', self.scope)
+        print('🔗user =', self.scope['user'])
         self.user1 = self.scope['user'].id  # Usuario actual
         self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # ID del otro usuario
 
@@ -37,36 +38,36 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
-        print(f"✅ Conexión aceptada para {self.channel_name}")
+        # print(f"✅ Conexión aceptada para {self.channel_name}")
 
         try:
             # Obtener modelos dinámicamente
-            print('obteniendo modelos')
+            # print('obteniendo modelos')
             Group = apps.get_model('chat', 'Group')
             Message = apps.get_model('chat', 'Message')
 
             # Buscar o crear la sala de chat
-            print('instanciando grupo')
+            # print('instanciando grupo')
             from django.core.exceptions import ObjectDoesNotExist
             try:
                 group = await sync_to_async(Group.objects.get)(room=self.room_group_name)
             except ObjectDoesNotExist:
                 group = await sync_to_async(Group.objects.create)(room=self.room_group_name)
 
-            print('instanciando lista de mensajes')
+            # print('instanciando lista de mensajes')
             # Obtener los mensajes de la sala
             messages = await sync_to_async(lambda: list(group.history.all()))()
 
-            print('instanciando bucle de mensajes')
+            # print('instanciando bucle de mensajes')
             # Enviar los mensajes anteriores al usuario
             for msg in messages:
-                print('es el message')
+                # print('es el message')
                 message = msg.message
-                print('es el username')
+                # print('es el username')
                 sender = await sync_to_async(lambda: msg.user.username)()
-                print('es el role')
+                # print('es el role')
                 role = 'me' if sender == self.scope['user'].username else 'sender'
-                print('old message: >>>', message)
+                # print('old message: >>>', message)
                 await self.send(text_data=json.dumps({
                     'message': message,
                     'sender': sender,
@@ -104,17 +105,19 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         message = data['message']
         sender = self.scope['user'].username  # Obtener el nombre del usuario actual
+        print('🔗scope =', self.scope)
+        print('🔗user =', self.scope['user'])
 
         # Guardar mensaje en la base de datos de forma asíncrona
         try:
             Group = apps.get_model('chat', 'Group')
             Message = apps.get_model('chat', 'Message')
-            print('modelos extraidos')
+            # print('modelos extraidos')
 
             # Usar sync_to_async para consultas a la base de datos
             group = await sync_to_async(Group.objects.get)(room=self.room_group_name)
             chat = await sync_to_async(Message.objects.create)(user=self.scope['user'], message=message)
-            print('modelos guardados')
+            # print('modelos guardados')
 
             # Relación ManyToMany hay que usar `.add()` dentro de `sync_to_async`
             await sync_to_async(group.history.add)(chat)

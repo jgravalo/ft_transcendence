@@ -68,7 +68,7 @@ function handleLink(event)
     else if (!path.includes('?'))
         path += "/";
     var state = base + path;
-    console.log("path = " + path);
+    //console.log("path = " + path);
     //if (path.slice(0, 8) === '/two_fa/')
     //    getInfo2FA();
     fetchLink(path);
@@ -88,12 +88,12 @@ function handleLink(event)
         return ;
     }
     //console.log("token before fetch =", getJWTToken());
-	console.log('path for GET =', path);
+	//console.log('path for GET =', path);
     
     // fetch(base + ":8000" + path, {
-        var get = '/api' + path;
-        if (path == "")
-            get = path;
+    var get = '/api' + path;
+    if (path == "")
+        get = path;
     console.log('fetch for GET =', base + get);
     fetch(base + get, {
         method: "GET",
@@ -110,7 +110,6 @@ function handleLink(event)
         return response.json();
     }) // Convertir la respuesta a JSON
     .then(data => {
-        //directions(path,`${data.element}`, `${data.content}`);
         var dest = `${data.element}`;
         document.getElementById(dest).innerHTML = `${data.content}`;
         //updating the newly added content with right language

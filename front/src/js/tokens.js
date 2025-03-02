@@ -63,7 +63,7 @@ function fetchJWT(rule, info, path) {
 			'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify(info), 
+		body: JSON.stringify(info),
 	})
 	.then(response => response.json())
     .then(data => {
