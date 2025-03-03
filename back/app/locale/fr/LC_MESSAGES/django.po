@@ -232,3 +232,7 @@ msgstr "Se connecter avec 42"
 #: language/translations.py:75
 msgid "Privacy Policy"
 msgstr "Politique de confidentialité"
+
+#: language/translations.py:76
+msgid "I accept the privacy policy"
+msgstr "Je suis d'accord avec la politique de confidentialité"

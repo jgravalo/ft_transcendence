@@ -76,4 +76,5 @@ TRANSLATION_KEYS = {
     "otp.verify": _("Verify"),
     "otp.42": _("Login with 42"),
     "footer.privacy": _("Privacy Policy"),
+    "register.privacyPolicy": _("I accept the privacy policy"),
 }

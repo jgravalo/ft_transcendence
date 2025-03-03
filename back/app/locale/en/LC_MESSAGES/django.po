@@ -232,3 +232,7 @@ msgstr "Login with 42"
 #: language/translations.py:75
 msgid "Privacy Policy"
 msgstr "Privacy Policy"
+
+#: language/translations.py:76
+msgid "I accept the privacy policy"
+msgstr "I accept the privacy policy"
