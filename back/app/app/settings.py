@@ -248,9 +248,9 @@ EMAIL_HOST_PASSWORD = get_vault_secret('django', 'email_host_password') # Tu con
 DEFAULT_FROM_EMAIL = 'no-reply@example.com'  # Dirección de remitente por defecto
 
 # Configuración de 42 OAuth
-FORTYTWO_CLIENT_ID = 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d'
-FORTYTWO_CLIENT_SECRET = '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'
-FORTYTWO_REDIRECT_URI = 'http://localhost:8080/api/users/auth/42/callback/'
+FORTYTWO_CLIENT_ID = os.getenv('FORTYTWO_CLIENT_ID')
+FORTYTWO_CLIENT_SECRET = os.getenv('FORTYTWO_CLIENT_SECRET')
+FORTYTWO_REDIRECT_URI = os.getenv('FORTYTWO_REDIRECT_URI', 'http://localhost:8080/api/users/auth/42/callback/')
 
 """ 
 LOGGING = {
