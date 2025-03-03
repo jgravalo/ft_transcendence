@@ -12,7 +12,7 @@ function game()
     const ctx = canvas.getContext('2d');
     canvas.width = 400;
     canvas.height = 800;
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#1b2735';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     const menu = document.getElementById('game-menu');
     const canvasContainer = document.getElementById('canvas-container');
@@ -237,6 +237,7 @@ function game()
             const data = JSON.parse(event.data);
             if (data.step === 'wait') {
                 resetBall();
+                playerName = data.playerName;
                 waitingLoop('Waiting for a victim!');
             } else if (data.step === 'ready') {
                 if (data.playerRole === 'player1') {
@@ -262,6 +263,8 @@ function game()
                     Object.assign(player, data.player2);
                 }
                 Object.assign(ball, data.ball);
+                playerName = data.player1Name;
+                opponentName = data.player2Name;
                 isGameRunning = true;
                 gameLoop()
             } else if (data.step === 'move') {

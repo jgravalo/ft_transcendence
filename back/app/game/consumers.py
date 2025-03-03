@@ -3,6 +3,8 @@ import json
 import uuid
 import time
 from cgitb import reset
+from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 import random
@@ -10,27 +12,9 @@ import math
 import logging
 import json
 import sys
+from app.logging_config import get_logger
 
-# TODO: make it a module
-class JSONFormatter(logging.Formatter):
-    def format(self, record):
-        log_record = {
-            "timestamp": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
-            "level": record.levelname,
-            "message": record.getMessage(),
-            "logger": record.name,
-            "filename": record.filename,
-            "funcName": record.funcName,
-            "lineno": record.lineno
-        }
-        if hasattr(record, "corr"):
-            log_record["corr"] = record.corr
-        return json.dumps(log_record)
-logger = logging.getLogger("game-back")
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(JSONFormatter())
-logger.addHandler(handler)
+logger = get_logger("game-back")  # Puedes cambiar el nombre según el módulo
 
 waiting_list = []
 playing_list = []
@@ -38,7 +22,6 @@ matches = {}
 
 CANVAS = {'width': 400, 'height': 800}
 PLAYER_ROLES = ['player1', 'player2']
-
 
 class GameSession:
     """
@@ -325,6 +308,7 @@ class Match(AsyncWebsocketConsumer):
     opponent = None
     opponent_name = None
     username = None
+    logged = False
     player_role = None
     other_list = []
     global matches
@@ -346,9 +330,22 @@ class Match(AsyncWebsocketConsumer):
     }
 
     async def connect(self):
+        # from django.contrib.auth.models import *
         await self.accept()
         self.cnn_id = str(uuid.uuid4())
-        logger.info(f"Connection established", extra={"corr": self.cnn_id})
+        # TODO: Delete when remote game is fully implemented.
+        logger.info(f"Session attributes: {vars(self.scope['session'])}")
+        user = self.scope['user']
+        if user.is_authenticated:
+            self.username = user.username
+            self.logged = True
+            logger.info(f'Logged user connected: conn {self.cnn_id} - user {self.username}',
+                        extra={"corr": self.cnn_id})
+        else:
+            random_number = str(random.randint(1, 999)).zfill(3)
+            self.username = f'shy_guy-{random_number}'
+            logger.info(f'Anonymous user connected: conn {self.cnn_id} - user {self.username}',
+                        extra={"corr": self.cnn_id})
 
     async def receive(self, text_data):
         """
@@ -367,10 +364,6 @@ class Match(AsyncWebsocketConsumer):
                     "detail": "Wrong game mode"
                 }))
                 await self.close(code=4001)
-            self.username = data.get("username")
-            if self.username == 'unregistered':
-                random_number = str(random.randint(1, 999)).zfill(3)
-                self.username = f'shy_guy-{random_number}'
             logger.info("Join remote game request.", extra={"corr": self.cnn_id})
             logger.info(f"Players waiting to play: {len(waiting_list)}", extra={"corr": self.cnn_id})
             if waiting_list:
@@ -397,6 +390,7 @@ class Match(AsyncWebsocketConsumer):
             else:
                 await self.send(text_data=json.dumps({
                     "step": "wait",
+                    "playerName": self.username
                 }))
                 waiting_list.append(self)
 
@@ -453,7 +447,10 @@ class Match(AsyncWebsocketConsumer):
                 "step": step,
                 "message": message,
                 "playerRole": game_info["players"][role].player_role,
+                "playerName": game_info["players"][role].username,
                 "opponentName": game_info["players"][opp].username,
+                "player1Name": game_info["players"]['player1'].username,
+                "player2Name": game_info["players"]['player2'].username,
                 "player1": paddles["player1"],
                 "player2": paddles["player2"],
                 "ball": ball
