@@ -75,4 +75,5 @@ TRANSLATION_KEYS = {
     "otp.introduce": _("Introduce your OTP code"),
     "otp.verify": _("Verify"),
     "otp.42": _("Login with 42"),
+    "footer.privacy": _("Privacy Policy"),
 }

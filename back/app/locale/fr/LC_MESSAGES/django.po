@@ -228,3 +228,7 @@ msgstr "Vérifier"
 #: language/translations.py:74
 msgid "Login with 42"
 msgstr "Se connecter avec 42"
+
+#: language/translations.py:75
+msgid "Privacy Policy"
+msgstr "Politique de confidentialité"
