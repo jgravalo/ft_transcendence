@@ -2,6 +2,56 @@
 function game()
 {
     /*
+    * @brief: Listener to open game menu inside the game canvas.
+    *
+    * When a user clicks over the auto-play game, the menu is shown.
+    */
+    document.getElementById("pongCanvas").addEventListener("click", function (event) {
+        if (gameMode === "auto-play") {
+            const menu = document.getElementById("overlay");
+            const canvas = this.getBoundingClientRect();
+
+            menu.style.width = `${canvas.width}px`;
+            menu.style.height = `${canvas.height}px`;
+            menu.style.top = `${canvas.top}px`;
+            menu.style.left = `${canvas.left}px`;
+            menu.style.display = "flex";
+        }
+    });
+
+    /*
+    * @brief: Listener to close game menu.
+    *
+    * When a user clicks outside the game canvas, game menu is closed.
+    */
+    document.addEventListener("click", function (event) {
+        const menu = document.getElementById("overlay");
+        const canvas = document.getElementById("pongCanvas");
+
+        if (menu.style.display === "flex" && !canvas.contains(event.target) && !menu.contains(event.target)) {
+            menu.style.display = "none";
+        }
+    });
+
+    /*
+    * @brief: Set up a game mode and start game workflow.
+    */
+    function setGameMode(mode) {
+        document.getElementById("overlay").style.display = "none";
+        gameMode = mode;
+        resetGameData();
+        if (mode === "local") {
+            playerName = "player1";
+            opponentName = "player2";
+            startGame();
+        } else if (mode === "remote") {
+            remoteModeGame();
+        } else if (mode === "remote-ai") {
+            remoteModeGame();
+        }
+    }
+
+    /*
     * @section: HTML elements to catch and use.
     *
     *   pongCanvas: to draw the game.
@@ -14,7 +64,7 @@ function game()
     canvas.height = 800;
     ctx.fillStyle = '#1b2735';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    const menu = document.getElementById('game-menu');
+    // const menu = document.getElementById('game-menu');
     const canvasContainer = document.getElementById('canvas-container');
 // TODO: User name should be placed properly
     // const playerName = document.getElementById('playerName').textContent;
@@ -66,13 +116,11 @@ function game()
     }
 
     function drawMessage(announce) {
-        menu.style.display = 'none';
-        canvasContainer.style.display = 'block';
         drawRect(0, 0, canvas.width, canvas.height, '#000');
         ctx.font = "30px Silkscreen";
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
-        ctx.fillText(announce, canvas.width / 2, canvas.height / 2 + 140, canvas.width - 10);
+        ctx.fillText(announce, canvas.width / 2, canvas.height / 2 + 70, canvas.width - 10);
     }
 
     function drawScore() {
@@ -95,32 +143,31 @@ function game()
     }
 
     /*
-    * @section: Buttons and listeners to start the game using different modes.
-    *
-    * The game can be started as:
-    *   Local: Multiplayer, using arrows and a - s to move the paddles.
-    *   AI-mode: Remote game, against code.
-    *   Remote-mode: Game against another user.
+    * @section: Helpers to restart game data.
     */
+    function resetGameData(){
+        const player_y = canvas.height - 80;
+        const opponent_y = 60;
+        const base_player = {
+            playerName: playerName,
+            left: false,
+            right: false,
+            x: canvas.width / 2 - paddleWidth / 2,
+            width: paddleWidth,
+            height: paddleHeight,
+            color: '#fff',
+            powerUp: null,
+            score: 0,
+            points: 0,
+            speed: 0,
+            speedModifier: 1
+        };
+        Object.assign(player, base_player);
+        Object.assign(opponent, base_player);
+        player.y = player_y;
+        opponent.y = opponent_y;
+    }
 
-    const localModeButton = document.getElementById('local-mode');
-    const localAiModeButton = document.getElementById('ai-mode');
-    const remoteMode = document.getElementById('remote-mode');
-
-    localModeButton.addEventListener('click', () => {
-        gameMode = 'local';
-        startGame();
-    });
-
-    localAiModeButton.addEventListener('click', () => {
-        gameMode = 'remote-ai';
-        remoteModeGame();
-    });
-
-    remoteMode.addEventListener('click', () => {
-        gameMode = 'remote';
-        remoteModeGame();
-    });
 
 
 // ---------------------------------------------------------------------
@@ -144,8 +191,9 @@ function game()
     let isGameRunning = false;
     let gameWinner = null;
     let gameMode = null;
-    let playerName = "unregistered"
-    let opponentName = "unregistered";
+    let playerName = "player1"
+    let opponentName = "player2";
+    let fieldMessage = "Click to play!"
 
     const player = {
         playerName: playerName,
@@ -313,8 +361,8 @@ function game()
 
     function endGame(winner) {
         isGameRunning = false;
-        menu.style.display = 'flex';
-        canvasContainer.style.display = 'none';
+        // menu.style.display = 'flex';
+        // canvasContainer.style.display = 'none';
         if (gameMode === 'remote-ai') {
             socket.send(JSON.stringify({
                 'step': 'end',
@@ -322,15 +370,13 @@ function game()
                 'opponent_score': opponent.score
             }))
         }
-        const message = winner === 'player' ? 'You win!' : 'You lost!';
-        document.getElementById('menu-message').innerText = message;
+        autoPlay(winner);
     }
 
     function startGame() {
         isGameRunning = true;
         player.score = 0;
         opponent.score = 0;
-        menu.style.display = 'none';
         canvasContainer.style.display = 'block';
         gameLoop();
     }
@@ -558,9 +604,9 @@ function game()
 
             if (gameMode !== "auto-play") {
                 if (player.score >= 5) {
-                    endGame('player');
+                    endGame('you won!');
                 } else if (opponent.score >= 5) {
-                    endGame('opponent');
+                    endGame('you lost :-(');
                 }
             }
         }
@@ -631,6 +677,9 @@ function game()
     function drawGame() {
         if (!isGameRunning) return;
         drawRect(0, 0, canvas.width, canvas.height, '#000');
+        if (gameMode === 'auto-play') {
+            drawMessage(fieldMessage);
+        }
         drawDashedLine();
         drawRect(player.x, player.y, player.width, player.height, player.color);
         drawRect(opponent.x, opponent.y, opponent.width, opponent.height, opponent.color);
@@ -655,6 +704,7 @@ function game()
                 moveAI(player);
                 moveAI(opponent);
                 moveBall();
+                movePowerUps();
             } else if (gameMode !== 'remote') {
                 updateGame();
             } else {
@@ -664,17 +714,6 @@ function game()
             requestAnimationFrame(gameLoop);
         }
     }
-    // function gameLoop() {
-    //     if (isGameRunning) {
-    //         if (gameMode !== 'remote') {
-    //             updateGame();
-    //         } else {
-    //             updateRemoteGame();
-    //         }
-    //         drawGame();
-    //         requestAnimationFrame(gameLoop);
-    //     }
-    // }
 
     function waitingLoop(msg) {
         movePaddle(player);
@@ -703,14 +742,27 @@ function game()
      *
      * Show the main screen to start the game workflow.
     */
-    menu.style.display = 'flex';
+    // menu.style.display = 'flex';
     canvasContainer.style.display = 'none';
-    document.addEventListener("DOMContentLoaded", function () {
+
+    function autoPlay(msg) {
         gameMode = "auto-play";
-        playerName = "hal-42";
-        opponentName = "also-hal-42";
+        fieldMessage = msg;
+        playerName = "norminette";
+        opponentName = "hal-42";
         startGame();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        autoPlay("Click here to play!");
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("local-game").addEventListener("click", function () { setGameMode("local"); });
+        document.getElementById("remote-game").addEventListener("click", function () { setGameMode("remote"); });
+        document.getElementById("remote-ia-game").addEventListener("click", function () { setGameMode("remote-ai"); });
+    });
+
 }
 
 game();
