@@ -409,6 +409,8 @@ class Match(AsyncWebsocketConsumer):
                 player = {key: value for key, value in paddles[role].items() if key not in keys_to_remove}
                 await game_info["players"][role].send(text_data=json.dumps({
                     "step": "update",
+                    "score1": paddles['player1']['score'],
+                    "score2": paddles['player2']['score'],
                     "playerRole": role,
                     "player": player,
                     "opponent": paddles[opp],

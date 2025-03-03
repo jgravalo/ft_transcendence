@@ -556,10 +556,12 @@ function game()
             movePowerUps();
             checkPowerUpCollisions();
 
-            if (player.score >= 5) {
-                endGame('player');
-            } else if (opponent.score >= 5) {
-                endGame('opponent');
+            if (gameMode !== "auto-play") {
+                if (player.score >= 5) {
+                    endGame('player');
+                } else if (opponent.score >= 5) {
+                    endGame('opponent');
+                }
             }
         }
     }
@@ -571,6 +573,22 @@ function game()
             'role': player.role,
             'position': player.x
         }))
+    }
+
+    function moveAI(paddle) {
+        const reactionTime = 2; // Número de frames antes de que la IA reaccione
+        if (Math.random() < 1 / reactionTime) {
+            // Mover hacia la pelota con un pequeño retraso
+            const center = paddle.x + paddle.width / 2;
+            if (center < ball.x - 10) {
+                paddle.x += 4; // Velocidad de la IA
+            } else if (center > ball.x + 10) {
+                paddle.x -= 4;
+            }
+        }
+
+        // Evitar que la paleta salga del área
+        paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
     }
 
     function movePaddle(paddle) {
@@ -633,7 +651,11 @@ function game()
     */
     function gameLoop() {
         if (isGameRunning) {
-            if (gameMode !== 'remote') {
+            if (gameMode === "auto-play") {
+                moveAI(player);
+                moveAI(opponent);
+                moveBall();
+            } else if (gameMode !== 'remote') {
                 updateGame();
             } else {
                 updateRemoteGame();
@@ -642,6 +664,17 @@ function game()
             requestAnimationFrame(gameLoop);
         }
     }
+    // function gameLoop() {
+    //     if (isGameRunning) {
+    //         if (gameMode !== 'remote') {
+    //             updateGame();
+    //         } else {
+    //             updateRemoteGame();
+    //         }
+    //         drawGame();
+    //         requestAnimationFrame(gameLoop);
+    //     }
+    // }
 
     function waitingLoop(msg) {
         movePaddle(player);
@@ -672,6 +705,13 @@ function game()
     */
     menu.style.display = 'flex';
     canvasContainer.style.display = 'none';
+    document.addEventListener("DOMContentLoaded", function () {
+        gameMode = "auto-play";
+        playerName = "hal-42";
+        opponentName = "also-hal-42";
+        startGame();
+    });
 }
 
 game();
+
