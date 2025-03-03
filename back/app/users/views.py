@@ -467,3 +467,11 @@ def fortytwo_callback(request):
         else:
             return render(request, '42_callback.html')
 
+
+def privacy_policy(request):
+    content = render_to_string('privacy_policy.html')
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
