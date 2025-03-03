@@ -70,7 +70,7 @@ TRANSLATION_KEYS = {
     "edit.profile.password.current": _("Current Password"),
     "edit.profile.password.new": _("New Password"),
     "edit.profile.twofa": _("Enable Two-Factor Authentication"),
-    "edit.profile.submit": _("Submit"),
+    "edit.profile.submit": _("Update"),
     "otp.title": _("Login"),
     "otp.introduce": _("Introduce your OTP code"),
     "otp.verify": _("Verify"),

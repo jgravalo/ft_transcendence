@@ -234,9 +234,6 @@ msgid "Privacy Policy"
 msgstr "Privacy Policy"
 
 #: language/translations.py:76
-msgid "I accept the privacy policy"
-msgstr "I accept the privacy policy"
+msgid "Update"
+msgstr "Update"
 
-#: language/translations.py:77
-msgid "Al registrarme, confirmo que he leído y acepto la Política de Privacidad y autorizo el uso de mis datos personales según lo indicado en ella."
-msgstr "When I register, I confirm that I have read and accept the Privacy Policy and authorize the use of my personal data as indicated in it."
