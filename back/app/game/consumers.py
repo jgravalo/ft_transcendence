@@ -41,6 +41,11 @@ class GameSession:
     collision_count = 0
     collision_threshold = 2
     collision_to_points = 0
+    base_ball = {
+        'speedX': float(4),
+        'speedY': float(4),
+        'baseSpeed': float(4)
+    }
     def __init__(self, match_id, players, width=400, height=800):
         """
         Init method to GameSession class
@@ -109,6 +114,7 @@ class GameSession:
         A new ball will be set at the middle of the field and a random
         angle is used to start.
         """
+        self.ball.update(self.base_ball)
         self.ball["x"] = self.canvas['width'] / 2
         self.ball["y"] = self.canvas['height'] / 2
         angle = (random.random() - 0.5) * math.pi / 8
@@ -130,6 +136,7 @@ class GameSession:
         # Side walls collisions.
         if self.ball["x"] <= 0 or self.ball["x"] >= self.canvas["width"]:
             self.ball["speedX"] *= -1
+            self.collision_to_points += 1
 
         # Player1 paddle collision.
         if self.check_collision(self.ball, self.paddles['player1']):
@@ -142,15 +149,20 @@ class GameSession:
             self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"] + self.ball['size'] / 2
             self.ball["speedY"] = abs(self.ball["baseSpeed"] * self.paddles['player2']["speedModifier"])
             self.collision_count += 1
+            self.collision_to_points += 1
 
         # Player2 point
         if self.ball["y"] >= self.canvas["height"]:
             self.paddles['player2']["score"] += 1
+            self.paddles['player2']['points'] += self.collision_to_points * (100 / self.paddles['player2']['width'])
+            self.collision_to_points = 0
             self.reset_ball()
         # Player1 point
         elif self.ball["y"] <= 0:
             self.paddles['player1']["score"] += 1
+            self.paddles['player1']['points'] += self.collision_to_points * (100 / self.paddles['player1']['width'])
             self.reset_ball()
+            self.collision_to_points = 0
 
         # Generate power up.
         self.generate_power_up()
@@ -231,6 +243,7 @@ class GameSession:
         elif power_up_type == "<<":
             self.paddles[role]["width"] = max(player["width"] - 10, 50)
             self.paddles[role]["speedModifier"] = min(player["speedModifier"] + 0.1, 1.2)
+        self.paddles[role]['points'] += 50
 
     def check_power_up_collisions(self):
         """
@@ -376,7 +389,7 @@ class Match(AsyncWebsocketConsumer):
                 await self.close(code=4001)
             logger.info("Join remote game request.", extra={"corr": self.cnn_id})
             logger.info(f"Players waiting to play: {len(waiting_list)}", extra={"corr": self.cnn_id})
-            if waiting_list:
+            if waiting_list and self not in waiting_list:
                 logger.info(f"Players Waiting. Create a new game.", extra={"corr": self.cnn_id})
                 # Get Opponent to the match.
                 self.opponent = waiting_list.pop(0)
@@ -476,16 +489,21 @@ class Match(AsyncWebsocketConsumer):
             logger.warning(f"Active Match was found {self.match_id}", extra={"corr": self.cnn_id})
             game_info = matches[self.match_id]
             for role in PLAYER_ROLES:
-                if game_info["players"][role] != self:
+                try:
                     await game_info["players"][role].send(text_data=json.dumps({
                         "step": "disconnection"
                     }))
                     logger.warning(f"Disconnection message was sent {self.match_id}", extra={"corr": self.cnn_id})
-        if self.status == 'wait':
-            pass
-        if self.player_id and self.player_id in self.players:
-            del self.players[self.player_id]
-            print(f"Jugador {self.player_id} eliminado del juego.")
+                except Exception as e:
+                    logger.warning(f"Disconnection message was not sent to {game_info['players'][role].cnn_id}", extra={"corr": self.cnn_id})
+                    continue
+            del matches[self.match_id]
+        if self in waiting_list:
+            logger.warning(f"Client Removed from waiting list {close_code}.", extra={"corr": self.cnn_id})
+            waiting_list.remove(self)
+        # if self.player_id and self.player_id in self.players:
+        #     del self.players[self.player_id]
+        #     print(f"Jugador {self.player_id} eliminado del juego.")
 
 
 class MatchAI(AsyncWebsocketConsumer):

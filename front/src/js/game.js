@@ -148,11 +148,6 @@ function game()
     function resetGameData(){
         const player_y = canvas.height - 80;
         const opponent_y = 60;
-        const base_ball = {
-            speedX: 4,
-            speedY: 4,
-            baseSpeed: 4,
-        };
         const base_player = {
             playerName: playerName,
             left: false,
@@ -243,6 +238,12 @@ function game()
         speedY: 4,
         baseSpeed: 4,
         color: '#fff'
+    };
+
+    const base_ball = {
+        speedX: 4,
+        speedY: 4,
+        baseSpeed: 4,
     };
 
 // @brief: Power up section. Ready to include new power ups.
@@ -512,6 +513,7 @@ function game()
      * is back to 0.
     */
     function resetBall() {
+        Object.assign(ball, base_ball);
         ball.x = canvas.width / 2;
         ball.y = canvas.height / 2;
         const angle = (Math.random() - 0.5) * Math.PI / 8;
