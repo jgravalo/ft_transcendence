@@ -236,3 +236,7 @@ msgstr "Politique de confidentialité"
 #: language/translations.py:76
 msgid "Update"
 msgstr "Mettre à jour"
+
+#: language/translations.py:77
+msgid "I confirm that I have read and accept the Privacy Policy and authorize the use of my personal data as indicated in it."
+msgstr "Je confirme que j'ai lu et accepte la Politique de confidentialité et autorise l'utilisation de mes données personnelles conformément à celle-ci."

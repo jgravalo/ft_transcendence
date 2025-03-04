@@ -173,7 +173,6 @@ function setError(error)
 }
 
 async function deleteUserAccount() {
-    console.log('Función deleteUserAccount llamada');
     if (!confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
         return;
     }
@@ -192,7 +191,7 @@ async function deleteUserAccount() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Limpiar los tokens y redirigir al login
+        // Limpiar los tokens y redirigir al home
         sessionStorage.removeItem('access');
         sessionStorage.removeItem('refresh');
         window.location.href = '/';
