@@ -43,6 +43,7 @@ def refresh(request):
     except Exception as e:
         return JsonResponse({'error': "Invalid refresh token:" + str(e)}, status=400)
 
+@csrf_exempt
 def delete_user(request):
     if request.method == "DELETE":
         try:

@@ -57,6 +57,8 @@ function handleLinks()
     links.forEach(function(link) {
         link.addEventListener('click', handleLink);
     });
+
+
 }
 
 function handleLink(event)
@@ -163,13 +165,35 @@ function setError(error)
     });
 }
 
+async function deleteUserAccount() {
+    console.log('Función deleteUserAccount llamada');
+    if (!confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+        return;
+    }
 
+    try {
+        const response = await fetch(base + '/api/users/delete/', {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${getJWTToken()}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+        });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-
-
-
-
+        // Limpiar los tokens y redirigir al login
+        sessionStorage.removeItem('access');
+        sessionStorage.removeItem('refresh');
+        window.location.href = '/';
+    } catch (error) {
+        console.error('Error al eliminar el usuario:', error);
+        alert('Error al eliminar el usuario. Por favor, intenta de nuevo.');
+    }
+}
 
 /*
 document.getElementById('fetchData').addEventListener('click', function() {
