@@ -26,6 +26,22 @@ These tags reference translation keys `button.home` and `register.title` from tr
 
 Note : If you have different "Login" words in different places/pages, it is better to use different tags like `home.login` and `game.login`. Both will then point to the same translation word in translation keys.
 
+
+After adding the tags in the templates/views, you need to add the corresponding translations keys in `/back/app/language/translations.py` as such : 
+
+```python
+from django.utils.translation import gettext_lazy as _
+
+TRANSLATION_KEYS = {
+    "button.home": _( "Home"),
+    "register.title": _( "Register"),
+}
+```
+
+These keys will match the i18n tag (left side) to the actual translation in .po files (right side).
+
+Note : As mentionned before, there can be multiple i18n tags referencing to the same translation in .po file (i.e. `home.login` and `game.login`)
+
 ### Option 2: Using gettext_lazy in Python Files
 For text that needs to be translated within Python files (e.g., views), use `gettext_lazy`:
 
@@ -39,25 +55,7 @@ error_messages = {
 
 Here gettext will fetch the translation corresponding to the translation key `User does not exist` from translations.py.
 
-## 2. Adding Translations Keys
-
-After adding the tags in the templates/views, you need to add the corresponding translations keys in `/back/app/language/translations.py` as such : 
-
-```python
-from django.utils.translation import gettext_lazy as _
-
-TRANSLATION_KEYS = {
-    "button.home": _( "Home"),
-    "register.title": _( "Register"),
-    "User does not exist": _( "User does not exist"),
-}
-```
-
-These keys will match the i18n tag (left side) to the actual translation in .po files (right side).
-
-Note : As mentionned before, there can be multiple i18n tags referencing to the same translation in .po file (i.e. `home.login` and `game.login`)
-
-## 3. Adding Translations in .po files
+## 2. Adding Translations in .po files
 
 Each language has a corresponding .po file inside `/back/app/locale/<lang_code>/LC_MESSAGES/django.po`. These files contain the actual translations.
 
