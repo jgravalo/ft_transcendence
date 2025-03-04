@@ -58,7 +58,14 @@ function handleLinks()
         link.addEventListener('click', handleLink);
     });
 
+    // Escuchando el evento click del botón de eliminación de usuario
+    const deleteButton = document.querySelector('.delete-user-btn');
+    if (deleteButton) {
+        // console.log('Botón de eliminación de usuario encontrado');
+        // deleteButton.addEventListener('dblclick', deleteUserAccount);
+        deleteButton.addEventListener('click', deleteUserAccount);
 
+    }
 }
 
 function handleLink(event)
