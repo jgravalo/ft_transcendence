@@ -330,21 +330,24 @@ class Match(AsyncWebsocketConsumer):
     }
 
     async def connect(self):
-        # from django.contrib.auth.models import *
-        await self.accept()
         self.cnn_id = str(uuid.uuid4())
-        # TODO: Delete when remote game is fully implemented.
-        logger.info(f"Session attributes: {vars(self.scope['session'])}")
-        user = self.scope['user']
-        if user.is_authenticated:
-            self.username = user.username
-            self.logged = True
-            logger.info(f'Logged user connected: conn {self.cnn_id} - user {self.username}',
-                        extra={"corr": self.cnn_id})
-        else:
-            random_number = str(random.randint(1, 999)).zfill(3)
-            self.username = f'shy_guy-{random_number}'
-            logger.info(f'Anonymous user connected: conn {self.cnn_id} - user {self.username}',
+        try:
+            await self.accept()
+            # TODO: Delete when remote game is fully implemented.
+            logger.info(f"Session attributes: {vars(self.scope['session'])}")
+            user = self.scope['user']
+            if user.is_authenticated:
+                self.username = user.username
+                self.logged = True
+                logger.info(f'Logged user connected: conn {self.cnn_id} - user {self.username}',
+                            extra={"corr": self.cnn_id})
+            else:
+                random_number = str(random.randint(1, 999)).zfill(3)
+                self.username = f'shy_guy-{random_number}'
+                logger.info(f'Anonymous user connected: conn {self.cnn_id} - user {self.username}',
+                            extra={"corr": self.cnn_id})
+        except Exception as e:
+            logger.error(f'Connection Error {self.cnn_id} - Detail {e}',
                         extra={"corr": self.cnn_id})
 
     async def receive(self, text_data):
@@ -356,6 +359,13 @@ class Match(AsyncWebsocketConsumer):
         """
         data = json.loads(text_data)
         # Join to remote mode
+        if not "step" in data:
+            logger.error(f"Connection {self.cnn_id} wrong request data: {data}.", extra={"corr": self.cnn_id})
+            await self.send(text_data=json.dumps({
+                "step": "error",
+                "detail": "Wrong"
+            }))
+            await self.close(code=4001)
         if data.get("step") == "join":
             if data.get("mode") != 'remote':
                 logger.error(f"Connection {self.cnn_id} requested a wrong game mode.", extra={"corr": self.cnn_id})
@@ -373,6 +383,7 @@ class Match(AsyncWebsocketConsumer):
                 # start a new GameSession
                 self.match_id = str(uuid.uuid4())
                 self.opponent.match_id = self.match_id
+                self.opponent.opponent = self
                 game = GameSession(self.match_id, [self, self.opponent])
                 logger.info(f"Match Created.", extra={"corr": self.match_id})
                 logger.info(f"Players {self.username} - {self.opponent.username}", extra={"corr": self.match_id})
@@ -460,8 +471,17 @@ class Match(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        logger.warning(f"Client disconnected {close_code}")
-        if (self.status == 'wait'):
+        logger.warning(f"Client disconnected {close_code}", extra={"corr": self.cnn_id})
+        if self.match_id:
+            logger.warning(f"Active Match was found {self.match_id}", extra={"corr": self.cnn_id})
+            game_info = matches[self.match_id]
+            for role in PLAYER_ROLES:
+                if game_info["players"][role] != self:
+                    await game_info["players"][role].send(text_data=json.dumps({
+                        "step": "disconnection"
+                    }))
+                    logger.warning(f"Disconnection message was sent {self.match_id}", extra={"corr": self.cnn_id})
+        if self.status == 'wait':
             pass
         if self.player_id and self.player_id in self.players:
             del self.players[self.player_id]
@@ -475,6 +495,8 @@ class MatchAI(AsyncWebsocketConsumer):
     lighter.
     """
     cnn_id = None
+    logged = False
+    username = None
 
     async def connect(self):
         """
@@ -482,7 +504,19 @@ class MatchAI(AsyncWebsocketConsumer):
         """
         await self.accept()
         self.cnn_id = str(uuid.uuid4())
-        logger.info(f"Connection established", extra={"corr": self.cnn_id})
+        # TODO: Delete when remote game is fully implemented.
+        logger.info(f"Session attributes: {vars(self.scope['session'])}")
+        user = self.scope['user']
+        if user.is_authenticated:
+            self.username = user.username
+            self.logged = True
+            logger.info(f'Logged user connected: conn {self.cnn_id} - user {self.username}',
+                        extra={"corr": self.cnn_id})
+        else:
+            random_number = str(random.randint(1, 999)).zfill(3)
+            self.username = f'shy_guy-{random_number}'
+            logger.info(f'Anonymous user connected: conn {self.cnn_id} - user {self.username}',
+                        extra={"corr": self.cnn_id})
 
     async def receive(self, text_data):
         """
@@ -498,6 +532,7 @@ class MatchAI(AsyncWebsocketConsumer):
             logger.info(f"Join AI game request.", extra={"corr": self.cnn_id})
             await self.send(text_data=json.dumps({
                 "step": "start",
+                "playerName": self.username,
                 "opponentName": 'HAL-42',
             }))
             logger.info(f"Response remote-ai request. Start.", extra={"corr": self.cnn_id})

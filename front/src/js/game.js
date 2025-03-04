@@ -148,6 +148,11 @@ function game()
     function resetGameData(){
         const player_y = canvas.height - 80;
         const opponent_y = 60;
+        const base_ball = {
+            speedX: 4,
+            speedY: 4,
+            baseSpeed: 4,
+        };
         const base_player = {
             playerName: playerName,
             left: false,
@@ -164,6 +169,7 @@ function game()
         };
         Object.assign(player, base_player);
         Object.assign(opponent, base_player);
+        Object.assign(ball, base_ball);
         player.y = player_y;
         opponent.y = opponent_y;
     }
@@ -290,17 +296,17 @@ function game()
             } else if (data.step === 'ready') {
                 if (data.playerRole === 'player1') {
                     Object.assign(player, data.player1);
-                    playerName = player.playerName;
+                    playerName = data.playerName;
                     opponentName = data.opponentName;
                 } else {
                     Object.assign(player, data.player2);
                     playerName = data.opponentName;
-                    opponentName = player.playerName;
+                    opponentName = data.playerName;
                 }
                 startingLoop(data.message);
             } else if (data.step === 'start') {
                 opponentName = data.opponentName;
-                opponent.playerName = data.opponentName;
+                playerName = data.playerName;
                 startGame();
             } else if (data.step === 'go') {
                 if (player.role === 'player1') {
@@ -655,15 +661,19 @@ function game()
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') player.left = true;
         if (e.key === 'ArrowRight') player.right = true;
-        if (e.key === 'a') opponent.left = true;
-        if (e.key === 'd') opponent.right = true;
+        if (gameMode === 'local') {
+            if (e.key === 'a') opponent.left = true;
+            if (e.key === 'd') opponent.right = true;
+        }
     });
 
     document.addEventListener('keyup', (e) => {
         if (e.key === 'ArrowLeft') player.left = false;
         if (e.key === 'ArrowRight') player.right = false;
-        if (e.key === 'a') opponent.left = false;
-        if (e.key === 'd') opponent.right = false;
+        if (gameMode === 'local') {
+            if (e.key === 'a') opponent.left = false;
+            if (e.key === 'd') opponent.right = false;
+        }
     });
 
 
