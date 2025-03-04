@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import get_home, get_error
 from .health import health_check
-
+from users.views import privacy_policy
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from your_app.views import EnableTOTPView, VerifyTOTPView, EnableEmailOTPView, VerifyEmailOTPView
 

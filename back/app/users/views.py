@@ -396,9 +396,9 @@ def fortytwo_auth(request):
     if request.method == "GET":
         auth_url = "https://api.intra.42.fr/oauth/authorize"
         params = {
-            'client_id': 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d',
-            'client_secret': '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',
-            'redirect_uri': 'http://localhost:8080/api/users/auth/42/callback/',
+            'client_id': settings.FORTYTWO_CLIENT_ID,
+            'client_secret': settings.FORTYTWO_CLIENT_SECRET,
+            'redirect_uri': settings.FORTYTWO_REDIRECT_URI,
             'response_type': 'code',
             'scope': 'public'
         }
@@ -420,10 +420,10 @@ def fortytwo_callback(request):
                 token_url = "https://api.intra.42.fr/oauth/token"
                 token_data = {
                     'grant_type': 'authorization_code',
-                    'client_id': 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d',
-                    'client_secret': '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',
+                    'client_id': settings.FORTYTWO_CLIENT_ID,
+                    'client_secret': settings.FORTYTWO_CLIENT_SECRET,
                     'code': code,
-                    'redirect_uri': 'http://localhost:8080/api/users/auth/42/callback/'
+                    'redirect_uri': settings.FORTYTWO_REDIRECT_URI
                 }
 
                 token_response = requests.post(token_url, data=token_data)
@@ -467,3 +467,11 @@ def fortytwo_callback(request):
         else:
             return render(request, '42_callback.html')
 
+
+def privacy_policy(request):
+    content = render_to_string('privacy_policy.html')
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)

@@ -22,4 +22,5 @@ urlpatterns = [
     path('refresh/', views.refresh, name='refresh'),
     path('auth/42/login/', views.fortytwo_auth, name='fortytwo-login'),
     path('auth/42/callback/', views.fortytwo_callback, name='fortytwo_callback'),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
 ]
