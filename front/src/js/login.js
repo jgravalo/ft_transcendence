@@ -171,19 +171,20 @@ function loginSock() // por definir
     // Escuchar eventos de conexión
     socket.onopen = function (event) {
         console.log("WebSocket conectado");
-        const data = JSON.parse(event.data);
-        document.getElementById('bar').innerHTML = data.content;
+        fetchLink('/users/login/close/');
+        //const data = JSON.parse(event.data);
+        //document.getElementById('bar').innerHTML = data.content;
         socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
     };
     // Escuchar mensajes desde el servidor
     socket.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        console.log(data.message);
+        //const data = JSON.parse(event.data);
+        //console.log(data.message);
     };
     // Manejar desconexión
     socket.onclose = function (event) {
-        const data = JSON.parse(event.data);
-        fetchLink('/users/logout/close/')
+        //const data = JSON.parse(event.data);
+        fetchLink('/users/logout/close/');
         // document.getElementById('bar').innerHTML = data.content;
         console.log("WebSocket desconectado");
     };

@@ -39,6 +39,9 @@ def refresh(request):
         data = {
             "access": new_access_token
         }
+        # decoded_payload = jwt.decode(refresh.access_token, settings.SECRET_KEY, algorithms=["HS256"])
+        # user = User.objects.get(id=decoded_payload['id'])
+        # login(request, user)
         return JsonResponse(data)
     except Exception as e:
         return JsonResponse({'error': "Invalid refresh token:" + str(e)}, status=400)
@@ -63,6 +66,12 @@ def get_login(request):
     return JsonResponse(data)
 
 def close_login(request):
+    try:
+        user = User.get_user(request)
+        login(request, user)  # Aquí Django desasigna `request.user`
+        print('LOGGED')
+    except:
+        None
     content = render_to_string('close_login.html')
     data = {
         "element": 'bar',
@@ -73,7 +82,7 @@ def close_login(request):
 def close_logout(request):
     try:
         logout(request)  # Aquí Django desasigna `request.user`
-        print('unlogged')
+        print('UNLOGGED')
     except:
         None
     content = render_to_string('close_logout.html')
