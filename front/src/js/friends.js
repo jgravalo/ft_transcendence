@@ -48,10 +48,11 @@ function fetchFriend(user, rule)
 			"Content-Type": "application/json",
 			'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
 		},
-		body: JSON.stringify({'user': user}), 
+		body: JSON.stringify({'user': user}),
 	})
 	.then(response => response.json())
     .then(data => {
+		fetchLink('/users/friends/');
 	})
 	.catch(error => {
 		console.log("fetch login catch");
