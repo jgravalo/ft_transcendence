@@ -4,4 +4,13 @@ root_token=hvs.r840eI3jck2rSl7CTyNYQzTw
 DB:
 role_id=6d40c02e-0532-b346-f321-f32b6a241d88
 secret_id=878a456d-3888-4059-0e1e-c6ec5f68937b
-token=hvs.CAESIK1dK-e5zxjK90aZ9ejJSGGlvekDfO0MejXJaNsRS-CIGh4KHGh2cy5scW95SGM2UlMzMG0zU2hPSUk4NFVkdHg
+
+DB-EXPORTER
+role_id=eac313aa-2a19-5082-d78d-a9f463791d96
+secret_id=4ae3d8c5-e3ff-8174-2483-ebf08f954fea
+
+DJANGO:
+roe_id=6dac6cf9-422c-4d7b-0f34-1610b09a591b
+secret_id=f1267920-0874-9518-4e59-9894deca7ab4
+
+
