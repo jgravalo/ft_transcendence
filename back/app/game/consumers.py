@@ -23,6 +23,7 @@ matches = {}
 CANVAS = {'width': 400, 'height': 800}
 PLAYER_ROLES = ['player1', 'player2']
 
+
 class GameSession:
     """
     Game Session class to control and update the game.
@@ -46,6 +47,7 @@ class GameSession:
         'speedY': float(4),
         'baseSpeed': float(4)
     }
+    winner = None
     def __init__(self, match_id, players, width=400, height=800):
         """
         Init method to GameSession class
@@ -154,13 +156,13 @@ class GameSession:
         # Player2 point
         if self.ball["y"] >= self.canvas["height"]:
             self.paddles['player2']["score"] += 1
-            self.paddles['player2']['points'] += self.collision_to_points * (100 / self.paddles['player2']['width'])
+            self.paddles['player2']['points'] += int(self.collision_to_points * (100 / self.paddles['player2']['width']))
             self.collision_to_points = 0
             self.reset_ball()
         # Player1 point
         elif self.ball["y"] <= 0:
             self.paddles['player1']["score"] += 1
-            self.paddles['player1']['points'] += self.collision_to_points * (100 / self.paddles['player1']['width'])
+            self.paddles['player1']['points'] += int(self.collision_to_points * (100 / self.paddles['player1']['width']))
             self.reset_ball()
             self.collision_to_points = 0
 
@@ -243,7 +245,7 @@ class GameSession:
         elif power_up_type == "<<":
             self.paddles[role]["width"] = max(player["width"] - 10, 50)
             self.paddles[role]["speedModifier"] = min(player["speedModifier"] + 0.1, 1.2)
-        self.paddles[role]['points'] += 50
+        self.paddles[role]['points'] += 10
 
     def check_power_up_collisions(self):
         """
@@ -309,7 +311,9 @@ class GameSession:
         self.update_ball_position()
         self.move_power_up()
         self.check_power_up_collisions()
-        return self.paddles, self.power_ups, self.ball
+        if self.paddles['player1']['score'] == 5 or self.paddles['player2']['score'] == 5:
+            self.winner = 'player1' if self.paddles['player1']['score'] == 5 else 'player2'
+        return self.paddles, self.power_ups, self.ball, self.winner
 
 class Match(AsyncWebsocketConsumer):
     cnn_id = None
@@ -426,7 +430,9 @@ class Match(AsyncWebsocketConsumer):
             role = data.get("role")
             matches[self.match_id]['game'].update_paddle_position(role, data.get('position'))
             game_info = matches[self.match_id]
-            paddles, power_ups, ball = game_info['game'].update_game()
+            paddles, power_ups, ball, winner = game_info['game'].update_game()
+            if winner:
+                await self.end_game_winner(paddles, winner)
             keys_to_remove = ["role", "y", "height"]
             for role in PLAYER_ROLES:
                 opp = 'player1' if role == 'player2' else 'player2'
@@ -441,6 +447,18 @@ class Match(AsyncWebsocketConsumer):
                     "ball": ball,
                     "powerUps": power_ups
                 }))
+
+    async def end_game_winner(self, paddles, winner):
+        game_info = matches[self.match_id]
+        for role in PLAYER_ROLES:
+            winner_msg = f"You won {paddles[winner]['points']} points!"
+            await game_info["players"][role].send(text_data=json.dumps({
+                "step": "endOfGame",
+                "message": winner_msg if role == winner else "You lost!"
+            }))
+            if role == winner:
+                save_match_result(self.username, paddles[role]['points'])
+
 
     async def send_start_screen(self, game):
         """
@@ -466,7 +484,7 @@ class Match(AsyncWebsocketConsumer):
         :param step: step sent
         """
         game_info = matches[self.match_id]
-        paddles, power_ups, ball = game_info['game'].update_game()
+        paddles, power_ups, ball, winner = game_info['game'].update_game()
         for role in PLAYER_ROLES:
             opp = 'player1' if role == 'player2' else 'player2'
             await game_info["players"][role].send(text_data=json.dumps({
@@ -585,3 +603,22 @@ class MatchAI(AsyncWebsocketConsumer):
             "step": "move",
             "position": position['x']
         }))
+
+from django.db import connection
+from channels.db import database_sync_to_async
+
+@database_sync_to_async
+def save_match_result(player, points):
+    """Guarda el resultado del partido y actualiza los puntos en la tabla users."""
+    with connection.cursor() as cursor:
+        # Obtener IDs de los jugadores
+        cursor.execute("SELECT id FROM users WHERE username = %s", [player])
+        player_id = cursor.fetchone()
+
+        if not player_id:
+            return
+
+        player_id = player_id[0]
+
+        cursor.execute("UPDATE users SET wins = wins + 1, matches = matches + 1, points = points + %s WHERE id = %s",
+                       [points, player_id])

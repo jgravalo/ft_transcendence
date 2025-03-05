@@ -42,7 +42,8 @@ canvas {
 }
 
 #canvas-container {
-	display: none;
+	display: block;
+	background-color: #1b2735;
 }
 
 #overlay {

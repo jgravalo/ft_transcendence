@@ -1,10 +1,16 @@
 
 function game()
 {
+    const canvas = document.getElementById('pongCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 400;
+    canvas.height = 800;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    let gameMode = null;
+
+
     /*
     * @brief: Listener to open game menu inside the game canvas.
-    *
-    * When a user clicks over the auto-play game, the menu is shown.
     */
     document.getElementById("pongCanvas").addEventListener("click", function (event) {
         if (gameMode === "auto-play") {
@@ -21,8 +27,6 @@ function game()
 
     /*
     * @brief: Listener to close game menu.
-    *
-    * When a user clicks outside the game canvas, game menu is closed.
     */
     document.addEventListener("click", function (event) {
         const menu = document.getElementById("overlay");
@@ -39,7 +43,6 @@ function game()
     function setGameMode(mode) {
         document.getElementById("overlay").style.display = "none";
         gameMode = mode;
-        resetGameData();
         if (mode === "local") {
             playerName = "player1";
             opponentName = "player2";
@@ -51,45 +54,16 @@ function game()
         }
     }
 
-    /*
-    * @section: HTML elements to catch and use.
-    *
-    *   pongCanvas: to draw the game.
-    *   ctx: to use context if is necessary.
-    *   set the size of the game.
-    */
-    const canvas = document.getElementById('pongCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 400;
-    canvas.height = 800;
-    ctx.fillStyle = '#1b2735';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // const menu = document.getElementById('game-menu');
-    const canvasContainer = document.getElementById('canvas-container');
-// TODO: User name should be placed properly
-    // const playerName = document.getElementById('playerName').textContent;
+
 
     /*
-    * @brief: General function to draw a rectangle.
-    *
-    * @param {x}: x position of the rectangle.
-    * @param {y}: y position of the rectangle.
-    * @param {width}: width of the rectangle.
-    * @param {height}: height of the rectangle.
-    * @param {color}: color of the rectangle.
+    * @section: Utilities - Drawers
     */
     function drawRect(x, y, width, height, color) {
         ctx.fillStyle = color;
         ctx.fillRect(x, y, width, height);
     }
 
-    /*
-    * @section: Drawers.
-    *
-    * drawDashedLine: Draw the middle line of the game.
-    * drawScore: Draw the score of the current game.
-    * drawPowerUps: Draw the generated Power Ups.
-    */
     function drawDashedLine() {
         ctx.strokeStyle = "#fff";
         ctx.setLineDash([15, 15]);
@@ -169,18 +143,8 @@ function game()
         opponent.y = opponent_y;
     }
 
-
-
-// ---------------------------------------------------------------------
-
     /*
     * @section: Variables and objects used through the game workflow
-    *
-    * Paddle Sizes.
-    * Player Object.
-    * Opponent Object.
-    * Ball ...
-    * @TODO: Complete comment
     * */
     const paddleWidth = 100
     const paddleHeight = 15;
@@ -191,10 +155,11 @@ function game()
     const maxSpeed = 20;
     let isGameRunning = false;
     let gameWinner = null;
-    let gameMode = null;
+
     let playerName = "player1"
     let opponentName = "player2";
     let fieldMessage = "Click to play!"
+
 
     const player = {
         playerName: playerName,
@@ -246,12 +211,14 @@ function game()
         baseSpeed: 4,
     };
 
-// @brief: Power up section. Ready to include new power ups.
-    let powerUps = []; // Lista de power-ups activos
-    const powerUpSize = ball.size * 1.5; // 50% más grande que la pelota
-    let collisionCount = 0; // Contador de colisiones
-    const collisionThreshold = 5; // Número de colisiones para activar el power-up (ajustado para pruebas)
-    const activationDistance = powerUpSize * 3; // Distancia de activación
+    /*
+        * @section: Power up section. Ready to include new power ups.
+        * */
+    let powerUps = [];
+    const powerUpSize = ball.size * 1.5;
+    let collisionCount = 0;
+    const collisionThreshold = 5;
+    const activationDistance = powerUpSize * 3;
     const powerUpColors = {
         '>>': 'green',
         '<<': 'red'
@@ -273,7 +240,6 @@ function game()
 
     function remoteModeGame() {
         connect();
-        canvasContainer.style.display = 'block';
 
         socket.onopen = () => {
             // Join to remote game
@@ -310,6 +276,8 @@ function game()
                 playerName = data.playerName;
                 startGame();
             } else if (data.step === 'go') {
+                playerName = data.player1Name;
+                opponentName = data.player2Name;
                 if (player.role === 'player1') {
                     Object.assign(opponent, data.player2);
                     Object.assign(player, data.player1);
@@ -318,10 +286,11 @@ function game()
                     Object.assign(player, data.player2);
                 }
                 Object.assign(ball, data.ball);
-                playerName = data.player1Name;
-                opponentName = data.player2Name;
                 isGameRunning = true;
-                gameLoop()
+                updateRemoteGame();
+                gameLoop();
+            } else if (data.step === 'endOfGame') {
+                autoPlay(data.message);
             } else if (data.step === 'move') {
                 opponent.x = data.position;
             } else if (data.step === 'update') {
@@ -368,8 +337,6 @@ function game()
 
     function endGame(winner) {
         isGameRunning = false;
-        // menu.style.display = 'flex';
-        // canvasContainer.style.display = 'none';
         if (gameMode === 'remote-ai') {
             socket.send(JSON.stringify({
                 'step': 'end',
@@ -381,10 +348,10 @@ function game()
     }
 
     function startGame() {
+        resetGameData();
         isGameRunning = true;
         player.score = 0;
         opponent.score = 0;
-        canvasContainer.style.display = 'block';
         gameLoop();
     }
 
@@ -641,7 +608,6 @@ function game()
             }
         }
 
-        // Evitar que la paleta salga del área
         paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
     }
 
@@ -687,7 +653,6 @@ function game()
      * and score
     */
     function drawGame() {
-        if (!isGameRunning) return;
         drawRect(0, 0, canvas.width, canvas.height, '#000');
         if (gameMode === 'auto-play') {
             drawMessage(fieldMessage);
@@ -727,6 +692,16 @@ function game()
         }
     }
 
+    function landingLoop() {
+        if (isGameRunning) return;
+        moveAI(player);
+        moveAI(opponent);
+        moveBall();
+        movePowerUps();
+        drawGame();
+        requestAnimationFrame(landingLoop);
+    }
+
     function waitingLoop(msg) {
         movePaddle(player);
         updateGame();
@@ -754,15 +729,17 @@ function game()
      *
      * Show the main screen to start the game workflow.
     */
-    // menu.style.display = 'flex';
-    canvasContainer.style.display = 'none';
 
     function autoPlay(msg) {
+        resetGameData();
+        player.score = 0;
+        opponent.score = 0;
         gameMode = "auto-play";
         fieldMessage = msg;
         playerName = "norminette";
         opponentName = "hal-42";
-        startGame();
+        landingLoop();
+        // startGame();
     }
 
     document.addEventListener("DOMContentLoaded", function () {
