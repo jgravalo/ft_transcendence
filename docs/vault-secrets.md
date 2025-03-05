@@ -66,10 +66,6 @@ vault policy read new_policy
 #Create the new role and attach the new policy to it
 vault write auth/approle/role/new_service token_policies="new_service_policy"
 
-
-#Register the policy to Vault
-vault policy write new_service_policy my_policy.hcl
-
 #Check that the policy is attached to the role (token_policies = ...)
 vault read auth/approle/role/new_service
 ```

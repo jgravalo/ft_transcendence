@@ -82,6 +82,25 @@ services:
       timeout: 5s
       retries: 5
 
+  db-exporter:
+    image: db-exporter
+    build:
+      context: ./db-exporter
+    container_name: db-exporter
+    env_file:
+      - ./db-exporter/.env
+    networks:
+      - pongnet
+    ports:
+      - "9187:9187"
+    depends_on:
+      vault:
+        condition: service_healthy
+      db:
+        condition: service_started
+      prometheus:
+        condition: service_started
+
   vault:
     image: vault
     build:
@@ -104,6 +123,15 @@ services:
       timeout: 5s
       retries: 5
 
+  prometheus:
+    image: prometheus
+    build:
+      context: ./prometheus
+    container_name: prometheus
+    networks:
+      - pongnet
+    ports:
+      - "9090:9090"
 
   redis:
     image: redis:latest

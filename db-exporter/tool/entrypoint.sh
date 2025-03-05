@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
 set -ex
 
 # Vault URLs
 VAULT_AUTH_URL="$VAULT_ADDR/v1/auth/approle/login"
-VAULT_SECRET_URL="$VAULT_ADDR/v1/secret/data/postgres"
+VAULT_SECRET_URL="$VAULT_ADDR/v1/secret/data/postgres-exporter"
 
 # Prepare JSON payload for authentication
 AUTH_PAYLOAD=$(jq -n --arg role_id "$VAULT_ROLE_ID" --arg secret_id "$VAULT_SECRET_ID" \
@@ -54,16 +54,18 @@ if [ -z "$SECRET_RESPONSE" ]; then
     exit 1
 fi
 
-POSTGRES_PASSWORD=$(echo "$SECRET_RESPONSE" | jq -r '.data.data.db_password')
-if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "null" ]; then
+DB_PASSWORD=$(echo "$SECRET_RESPONSE" | jq -r '.data.data.db_password')
+if [ -z "$DB_PASSWORD" ] || [ "$DB_PASSWORD" = "null" ]; then
     echo "Error: Failed to retrieve PostgreSQL password from Vault!"
     echo "Vault Response: $SECRET_RESPONSE"
     exit 1
 fi
 
 # ---------------------------------------------------------------
-# 4) Export the password and start PostgreSQL
+# 4) Build & Export the DATA_SOURCE_NAME dynamically
 # ---------------------------------------------------------------
-export POSTGRES_PASSWORD
-echo "Starting Postgres Exporter with dynamic credentials..."
+DATA_SOURCE_NAME="postgresql://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$DB_NAME?sslmode=disable"
+export DATA_SOURCE_NAME
+
+echo "Starting Postgres Exporter with: $DATA_SOURCE_NAME"
 exec /postgres_exporter  # Start the exporter
