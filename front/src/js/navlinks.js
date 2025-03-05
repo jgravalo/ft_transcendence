@@ -32,7 +32,7 @@ window.addEventListener('custom-navigation', () => {
 var base = window.location.origin;
 console.log("base: ", base);
 
-window.addEventListener('popstate', (event) => handlePopstate(event));
+/* window.addEventListener('popstate', (event) => handlePopstate(event));
 
 
 
@@ -46,7 +46,7 @@ function handlePopstate(event)
         return;
     }
     handleLink(path);
-}
+} */
 
 handleLinks();
 
@@ -63,9 +63,9 @@ function handleLink(event)
 {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
     var path = event.currentTarget.getAttribute('href');
-    if (path == "/")
+    /* if (path == "/")
         path = "";
-    else
+    else  */if (!path.includes('?'))
         path += "/";
     var state = base + path;
     console.log("path = " + path);
@@ -89,10 +89,13 @@ function handleLink(event)
     }
     //console.log("token before fetch =", getJWTToken());
 	console.log('path for GET =', path);
-	console.log('fetch for GET =', base + '/api' + path);
-
+    
     // fetch(base + ":8000" + path, {
-    fetch(base + '/api' + path, {
+    var get = '/api' + path;
+        if (path == "")
+            get = path;
+    console.log('fetch for GET =', base + get);
+    fetch(base + get, {
         method: "GET",
         headers: {
             'Authorization': `Bearer ${getJWTToken()}`,
@@ -114,27 +117,26 @@ function handleLink(event)
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
         if (dest == 'modalContainer')
             makeModal(path);
-        else if (path == '/users/update/')
-            makePost(path);
+        /* {
+            pushState(path);
+        } */
         else
         {
-            if (path != '/users/logout/close/')
-            {
+            if (path != '/users/login/close/' && path != '/users/logout/close/')
                 pushState(path);
-                /* var title = path.slice(1, -1);
-                // console.log("pushState = <" + title + ">");
-                window.history.pushState(
-                    { page: title},
-                    title,
-                    "/" + title
-                ); */
-            }
+            if (path == '/users/update/')
+                makePost(path);
+            else if (path.slice(0, 6) == '/chat/')
+                chat(base + get);
+            else if (path.slice(0, 6) == '/game/')
+                game();
             handleLinks();
         }
     })
     .catch(error => {
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
+        console.error('path error:', path);
         setError(error);
     });
 }
@@ -158,7 +160,6 @@ function setError(error)
     .catch(error => {
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
-        //error(error.slice(-3));
     });
 }
 

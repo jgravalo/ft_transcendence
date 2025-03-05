@@ -224,3 +224,16 @@ msgstr "Introduce your OTP code"
 #: language/translations.py:73
 msgid "Verify"
 msgstr "Verify"
+
+#: language/translations.py:74
+msgid "Login with 42"
+msgstr "Login with 42"
+
+#: language/translations.py:75
+msgid "Privacy Policy"
+msgstr "Privacy Policy"
+
+#: language/translations.py:76
+msgid "Update"
+msgstr "Update"
+

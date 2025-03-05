@@ -1,12 +1,13 @@
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="color: #000;">
-    <div class="modal-dialog">
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true"
+    style="color: #000;">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="loginModalLabel" data-i18n="register.title">Regístrate</h5>
                 <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                
+
                 <!-- Formulario de Login -->
                 <form id="loginForm">
                     <div class="mb-3">
@@ -24,9 +25,25 @@
                         <input type="password" class="form-control" name="password" id="password" required>
                         <span id="errorPassword" class="error"></span><br>
                     </div>
-                    <button type="submit" class="btn btn-primary" data-i18n="register.submit">Ingresar</button>
+                    <div class="mt-3">
+                        <input type="checkbox" id="privacyPolicy" required>
+                        <label for="privacyPolicy" data-i18n="register.privacyPolicy">Al registrarme, confirmo que he leído y acepto la Política de Privacidad y autorizo el uso de mis datos personales según lo indicado en ella.</label>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary w-100" data-i18n="login.submit">Ingresar</button>
+                    </div>
                 </form>
-
+                <div class="separator">
+                    <div ></div>
+                    <span>O</span>
+                    <div ></div>
+                </div>
+                <!-- Botón de login con 42 -->
+                <div class="mt-3">
+                    <a href="/api/users/auth/42/login/" class="btn btn-primary w-100" data-i18n="otp.42">
+                        <i class="fas"></i> Iniciar sesión con 42
+                    </a>
+                </div>
             </div>
         </div>
     </div>

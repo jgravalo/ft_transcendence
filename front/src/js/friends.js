@@ -18,6 +18,7 @@ function blockUser(user)
 	document.getElementById("block-" + user).innerHTML = '<i class="fas fa-lock-open friend-icon" onclick="unlockUser(\'' + user + '\')"></i>';
 	fetchFriend(user, 'block');
 }
+
 function unlockUser(user)
 {
 	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + user + '\')"></i>';
@@ -47,7 +48,7 @@ function fetchFriend(user, rule)
 			"Content-Type": "application/json",
 			'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
 		},
-		body: JSON.stringify(info), 
+		body: JSON.stringify({'user': user}), 
 	})
 	.then(response => response.json())
     .then(data => {

@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'users',
     'two_fa',
     'language',
+    'chat',
 
     'rest_framework', # REST framework
     'corsheaders', # cors-headers
@@ -101,6 +102,12 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'app.urls'
 
 CORS_ALLOW_ALL_ORIGINS = True # cors-headers
+
+#CORS_ALLOWED_ORIGINS = [
+#    "http://localhost:8000",
+#    "http://127.0.0.1:8000",
+#    "http://jgravalo.42.fr:8000",
+#]
 
 CSRF_TRUSTED_ORIGINS = [#'http://*']
     'http://localhost',  # Dominio del frontend
@@ -136,11 +143,11 @@ ASGI_APPLICATION = 'app.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        # 'CONFIG': {
-        #     "hosts": [("127.0.0.1", 6379)],
-        # },
+        # 'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [("chat-redis", 6379)],
+        },
     },
 }
 
@@ -240,6 +247,11 @@ EMAIL_HOST_USER = 'trascendente78@gmail.com'  # Tu dirección de correo
 EMAIL_HOST_PASSWORD = get_vault_secret('django', 'email_host_password') # Tu contraseña o clave para aplicaciones
 DEFAULT_FROM_EMAIL = 'no-reply@example.com'  # Dirección de remitente por defecto
 
+# Configuración de 42 OAuth
+FORTYTWO_CLIENT_ID = os.getenv('FORTYTWO_CLIENT_ID')
+FORTYTWO_CLIENT_SECRET = os.getenv('FORTYTWO_CLIENT_SECRET')
+FORTYTWO_REDIRECT_URI = os.getenv('FORTYTWO_REDIRECT_URI', 'http://localhost:8080/api/users/auth/42/callback/')
+
 """ 
 LOGGING = {
     'version': 1,
@@ -261,8 +273,25 @@ LOGGING = {
     },
 }
  """
-
-# Configuración de 42 OAuth
-FORTYTWO_CLIENT_ID = 'tu_client_id'
-FORTYTWO_CLIENT_SECRET = 'tu_client_secret'
-FORTYTWO_REDIRECT_URI = 'http://localhost:8000/api/users/auth/42/callback/'
+""" 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "channels": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
+} """

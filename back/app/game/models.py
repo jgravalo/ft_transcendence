@@ -1,15 +1,17 @@
 from django.db import models
+from users.models import User
+import uuid
 
 # Create your models here.
 
 class Match(models.Model):
-    id_match = models.IntegerField()  # Campo de número decimal
-    player1 = models.CharField(max_length=100)  # Campo de texto con longitud máxima
-    player2 = models.CharField(max_length=100)  # Campo de texto con longitud máxima
-    p1_move = models.IntegerField(default=0)  # Campo de número decimal
-    p2_move = models.IntegerField(default=0)  # Campo de número decimal
-    #precio = models.DecimalField(max_digits=10, decimal_places=2)  # Campo de número decimal
-    #descripcion = models.TextField()  # Campo de texto largo
+    id_match = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
+    player1 = models.ForeignKey(User, related_name="matches_as_player1", on_delete=models.CASCADE)
+    player2 = models.ForeignKey(User, related_name="matches_as_player2", on_delete=models.CASCADE)
+    winner = models.ForeignKey(User, related_name="matches_won", on_delete=models.SET_NULL, null=True, blank=True)
+    date_played = models.DateTimeField(auto_now_add=True)
+    score_player1 = models.IntegerField(default=0)
+    score_player2 = models.IntegerField(default=0)
 
-    #def __str__(self):
-    #    return self.nombre  # Define cómo se verá el objeto cuando lo representemos como cadena
+    def __str__(self):
+        return f"{self.player1.username} vs {self.player2.username} - Winner: {self.winner.username if self.winner else 'N/A'}"

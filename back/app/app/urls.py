@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import get_home, get_error
 from .health import health_check
-
+from users.views import privacy_policy
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from your_app.views import EnableTOTPView, VerifyTOTPView, EnableEmailOTPView, VerifyEmailOTPView
 
@@ -35,6 +35,8 @@ urlpatterns = [
     path('api/', include([
         path('', get_home, name='get_home'),
         path('error/', get_error, name='get_error'),
+        path('auth/', include('authy.urls')),
+        path('chat/', include('chat.urls')),
         path('game/', include('game.urls')),
         path('users/', include('users.urls')),
         path('two_fa/', include('two_fa.urls')),

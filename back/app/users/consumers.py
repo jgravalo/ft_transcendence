@@ -2,6 +2,7 @@ import json
 import time
 from channels.generic.websocket import WebsocketConsumer
 #from channels.generic.websocket import AsyncWebsocketConsumer
+from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 
 #User = get_user_model()  # 👈 Esto obtiene tu modelo personalizado
@@ -9,15 +10,28 @@ from django.contrib.auth import get_user_model
 class Connection(WebsocketConsumer):
     def connect(self):
         # Aceptar la conexión WebSocket
-        username = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+        # username = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+        print('llego a WebSocket Connect')
+        user = self.scope['user']
+        print("username from ws:", user.username)
         self.accept()
+        print('llego a accept')
+        user.is_online=True
+        user.save()
         self.send(text_data=json.dumps({
             "message": "Conexión WebSocket exitosa from Django",
-            "content": render_to_string("close_login.html");
+            "status": user.is_active,
+            "content": render_to_string("close_login.html")
             }))
 
     def disconnect(self, close_code):
-        pass
+        print('desconexion desde el front')
+        user = self.scope['user']
+        user.is_online=False
+        user.save()
+        # logout(request)
+        self.close()
+        # pass
 
     def receive(self, text_data):
         # Recibir un mensaje desde el WebSocket

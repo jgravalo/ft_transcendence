@@ -11,6 +11,8 @@
 				<th data-i18n="friends.table.username">Username</th>
 				<th data-i18n="friends.table.email">Email</th>
 				<th data-i18n="friends.table.record">Record</th>
+				<th data-i18n="friends.table.action">State</th>
+				<th data-i18n="friends.table.action">-</th>
 				<th data-i18n="friends.table.action">-</th>
 				<th data-i18n="friends.table.action">-</th>
 			</tr>
@@ -24,6 +26,11 @@
 				<td>{{ friend.username }}</td>
 				<td>{{ friend.email }}</td>
 				<td>{{ friend.wins }}-{{ friend.losses }}</td>
+				<td>{% if friend.is_online %}Active{% else %}Unavailable{% endif %}</td>
+				<td id="chat-{{ friend.username }}">
+					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i> -->
+					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.id }}" ></i>
+				</td>
 				<td id="follow-{{ friend.username }}">
 					<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.username }}')"></i>
 				</td>
@@ -47,6 +54,7 @@
 				<th data-i18n="friends.table.username">Username</th>
 				<th data-i18n="friends.table.email">Email</th>
 				<th data-i18n="friends.table.record">Record</th>
+				<th data-i18n="friends.table.action">-</th>
 				<th data-i18n="friends.table.action">-</th>
 				<th data-i18n="friends.table.action">-</th>
 			</tr>
@@ -94,6 +102,10 @@
 				<td>{{ user.username }}</td>
 				<td>{{ user.email }}</td>
 				<td>{{ user.wins }}-{{ user.losses }}</td>
+				<td id="chat-{{ user.username }}">
+					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ user.username }}')"></i> -->
+					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ user.id }}" ></i>
+				</td>
 				<td id="follow-{{ user.username }}">
 					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ user.username }}')"></i>
 				</td>

@@ -1,68 +1,209 @@
-.start-div {
-	height: 80px;
-	align-items: center;
+.silkscreen-regular {
+	font-family: "Silkscreen", sans-serif;
+	font-weight: 400;
+	font-style: normal;
 }
 
-#table {
-	background-color: black;
-	margin: 0 auto;
-	width: 800px;
-	height: 500px;
-	border: 15px solid white;
-	display: flex;
-	justify-content: space-between;
+.silkscreen-bold {
+	font-family: "Silkscreen", sans-serif;
+	font-weight: 700;
+	font-style: normal;
 }
 
-.marcador {
-	margin: 0 auto;
-	width: 300px;
-	display: flex;
-	justify-content: space-between;
+#main-container {
+	width: 100%;
+	display: inline-flex;
+	background-color: bisque;
+}
+.site-container {
+	width: 30%;
+	min-width: 400px;
+	display: block;
+	margin: auto;
+}
+#game-container {
+	width: 450px;
+	background-color: aqua;
+	display: block;
+}
+canvas {
+	border: 15px solid #ffffff;
+	display: block;
+	margin: 20px auto;
 }
 
-.score {
-	font-size: 110px;
-	color: white;
-	font-weight: bold;
-	text-align: center;
-	margin-top: 20px;
-}
-
-.goal {
-	width: 20px;
-}
-
-.figure {
-	background-color: white;
-	height: 100px;
-	width: 10px;
-	/* 	margin: 10px; */
-	/* 	top: 290px;
-	position: absolute; */
-	margin-top: 150px;
-}
-
-#left {
-	margin-left: 10px;
-}
-
-#right {
-	/* margin-top: 150px; */
-	margin-right: 10px;
-}
-
-#ball {
+/* Power-Up placeholder visual */
+.power-up {
+	background-color: #007bff;
+	border: 1px solid #fff;
 	width: 30px;
 	height: 30px;
-	background-color: red;
-	border-radius: 50%;
-	position: absolute; /* Para que podamos moverlo con top y left */
-	top: 400px;
-	left: 50vw;
+	margin: 5px;
 }
 
-@keyframes moveBox {
-	0% { left: 0; top: 0;}
-	50% { left: calc(100% - 100px); top: calc(100% - 100px); } /* Se mueve a la derecha */
-	100% { left: 0; top: 0; } /* Vuelve a la posición inicial */
+#menu {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background-color: #000;
+	color: #fff;
 }
+
+#game-menu h2 {
+	font-size: 2rem;
+	margin-bottom: 20px;
+}
+
+#game-menu button {
+	margin: 10px;
+	padding: 10px 20px;
+	font-size: 1.2rem;
+	background-color: #fff;
+	color: #000;
+	border: none;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+#game-menu button:hover {
+	background-color: #ccc;
+}
+
+#canvas-container {
+	display: none;
+}
+
+
+
+/*!* Font included at game *!*/
+/*.silkscreen-regular {*/
+/*	font-family: "Silkscreen", sans-serif;*/
+/*	font-weight: 400;*/
+/*	font-style: normal;*/
+/*}*/
+
+/*.silkscreen-bold {*/
+/*	font-family: "Silkscreen", sans-serif;*/
+/*	font-weight: 700;*/
+/*	font-style: normal;*/
+/*}*/
+
+/*!* Game Menú *!*/
+/*#game-menu {*/
+/*	display: flex;*/
+/*	flex-direction: column;*/
+/*	align-items: center;*/
+/*	justify-content: center;*/
+/*	height: 100vh;*/
+/*	background-color: #000;*/
+/*	color: #fff;*/
+/*}*/
+
+/*#game-menu h2 {*/
+/*	font-size: 2rem;*/
+/*	margin-bottom: 20px;*/
+/*}*/
+
+/*#game-menu button {*/
+/*	margin: 10px;*/
+/*	padding: 10px 20px;*/
+/*	font-size: 1.2rem;*/
+/*	background-color: #fff;*/
+/*	color: #000;*/
+/*	border: none;*/
+/*	cursor: pointer;*/
+/*	border-radius: 5px;*/
+/*}*/
+
+/*#game-menu button:hover {*/
+/*	background-color: #ccc;*/
+/*}*/
+/*!* Canvas and game container *!*/
+/*#canvas-container {*/
+/*	display: none;*/
+/*}*/
+/*canvas {*/
+/*	border: 15px solid #ffffff;*/
+/*	display: block;*/
+/*	margin: 20px auto;*/
+/*}*/
+
+/*!* Power-Up placeholder visual *!*/
+/*.power-up {*/
+/*	background-color: #007bff;*/
+/*	border: 1px solid #fff;*/
+/*	width: 30px;*/
+/*	height: 30px;*/
+/*	margin: 5px;*/
+/*}*/
+/*!* --- *!*/
+/*.start-div {*/
+/*	height: 80px;*/
+/*	align-items: center;*/
+/*}*/
+
+/*#table {*/
+/*	background-color: black;*/
+/*	margin: 0 auto;*/
+/*	width: 800px;*/
+/*	height: 500px;*/
+/*	border: 15px solid white;*/
+/*	display: flex;*/
+/*	justify-content: space-between;*/
+/*}*/
+
+/*.marcador {*/
+/*	margin: 0 auto;*/
+/*	width: 300px;*/
+/*	display: flex;*/
+/*	justify-content: space-between;*/
+/*}*/
+
+/*.score {*/
+/*	font-size: 110px;*/
+/*	color: white;*/
+/*	font-weight: bold;*/
+/*	text-align: center;*/
+/*	margin-top: 20px;*/
+/*}*/
+
+/*.goal {*/
+/*	width: 20px;*/
+/*}*/
+
+/*.figure {*/
+/*	background-color: white;*/
+/*	height: 100px;*/
+/*	width: 10px;*/
+/*	!* 	margin: 10px; *!*/
+/*	!* 	top: 290px;*/
+/*	position: absolute; *!*/
+/*	margin-top: 150px;*/
+/*}*/
+
+/*#left {*/
+/*	margin-left: 10px;*/
+/*}*/
+
+/*#right {*/
+/*	!* margin-top: 150px; *!*/
+/*	margin-right: 10px;*/
+/*}*/
+
+/*#ball {*/
+/*	width: 30px;*/
+/*	height: 30px;*/
+/*	background-color: red;*/
+/*	border-radius: 50%;*/
+/*	position: absolute; !* Para que podamos moverlo con top y left *!*/
+/*	top: 400px;*/
+/*	left: 50vw;*/
+/*}*/
+
+/*@keyframes moveBox {*/
+/*	0% { left: 0; top: 0;}*/
+/*	50% { left: calc(100% - 100px); top: calc(100% - 100px); } !* Se mueve a la derecha *!*/
+/*	100% { left: 0; top: 0; } !* Vuelve a la posición inicial *!*/
+/*}*/

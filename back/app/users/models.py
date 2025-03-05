@@ -11,7 +11,7 @@ class User(AbstractUser):
 # 	email = models.CharField(max_length=100)
 	email = models.EmailField(max_length=100, unique=True)  # Asegura que el email sea único
 # 	password = models.CharField(max_length=100)
-#	is_active = models.BooleanField(default=True)
+	is_online = models.BooleanField(default=True)
 #	user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
 	image = models.ImageField(upload_to='', default='default.jpg') # Carpeta dentro de MEDIA_ROOT
 	wins = models.IntegerField(default=0)
@@ -44,7 +44,7 @@ class User(AbstractUser):
 		#if token == 'empty':
 		data = decode_token(token)
 		print("data =", data)
-		return cls.objects.get(username=data["username"])
+		return cls.objects.get(id=data["id"])
 
 	def num_friends(self):
 		return self.friends.count()

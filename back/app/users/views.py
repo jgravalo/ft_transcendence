@@ -26,27 +26,32 @@ from django.contrib.auth import authenticate, login, logout
 #         return HttpResponse("Error en las credenciales")
 
 @csrf_exempt  # Esto es necesario si no estás usando el token CSRF en el frontend
-
 def refresh(request):
     data = json.loads(request.body)
     token = data.get('refresh')
     try:
         # 2. Validar el refresh token
-        print("token al empezar:", token)
+        # print("token al empezar:", token)
         refresh = RefreshToken(token)
-        print("aqui")
+        # print("aqui")
         # 3. Crear un nuevo access token desde el refresh token
         new_access_token = str(refresh.access_token)
         data = {
             "access": new_access_token
         }
+        # decoded_payload = jwt.decode(refresh.access_token, settings.SECRET_KEY, algorithms=["HS256"])
+        # user = User.objects.get(id=decoded_payload['id'])
+        # login(request, user)
         return JsonResponse(data)
     except Exception as e:
         return JsonResponse({'error': "Invalid refresh token:" + str(e)}, status=400)
 
 def delete_user(request):
     if request.method == "DELETE":
-        user = User.get_user(request)
+        try:
+            user = User.get_user(request)
+        except:
+            return JsonResponse({'error': 'Forbidden'}, status=403)
         user.delete()
         return JsonResponse({"message": "Usuario borrado con éxito."}, status=200)
     return JsonResponse({"error": "Método no permitido."}, status=405)
@@ -61,6 +66,14 @@ def get_login(request):
     return JsonResponse(data)
 
 def close_login(request):
+    try:
+        user = User.get_user(request)
+        print("Antes de login:", request.user)
+        login(request, user)  # Aquí Django asigna `request.user`
+        print("Después de login:", request.user)
+        print('LOGGED')
+    except:
+        None
     content = render_to_string('close_login.html')
     data = {
         "element": 'bar',
@@ -69,6 +82,11 @@ def close_login(request):
     return JsonResponse(data)
 
 def close_logout(request):
+    try:
+        logout(request)  # Aquí Django desasigna `request.user`
+        print('UNLOGGED')
+    except:
+        None
     content = render_to_string('close_logout.html')
     data = {
         "element": 'bar',
@@ -85,6 +103,7 @@ def set_login(request):
         try:
             username = request.POST.get('username')
             password = request.POST.get('password')
+            print('password:', password)
             try:
                 if not '@' in username:
                     user = User.objects.get(username=username)
@@ -92,8 +111,7 @@ def set_login(request):
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
                 return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
-            # if password != user.password: # unhashed
-            if user.check_password(password): # hashed
+            if not user.check_password(password): # hashed
                 return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
             #user = authenticate(username=username, password=password)
             #if user:
@@ -101,8 +119,6 @@ def set_login(request):
             if not user.two_fa_enabled:
                 content = render_to_string('close_login.html') # online_bar
                 next_path = '/users/profile/'
-                user.is_active=True
-                user.save()
             else:
                 content = render_to_string('close_logout.html') # offline_bar
                 next_path = '/two_fa/verify/'
@@ -144,24 +160,19 @@ def parse_data(username, email, password):
 def set_register(request):
     if request.method == "POST":
         try:
-            print("POST data:", request.POST)
             username = request.POST.get('username')
             email = request.POST.get('email')
             password = request.POST.get('password')
-            print("pillo los datos")
-            print('username: ', username)
-            print('email: ', email)
-            print('password: ', password)
+            print('password:', password)
             if User.objects.filter(username=username).exists():
                 return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
             if User.objects.filter(email=email).exists():
                 return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
             if len(password) < 6:
-                return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}
+                return JsonResponse({'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")})
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
-            # user = User.objects.create(username=username, email=email, password=password) # unhashed
             user = User.objects.create_user(username=username, email=email, password=password) # hashed
             print("password hashed:", user.password)
             login(request, user)  # Aquí Django asigna `request.user`
@@ -184,10 +195,6 @@ def set_register(request):
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
 def get_logout(request):
-    user = User.get_user(request)
-    user.is_active=False
-    user.save()
-    logout(request)  # Aquí Django desasigna `request.user`
     content = render_to_string('logout.html')
     data = {
         "element": 'modalContainer',
@@ -196,8 +203,11 @@ def get_logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    user = User.get_user(request)
-    print("url =", user.image.url)
+    try:
+        user = User.get_user(request)
+    except:
+       return JsonResponse({'error': 'Forbidden'}, status=403)
+    # print("url =", user.image.url)
     context = {
         'user': user
     }
@@ -208,8 +218,28 @@ def profile(request):
     }
     return JsonResponse(data)
 
+def foreign_profile(request):
+    try:
+        username = request.GET.get('user', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
+        user = User.objects.get(username=username)
+    except:
+       return JsonResponse({'error': 'Forbidden'}, status=403)
+    # print("url =", user.image.url)
+    context = {
+        'user': user
+    }
+    content = render_to_string('foreign.html', context)
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
+
 def update(request):
-    user = User.get_user(request)
+    try:
+        user = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     context = {
         'user': user
     }
@@ -226,7 +256,10 @@ from django.core.files.storage import default_storage
 def set_update(request):
     if request.method == "POST":
         try:
-            user = User.get_user(request)
+            try:
+                user = User.get_user(request)
+            except:
+                return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
                 #image = data.get('image')
                 # Acceder al archivo 'image' desde request.FILES
@@ -237,9 +270,9 @@ def set_update(request):
                     #file_path = default_storage.save('profile_images/' + file.name, file)
                     user.image = file#_path  # Asigna el archivo al campo image
                     user.save()  # Guarda el usuario con la imagen
-                print('funciono request.FILES')
+                # print('funciono request.FILES')
                 # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
-                print('funciono image.save')
+                # print('funciono image.save')
             except:
                 print("fallo al subir image")
             username = request.POST.get('username')
@@ -283,11 +316,12 @@ def set_update(request):
 
 @csrf_exempt
 def friends(request):
-    user = User.get_user(request)
+    try:
+        user = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     blocked = user.blocked.all()
     blocked_by = user.blocked_by.all()
-    for block in blocked:
-        print('blocked =', block.username)
     friends = user.friends.all()
     non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked)  - set(blocked_by)
     context = {
@@ -309,8 +343,11 @@ def add_friend(request):
         user2 = User.objects.get(username=friends_name)
     except: #Does not exist
         print(f"user {friends_name} does not exist")
-    print(user2.email)
-    user1 = User.get_user(request)
+    # print(user2.email)
+    try:
+        user1 = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     user1.friends.add(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
@@ -318,12 +355,15 @@ def add_friend(request):
 @csrf_exempt
 def delete_friend(request):
     friends_name = request.GET.get('delete', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-    print(friends_name)
+    # print(friends_name)
     try:
         user2 = User.objects.get(username=friends_name)
     except: #Does not exist
         print(f"user {friends_name} does not exist")
-    user1 = User.get_user(request)
+    try:
+        user1 = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     user1.friends.remove(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
@@ -335,8 +375,11 @@ def block_user(request):
         user2 = User.objects.get(username=blocked_name)
     except: #Does not exist
         print(f"user {blocked_name} does not exist")
-    print(user2.email)
-    user1 = User.get_user(request)
+    # print(user2.email)
+    try:
+        user1 = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     if user1.friends.filter(username=user2.username).exists():
         user1.friends.remove(user2)
     user1.blocked.add(user2)
@@ -350,21 +393,23 @@ def unlock_user(request):
         user2 = User.objects.get(username=blocked_name)
     except: #Does not exist
         print(f"user {blocked_name} does not exist")
-    print(user2.email)
-    user1 = User.get_user(request)
+    # print(user2.email)
+    try:
+        user1 = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     user1.blocked.remove(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
-
 
 @csrf_exempt
 def fortytwo_auth(request):
     if request.method == "GET":
         auth_url = "https://api.intra.42.fr/oauth/authorize"
         params = {
-            'client_id': 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d',
-            'client_secret': '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',
-            'redirect_uri': 'http://localhost:8080/api/users/auth/42/callback/',
+            'client_id': settings.FORTYTWO_CLIENT_ID,
+            'client_secret': settings.FORTYTWO_CLIENT_SECRET,
+            'redirect_uri': settings.FORTYTWO_REDIRECT_URI,
             'response_type': 'code',
             'scope': 'public'
         }
@@ -377,7 +422,7 @@ def fortytwo_auth(request):
 # 42 callback, devuelve JSON y redirige a profile o html
 @csrf_exempt
 def fortytwo_callback(request):
-    print("Callback recibido!")
+    # print("Callback recibido!")
     if request.method == "GET":
         code = request.GET.get('code')
         # Si la petición viene con el header de JSON, procesar como API
@@ -386,10 +431,10 @@ def fortytwo_callback(request):
                 token_url = "https://api.intra.42.fr/oauth/token"
                 token_data = {
                     'grant_type': 'authorization_code',
-                    'client_id': 'u-s4t2ud-065d2e79cc9103d3348f18916b765b6a1b24615ea8d105068433b886622fe14d',
-                    'client_secret': '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',
+                    'client_id': settings.FORTYTWO_CLIENT_ID,
+                    'client_secret': settings.FORTYTWO_CLIENT_SECRET,
                     'code': code,
-                    'redirect_uri': 'http://localhost:8080/api/users/auth/42/callback/'
+                    'redirect_uri': settings.FORTYTWO_REDIRECT_URI
                 }
 
                 token_response = requests.post(token_url, data=token_data)
@@ -405,18 +450,17 @@ def fortytwo_callback(request):
                 user_response.raise_for_status()
                 user_data = user_response.json()
 
-                print("user_data =", user_data)
+                # print("user_data =", user_data)
                 # print("user_data['image_url'] =", user_data['image_url'])
                 try:
                     user = User.objects.get(email=user_data['email'])
                 except User.DoesNotExist:
-                    user = User.objects.create(
+                    user = User.objects.create_user(
                         username=user_data['login'],
                         email=user_data['email'],
-                        password='42auth',
-                        image=user_data['image']['link']
+                        password='42auth'
                     )
-
+                login(request, user)  # Aquí Django asigna `request.user`
                 data = {
                     "access": make_token(user, 'access'),
                     "refresh": make_token(user, 'refresh'),
@@ -434,3 +478,11 @@ def fortytwo_callback(request):
         else:
             return render(request, '42_callback.html')
 
+
+def privacy_policy(request):
+    content = render_to_string('privacy_policy.html')
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)

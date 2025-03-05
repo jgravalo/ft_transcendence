@@ -64,14 +64,24 @@ function fetchPage(href)
 }); */
 
 window.addEventListener("popstate", (event) => {
+    console.log("POPSTATE");
+    if (chatSocket)
+        chatSocket.close();
     path = window.location.pathname;
-    console.log("Nueva URL:", path);
+    console.log("Nueva URL(path):", path);
+    console.log("Se cambió la URL(event.state):", event.state);
+    if (path.startsWith("/get-translations")) {
+        console.log("Ignoring language fetch in handlePopstate.");
+        return;
+    }
     fetchLink(path);
 });
 
 function pushState(path)
 {
     //path = path.slice(1, -1);
+    if (chatSocket)
+        chatSocket.close();
     path = path.slice(1);
     if (path.slice(-1) == '/')
         path = path.slice(0, -1);

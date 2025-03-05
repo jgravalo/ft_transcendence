@@ -11,11 +11,12 @@ def make_token(user, mode):
         time = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
     payload = {
         #"user_id": str(user.user_id),
-        "username": user.username,
+        "id": user.id,
+        #"username": user.username,
         #"role": "admin",
         "exp": datetime.datetime.utcnow() + time, # Expiración
         "jti": str(uuid.uuid4()),  # Generar un identificador único para el token
-        "token_type": "refresh"  # Indicar el tipo de token (refresh o access)
+        "token_type": mode  # Indicar el tipo de token (refresh o access)
     }
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
     print(f"JWT{mode}: " + token)
