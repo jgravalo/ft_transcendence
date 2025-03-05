@@ -68,7 +68,9 @@ def get_login(request):
 def close_login(request):
     try:
         user = User.get_user(request)
-        login(request, user)  # Aquí Django desasigna `request.user`
+        print("Antes de login:", request.user)
+        login(request, user)  # Aquí Django asigna `request.user`
+        print("Después de login:", request.user)
         print('LOGGED')
     except:
         None

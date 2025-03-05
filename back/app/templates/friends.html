@@ -26,7 +26,7 @@
 				<td>{{ friend.username }}</td>
 				<td>{{ friend.email }}</td>
 				<td>{{ friend.wins }}-{{ friend.losses }}</td>
-				<td>{% if friend.is_active %}Active{% else %}Unavailable{% endif %}</td>
+				<td>{% if friend.is_online %}Active{% else %}Unavailable{% endif %}</td>
 				<td id="chat-{{ friend.username }}">
 					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i> -->
 					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.id }}" ></i>

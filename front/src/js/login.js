@@ -1,5 +1,7 @@
 //import { getInfo2FA } from './two_fa.js';
 
+let connSocket = null;
+
 function make2FA()
 {
     handleLinks();
@@ -12,7 +14,7 @@ function makeLogout()
         removeStorage('access');
         removeStorage('refresh');
         document.getElementById('cancel-logout').click();
-        //socket.close();
+        connSocket.close();
         fetchLink('/users/logout/close/');
         fetchLink('/');
         handleLinks();
@@ -167,29 +169,29 @@ function loginSock() // por definir
     const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/';
     //const route = 'ws://back:8000/ws/connect/';
     console.log('ruta: ', route);
-    const socket = new WebSocket(route);
+    connSocket = new WebSocket(route);
     // Escuchar eventos de conexión
-    socket.onopen = function (event) {
+    connSocket.onopen = function (event) {
         console.log("WebSocket conectado");
-        fetchLink('/users/login/close/');
+        //fetchLink('/users/login/close/');
         //const data = JSON.parse(event.data);
         //document.getElementById('bar').innerHTML = data.content;
-        socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
+        connSocket.send(JSON.stringify({ message: "Hola desde el frontend" }));
     };
     // Escuchar mensajes desde el servidor
-    socket.onmessage = function (event) {
+    connSocket.onmessage = function (event) {
         //const data = JSON.parse(event.data);
         //console.log(data.message);
     };
     // Manejar desconexión
-    socket.onclose = function (event) {
+    connSocket.onclose = function (event) {
         //const data = JSON.parse(event.data);
         fetchLink('/users/logout/close/');
         // document.getElementById('bar').innerHTML = data.content;
         console.log("WebSocket desconectado");
     };
     // Manejar errores
-    socket.onerror = function (error) {
+    connSocket.onerror = function (error) {
         console.error("WebSocket error:", error);
     };
 }

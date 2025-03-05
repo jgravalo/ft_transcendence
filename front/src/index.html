@@ -114,7 +114,7 @@
 		window.onload = function() {
 			// Si hay un token de acceso, cargar la barra de usuario autenticado
 			if (sessionStorage.getItem('access')) {
-				fetch('/api/users/login/close/', {
+				fetch(window.location.origin + '/api/users/login/close/', {
 					headers: {
 						'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
 						'Content-Type': 'application/json',
