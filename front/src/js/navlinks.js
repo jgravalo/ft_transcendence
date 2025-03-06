@@ -212,6 +212,10 @@ async function deleteUserAccount() {
 }
 
 function anonymizeUserAccount() {
+    if (!confirm('¿Estás seguro de que quieres anonimizar tu cuenta? Esta acción no se puede deshacer y perderás acceso a la cuenta.')) {
+        return;
+    }
+
     console.log("Anonymizing user account");
     fetch(base + '/api/users/anonymize/', {
         method: 'POST',
@@ -219,8 +223,27 @@ function anonymizeUserAccount() {
             'Authorization': `Bearer ${getJWTToken()}`,
             'Content-Type': 'application/json',
         },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Limpiar los tokens
+        sessionStorage.removeItem('access');
+        sessionStorage.removeItem('refresh');
+        // Redirigir al home
+        window.location.href = '/';
+    })
+    .catch(error => {
+        console.error('Error al anonimizar la cuenta:', error);
+        alert('Error al anonimizar la cuenta. Por favor, intenta de nuevo.');
     });
 }
+
+
 function downloadUserData() {
     console.log("Downloading user data");
     fetch(base + '/api/users/download/', {

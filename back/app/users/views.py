@@ -21,6 +21,8 @@ from io import BytesIO
 from django.http import HttpResponse
 from .serializers import UserSerializer
 import os
+import hashlib
+import secrets
 
 # def iniciar_sesion(request):
 #     usuario = authenticate(username="juan", password="secreto123")
@@ -524,5 +526,51 @@ def download_user_data(request):
         # response['Content'] = f'attachment; filename={user.username}_data.zip'
         
         return response
+    
+    return JsonResponse({"error": "Método no permitido."}, status=405)
+
+@csrf_exempt
+def anonymize_user_account(request):
+    if request.method == "POST":
+        try:
+            user = User.get_user(request)
+        except:
+            return JsonResponse({'error': 'Forbidden'}, status=403)
+        
+        random_salt = secrets.token_hex(8)
+        hash_object = hashlib.sha256((user.username + random_salt).encode())
+        anon_username = 'anon_' + hash_object.hexdigest()[:12]
+        
+        anon_email = f"anon_{hash_object.hexdigest()[:8]}@anonymous.com"
+        
+        # old_username = user.username
+        # print("old_username =", user.username)
+        
+        # Actualizar usuario
+        user.username = anon_username
+        user.email = anon_email
+        user.first_name = ''
+        user.last_name = ''
+        
+        # Eliminar imagen de perfil si no es la default
+        if user.image and user.image.name != 'default.jpg':
+            user.image.delete()
+        user.image = 'default.jpg'
+        
+        # Eliminar conexiones sociales
+        user.friends.clear()
+        user.blocked.clear()
+        
+        random_password = secrets.token_urlsafe(32)
+        user.set_password(random_password)
+        
+        user.save()
+        
+        logout(request)
+        
+        return JsonResponse({
+            "message": "Cuenta anonimizada con éxito",
+            "status": "success"
+        }, status=200)
     
     return JsonResponse({"error": "Método no permitido."}, status=405)
