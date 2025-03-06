@@ -1,9 +1,6 @@
 <div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
 	<div class="modal-header d-flex justify-content-between">
 		<h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5>
-		<button type="button" class="btn btn-danger delete-user-btn">
-			<i class="fas fa-trash"></i>
-		</button>
 	</div>
 	<div class="modal-body">
 		<!-- Formulario de Login -->
@@ -47,5 +44,27 @@
 				</div>
 			<button type="submit" data-i18n="edit.profile.submit">Actualizar</button>
 		</form>
+	</div>
+</div>
+<div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
+	<div class="modal-body">
+		<!-- boton para descargar todos los datos de la cuenta -->
+		<button type="button" class="btn text-white download-user-data-btn">
+			<i class="fas fa-download"></i>
+			<span data-i18n="privacy.data.download.account">Download account data</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<!-- <h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5> -->
+		<!-- <p data-i18n="privacy.data.controller.description">The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona.</p> -->
+		 <!-- Botton para anonimizar datos y eliminar cuenta -->
+		 <button type="button" class="btn btn-danger delete-user-btn">
+			<i class="fas fa-trash"></i>
+			<span data-i18n="privacy.data.delete.account">Delete account</span>
+		</button>
+		<button type="button" class="btn btn-danger anonymize-user-btn">
+			<i class="fas fa-user-times"></i>
+			<span data-i18n="privacy.data.anonymize.account">Anonymize account</span>
+		</button>
 	</div>
 </div>

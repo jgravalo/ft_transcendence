@@ -66,6 +66,16 @@ function handleLinks()
         deleteButton.addEventListener('click', deleteUserAccount);
 
     }
+
+    const anonymizeButton = document.querySelector('.anonymize-user-btn');
+    if (anonymizeButton) {
+        anonymizeButton.addEventListener('click', anonymizeUserAccount);
+    }
+
+    const downloadUserDataButton = document.querySelector('.download-user-data-btn');
+    if (downloadUserDataButton) {
+        downloadUserDataButton.addEventListener('click', downloadUserData);
+    }
 }
 
 function handleLink(event)
@@ -199,6 +209,26 @@ async function deleteUserAccount() {
         console.error('Error al eliminar el usuario:', error);
         alert('Error al eliminar el usuario. Por favor, intenta de nuevo.');
     }
+}
+
+function anonymizeUserAccount() {
+    console.log("Anonymizing user account");
+    fetch(base + '/api/users/anonymize/', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${getJWTToken()}`,
+            'Content-Type': 'application/json',
+        },
+    });
+}
+function downloadUserData() {
+    console.log("Downloading user data");
+    fetch(base + '/api/users/download/', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${getJWTToken()}`,
+        },
+    });
 }
 
 /*
