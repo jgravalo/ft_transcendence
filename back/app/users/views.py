@@ -530,47 +530,106 @@ def download_user_data(request):
     return JsonResponse({"error": "Método no permitido."}, status=405)
 
 @csrf_exempt
-def anonymize_user_account(request):
-    if request.method == "POST":
+def anonymize_user(request):
+    print("Iniciando proceso de anonimización")
+    
+    if request.method != "POST":
+        print("Método incorrecto:", request.method)
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    # Verificar que el token existe
+    auth_header = request.headers.get('Authorization')
+    print("Auth header:", auth_header)
+    
+    if not auth_header:
+        print("No se encontró header de autorización")
+        return JsonResponse({'error': 'No se proporcionó token de autorización'}, status=401)
+    
+    try:
+        # Extraer y validar el token
+        token = auth_header.split(" ")[1]
+        print("Token extraído:", token[:10] + "...")
+        
+        if not token:
+            print("Token vacío después de split")
+            return JsonResponse({'error': 'Token de autorización inválido'}, status=401)
+        
+        # Obtener usuario
         try:
             user = User.get_user(request)
-        except:
-            return JsonResponse({'error': 'Forbidden'}, status=403)
+            print(f"Usuario encontrado: {user.username}")
+        except Exception as e:
+            print(f"Error al obtener usuario: {str(e)}")
+            return JsonResponse({'error': f'Error al obtener usuario: {str(e)}'}, status=403)
         
-        random_salt = secrets.token_hex(8)
-        hash_object = hashlib.sha256((user.username + random_salt).encode())
-        anon_username = 'anon_' + hash_object.hexdigest()[:12]
+        if not user:
+            print("Usuario no encontrado después de get_user")
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
         
-        anon_email = f"anon_{hash_object.hexdigest()[:8]}@anonymous.com"
-        
-        # old_username = user.username
-        # print("old_username =", user.username)
-        
-        # Actualizar usuario
-        user.username = anon_username
-        user.email = anon_email
-        user.first_name = ''
-        user.last_name = ''
-        
-        # Eliminar imagen de perfil si no es la default
-        if user.image and user.image.name != 'default.jpg':
-            user.image.delete()
-        user.image = 'default.jpg'
-        
-        # Eliminar conexiones sociales
-        user.friends.clear()
-        user.blocked.clear()
-        
-        random_password = secrets.token_urlsafe(32)
-        user.set_password(random_password)
-        
-        user.save()
-        
-        logout(request)
-        
+        try:
+            # Crear hash para anonimización
+            salt = secrets.token_hex(8)
+            hash_base = hashlib.sha256((user.username + salt).encode()).hexdigest()
+            print(f"Hash generado para {user.username}")
+            
+            # Crear nuevo username y email anónimos
+            anon_username = f"anon_{hash_base[:8]}"
+            anon_email = f"{hash_base[:12]}@anonymous.com"
+            print(f"Nuevos datos generados: {anon_username}, {anon_email}")
+            
+            # Verificar que el nuevo username no existe
+            if User.objects.filter(username=anon_username).exists():
+                print("Username anónimo ya existe")
+                return JsonResponse({'error': 'Error interno: nombre de usuario duplicado'}, status=409)
+            
+            # Backup de datos antiguos para logging
+            old_username = user.username
+            
+            # Limpiar datos personales
+            user.username = anon_username
+            user.email = anon_email
+            user.first_name = ""
+            user.last_name = ""
+            
+            # Restablecer imagen a default
+            if user.image and user.image.name != 'default.jpg':
+                try:
+                    user.image.delete(save=False)
+                    print("Imagen de perfil eliminada")
+                except Exception as e:
+                    print(f"Error al eliminar imagen: {str(e)}")
+            user.image = 'default.jpg'
+            
+            # Eliminar conexiones sociales
+            user.friends.clear()
+            user.blocked.clear()
+            print("Conexiones sociales eliminadas")
+            
+            # Cambiar contraseña a algo aleatorio
+            user.set_password(secrets.token_urlsafe(32))
+            
+            # Guardar cambios
+            user.save()
+            print(f"Usuario {old_username} anonimizado exitosamente a {anon_username}")
+            
+            # Cerrar sesión del usuario
+            logout(request)
+            
+            return JsonResponse({
+                "status": "success",
+                "message": "Cuenta anonimizada correctamente"
+            })
+            
+        except Exception as e:
+            print(f"Error durante la anonimización: {str(e)}")
+            return JsonResponse({
+                "error": "Error durante la anonimización",
+                "detail": str(e)
+            }, status=500)
+            
+    except Exception as e:
+        print(f"Error general en anonimización: {str(e)}")
         return JsonResponse({
-            "message": "Cuenta anonimizada con éxito",
-            "status": "success"
-        }, status=200)
-    
-    return JsonResponse({"error": "Método no permitido."}, status=405)
+            "error": "Error general en la anonimización",
+            "detail": str(e)
+        }, status=500)

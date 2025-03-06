@@ -24,15 +24,22 @@ def make_token(user, mode):
 
 def decode_token(token):
     try:
-        print("Token válido:", token)
+        print("Decodificando token:", token[:10] + "...")
         decoded_payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        print("Token válido decoded:", decoded_payload)
+        print("Token decodificado:", decoded_payload)
         return decoded_payload
     except jwt.ExpiredSignatureError:
         print("El token ha expirado.")
+        raise ValueError("Token expirado")
     except jwt.InvalidSignatureError:
-        print("El token no esta bien firmado.")
+        print("El token no está bien firmado.")
+        raise ValueError("Token inválido")
     except jwt.DecodeError:
         print("El token no puede ser decodificado.")
+        raise ValueError("Token malformado")
     except jwt.InvalidTokenError:
         print("El token no es válido.")
+        raise ValueError("Token inválido")
+    except Exception as e:
+        print(f"Error inesperado al decodificar token: {str(e)}")
+        raise ValueError(f"Error al procesar token: {str(e)}")

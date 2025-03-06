@@ -39,12 +39,33 @@ class User(AbstractUser):
 		return self.username  # Representación amigable del objeto
 
 	@classmethod
+	# More secure way to get the user :)
 	def get_user(cls, request):
-		token = request.headers.get('Authorization').split(" ")[1]
-		#if token == 'empty':
-		data = decode_token(token)
-		print("data =", data)
-		return cls.objects.get(id=data["id"])
+		try:
+			auth_header = request.headers.get('Authorization')
+			if not auth_header:
+				raise ValueError("No se proporcionó token de autorización")
+			
+			token = auth_header.split(" ")[1]
+			if not token:
+				raise ValueError("Token de autorización vacío")
+			
+			data = decode_token(token)
+			if not data or "id" not in data:
+				raise ValueError("Token inválido o malformado")
+			
+			user = cls.objects.get(id=data["id"])
+			if not user:
+				raise ValueError("Usuario no encontrado")
+			
+			return user
+		
+		except cls.DoesNotExist:
+			raise ValueError("Usuario no encontrado en la base de datos")
+		except ValueError as e:
+			raise ValueError(str(e))
+		except Exception as e:
+			raise ValueError(f"Error al obtener usuario: {str(e)}")
 
 	def num_friends(self):
 		return self.friends.count()
