@@ -25,7 +25,7 @@ function game()
         constructor(mode="auto-play", player1Name = "player1", player2Name = "player2") {
             // --- Game Mode and status
             this.mode = mode;
-            this.running = false;
+            this.running = true;
             // --- Canvas
             this.canvas = document.getElementById('pongCanvas');
             this.ctx = this.canvas.getContext('2d');
@@ -119,7 +119,7 @@ function game()
         }
         // -- Game Loop
         gameLoop() {
-
+            if (!this.running) return;
             if (this.mode) {
                 if (this.mode === "auto-play") {
                     this.moveAI(this.player);
@@ -154,8 +154,14 @@ function game()
 
                 if (this.mode !== "auto-play") {
                     if (this.player.score >= 5) {
+                        if (this.mode === "local") {
+                            this.endGame("Player1 Won!");
+                        }
                         this.endGame('you won!');
                     } else if (this.opponent.score >= 5) {
+                        if (this.mode === "local") {
+                            this.endGame("Player2 Won!");
+                        }
                         this.endGame('you lost :-(');
                     }
                 }
@@ -478,21 +484,16 @@ function game()
 
 
         endGame(winner) {
-            this.running = false;
-            // if (this.mode === 'remote-ai') {
-            //     socket.send(JSON.stringify({
-            //         'step': 'end',
-            //         'player_score': player.score,
-            //         'opponent_score': opponent.score
-            //     }))
-            // }
             message = winner;
-            let current = gameInstance;
-            gameInstance = new PongGame("auto-play", "Hal42", "Norminette");
-            current.destroy();
+            this.running = false;
+            this.destroy();
+            startNewGame("auto-play");
         }
     }
 
+    function startNewGame() {
+        gameInstance = new PongGame("auto-play", "Hal42", "Norminette");
+    }
 
     //
     // function drawRect(x, y, width, height, color) {
@@ -556,12 +557,6 @@ function game()
         message = "Click here to play!";
         gameInstance = new PongGame('auto-play');
     });
-    //
-    // document.addEventListener("DOMContentLoaded", function () {
-    //     document.getElementById("local-game").addEventListener("click", function () { setGameMode("local"); });
-    //     document.getElementById("remote-game").addEventListener("click", function () { setGameMode("remote"); });
-    //     document.getElementById("remote-ia-game").addEventListener("click", function () { setGameMode("remote-ai"); });
-    // });
 
 }
 
