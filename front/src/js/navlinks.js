@@ -228,6 +228,26 @@ function downloadUserData() {
         headers: {
             'Authorization': `Bearer ${getJWTToken()}`,
         },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'user_data.zip';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    })
+    .catch(error => {
+        console.error('Error downloading user data:', error);
+        alert('Error al descargar los datos del usuario');
     });
 }
 

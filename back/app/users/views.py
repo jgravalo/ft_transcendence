@@ -16,6 +16,11 @@ from rest_framework import status
 import requests
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
+import zipfile
+from io import BytesIO
+from django.http import HttpResponse
+from .serializers import UserSerializer
+import os
 
 # def iniciar_sesion(request):
 #     usuario = authenticate(username="juan", password="secreto123")
@@ -476,3 +481,48 @@ def privacy_policy(request):
         "content": content
     }
     return JsonResponse(data)
+
+@csrf_exempt
+def download_user_data(request):
+    if request.method == "GET":
+        try:
+            user = User.get_user(request)
+        except:
+            return JsonResponse({'error': 'Forbidden'}, status=403)
+        
+        zip_buffer = BytesIO()
+        # zip_buffer = BytesDEFFIO() #Testing 
+
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            user_data = UserSerializer(user).data
+            
+            user_data['statistics'] = {
+                'total_matches': user.matches,
+                'wins': user.wins,
+                'losses': user.losses,
+                'win_rate': f"{(user.wins / user.matches * 100) if user.matches > 0 else 0:.2f}%"
+            }
+            
+            user_data['friends_list'] = list(user.friends.values_list('username', flat=True))
+            
+            json_data = json.dumps(user_data, indent=4)
+            zip_file.writestr('user_data.json', json_data)
+            
+            if user.image and user.image.name != 'default.jpg':
+                try:
+                    zip_file.write(user.image.path, f'profile_image{os.path.splitext(user.image.name)[1]}')
+                except:
+                    pass
+        
+        zip_buffer.seek(0)
+        # zip_buffer.see
+        response = HttpResponse(zip_buffer.read(), content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename={user.username}_data.zip'
+
+        # response = JsonResponse(zip_buffer.read(), content_type='application/zip')
+        # response['Content'] = f'attachment; filename={user.username}_data.zip'
+        
+        return response
+    
+    return JsonResponse({"error": "Método no permitido."}, status=405)
