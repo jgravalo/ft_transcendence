@@ -240,3 +240,270 @@ msgstr "Mettre à jour"
 #: language/translations.py:77
 msgid "I confirm that I have read and accept the Privacy Policy and authorize the use of my personal data as indicated in it."
 msgstr "Je confirme que j'ai lu et accepte la Politique de confidentialité et autorise l'utilisation de mes données personnelles conformément à celle-ci."
+
+#: language/translations.py:78
+msgid "Last update: 06/03/2025"
+msgstr "Dernière mise à jour: 06/03/2025"
+
+#: language/translations.py:79
+msgid "Legal basis We process your personal data on the basis of your consent, which you give when you register and accept this Privacy Policy. You can withdraw your consent at any time by requesting the deletion of your account."
+msgstr "Base légale Nous traitons vos données personnelles sur la base de votre consentement, que vous donnez lorsque vous vous inscrivez et acceptez cette Politique de confidentialité. Vous pouvez retirer votre consentement à tout moment en demandant la suppression de votre compte."
+
+#: language/translations.py:80
+msgid "2. What data we store"
+msgstr "2. Quelles données nous stockons"
+
+#: language/translations.py:81
+msgid "We collect and store the following information:"
+msgstr "Nous collectons et stockons les informations suivantes :"
+
+#: language/translations.py:82
+msgid "Account data"
+msgstr "Données du compte"
+
+msgid "Security Data"
+msgstr "Données de sécurité"
+
+msgid "Two-factor authentication (2FA) status"
+msgstr "Statut de l'authentification à deux facteurs (2FA)"
+
+msgid "JWT session tokens"
+msgstr "Jetons de session JWT"
+
+msgid "Game Data"
+msgstr "Données de jeu"
+
+msgid "Match history"
+msgstr "Historique des matchs"
+
+msgid "Statistics (wins, losses, matches played)"
+msgstr "Statistiques (victoires, défaites, matchs joués)"
+
+msgid "Social Data"
+msgstr "Données sociales"
+
+msgid "Friends list"
+msgstr "Liste d'amis"
+
+msgid "Blocked users list"
+msgstr "Liste des utilisateurs bloqués"
+
+msgid "3. Why we store this data"
+msgstr "3. Pourquoi nous stockons ces données"
+
+msgid "Data is stored for:"
+msgstr "Les données sont stockées pour :"
+
+msgid "Account Management"
+msgstr "Gestion du compte"
+
+msgid "Provide and maintain your user account"
+msgstr "Fournir et maintenir votre compte utilisateur"
+
+msgid "Ensure your account security"
+msgstr "Assurer la sécurité de votre compte"
+
+msgid "Game Experience"
+msgstr "Expérience de jeu"
+
+msgid "Manage your game progress and statistics"
+msgstr "Gérer votre progression et vos statistiques de jeu"
+
+msgid "Improve user experience"
+msgstr "Améliorer l'expérience utilisateur"
+
+msgid "4. Legal bases for processing"
+msgstr "4. Bases légales du traitement"
+
+msgid "We process your personal data based on the following legal bases:"
+msgstr "Nous traitons vos données personnelles sur la base des fondements juridiques suivants :"
+
+msgid "User Consent"
+msgstr "Consentement de l'utilisateur"
+
+msgid "When registering and accepting this privacy policy"
+msgstr "Lors de l'inscription et de l'acceptation de cette politique de confidentialité"
+
+msgid "When providing additional profile information"
+msgstr "Lors de la fourniture d'informations supplémentaires sur le profil"
+
+msgid "When participating in social features"
+msgstr "Lors de la participation aux fonctionnalités sociales"
+
+msgid "Contract Execution"
+msgstr "Exécution du contrat"
+
+msgid "To provide the game service"
+msgstr "Pour fournir le service de jeu"
+
+msgid "To manage your account and access"
+msgstr "Pour gérer votre compte et votre accès"
+
+msgid "To maintain your statistics and progress"
+msgstr "Pour maintenir vos statistiques et votre progression"
+
+msgid "Legitimate Interest"
+msgstr "Intérêt légitime"
+
+msgid "To improve our services"
+msgstr "Pour améliorer nos services"
+
+msgid "To ensure platform security"
+msgstr "Pour assurer la sécurité de la plateforme"
+
+msgid "To prevent fraud and abuse"
+msgstr "Pour prévenir la fraude et les abus"
+
+msgid "5. How we protect your data"
+msgstr "5. Comment nous protégeons vos données"
+
+msgid "We implement the following security measures:"
+msgstr "Nous mettons en œuvre les mesures de sécurité suivantes :"
+
+msgid "Access Security"
+msgstr "Sécurité d'accès"
+
+msgid "Password encryption using secure algorithms"
+msgstr "Chiffrement des mots de passe utilisant des algorithmes sécurisés"
+
+msgid "Optional two-factor authentication (2FA)"
+msgstr "Authentification à deux facteurs (2FA) optionnelle"
+
+msgid "JWT tokens for secure sessions"
+msgstr "Jetons JWT pour des sessions sécurisées"
+
+msgid "Data Protection"
+msgstr "Protection des données"
+
+msgid "Secure storage in PostgreSQL databases"
+msgstr "Stockage sécurisé dans des bases de données PostgreSQL"
+
+msgid "Encryption of sensitive data in transit (HTTPS)"
+msgstr "Chiffrement des données sensibles en transit (HTTPS)"
+
+msgid "6. Data Transfer"
+msgstr "6. Transfert de données"
+
+msgid "Data is hosted on servers within the European Union, the application host is Obambu SARL, located in Paris, France."
+msgstr "Les données sont hébergées sur des serveurs au sein de l'Union européenne, l'hébergeur de l'application est Obambu SARL, situé à Paris, France."
+
+msgid "If you use 42 login, the personal data we collect may be transferred to 42, which is the application's authentication provider."
+msgstr "Si vous utilisez la connexion 42, les données personnelles que nous collectons peuvent être transférées à 42, qui est le fournisseur d'authentification de l'application."
+
+msgid "7. Cookies and similar technologies"
+msgstr "7. Cookies et technologies similaires"
+
+msgid "We use cookies and similar technologies for:"
+msgstr "Nous utilisons des cookies et des technologies similaires pour :"
+
+msgid "Essential Functionality"
+msgstr "Fonctionnalités essentielles"
+
+msgid "Session management and authentication"
+msgstr "Gestion de session et authentification"
+
+msgid "User preferences storage"
+msgstr "Stockage des préférences utilisateur"
+
+msgid "Application state maintenance"
+msgstr "Maintenance de l'état de l'application"
+
+msgid "Local Storage"
+msgstr "Stockage local"
+
+msgid "LocalStorage for game data and preferences"
+msgstr "LocalStorage pour les données de jeu et les préférences"
+
+msgid "SessionStorage for temporary session information"
+msgstr "SessionStorage pour les informations temporaires de session"
+
+msgid "Cookies for authentication tokens"
+msgstr "Cookies pour les jetons d'authentification"
+
+msgid "Security"
+msgstr "Sécurité"
+
+msgid "Protection against CSRF attacks"
+msgstr "Protection contre les attaques CSRF"
+
+msgid "Session validation"
+msgstr "Validation des sessions"
+
+msgid "Security monitoring"
+msgstr "Surveillance de la sécurité"
+
+msgid "You can configure your browser to reject some cookies, although this may affect the platform's functionality. For more information about managing cookies in your browser, consult its official documentation."
+msgstr "Vous pouvez configurer votre navigateur pour rejeter certains cookies, bien que cela puisse affecter le fonctionnement de la plateforme. Pour plus d'informations sur la gestion des cookies dans votre navigateur, consultez sa documentation officielle."
+
+msgid "8. Your rights over your data"
+msgstr "8. Vos droits sur vos données"
+
+msgid "If you believe that the processing of your personal data does not comply with current regulations, you have the right to file a complaint with the Spanish Data Protection Agency (or the competent authority in your country of residence)."
+msgstr "Si vous estimez que le traitement de vos données personnelles n'est pas conforme à la réglementation en vigueur, vous avez le droit de déposer une plainte auprès de l'Agence espagnole de protection des données (ou de l'autorité compétente dans votre pays de résidence)."
+
+msgid "As a user, you have the following rights:"
+msgstr "En tant qu'utilisateur, vous disposez des droits suivants :"
+
+msgid "Data Control"
+msgstr "Contrôle des données"
+
+msgid "Access your personal data"
+msgstr "Accéder à vos données personnelles"
+
+msgid "Modify your profile information"
+msgstr "Modifier vos informations de profil"
+
+msgid "Request account deletion"
+msgstr "Demander la suppression de votre compte"
+
+msgid "Export your data"
+msgstr "Exporter vos données"
+
+msgid "Right to temporary suspension of data processing: You can request that we stop processing your data in certain cases."
+msgstr "Droit à la suspension temporaire du traitement des données : Vous pouvez demander que nous arrêtions de traiter vos données dans certains cas."
+
+msgid "9. Data Retention"
+msgstr "9. Conservation des données"
+
+msgid "We retain your personal data while your account is active. If you decide to delete your account, all your personal data will be immediately and permanently deleted. We will only retain anonymized game statistics that do not personally identify you."
+msgstr "Nous conservons vos données personnelles tant que votre compte est actif. Si vous décidez de supprimer votre compte, toutes vos données personnelles seront immédiatement et définitivement supprimées. Nous ne conserverons que des statistiques de jeu anonymisées qui ne permettent pas de vous identifier personnellement."
+
+msgid "Deletion Process"
+msgstr "Processus de suppression"
+
+msgid "All your personal data will be deleted"
+msgstr "Toutes vos données personnelles seront supprimées"
+
+msgid "Only anonymous game statistics will be kept"
+msgstr "Seules les statistiques de jeu anonymes seront conservées"
+
+msgid "Your message history and social relationships will be deleted"
+msgstr "Votre historique de messages et vos relations sociales seront supprimés"
+
+msgid "10. Minors"
+msgstr "10. Mineurs"
+
+msgid "The service can be used by minors under 18 years of age. If you are under 18, you must obtain consent from your parents or guardians to use the service."
+msgstr "Le service peut être utilisé par les mineurs de moins de 18 ans. Si vous avez moins de 18 ans, vous devez obtenir le consentement de vos parents ou tuteurs pour utiliser le service."
+
+msgid "If you become aware that a user under 18 is using the service, you must notify the service administration."
+msgstr "Si vous avez connaissance qu'un utilisateur de moins de 18 ans utilise le service, vous devez en informer l'administration du service."
+
+msgid "11. Changes to the Privacy Policy"
+msgstr "11. Modifications de la politique de confidentialité"
+
+msgid "We may update this Privacy Policy at any time. We will notify you of significant changes through the application or the email associated with your account. The date of the last update will be indicated at the top of this page."
+msgstr "Nous pouvons mettre à jour cette politique de confidentialité à tout moment. Nous vous informerons des changements importants via l'application ou l'email associé à votre compte. La date de la dernière mise à jour sera indiquée en haut de cette page."
+
+msgid "12. Contact"
+msgstr "12. Contact"
+
+msgid "For any privacy and data handling inquiries, you can contact the system administrator at contact@pong42.com"
+msgstr "Pour toute question concernant la confidentialité et le traitement des données, vous pouvez contacter l'administrateur système à l'adresse contact@pong42.com"
+
+msgid "1. Data Controller"
+msgstr "1. Responsable du traitement des données"
+
+msgid "The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
+msgstr "Le responsable du traitement des données est Pong42, avec l'adresse Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
+

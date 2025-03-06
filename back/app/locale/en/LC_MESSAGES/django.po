@@ -240,3 +240,32 @@ msgstr "Update"
 #: language/translations.py:77
 msgid "I confirm that I have read and accept the Privacy Policy and authorize the use of my personal data as indicated in it."
 msgstr "I confirm that I have read and accept the Privacy Policy and authorize the use of my personal data as indicated in it."
+
+#: language/translations.py:78
+msgid "Last update: 06/03/2025"
+msgstr "Last update: 06/03/2025"
+
+#: language/translations.py:79
+msgid "Legal basis We process your personal data on the basis of your consent, which you give when you register and accept this Privacy Policy. You can withdraw your consent at any time by requesting the deletion of your account."
+msgstr "Legal basis We process your personal data on the basis of your consent, which you give when you register and accept this Privacy Policy. You can withdraw your consent at any time by requesting the deletion of your account."
+
+#: language/translations.py:80
+msgid "2. What data we store"
+msgstr "2. What data we store"
+
+#: language/translations.py:81
+msgid "We collect and store the following information:"
+msgstr "We collect and store the following information:"
+
+#: language/translations.py:82
+msgid "Account data"
+msgstr "Account data"
+
+#: language/translations.py:83
+msgid "1. Data Controller"
+msgstr "1. Data Controller"
+
+#: language/translations.py:84
+msgid "The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
+msgstr "The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
+
