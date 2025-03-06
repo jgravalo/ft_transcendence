@@ -211,7 +211,7 @@ async function deleteUserAccount() {
     }
 }
 
-function anonymizeUserAccount() {
+async function anonymizeUserAccount() {
     if (!confirm('¿Estás seguro de que quieres anonimizar tu cuenta? Esta acción no se puede deshacer.')) {
         return;
     }
@@ -223,42 +223,73 @@ function anonymizeUserAccount() {
         return;
     }
 
-    console.log('Iniciando proceso de anonimización...');
-    console.log('Token presente:', !!token);
+    // Si el token está expirado, intentar renovarlo
+    if (isTokenExpired(token)) {
+        console.log('Token expirado, intentando renovar...');
+        try {
+            const refreshToken = sessionStorage.getItem('refresh');
+            if (!refreshToken) {
+                throw new Error('No hay refresh token disponible');
+            }
 
-    fetch(base + '/api/users/anonymize/', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),
+            const response = await fetch(base + '/api/users/refresh/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refresh: refreshToken })
+            });
+
+            if (!response.ok) {
+                throw new Error('No se pudo renovar el token');
+            }
+
+            const data = await response.json();
+            sessionStorage.setItem('access', data.access);
+        } catch (error) {
+            console.error('Error al renovar token:', error);
+            alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            sessionStorage.removeItem('access');
+            sessionStorage.removeItem('refresh');
+            window.location.href = '/';
+            return;
         }
-    })
-    .then(async response => {
+    }
+
+    // Usar el token renovado
+    const currentToken = getJWTToken();
+    console.log('Iniciando proceso de anonimización...');
+
+    try {
+        const response = await fetch(base + '/api/users/anonymize/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${currentToken}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            }
+        });
+
         const data = await response.json();
         console.log('Respuesta del servidor:', data);
-        
+
         if (!response.ok) {
             throw new Error(data.error || data.detail || 'Error desconocido en el servidor');
         }
-        
+
         if (data.status === 'success') {
             console.log('Anonimización exitosa');
-            // Limpiar tokens
             sessionStorage.removeItem('access');
             sessionStorage.removeItem('refresh');
             alert('Tu cuenta ha sido anonimizada correctamente.');
-            // Redirigir al home
             window.location.href = '/';
         } else {
             throw new Error(data.error || 'La respuesta del servidor no indica éxito');
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error detallado:', error);
-        console.error('Mensaje de error:', error.message);
         alert('Error al anonimizar la cuenta: ' + error.message);
-    });
+    }
 }
 
 
