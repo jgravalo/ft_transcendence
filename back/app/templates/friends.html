@@ -1,122 +1,136 @@
-<h1 style="color: white;" data-i18n="friends.list.title">Lista de Usuarios</h1>
-<form class="search-bar" action="/search" method="get">
-	<input type="text" name="search" placeholder="Search..." data-i18n="friends.search.placeholder" />
-	<button type="submit"><i class="fas fa-search"></i></button>
-</form>
-<h5 style="color: white;" data-i18n="friends.title">Friends</h1>
-	<table class="user">
-		<thead>
-			<tr>
-				<th data-i18n="friends.table.index">#</th>
-				<th data-i18n="friends.table.username">Username</th>
-				<th data-i18n="friends.table.email">Email</th>
-				<th data-i18n="friends.table.record">Record</th>
-				<th data-i18n="friends.table.action">State</th>
-				<th data-i18n="friends.table.action">-</th>
-				<th data-i18n="friends.table.action">-</th>
-				<th data-i18n="friends.table.action">-</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for friend in friends %}
-			<tr>
-				<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
-					<img src="{{ friend.image.url }}">
-				</div></td>
-				<td>{{ friend.username }}</td>
-				<td>{{ friend.email }}</td>
-				<td>{{ friend.wins }}-{{ friend.losses }}</td>
-				<td>{% if friend.is_active %}Active{% else %}Unavailable{% endif %}</td>
-				<td id="chat-{{ friend.username }}">
-					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i> -->
-					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.id }}" ></i>
-				</td>
-				<td id="follow-{{ friend.username }}">
-					<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.username }}')"></i>
-				</td>
-				<td id="block-{{ friend.username }}">
-					<i class="fas fa-ban friend-icon" onclick="blockUser('{{ friend.username }}')" style="color: brown;"></i>
-				</td>
-			</tr>
-			{% empty %}
-			<tr>
-				<td colspan="4" data-i18n="friends.friends.empty">You don't have friends</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+<div class="profile-container">
+	<h1 class="username" data-i18n="friends.list.title">Lista de Usuarios</h1>
+	
+	<div class="search-bar">
+		<input type="text" name="search" placeholder="Search..." data-i18n="friends.search.placeholder" />
+		<button type="submit"><i class="fas fa-search"></i></button>
+	</div>
 
-<h5 style="color: white;" data-i18n="friends.blocked.title">blocked users</h1>
-	<table class="user">
-		<thead>
-			<tr>
-				<th data-i18n="friends.table.index">#</th>
-				<th data-i18n="friends.table.username">Username</th>
-				<th data-i18n="friends.table.email">Email</th>
-				<th data-i18n="friends.table.record">Record</th>
-				<th data-i18n="friends.table.action">-</th>
-				<th data-i18n="friends.table.action">-</th>
-				<th data-i18n="friends.table.action">-</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for blocked in blockeds %}
-			<tr>
-				<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
-					<img src="{{ blocked.image.url }}">
-				</div></td>
-				<td>{{ blocked.username }}</td>
-				<td>{{ blocked.email }}</td>
-				<td>{{ blocked.wins }}-{{ blocked.losses }}</td>
-				<td id="follow-{{ blocked.username }}"> </td>
-				<td id="block-{{ blocked.username }}">
-					<i class="fas fa-lock-open friend-icon" onclick="unlockUser('{{ blocked.username }}')"></i>
-				</td>
-			</tr>
-			{% empty %}
-			<tr>
-				<td colspan="4" data-i18n="friends.blocked.empty">There are not blocked users.</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+	<div class="section-container">
+		<h2 class="section-title" data-i18n="friends.title">Friends</h2>
+		<div class="table-container">
+			<table class="user">
+				<thead>
+					<tr>
+						<th data-i18n="friends.table.index">#</th>
+						<th data-i18n="friends.table.username">Username</th>
+						<th data-i18n="friends.table.email">Email</th>
+						<th data-i18n="friends.table.record">Record</th>
+						<th data-i18n="friends.table.action">State</th>
+						<th data-i18n="friends.table.action">-</th>
+						<th data-i18n="friends.table.action">-</th>
+						<th data-i18n="friends.table.action">-</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for friend in friends %}
+					<tr>
+						<td><div class="user-photo">
+							<img src="{{ friend.image.url }}" alt="{{ friend.username }}">
+						</div></td>
+						<td>{{ friend.username }}</td>
+						<td>{{ friend.email }}</td>
+						<td>{{ friend.wins }}-{{ friend.losses }}</td>
+						<td>{% if friend.is_active %}Active{% else %}Unavailable{% endif %}</td>
+						<td id="chat-{{ friend.username }}">
+							<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.id }}"></i>
+						</td>
+						<td id="follow-{{ friend.username }}">
+							<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.username }}')"></i>
+						</td>
+						<td id="block-{{ friend.username }}">
+							<i class="fas fa-ban friend-icon" onclick="blockUser('{{ friend.username }}')"></i>
+						</td>
+					</tr>
+					{% empty %}
+					<tr>
+						<td colspan="8" class="empty-message" data-i18n="friends.friends.empty">You don't have friends</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 
-<h5 style="color: white;" data-i18n="friends.other.title">Other users</h1>
-	<table class="user">
-		<thead>
-			<tr>
-				<th data-i18n="friends.table.index">#</th>
-				<th data-i18n="friends.table.username">Username</th>
-				<th data-i18n="friends.table.email">Email</th>
-				<th data-i18n="friends.table.record">Record</th>
-				<th data-i18n="friends.table.action">-</th>
-				<th data-i18n="friends.table.action">-</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for user in users %}
-			<tr>
-				<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
-					<img src="{{ user.image.url }}">
-				</div></td>
-				<td>{{ user.username }}</td>
-				<td>{{ user.email }}</td>
-				<td>{{ user.wins }}-{{ user.losses }}</td>
-				<td id="chat-{{ user.username }}">
-					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ user.username }}')"></i> -->
-					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ user.id }}" ></i>
-				</td>
-				<td id="follow-{{ user.username }}">
-					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ user.username }}')"></i>
-				</td>
-				<td id="block-{{ user.username }}">
-					<i class="fas fa-ban friend-icon" onclick="blockUser('{{ user.username }}')" style="color: brown;"></i>
-				</td>
-			</tr>
-			{% empty %}
-			<tr>
-				<td colspan="4" data-i18n="friends.other.empty">There are not users.</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+	<div class="section-container">
+		<h2 class="section-title" data-i18n="friends.blocked.title">Blocked Users</h2>
+		<div class="table-container">
+			<table class="user">
+				<thead>
+					<tr>
+						<th data-i18n="friends.table.index">#</th>
+						<th data-i18n="friends.table.username">Username</th>
+						<th data-i18n="friends.table.email">Email</th>
+						<th data-i18n="friends.table.record">Record</th>
+						<th data-i18n="friends.table.action">-</th>
+						<th data-i18n="friends.table.action">-</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for blocked in blockeds %}
+					<tr>
+						<td><div class="user-photo">
+							<img src="{{ blocked.image.url }}" alt="{{ blocked.username }}">
+						</div></td>
+						<td>{{ blocked.username }}</td>
+						<td>{{ blocked.email }}</td>
+						<td>{{ blocked.wins }}-{{ blocked.losses }}</td>
+						<td id="follow-{{ blocked.username }}"></td>
+						<td id="block-{{ blocked.username }}">
+							<i class="fas fa-lock-open friend-icon" onclick="unlockUser('{{ blocked.username }}')"></i>
+						</td>
+					</tr>
+					{% empty %}
+					<tr>
+						<td colspan="6" class="empty-message" data-i18n="friends.blocked.empty">There are not blocked users.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="section-container">
+		<h2 class="section-title" data-i18n="friends.other.title">Other Users</h2>
+		<div class="table-container">
+			<table class="user">
+				<thead>
+					<tr>
+						<th data-i18n="friends.table.index">#</th>
+						<th data-i18n="friends.table.username">Username</th>
+						<th data-i18n="friends.table.email">Email</th>
+						<th data-i18n="friends.table.record">Record</th>
+						<th data-i18n="friends.table.action">-</th>
+						<th data-i18n="friends.table.action">-</th>
+						<th data-i18n="friends.table.action">-</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for user in users %}
+					<tr>
+						<td><div class="user-photo">
+							<img src="{{ user.image.url }}" alt="{{ user.username }}">
+						</div></td>
+						<td>{{ user.username }}</td>
+						<td>{{ user.email }}</td>
+						<td>{{ user.wins }}-{{ user.losses }}</td>
+						<td id="chat-{{ user.username }}">
+							<i class="fas fa-comment friend-icon link" href="/chat/?user={{ user.id }}"></i>
+						</td>
+						<td id="follow-{{ user.username }}">
+							<i class="fas fa-plus friend-icon" onclick="addFriend('{{ user.username }}')"></i>
+						</td>
+						<td id="block-{{ user.username }}">
+							<i class="fas fa-ban friend-icon" onclick="blockUser('{{ user.username }}')"></i>
+						</td>
+					</tr>
+					{% empty %}
+					<tr>
+						<td colspan="7" class="empty-message" data-i18n="friends.other.empty">There are not users.</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
