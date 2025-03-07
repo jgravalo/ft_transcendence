@@ -82,9 +82,9 @@ function handleLink(event)
 {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
     var path = event.currentTarget.getAttribute('href');
-    if (path == "/")
+    /* if (path == "/")
         path = "";
-    else if (!path.includes('?'))
+    else  */if (!path.includes('?'))
         path += "/";
     var state = base + path;
     console.log("path = " + path);
@@ -110,7 +110,7 @@ function handleLink(event)
 	console.log('path for GET =', path);
     
     // fetch(base + ":8000" + path, {
-        var get = '/api' + path;
+    var get = '/api' + path;
         if (path == "")
             get = path;
     console.log('fetch for GET =', base + get);
@@ -141,7 +141,7 @@ function handleLink(event)
         } */
         else
         {
-            if (path != '/users/logout/close/')
+            if (path != '/users/login/close/' && path != '/users/logout/close/')
                 pushState(path);
             if (path == '/users/update/')
                 makePost(path);
