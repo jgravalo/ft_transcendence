@@ -26,6 +26,7 @@ function game()
             // --- Game Mode and status
             this.mode = mode;
             this.running = true;
+            this.waiting = false;
             // --- Canvas
             this.canvas = document.getElementById('pongCanvas');
             this.ctx = this.canvas.getContext('2d');
@@ -43,8 +44,19 @@ function game()
             this.collisionCount = 0;
             this.playerName = player1Name;
             this.opponentName = player2Name;
-            if (mode !== "auto-play") {
+            if (this.mode !== "auto-play") {
                 message = null;
+            }
+            // --- Remote Vars
+            this.socket = null;
+            if (this.mode === 'remote-ai') {
+                this.socket = new WebSocket('ws://localhost:8000/ws/gamehal/');
+            } else if (this.mode === "remote") {
+                this.socket = new WebSocket('ws://localhost:8000/ws/game/');
+            }
+            if (this.socket !== null) {
+                this.connectSocket();
+                this.socketListener();
             }
 
             this.player = {
@@ -113,7 +125,11 @@ function game()
         }
         destroy() {
             this.running = false;
+            if (this.socket !== null) {
+                this.socket.close();
+            }
             document.removeEventListener('keydown', this.keydownHandler);
+            document.removeEventListener('keyup', this.keyUpHandler);
             this.canvas.removeEventListener("click", this.canvasClickHandler);
             document.removeEventListener("click", this.documentClickHandler);
         }
@@ -126,50 +142,62 @@ function game()
                     this.moveAI(this.opponent);
                     this.moveBall();
                     this.movePowerUps();
-                } else if (this.mode !== 'remote') {
-                    this.updateGame();
                 } else {
-                    // this.updateRemoteGame();
+                    this.updateGame();
                 }
                 this.drawGame();
                 requestAnimationFrame(() => this.gameLoop());
             }
         }
 
+        updateRemoteGame() {
+            if (this.mode === "remote") {
+                this.movePaddle(this.player);
+                this.socket.send(JSON.stringify({
+                    'step': 'update',
+                    'role': this.player.role,
+                    'position': this.player.x
+                }))
+            } else {
+                this.socket.send(JSON.stringify({
+                    'step': 'move',
+                    'opponent': this.opponent,
+                    'ball': this.ball
+                }))
+            }
+        }
+
+
         updateGame() {
             if (!this.mode) return;
-
+            // TODO CHECK THIS BEHAVIOUR
+            if (this.mode === "remote" || this.mode === "remote-ai") {
+                this.updateRemoteGame();
+                if (this.mode === "remote") return;
+            }
             this.movePaddle(this.player);
             this.movePaddle(this.opponent);
-            if (this.mode === 'local') {
-                this.movePaddle(this.opponent);
-            } else if (this.mode === 'remote-ai') {
-                // listener();
-                this.movePaddle(this.opponent);
-            }
-            if (this.mode !== 'remote') {
-                this.moveBall();
-                this.movePowerUps();
-                this.checkPowerUpCollisions();
+            this.moveBall();
+            this.movePowerUps();
+            this.checkPowerUpCollisions();
 
-                if (this.mode !== "auto-play") {
-                    if (this.player.score >= 5) {
-                        if (this.mode === "local") {
-                            this.endGame("Player1 Won!");
-                        }
-                        this.endGame('you won!');
-                    } else if (this.opponent.score >= 5) {
-                        if (this.mode === "local") {
-                            this.endGame("Player2 Won!");
-                        }
-                        this.endGame('you lost :-(');
+            if (this.mode !== "auto-play") {
+                if (this.player.score >= 5) {
+                    if (this.mode === "local") {
+                        this.endGame("Player1 Won!");
                     }
+                    this.endGame('you won!');
+                } else if (this.opponent.score >= 5) {
+                    if (this.mode === "local") {
+                        this.endGame("Player2 Won!");
+                    }
+                    this.endGame('you lost :-(');
                 }
             }
         }
         drawGame() {
             this.drawRect(0, 0, this.canvas.width, this.canvas.height, '#000');
-            if (this.mode === 'auto-play') {
+            if (message  !== null) {
                 this.drawMessage(message);
             }
             this.drawDashedLine();
@@ -180,6 +208,93 @@ function game()
             this.drawScore();
             this.drawPlayerName();
             this.drawOpponentName();
+        }
+        // -- Remote Mode
+        connectSocket() {
+            this.socket.onopen = () => {
+                this.socket.send(JSON.stringify({
+                    step: 'join',
+                    username: this.playerName,
+                    player: this.player,
+                    mode: this.mode}
+                ));
+            };
+        }
+
+        socketListener () {
+            this.socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.step === 'wait') {
+                    this.running = false;
+                    this.waiting = true;
+                    this.resetBall();
+                    this.playerName = data.playerName;
+                    this.waitingLoop('Waiting for a victim!');
+                } else if (data.step === 'ready') {
+                    this.waiting = false;
+                    if (data.playerRole === 'player1') {
+                        Object.assign(this.player, data.player1);
+                        this.playerName = data.playerName;
+                        this.opponentName = data.opponentName;
+                    } else {
+                        Object.assign(this.player, data.player2);
+                        this.playerName = data.opponentName;
+                        this.opponentName = data.playerName;
+                    }
+                    this.startingLoop(data.message);
+                } else if (data.step === 'start') {
+                    this.running = true;
+                    this.opponentName = data.opponentName;
+                    this.playerName = data.playerName;
+                    this.gameLoop();
+                } else if (data.step === 'go') {
+                    this.running = true;
+                    this.playerName = data.player1Name;
+                    this.opponentName = data.player2Name;
+                    if (this.player.role === 'player1') {
+                        Object.assign(this.opponent, data.player2);
+                        Object.assign(this.player, data.player1);
+                    } else {
+                        Object.assign(this.opponent, data.player1);
+                        Object.assign(this.player, data.player2);
+                    }
+                    Object.assign(this.ball, data.ball);
+                    this.updateRemoteGame();
+                    this.gameLoop();
+                } else if (data.step === 'endOfGame') {
+                //     TODO: Implementar re-match
+                } else if (data.step === 'move') {
+                    this.opponent.x = data.position;
+                } else if (data.step === 'update') {
+                    Object.assign(this.opponent, data.opponent);
+                    Object.assign(this.player, data.player);
+                    Object.assign(this.ball, data.ball);
+                    this.powerUps = data.powerUps;
+                }
+            };
+        }
+        // -- Remote Mode loops
+        waitingLoop(msg) {
+            if (!this.waiting) return;
+            this.movePaddle(this.player);
+            this.updateGame();
+            this.drawMessage(msg);
+            this.ballPlay();
+            this.ballBounce();
+            this.drawRect(this.ball.x - this.ball.size / 2, this.ball.y - this.ball.size / 2, this.ball.size, this.ball.size, this.ball.color);
+            requestAnimationFrame(() => this.waitingLoop(msg));
+        }
+
+        startingLoop(msg) {
+            if (!this.running) {
+                this.movePaddle(player);
+                this.drawMessage(msg);
+                this.drawDashedLine();
+                this.drawRect(this.player.x, this.player.y, this.player.width, this.player.height, this.player.color);
+                this.drawPlayerName();
+                this.drawOpponentName();
+                requestAnimationFrame(() => this.startingLoop(msg));
+            }
         }
         // -- Listeners
         initEventListeners() {
@@ -203,11 +318,19 @@ function game()
             document.addEventListener('keyup', this.keyUpHandler);
         }
 
+        clickMode (msg, mode) {
+            const menu = document.getElementById("overlay");
+            if (menu.style.display === "flex") {
+                menu.style.display = "none";
+                this.endGame(msg, mode);
+            }
+        }
+
         initUIListeners() {
             this.uiHandlers = {
-                local: () => setGameMode("local"),
-                remote: () => setGameMode("remote"),
-                remoteAI: () => setGameMode("remote-ai")
+                local: () => this.clickMode(null, "local"),
+                remote: () => this.clickMode(null, "remote"),
+                remoteAI: () => this.clickMode(null, "remote-ai")
             };
 
             document.getElementById("local-game").addEventListener("click", this.uiHandlers.local);
@@ -483,16 +606,20 @@ function game()
         }
 
 
-        endGame(winner) {
-            message = winner;
+        endGame(msg, mode="auto-play") {
+            message = msg;
             this.running = false;
             this.destroy();
-            startNewGame("auto-play");
+            startNewGame(mode);
         }
     }
 
-    function startNewGame() {
-        gameInstance = new PongGame("auto-play", "Hal42", "Norminette");
+    function startNewGame(mode) {
+        if (mode === "auto-play") {
+            gameInstance = new PongGame("auto-play", "Hal42", "Norminette");
+        } else {
+            gameInstance = new PongGame(mode);
+        }
     }
 
     //
