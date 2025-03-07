@@ -86,7 +86,7 @@ To add a new secret use the kv put function.
 
 ```sh
 #For the new_service container
-vault kv put secret/new_service secret_1-"user" secret_2="password"
+vault kv put secret/new_service secret_1="user" secret_2="password"
 ```
 
 ## 3. Fetching Secrets in Python
