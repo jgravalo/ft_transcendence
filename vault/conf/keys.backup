@@ -1,7 +1,7 @@
 Vault:
-root_token=hvs.r840eI3jck2rSl7CTyNYQzTw
-new=hvs.toDVk5SP6J8jtQpd3AfPKYIn
 
+root_token=hvs.yJX1xIdRvp7Y72uEl7h7T9sI
+orphan root token=hvs.30k1ZSsaCdw8I8lcgADvwOxC
 DB:
 role_id=6d40c02e-0532-b346-f321-f32b6a241d88
 secret_id=878a456d-3888-4059-0e1e-c6ec5f68937b

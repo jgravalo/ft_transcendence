@@ -74,30 +74,12 @@ services:
     depends_on:
       vault:
         condition: service_healthy
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
-
-  db-exporter:
-    image: db-exporter
-    build:
-      context: ./db-exporter
-    container_name: db-exporter
-    env_file:
-      - ./db-exporter/.env
-    networks:
-      - pongnet
-    ports:
-      - "9187:9187"
-    depends_on:
-      vault:
-        condition: service_healthy
-      db:
-        condition: service_started
-      prometheus:
-        condition: service_started
 
   vault:
     image: vault
@@ -110,16 +92,25 @@ services:
       - "8200:8200"
     volumes:
       - ./vault/data:/vault/data
-    restart: always
     networks:
       - pongnet
     cap_add:
       - IPC_LOCK
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "sh", "-c", "vault status | grep -q 'Sealed.*false'"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: chat-redis
+    ports:
+      - "8379:6379"
+    networks:
+      - pongnet
+    restart: always
 
   prometheus:
     image: prometheus
@@ -130,15 +121,38 @@ services:
       - pongnet
     ports:
       - "9090:9090"
+    restart: unless-stopped
 
-  redis:
-    image: redis:latest
-    container_name: chat-redis
-    ports:
-      - "8379:6379"
+  db-exporter:
+    image: db-exporter
+    build:
+      context: ./db-exporter
+    container_name: db-exporter
+    env_file:
+      - ./db-exporter/.env
     networks:
       - pongnet
-    restart: always
+    depends_on:
+      vault:
+        condition: service_healthy
+      db:
+        condition: service_started
+      prometheus:
+        condition: service_started
+    restart: unless-stopped
+
+  waf-exporter:
+    image: waf-exporter
+    build:
+      context: ./waf-exporter
+    container_name: waf-exporter
+    networks:
+      - pongnet
+    ports:
+      - "9187:9187"
+    depends_on:
+      - waf
+    restart: unless-stopped
 
 volumes:
   pgdata:
