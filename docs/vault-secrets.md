@@ -193,3 +193,39 @@ fi
 # ---------------------------------------------------------------
 export NEW_PASSWORD
 ```
+
+## 5. Recreating a Root Token (If Lost)
+
+If you ever lose or invalidate your root token, you can generate a new one. Here’s the process:
+
+### Step 1: Unseal Vault (if needed).
+
+If Vault is sealed, use your unseal keys:
+
+```bash
+vault operator unseal
+Repeat until sealed: false. You need the unseal keys from your initial Vault setup.
+Generate a Root Token.
+```
+
+Start the “generate-root” process:
+
+```bash
+vault operator generate-root -init
+```
+
+You’ll see a `nonce` in the output and an `OTP`, bot will be used after.
+Generate the token usisng the nonse and the unseal_key available in `/data/.keys`
+
+```bash
+vault operator generate-root -nonce=<your_nonce> <unseal_key>
+```
+
+Decode the Encoded Token with :
+```bash
+vault operator generate-root -otp -decode <encoded_token_here>
+```
+
+This prints a new root token (for example, hvs.K3DK...).
+Update /vault/conf/keys.backup (or your secret manager) with this new root token.
+

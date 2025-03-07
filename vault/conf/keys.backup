@@ -1,7 +1,10 @@
 Vault:
+root_token=hvs.5myxWfFKfNaweisS1XKu2oCS
 
-root_token=hvs.yJX1xIdRvp7Y72uEl7h7T9sI
-orphan root token=hvs.30k1ZSsaCdw8I8lcgADvwOxC
+Prometheus:
+role_id=4ca18fbe-7109-c973-a183-871dc3db065c
+secret_id=cfbeb263-1789-16ad-ebc9-8bd01e74c149
+
 DB:
 role_id=6d40c02e-0532-b346-f321-f32b6a241d88
 secret_id=878a456d-3888-4059-0e1e-c6ec5f68937b

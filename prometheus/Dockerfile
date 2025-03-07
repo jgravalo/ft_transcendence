@@ -3,5 +3,6 @@ FROM prom/prometheus:v2.42.0
 
 # Copy your custom configuration file
 COPY ./conf/prometheus.yml /etc/prometheus/
+COPY ./tool/entrypoint.sh /etc/prometheus/
 
-# No CMD/ENTRYPOINT needed here because the official base image sets it already.
+ENTRYPOINT [ "/bin/sh", "/etc/prometheus/entrypoint.sh" ]
