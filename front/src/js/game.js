@@ -46,6 +46,9 @@ function game()
             this.opponentName = player2Name;
             if (this.mode !== "auto-play") {
                 message = null;
+            } else {
+                this.playerName = "Norminette";
+                this.opponentName = "Hal42";
             }
             // --- Remote Vars
             this.socket = null;
@@ -120,7 +123,8 @@ function game()
             };
             this.initEventListeners();
             this.initUIListeners();
-            this.initCanvasListeners();
+            this.initCanvasListeners("auto-play", "overlay");
+            this.initCanvasListeners("remote", "cancel-wait");
             this.gameLoop();
         }
         destroy() {
@@ -171,7 +175,7 @@ function game()
         updateGame() {
             if (!this.mode) return;
             // TODO CHECK THIS BEHAVIOUR
-            if (this.mode === "remote" || this.mode === "remote-ai") {
+            if (this.running && (this.mode === "remote" || this.mode === "remote-ai")) {
                 this.updateRemoteGame();
                 if (this.mode === "remote") return;
             }
@@ -232,6 +236,7 @@ function game()
                     this.waitingLoop('Waiting for a victim!');
                 } else if (data.step === 'ready') {
                     this.waiting = false;
+                    this.running = false;
                     if (data.playerRole === 'player1') {
                         Object.assign(this.player, data.player1);
                         this.playerName = data.playerName;
@@ -243,11 +248,13 @@ function game()
                     }
                     this.startingLoop(data.message);
                 } else if (data.step === 'start') {
+                    this.waiting = false;
                     this.running = true;
                     this.opponentName = data.opponentName;
                     this.playerName = data.playerName;
                     this.gameLoop();
                 } else if (data.step === 'go') {
+                    this.waiting = false;
                     this.running = true;
                     this.playerName = data.player1Name;
                     this.opponentName = data.player2Name;
@@ -262,7 +269,10 @@ function game()
                     this.updateRemoteGame();
                     this.gameLoop();
                 } else if (data.step === 'endOfGame') {
-                //     TODO: Implementar re-match
+                    this.openMenu("remote-match");
+                    this.startCountdown(10, "rematch-countdown", () => {
+                        this.clickMode(message, "auto-play", "rematch-countdown");
+                    });
                 } else if (data.step === 'move') {
                     this.opponent.x = data.position;
                 } else if (data.step === 'update') {
@@ -272,6 +282,15 @@ function game()
                     this.powerUps = data.powerUps;
                 }
             };
+        }
+
+        joinRematch() {
+            this.waiting = true;
+            this.running = false;
+            this.waitingLoop('Waiting for a victim!');
+            this.socket.send(JSON.stringify({
+                'step': 'rematch'
+            }))
         }
         // -- Remote Mode loops
         waitingLoop(msg) {
@@ -287,7 +306,7 @@ function game()
 
         startingLoop(msg) {
             if (!this.running) {
-                this.movePaddle(player);
+                this.movePaddle(this.player);
                 this.drawMessage(msg);
                 this.drawDashedLine();
                 this.drawRect(this.player.x, this.player.y, this.player.width, this.player.height, this.player.color);
@@ -295,6 +314,23 @@ function game()
                 this.drawOpponentName();
                 requestAnimationFrame(() => this.startingLoop(msg));
             }
+        }
+        // -- Rematch countdown
+        startCountdown(seconds, elementId, callback) {
+            let counter = seconds;
+            const countdownElement = document.getElementById(elementId);
+
+            countdownElement.innerText = counter;
+
+            const interval = setInterval(() => {
+                counter--;
+                countdownElement.innerText = counter;
+
+                if (counter <= 0) {
+                    clearInterval(interval);
+                    if (callback) callback();
+                }
+            }, 1000);
         }
         // -- Listeners
         initEventListeners() {
@@ -318,42 +354,65 @@ function game()
             document.addEventListener('keyup', this.keyUpHandler);
         }
 
-        clickMode (msg, mode) {
-            const menu = document.getElementById("overlay");
-            if (menu.style.display === "flex") {
-                menu.style.display = "none";
-                this.endGame(msg, mode);
+        rematch(mode) {
+            if (mode === 'join') {
+
+            } else {
+                this.clickMode(message, "auto-play", "remote-match")
             }
+        }
+
+        clickMode (msg, mode, element="overlay") {
+            const menu = document.getElementById(element);
+            this.closeMenu(element);
+            this.endGame(msg, mode);
         }
 
         initUIListeners() {
             this.uiHandlers = {
                 local: () => this.clickMode(null, "local"),
                 remote: () => this.clickMode(null, "remote"),
-                remoteAI: () => this.clickMode(null, "remote-ai")
+                remoteAI: () => this.clickMode(null, "remote-ai"),
+                rematch_ok: () => this.rematch('join'),
+                rematch_cancel: () => this.rematch('cancel'),
+                waiting_cancel: () => this.clickMode("Clic here to play!", 'auto-play', "cancel-wait")
             };
 
             document.getElementById("local-game").addEventListener("click", this.uiHandlers.local);
             document.getElementById("remote-game").addEventListener("click", this.uiHandlers.remote);
             document.getElementById("remote-ia-game").addEventListener("click", this.uiHandlers.remoteAI);
+            document.getElementById("accept-rematch").addEventListener("click", this.uiHandlers.rematch_ok);
+            document.getElementById("reject-rematch").addEventListener("click", this.uiHandlers.rematch_cancel);
+            document.getElementById("cancel-wait").addEventListener("click", this.uiHandlers.waiting_cancel);
         }
 
-        initCanvasListeners() {
-            this.canvasClickHandler = (event) => {
-                if (this.mode === "auto-play") {
-                    const menu = document.getElementById("overlay");
-                    const canvas = this.canvas.getBoundingClientRect();
+        openMenu(element) {
+            const menu = document.getElementById(element);
+            const canvas = this.canvas.getBoundingClientRect();
 
-                    menu.style.width = `${canvas.width}px`;
-                    menu.style.height = `${canvas.height}px`;
-                    menu.style.top = `${canvas.top}px`;
-                    menu.style.left = `${canvas.left}px`;
-                    menu.style.display = "flex";
+            menu.style.width = `${canvas.width}px`;
+            menu.style.height = `${canvas.height}px`;
+            menu.style.top = `${canvas.top}px`;
+            menu.style.left = `${canvas.left}px`;
+            menu.style.display = "flex";
+        }
+
+        closeMenu(element) {
+            const menu = document.getElementById(element);
+            if (menu.style.display === "flex") {
+                menu.style.display = "none";
+            }
+        }
+
+        initCanvasListeners(condition, element) {
+            this.canvasClickHandler = (event) => {
+                if (this.mode === condition) {
+                    this.openMenu(element);
                 }
             };
 
             this.documentClickHandler = (event) => {
-                const menu = document.getElementById("overlay");
+                const menu = document.getElementById(element);
                 if (menu.style.display === "flex" && !this.canvas.contains(event.target) && !menu.contains(event.target)) {
                     menu.style.display = "none";
                 }
@@ -605,7 +664,6 @@ function game()
             }
         }
 
-
         endGame(msg, mode="auto-play") {
             message = msg;
             this.running = false;
@@ -622,64 +680,6 @@ function game()
         }
     }
 
-    //
-    // function drawRect(x, y, width, height, color) {
-    //     this.ctx.fillStyle = color;
-    //     this.ctx.fillRect(x, y, width, height);
-    // }
-    //
-    // function drawDashedLine() {
-    //     this.ctx.strokeStyle = "#fff";
-    //     this.ctx.setLineDash([15, 15]);
-    //     this.ctx.lineWidth = 15;
-    //     this.ctx.beginPath();
-    //     this.ctx.moveTo(0, this.canvas.height / 2);
-    //     this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
-    //     this.ctx.stroke();
-    //     this.ctx.setLineDash([]);
-    // }
-    //
-    // function drawPlayerName() {
-    //     this.ctx.font = "40px Silkscreen";
-    //     this.ctx.fillStyle = "#fff";
-    //     this.ctx.textAlign = "left";
-    //     this.ctx.fillText(playerName, 0, this.canvas.height - 5);
-    // }
-    //
-    // function drawOpponentName() {
-    //     this.ctx.font = "40px Silkscreen";
-    //     this.ctx.fillStyle = "#fff";
-    //     this.ctx.textAlign = "right";
-    //     this.ctx.fillText(opponentName, this.canvas.width, 35);
-    // }
-    //
-    // function drawMessage(announce) {
-    //     drawRect(0, 0, this.canvas.width, this.canvas.height, '#000');
-    //     this.ctx.font = "30px Silkscreen";
-    //     this.ctx.fillStyle = "#fff";
-    //     this.ctx.textAlign = "center";
-    //     this.ctx.fillText(announce, this.canvas.width / 2, this.canvas.height / 2 + 70, this.canvas.width - 10);
-    // }
-    //
-    // function drawScore() {
-    //     this.ctx.font = "70px Silkscreen";
-    //     this.ctx.fillStyle = "#fff";
-    //     this.ctx.textAlign = "right";
-    //
-    //     this.ctx.fillText(player.score, this.canvas.width - 20, this.canvas.height / 2 + 140);
-    //     this.ctx.fillText(opponent.score, this.canvas.width - 20, this.canvas.height / 2 - 100);
-    // }
-    //
-    // function drawPowerUps() {
-    //     for (const powerUp of powerUps) {
-    //         this.ctx.fillStyle = powerUpColors[powerUp.type];
-    //         this.ctx.font = '20px Silkscreen';
-    //         this.ctx.textAlign = 'center';
-    //         this.ctx.fillText(powerUp.type, powerUp.x + powerUpSize / 2, powerUp.y + powerUpSize / 1.5);
-    //         drawRect(powerUp.x, powerUp.y, powerUpSize, powerUpSize, powerUpColors[powerUp.type]);
-    //     }
-    // }
-    //
     document.addEventListener("DOMContentLoaded", function () {
         message = "Click here to play!";
         gameInstance = new PongGame('auto-play');
@@ -688,4 +688,3 @@ function game()
 }
 
 game();
-

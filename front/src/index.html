@@ -71,20 +71,26 @@
 		<!-- Main content -->
 		<div id="all">
 			<div id="game-container">
-				<div id="overlay">
-					<div id="game-menu">
+				<div id="overlay" class="overlay_style">
+					<div id="game-menu" class="game-menu-style">
 						<button id="local-game">Local mode</button>
 						<button id="remote-game">Remote mode</button>
 						<button id="remote-ia-game">Remote IA</button>
 					</div>
 				</div>
-
-				<!--				<div id="game-menu">-->
-<!--					<h2 id="menu-message">Welcome to Pong</h2>-->
-<!--					<button id="local-mode">Local Multiplayer</button>-->
-<!--					<button id="ai-mode">IA mode</button>-->
-<!--					<button id="remote-mode">Remote</button>-->
-<!--				</div>-->
+				<div id="remote-match" class="overlay_style">
+					<div class="game-menu-style">
+						<h2>Rematch?</h2>
+						<h2 id="rematch-countdown">10</h2>
+						<button id="accept-rematch">ok</button>
+						<button id="reject-rematch">cancel</button>
+					</div>
+				</div>
+				<div id="cancel-wait" class="overlay_style">
+					<div class="game-menu-style">
+						<button id="end-waiting">back to menu</button>
+					</div>
+				</div>
 
 				<div id="canvas-container">
 					<canvas id="pongCanvas"></canvas>

@@ -46,21 +46,21 @@ canvas {
 	background-color: #1b2735;
 }
 
-#overlay {
+.overlay_style {
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
 	padding: 20px;
-	background: rgba(0, 0, 0, 0.8);
 	display: none;
+	background: rgba(0, 0, 0, 0.8);
 	justify-content: center;
 	align-items: center;
 	z-index: 1000;
 }
 
-#game-menu {
+.game-menu-style {
 	font-family: "Silkscreen", sans-serif;
 	background: rgba(255, 255, 255, 0.9);
 	text-align: center;
@@ -69,7 +69,7 @@ canvas {
 	border-radius: 0;
 }
 
-#game-menu button {
+.game-menu-style button {
 	display: block;
 	font-weight: 200;
 	width: 100%;
@@ -83,8 +83,9 @@ canvas {
 	text-align: center;
 }
 
-#game-menu button:hover {
+.game-menu-style button:hover {
 	background: linear-gradient(to right, #b22633, #001695);
+	color: white;
 }
 
 
