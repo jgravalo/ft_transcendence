@@ -1,13 +1,14 @@
 Vault:
 root_token=hvs.r840eI3jck2rSl7CTyNYQzTw
+new=hvs.toDVk5SP6J8jtQpd3AfPKYIn
 
 DB:
 role_id=6d40c02e-0532-b346-f321-f32b6a241d88
 secret_id=878a456d-3888-4059-0e1e-c6ec5f68937b
 
 DB-EXPORTER
-role_id=eac313aa-2a19-5082-d78d-a9f463791d96
-secret_id=4ae3d8c5-e3ff-8174-2483-ebf08f954fea
+role_id=d32ede34-1672-c02b-6c16-9cdfff4c2998
+secret_id=61fca0d9-5a49-5778-e7b5-d99afc295a48
 
 DJANGO:
 roe_id=6dac6cf9-422c-4d7b-0f34-1610b09a591b

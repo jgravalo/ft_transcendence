@@ -81,6 +81,14 @@ vault read auth/approle/role/new_service/role-id
 vault write -f auth/approle/role/new_service/secret-id
 ```
 
+### Step 4 : Add the new secrets
+To add a new secret use the kv put function.
+
+```sh
+#For the new_service container
+vault kv put secret/new_service secret_1-"user" secret_2="password"
+```
+
 ## 3. Fetching Secrets in Python
 In Django (or any Python script) you can use the **hvac** library to retrieve the secret :
 

@@ -68,4 +68,4 @@ DATA_SOURCE_NAME="postgresql://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$DB_NAME?
 export DATA_SOURCE_NAME
 
 echo "Starting Postgres Exporter with: $DATA_SOURCE_NAME"
-exec /postgres_exporter  # Start the exporter
+exec /usr/bin/prometheus-postgres-exporter

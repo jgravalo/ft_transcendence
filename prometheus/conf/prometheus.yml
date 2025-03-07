@@ -6,6 +6,8 @@ scrape_configs:
   - job_name: 'backend'
     static_configs:
       - targets: ['back:8000']
+
   - job_name: 'database'
     static_configs:
-      - targets: ['db:9187']
+      - targets: ['db-exporter:9187']
+  

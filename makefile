@@ -25,7 +25,7 @@ back:
 
 db:
 	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) --build-arg ENVIRONMENT=$(ENVIRONMENT) -t db ./db
-	docker run -d -p 5432:5432 db
+	docker run -d db
 
 restart-waf:
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml restart waf
