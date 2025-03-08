@@ -27,6 +27,7 @@ function game()
             this.mode = mode;
             this.running = true;
             this.waiting = false;
+            this.listening = false;
             // --- Canvas
             this.canvas = document.getElementById('pongCanvas');
             this.ctx = this.canvas.getContext('2d');
@@ -34,6 +35,7 @@ function game()
             this.canvas.height = 800;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             // --- Vars
+            this.countdownInterval = null
             this.paddleWidth = 100
             this.paddleHeight = 15;
             this.minPaddleWidth = 45;
@@ -58,6 +60,7 @@ function game()
                 this.socket = new WebSocket('ws://localhost:8000/ws/game/');
             }
             if (this.socket !== null) {
+                this.listening = true;
                 this.connectSocket();
                 this.socketListener();
             }
@@ -228,6 +231,9 @@ function game()
         socketListener () {
             this.socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
+                if (!this.listening) {
+                    if (data.step !== 'close') return;
+                }
                 if (data.step === 'wait') {
                     this.running = false;
                     this.waiting = true;
@@ -269,9 +275,11 @@ function game()
                     this.updateRemoteGame();
                     this.gameLoop();
                 } else if (data.step === 'endOfGame') {
+                    this.listening = false;
+                    this.running = false;
                     this.openMenu("remote-match");
                     this.startCountdown(10, "rematch-countdown", () => {
-                        this.clickMode(message, "auto-play", "rematch-countdown");
+                        this.clickMode(message, "auto-play", "remote-match");
                     });
                 } else if (data.step === 'move') {
                     this.opponent.x = data.position;
@@ -284,14 +292,6 @@ function game()
             };
         }
 
-        joinRematch() {
-            this.waiting = true;
-            this.running = false;
-            this.waitingLoop('Waiting for a victim!');
-            this.socket.send(JSON.stringify({
-                'step': 'rematch'
-            }))
-        }
         // -- Remote Mode loops
         waitingLoop(msg) {
             if (!this.waiting) return;
@@ -316,19 +316,20 @@ function game()
             }
         }
         // -- Rematch countdown
-        startCountdown(seconds, elementId, callback) {
+        startCountdown(seconds, elementId) {
             let counter = seconds;
             const countdownElement = document.getElementById(elementId);
 
+            if (this.countdownInterval) {
+                clearInterval(this.countdownInterval);
+            }
             countdownElement.innerText = counter;
-
-            const interval = setInterval(() => {
+            this.countdownInterval = setInterval(() => {
                 counter--;
                 countdownElement.innerText = counter;
-
-                if (counter <= 0) {
-                    clearInterval(interval);
-                    if (callback) callback();
+                if (counter === 0) {
+                    clearInterval(this.countdownInterval);
+                    this.countdownInterval = null;
                 }
             }, 1000);
         }
@@ -356,14 +357,21 @@ function game()
 
         rematch(mode) {
             if (mode === 'join') {
-
+                this.waiting = true;
+                this.running = false;
+                this.listening = true;
+                this.waitingLoop('Waiting for a rematch!');
+                this.socket.send(JSON.stringify({
+                    'step': 'rematch'
+                }))
             } else {
                 this.clickMode(message, "auto-play", "remote-match")
             }
         }
 
         clickMode (msg, mode, element="overlay") {
-            const menu = document.getElementById(element);
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null
             this.closeMenu(element);
             this.endGame(msg, mode);
         }

@@ -19,6 +19,7 @@ logger = get_logger("game-back")  # Puedes cambiar el nombre según el módulo
 waiting_list = []
 playing_list = []
 matches = {}
+rematch = {}
 
 CANVAS = {'width': 400, 'height': 800}
 PLAYER_ROLES = ['player1', 'player2']
@@ -59,10 +60,13 @@ class GameSession:
         """
         self.canvas = {'width': width, 'height': height}
         # Assign randomly roles to players.
-        random.shuffle(self.roles)
-        self.users[self.roles[0]] = players[0]
-        self.users[self.roles[1]] = players[1]
-
+        if isinstance(players, list):
+            random.shuffle(self.roles)
+            self.users[self.roles[0]] = players[0]
+            self.users[self.roles[1]] = players[1]
+        else:
+            for key, value in players.items():
+                self.users[key] = value
         self.players = players
         self.match_id = match_id
         self.ball = {
@@ -383,6 +387,29 @@ class Match(AsyncWebsocketConsumer):
                 "detail": "Wrong"
             }))
             await self.close(code=4001)
+        if data.get("step") == "rematch":
+            logger.info(f"Rematch accepted by player {self.username} for match {self.match_id}.", extra={"corr": self.cnn_id})
+            if self.match_id not in rematch:
+                rematch[self.match_id] = matches[self.match_id]
+                del matches[self.match_id]
+            else:
+                players = rematch[self.match_id]["players"]
+                changed_roles = {}
+                for key, value in players:
+                    changed_roles["player1" if key == "player2" else "player2"] = value
+                del rematch[self.match_id]["game"]
+                del rematch[self.match_id]
+                self.match_id = str(uuid.uuid4())
+                game = GameSession(self, changed_roles)
+                logger.info(f"Re match Created.", extra={"corr": self.match_id})
+                logger.info(f"Players {self.username} - {self.opponent.username}", extra={"corr": self.match_id})
+                self.player_role = game.get_role(self)
+                self.opponent.player_role = game.get_role(self.opponent)
+                matches[self.match_id] = {
+                    "players": changed_roles,
+                    "game": game
+                }
+                await self.send_start_screen(game)
         if data.get("step") == "join":
             if data.get("mode") != 'remote':
                 logger.error(f"Connection {self.cnn_id} requested a wrong game mode.", extra={"corr": self.cnn_id})
@@ -432,6 +459,7 @@ class Match(AsyncWebsocketConsumer):
             game_info = matches[self.match_id]
             paddles, power_ups, ball, winner = game_info['game'].update_game()
             if winner:
+                logger.info("llego un ganador..")
                 await self.end_game_winner(paddles, winner)
             keys_to_remove = ["role", "y", "height"]
             for role in PLAYER_ROLES:
@@ -580,7 +608,8 @@ class MatchAI(AsyncWebsocketConsumer):
                 }))
                 await self.close(code=4001)
         elif data.get("step") == "move":
-            await self.opponent_ia(data.get("position"), data.get("ball"))
+            logger.info(data.get("opponent"));
+            await self.opponent_ia(data.get("opponent"), data.get("ball"))
 
         elif data.get("step") == "end":
             logger.info(f"AI Game Ended. Score {data.get('player_score')} - {data.get('opponent_score')}", extra={"corr": self.cnn_id})
