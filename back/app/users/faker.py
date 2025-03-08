@@ -12,7 +12,7 @@ django.setup()
 
 fake = Faker()
 
-def create_fake_matches(n=5):
+def create_fake_matches(n=1):
     for _ in range(n):
         users = list(User.objects.all())
         if users:
@@ -30,7 +30,7 @@ def create_fake_matches(n=5):
 # Generar 10 partidos aleatorios
 # create_fake_matches(10)
 
-def create_fake_users(n=5):
+def create_fake_users(n=1):
     for _ in range(n):
         username = fake.user_name()
         email = fake.email()

@@ -237,11 +237,15 @@
 .match-players {
 	font-size: 1.2rem;
 	color: white;
+	display: flex;
+	justify-content: left;
 }
 
 .match-time {
 	color: #888;
 	font-size: 0.9rem;
+	display: flex;
+	justify-content: left;
 }
 
 .match-score {

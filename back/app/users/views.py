@@ -268,18 +268,10 @@ def set_update(request):
             except:
                 return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
-                #image = data.get('image')
-                # Acceder al archivo 'image' desde request.FILES
-                # file = request.FILES['image']
-                # user.image.save(file.name, file)
                 file = request.FILES.get('image')  # Asegúrate de obtener la imagen correctamente
                 if file:
-                    #file_path = default_storage.save('profile_images/' + file.name, file)
-                    user.image = file#_path  # Asigna el archivo al campo image
+                    user.image = file # Asigna el archivo al campo image
                     user.save()  # Guarda el usuario con la imagen
-                # print('funciono request.FILES')
-                # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
-                # print('funciono image.save')
             except:
                 print("fallo al subir image")
             username = request.POST.get('username')
