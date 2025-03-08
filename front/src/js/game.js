@@ -134,6 +134,7 @@ function game()
             this.running = false;
             if (this.socket !== null) {
                 this.socket.close();
+                this.socket.destroy();
             }
             document.removeEventListener('keydown', this.keydownHandler);
             document.removeEventListener('keyup', this.keyUpHandler);
@@ -234,7 +235,9 @@ function game()
                 if (!this.listening) {
                     if (data.step !== 'close') return;
                 }
-                if (data.step === 'wait') {
+                if (data.step === 'error') {
+                    this.clickMode(message, "auto-play", "remote-match");
+                } else if (data.step === 'wait') {
                     this.running = false;
                     this.waiting = true;
                     this.resetBall();

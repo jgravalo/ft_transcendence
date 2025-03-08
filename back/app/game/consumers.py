@@ -568,8 +568,6 @@ class MatchAI(AsyncWebsocketConsumer):
         """
         await self.accept()
         self.cnn_id = str(uuid.uuid4())
-        # TODO: Delete when remote game is fully implemented.
-        logger.info(f"Session attributes: {vars(self.scope['session'])}")
         user = self.scope['user']
         if user.is_authenticated:
             self.username = user.username
@@ -608,7 +606,6 @@ class MatchAI(AsyncWebsocketConsumer):
                 }))
                 await self.close(code=4001)
         elif data.get("step") == "move":
-            logger.info(data.get("opponent"));
             await self.opponent_ia(data.get("opponent"), data.get("ball"))
 
         elif data.get("step") == "end":
@@ -632,6 +629,10 @@ class MatchAI(AsyncWebsocketConsumer):
             "step": "move",
             "position": position['x']
         }))
+
+    async def disconnect(self, close_code):
+        logger.warning(f"Client disconnected {close_code}", extra={"corr": self.cnn_id})
+
 
 from django.db import connection
 from channels.db import database_sync_to_async
