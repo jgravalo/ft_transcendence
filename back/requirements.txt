@@ -60,3 +60,6 @@ hvac==2.2.0
 
 # To create json formatted logs
 python-json-logger==3.2.1
+
+# Para generar modelos random
+Faker==20.1.0
