@@ -117,6 +117,8 @@ services:
     build:
       context: ./prometheus
     container_name: prometheus
+    env_file:
+      - ./prometheus/.env
     networks:
       - pongnet
     ports:
@@ -152,6 +154,21 @@ services:
       - "9187:9187"
     depends_on:
       - waf
+    restart: unless-stopped
+
+  grafana:
+    image: grafana
+    build:
+      context: ./grafana
+    container_name: grafana
+    env_file:
+      - ./grafana/.env
+    networks:
+      - pongnet
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
     restart: unless-stopped
 
 volumes:

@@ -4,6 +4,7 @@ set -ex
 
 # Vault URLs
 VAULT_AUTH_URL="$VAULT_ADDR/v1/auth/approle/login"
+VAULT_SECRET_URL="$VAULT_ADDR/v1/secret/data/grafana"
 
 # Prepare JSON payload for authentication
 AUTH_PAYLOAD=$(jq -n --arg role_id "$VAULT_ROLE_ID" --arg secret_id "$VAULT_SECRET_ID" \
@@ -43,12 +44,26 @@ if [ -z "$VAULT_TOKEN" ] || [ "$VAULT_TOKEN" = "null" ]; then
 fi
 
 # ---------------------------------------------------------------
-# 3) Export the Vault Token
+# 3) Fetch the PostgreSQL password from Vault
 # ---------------------------------------------------------------
+SECRET_RESPONSE=$(curl -fs -X GET -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_SECRET_URL")
 
-export VAULT_TOKEN
-envsubst < /etc/prometheus/prometheus.yml > /etc/prometheus/prometheus_resolved.yml
-cat /etc/prometheus/prometheus_resolved.yml  # Debugging: Check if the token is replaced
+# If curl fails, SECRET_RESPONSE is empty. Check that:
+if [ -z "$SECRET_RESPONSE" ]; then
+    echo "Error: Could not get a response from Vault for the secret."
+    exit 1
+fi
 
-echo "Vault Token exported:  $VAULT_TOKEN. Starting Prometheus..."
-exec prometheus --config.file=/etc/prometheus/prometheus_resolved.yml
+GF_SECURITY_ADMIN_PASSWORD=$(echo "$SECRET_RESPONSE" | jq -r '.data.data.gf_password')
+if [ -z "$GF_SECURITY_ADMIN_PASSWORD" ] || [ "$DB_PASSWORD" = "null" ]; then
+    echo "Error: Failed to retrieve Grafana password from Vault!"
+    echo "Vault Response: $SECRET_RESPONSE"
+    exit 1
+fi
+
+# ---------------------------------------------------------------
+# 4) Export grafana admin password
+# ---------------------------------------------------------------
+export GF_SECURITY_ADMIN_PASSWORD
+
+exec /usr/sbin/grafana-server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini

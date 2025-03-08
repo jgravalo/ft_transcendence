@@ -1,0 +1,53 @@
+{
+    "id": null,
+    "title": "System Overview",
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "CPU Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode='idle'}[1m])) * 100)",
+            "legendFormat": "{{instance}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+            "legendFormat": "{{instance}}",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "title": "Disk Usage",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "(1 - node_filesystem_free_bytes{mountpoint='/'} / node_filesystem_size_bytes{mountpoint='/'}) * 100",
+            "legendFormat": "{{instance}}",
+            "refId": "C"
+          }
+        ]
+      },
+      {
+        "title": "HTTP Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[1m])",
+            "legendFormat": "{{instance}}",
+            "refId": "D"
+          }
+        ]
+      }
+    ],
+    "schemaVersion": 18,
+    "version": 1
+  }

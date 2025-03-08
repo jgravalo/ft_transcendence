@@ -1,9 +1,13 @@
-Vault:
+VAULT:
 root_token=hvs.5myxWfFKfNaweisS1XKu2oCS
 
-Prometheus:
+PROMETHEUS:
 role_id=4ca18fbe-7109-c973-a183-871dc3db065c
 secret_id=cfbeb263-1789-16ad-ebc9-8bd01e74c149
+
+GRAFANA:
+role_id=77c9dfa2-9d89-3496-d547-2a4a60659327
+secret_id=64b42db6-5986-421e-382e-6d1bb20957f6
 
 DB:
 role_id=6d40c02e-0532-b346-f321-f32b6a241d88

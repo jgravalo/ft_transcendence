@@ -1,7 +1,10 @@
-# Using the official Prometheus base image
-FROM prom/prometheus:v2.42.0
+# Use Alpine to ensure `wget` and SSL work correctly
+FROM alpine:latest
 
-# Copy your custom configuration file
+# Install necessary tools
+RUN apk add --no-cache prometheus wget curl jq envsubst ca-certificates
+
+# Copy Prometheus config and entrypoint
 COPY ./conf/prometheus.yml /etc/prometheus/
 COPY ./tool/entrypoint.sh /etc/prometheus/
 

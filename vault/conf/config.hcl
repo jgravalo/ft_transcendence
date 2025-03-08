@@ -4,7 +4,7 @@ storage "file" {
 
 listener "tcp" {
   address = "0.0.0.0:8200"
-  tls_disable = "true"  # Set to false and configure TLS for production
+  tls_disable = "true"  # Set to false for production with proper certs
 }
 
 telemetry {
