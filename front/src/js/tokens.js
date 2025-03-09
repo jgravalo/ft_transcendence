@@ -71,13 +71,13 @@ function checkAccess(path) {
 	let refresh = getStorage('refresh');
     // console.log("JWT before GET:", getJWTToken());
     //console.log("token =", token);
-    if (refresh && refresh !== undefined && refresh !== "undefined" && isTokenExpired(refresh)) {
-		alert('tu sesion ha expirado');
-		makeLogout();
-		return (1);
-	}
 	if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
-        console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
+		if (refresh && refresh !== undefined && refresh !== "undefined" && isTokenExpired(refresh)) {
+			alert('tu sesion ha expirado');
+			makeLogout();
+			return (1);
+		}
+		console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
         refreshJWT(path);
         console.log("El token ha renovado");
         return (1);
