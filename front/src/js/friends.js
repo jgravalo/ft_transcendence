@@ -28,18 +28,15 @@ function unlockUser(user)
 
 function fetchFriend(user, rule)
 {
-	let token = getJWTToken();
+	/* let token = getJWTToken();
 	if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
 		console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
-		refreshJWT('/users/friends/' + rule + '/?' + rule + '=' + user/* , data => {
-			//if (path == '/users/update/')
-			makePost(data);
-			// else
-			//     makeModal(path);
-		} */);
+		refreshJWT('/users/friends/' + rule + '/?' + rule + '=' + user);
 		console.log("El token ha renovado");
 		return ;
-	}
+	} */
+	if (checkAccess('/users/friends/' + rule + '/?' + rule + '=' + user) != 0)
+        return ;
 	//fetch(base + ':8000/users/friends/' + rule + '/?' + rule + '=' + user, {
 	fetch(base + '/api' + '/users/friends/' + rule + '/?' + rule + '=' + user, {
 		method: "POST",
