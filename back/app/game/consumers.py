@@ -23,7 +23,7 @@ rematch = {}
 
 CANVAS = {'width': 400, 'height': 800}
 PLAYER_ROLES = ['player1', 'player2']
-
+MUTEX = asyncio.Lock()
 
 class GameSession:
     """
@@ -127,6 +127,7 @@ class GameSession:
         self.ball["speedX"] = self.ball["baseSpeed"] * math.sin(angle)
         self.ball["speedY"] = self.ball["baseSpeed"] * math.cos(angle) * (1 if random.random() > 0.5 else -1)
         self.collision_count = 0
+
 
     def update_ball_position(self):
         """
@@ -319,6 +320,24 @@ class GameSession:
             self.winner = 'player1' if self.paddles['player1']['score'] == 5 else 'player2'
         return self.paddles, self.power_ups, self.ball, self.winner
 
+class Challenges(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.cnn_id = str(uuid.uuid4())
+        try:
+            await self.accept()
+            async with MUTEX:
+                challenges = [usr.username for usr in waiting_list]
+                await self.send(text_data=json.dumps({
+                    "step": "challenges",
+                    "action": "get",
+                    "challenges": challenges
+                }))
+        except Exception as e:
+            logger.error(f'Connection Error {self.cnn_id} - Detail {e}',
+                         extra={"corr": self.cnn_id})
+        self.close()
+
+
 class Match(AsyncWebsocketConsumer):
     cnn_id = None
     match_id = None
@@ -371,6 +390,59 @@ class Match(AsyncWebsocketConsumer):
             logger.error(f'Connection Error {self.cnn_id} - Detail {e}',
                         extra={"corr": self.cnn_id})
 
+    async def challenges(self, data):
+        """
+        Handle for challenges. Instead, a random game we can play with a specific
+        challenge, previously created.
+        """
+        if data.get("action") == "get":
+            async with MUTEX:
+                challenges = [usr.username for usr in waiting_list]
+                await self.send(text_data=json.dumps({
+                    "step": "challenges",
+                    "action": "get",
+                    "challenges": challenges
+                }))
+        if data.get("action") == "create":
+            async with MUTEX:
+                waiting_list.append(self)
+                await self.send(text_data=json.dumps({
+                    "step": "wait",
+                    "playerName": self.username
+                }))
+        if data.get("action") == "accept":
+            async with MUTEX:
+                challenger = data.get("username")
+                opponent = None
+                for i, user in enumerate(waiting_list):
+                    if user.username == challenger:
+                        opponent = waiting_list.pop(i)
+                        break
+                if opponent:
+                    await self.playball(opponent)
+                else:
+                    await self.send(text_data=json.dumps({
+                        "step": "challenges",
+                        "detail": "error"
+                    }))
+
+    async def playball(self, players, opponent):
+        self.opponent = opponent
+        self.match_id = str(uuid.uuid4())
+        self.opponent.match_id = self.match_id
+        self.opponent.opponent = self
+        game = GameSession(self.match_id, players)
+        logger.info(f"Match Created.", extra={"corr": self.match_id})
+        logger.info(f"Players {self.username} - {self.opponent.username}", extra={"corr": self.match_id})
+        self.player_role = game.get_role(self)
+        self.opponent.player_role = game.get_role(self.opponent)
+        logger.info(f'Random roles assigned', extra={"corr": self.match_id})
+        matches[self.match_id] = {
+            "players": players,
+            "game": game
+        }
+        await self.send_start_screen(game)
+
     async def receive(self, text_data):
         """
         Process received message.
@@ -387,6 +459,12 @@ class Match(AsyncWebsocketConsumer):
                 "detail": "Wrong"
             }))
             await self.close(code=4001)
+        if data.get("step") == "handshake":
+            await self.send(text_data=json.dumps({
+                "step": "handshake"
+            }))
+        if data.get("step") == "challenges":
+            await self.challenges(data)
         if data.get("step") == "rematch":
             logger.info(f"Rematch accepted by player {self.username} for match {self.match_id}.", extra={"corr": self.cnn_id})
             if self.match_id not in rematch:
@@ -423,25 +501,14 @@ class Match(AsyncWebsocketConsumer):
             if waiting_list and self not in waiting_list:
                 logger.info(f"Players Waiting. Create a new game.", extra={"corr": self.cnn_id})
                 # Get Opponent to the match.
-                self.opponent = waiting_list.pop(0)
-                # start a new GameSession
-                self.match_id = str(uuid.uuid4())
-                self.opponent.match_id = self.match_id
-                self.opponent.opponent = self
-                game = GameSession(self.match_id, [self, self.opponent])
-                logger.info(f"Match Created.", extra={"corr": self.match_id})
-                logger.info(f"Players {self.username} - {self.opponent.username}", extra={"corr": self.match_id})
-                self.player_role = game.get_role(self)
-                self.opponent.player_role = game.get_role(self.opponent)
-                logger.info(f'Random roles assigned', extra={"corr": self.match_id})
-                matches[self.match_id] = {
-                    "players": {
-                        "player1": self if self.player_role == "player1" else self.opponent,
-                        "player2": self if self.player_role == "player2" else self.opponent
-                    },
-                    "game": game
+                opponent = waiting_list.pop(0)
+                role = f"player{str(random.randint(1, 2))}"
+                players = {
+                    role: self,
+                    "player1" if role == "player2" else "player2": opponent
                 }
-                await self.send_start_screen(game)
+                logger.info(f'hello {players}')
+                await self.playball(players, opponent)
             else:
                 await self.send(text_data=json.dumps({
                     "step": "wait",
@@ -566,19 +633,23 @@ class MatchAI(AsyncWebsocketConsumer):
         """
         Accept a new connection.
         """
-        await self.accept()
-        self.cnn_id = str(uuid.uuid4())
-        user = self.scope['user']
-        if user.is_authenticated:
-            self.username = user.username
-            self.logged = True
-            logger.info(f'Logged user connected: conn {self.cnn_id} - user {self.username}',
-                        extra={"corr": self.cnn_id})
-        else:
-            random_number = str(random.randint(1, 999)).zfill(3)
-            self.username = f'shy_guy-{random_number}'
-            logger.info(f'Anonymous user connected: conn {self.cnn_id} - user {self.username}',
-                        extra={"corr": self.cnn_id})
+        try:
+            await self.accept()
+            logger.info(f"Session attributes: {vars(self.scope['session'])}")
+            user = self.scope['user']
+            if user.is_authenticated:
+                self.username = user.username
+                self.logged = True
+                logger.info(f'Logged user connected: conn {self.cnn_id} - user {self.username}',
+                            extra={"corr": self.cnn_id})
+            else:
+                random_number = str(random.randint(1, 999)).zfill(3)
+                self.username = f'shy_guy-{random_number}'
+                logger.info(f'Anonymous user connected: conn {self.cnn_id} - user {self.username}',
+                            extra={"corr": self.cnn_id})
+        except Exception as e:
+            logger.error(f'Connection Error {self.cnn_id} - Detail {e}',
+                         extra={"corr": self.cnn_id})
 
     async def receive(self, text_data):
         """

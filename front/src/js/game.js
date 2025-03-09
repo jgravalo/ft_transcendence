@@ -1,25 +1,9 @@
 
 function game()
 {
+    document.getElementById("get-challenges").addEventListener("click", getChallenges);
     let message = null;
     let gameInstance = null;
-
-    function setGameMode(mode) {
-        document.getElementById("overlay").style.display = "none";
-        let newGame = null;
-        if (mode === "auto-play") {
-            newGame = new PongGame(mode, "Hal42", "Norminette");
-            message = "click here to play!";
-        } else {
-            newGame = new PongGame(mode);
-        }
-        if (!gameInstance) {
-            gameInstance = newGame;
-        } else {
-            gameInstance.destroy();
-            gameInstance = newGame;
-        }
-    }
 
     class PongGame {
         constructor(mode="auto-play", player1Name = "player1", player2Name = "player2") {
@@ -128,13 +112,15 @@ function game()
             this.initUIListeners();
             this.initCanvasListeners("auto-play", "overlay");
             this.initCanvasListeners("remote", "cancel-wait");
-            this.gameLoop();
+            if (this.mode !== "menu") {
+                this.gameLoop();
+            }
         }
         destroy() {
             this.running = false;
+            this.listening = false;
             if (this.socket !== null) {
                 this.socket.close();
-                this.socket.destroy();
             }
             document.removeEventListener('keydown', this.keydownHandler);
             document.removeEventListener('keyup', this.keyUpHandler);
@@ -142,23 +128,33 @@ function game()
             document.removeEventListener("click", this.documentClickHandler);
         }
         // -- Game Loop
-        gameLoop() {
+        gameLoop(lastTime = 0) {
             if (!this.running) return;
-            if (this.mode) {
-                if (this.mode === "auto-play") {
-                    this.moveAI(this.player);
-                    this.moveAI(this.opponent);
-                    this.moveBall();
-                    this.movePowerUps();
-                } else {
-                    this.updateGame();
+
+            const now = performance.now();
+            const deltaTime = now - lastTime;
+
+            if (deltaTime >= (1000 / 100)) {
+                if (this.mode) {
+                    if (this.mode === "auto-play") {
+                        this.moveAI(this.player);
+                        this.moveAI(this.opponent);
+                        this.moveBall();
+                        this.movePowerUps();
+                    } else {
+                        this.updateGame();
+                    }
+                    this.drawGame();
                 }
-                this.drawGame();
-                requestAnimationFrame(() => this.gameLoop());
+
+                lastTime = now;
             }
+
+            requestAnimationFrame(() => this.gameLoop(lastTime));
         }
 
         updateRemoteGame() {
+            if (!this.running) return;
             if (this.mode === "remote") {
                 this.movePaddle(this.player);
                 this.socket.send(JSON.stringify({
@@ -175,11 +171,10 @@ function game()
             }
         }
 
-
         updateGame() {
             if (!this.mode) return;
             // TODO CHECK THIS BEHAVIOUR
-            if (this.running && (this.mode === "remote" || this.mode === "remote-ai")) {
+            if (this.running && !this.waiting && (this.mode === "remote" || this.mode === "remote-ai")) {
                 this.updateRemoteGame();
                 if (this.mode === "remote") return;
             }
@@ -227,6 +222,19 @@ function game()
                     mode: this.mode}
                 ));
             };
+            // if (this.mode === "remote") {
+            //     this.socket.send(JSON.stringify({
+            //         step: 'join',
+            //         username: this.playerName,
+            //         player: this.player,
+            //         mode: this.mode}
+            //     ));
+            // } else if (this.mode === "menu") {
+            //     this.socket.send(JSON.stringify({
+            //         step: 'challenges',
+            //         action: 'get'}
+            //     ));
+            // }
         }
 
         socketListener () {
@@ -236,6 +244,7 @@ function game()
                     if (data.step !== 'close') return;
                 }
                 if (data.step === 'error') {
+                    message = "Error at game";
                     this.clickMode(message, "auto-play", "remote-match");
                 } else if (data.step === 'wait') {
                     this.running = false;
@@ -299,7 +308,6 @@ function game()
         waitingLoop(msg) {
             if (!this.waiting) return;
             this.movePaddle(this.player);
-            this.updateGame();
             this.drawMessage(msg);
             this.ballPlay();
             this.ballBounce();
@@ -319,10 +327,9 @@ function game()
             }
         }
         // -- Rematch countdown
-        startCountdown(seconds, elementId) {
+        startCountdown(seconds, elementId, callback) {
             let counter = seconds;
             const countdownElement = document.getElementById(elementId);
-
             if (this.countdownInterval) {
                 clearInterval(this.countdownInterval);
             }
@@ -330,9 +337,13 @@ function game()
             this.countdownInterval = setInterval(() => {
                 counter--;
                 countdownElement.innerText = counter;
-                if (counter === 0) {
-                    clearInterval(this.countdownInterval);
-                    this.countdownInterval = null;
+
+                if (counter <= 0) {
+                  clearInterval(this.countdownInterval);
+                  this.countdownInterval = null;
+                  if (typeof callback === "function") {
+                    callback();
+                  }
                 }
             }, 1000);
         }
@@ -410,9 +421,7 @@ function game()
 
         closeMenu(element) {
             const menu = document.getElementById(element);
-            if (menu.style.display === "flex") {
-                menu.style.display = "none";
-            }
+            menu.style.display = "none";
         }
 
         initCanvasListeners(condition, element) {
@@ -491,6 +500,7 @@ function game()
             if (this.ball.x + this.ball.size / 2 >= this.canvas.width) {
                 this.ball.x = this.canvas.width - this.ball.size / 2;
                 this.ball.speedX = -Math.abs(this.ball.baseSpeed * this.opponent.speedModifier);
+                this.collisionCount++;
             }
         }
 
@@ -695,7 +705,21 @@ function game()
         message = "Click here to play!";
         gameInstance = new PongGame('auto-play');
     });
+    // -- GAME INFO
 
+    function getChallenges() {
+        socket = new WebSocket('ws://localhost:8000/ws/challenges/');
+        socket.onopen = () => {
+            alert("here..");
+            socket.send(JSON.stringify({
+                step: 'get'}
+            ));
+        };
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            alert(data);
+        };
+    }
 }
 
 game();
