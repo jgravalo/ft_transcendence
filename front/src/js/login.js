@@ -9,16 +9,18 @@ function make2FA()
 
 function makeLogout()
 {
-    document.getElementById('close-session').addEventListener('click', () => {
+    /* document.getElementById('close-session').addEventListener('click', () => {
+    }); */
         // console.log('El botón de cerrar sesion ha sido pulsado');
         removeStorage('access');
         removeStorage('refresh');
-        document.getElementById('cancel-logout').click();
-        connSocket.close();
+        if (document.getElementById('cancel-logout'))
+            document.getElementById('cancel-logout').click();
+        if (connSocket)
+            connSocket.close();
         fetchLink('/users/logout/close/');
         fetchLink('/');
         handleLinks();
-    });
 }
 
 function deleteUser(path)
@@ -45,7 +47,9 @@ function makeModal(path) //modalHTML)
 
     // Manejador del evento de envío del formulario
     if (path == "/users/logout/")
-        makeLogout();
+        document.getElementById('close-session').addEventListener('click', () => {
+            makeLogout();
+        });
     if (path == "/two_fa/")
         make2FA();
     makePost(path);
