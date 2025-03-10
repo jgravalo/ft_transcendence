@@ -18,23 +18,23 @@ function isActive()
 
 
 // Cargar la barra de usuario autenticado, 42 auth
+fetch(window.location.href)
+.then(response => {
+    var ref = response.headers.get("X-Current-Path");
+    console.log("ref =", ref);  // "/ruta/actual"
+    fetchLink(ref);
+});
 window.onload = function() {
     // Si hay un token de acceso, cargar la barra de usuario autenticado
     if (sessionStorage.getItem('access'))
         loginSock();
-    fetch(window.location.href)
-    .then(response => {
-        var ref = response.headers.get("X-Current-Path");
-        console.log("ref =", ref);  // "/ruta/actual"
-        fetchLink(ref);
-    });
     /* fetch(window.location.origin + '/api/users/login/close/', {
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
-                'Content-Type': 'application/json',
-                // 'X-CSRFToken': getCSRFToken()
-            }
-        })
+        headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
+            'Content-Type': 'application/json',
+            // 'X-CSRFToken': getCSRFToken()
+        }
+    })
         // .then(response => response.json())
         .then(response => response.json())
         .then(data => {
@@ -43,25 +43,20 @@ window.onload = function() {
             }
             loginSock();
         });
-    */
-}
+        */
+    }
 
 //fetchPage(window.location.href);
 
-function fetchPage(href)
+/* function fetchPage(href)
 {
-    /* if (href == '/' || href == '/users/profile/')
-    if (isActive())
-    {
-      fetchLink('')
-    } */
     fetch(href)
     .then(response => {
         var ref = response.headers.get("X-Current-Path");
         console.log("ref =", ref);  // "/ruta/actual"
         fetchLink(ref);
     });
-}
+} */
 
 /* const loadConfig = async () => {
     await import("/config.js");
@@ -84,7 +79,7 @@ function fetchPage(href)
         originalReplaceState.apply(this, args);
         window.dispatchEvent(new Event('custom-navigation'));
     };
-})();
+});
 
 // Detectar la navegación personalizada
 /* window.addEventListener('custom-navigation', () => {
