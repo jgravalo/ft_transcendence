@@ -90,12 +90,20 @@ msgid "Other Users"
 msgstr "Otros Usuarios"
 
 #: language/translations.py:22
+msgid "Blocked Users"
+msgstr "Usuarios bloqueados"
+
+#: language/translations.py:22
 msgid "#"
 msgstr "#"
 
 #: language/translations.py:23
 msgid "There are no users"
 msgstr "No hay usuarios"
+
+#: language/translations.py:23
+msgid "There are no blocked users"
+msgstr "No hay usuarios bloqueados"
 
 #: language/translations.py:24
 msgid "Start 1vs1"
