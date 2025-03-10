@@ -20,9 +20,15 @@ function isActive()
 // Cargar la barra de usuario autenticado, 42 auth
 window.onload = function() {
     // Si hay un token de acceso, cargar la barra de usuario autenticado
-    loginSock();
-    /* if (sessionStorage.getItem('access')) {
-        fetch(window.location.origin + '/api/users/login/close/', {
+    if (sessionStorage.getItem('access'))
+        loginSock();
+    fetch(window.location.href)
+    .then(response => {
+        var ref = response.headers.get("X-Current-Path");
+        console.log("ref =", ref);  // "/ruta/actual"
+        fetchLink(ref);
+    });
+    /* fetch(window.location.origin + '/api/users/login/close/', {
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
                 'Content-Type': 'application/json',
@@ -37,10 +43,10 @@ window.onload = function() {
             }
             loginSock();
         });
-    } */
+    */
 }
 
-fetchPage(window.location.href);
+//fetchPage(window.location.href);
 
 function fetchPage(href)
 {
