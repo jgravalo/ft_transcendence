@@ -182,6 +182,20 @@ function loginSock() // por definir
         //fetchLink('/users/login/close/');
         //const data = JSON.parse(event.data);
         //document.getElementById('bar').innerHTML = data.content;
+        fetch(window.location.origin + '/api/users/login/close/', {
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
+                'Content-Type': 'application/json',
+                // 'X-CSRFToken': getCSRFToken()
+            }
+        })
+        // .then(response => response.json())
+        .then(response => response.json())
+        .then(data => {
+            if (data.content) {
+                document.getElementById('bar').innerHTML = data.content;
+            }
+        });
         connSocket.send(JSON.stringify({ message: "Hola desde el frontend" }));
     };
     // Escuchar mensajes desde el servidor
