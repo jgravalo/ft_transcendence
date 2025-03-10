@@ -20,6 +20,7 @@ services:
     volumes:
       - ./waf/conf/nginx.modsecurity.conf.template:/etc/nginx/templates/conf.d/modsecurity.conf.template
       - ./waf/conf/setup.conf.template:/etc/nginx/templates/modsecurity.d/setup.conf.template
+      - nginx_logs:/var/log/nginx
 
   front:
     container_name: front
@@ -154,6 +155,15 @@ services:
       - "9187:9187"
     depends_on:
       - waf
+    volumes:
+      - nginx_logs:/var/log/nginx
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    networks:
+      - pongnet
     restart: unless-stopped
 
   grafana:
@@ -171,12 +181,17 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     restart: unless-stopped
 
+
+
 volumes:
   pgdata:
     name: pgdata
   media:
     name: media
-
+  nginx_logs:
+    name: nginx_logs
+  
+  
 networks:
   pongnet:
     name: pongnet
