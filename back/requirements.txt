@@ -24,7 +24,7 @@ PyJWT==2.8.0
 channels-redis>=4.0
 
 # Libreria Pillow para usar ImageField en Models
-Pillow>=10.0.0 
+Pillow>=10.0.0
 
 # Para autenticación con JWT
 djangorestframework-simplejwt==5.2.2
