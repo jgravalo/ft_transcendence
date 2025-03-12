@@ -14,6 +14,7 @@ function deleteFriend(user)
 function blockUser(user)
 {
 	alert("Do you want to block " + user + "?");
+	document.getElementById("chat-" + user).innerHTML = ' ';
 	document.getElementById("follow-" + user).innerHTML = ' ';
 	document.getElementById("block-" + user).innerHTML = '<i class="fas fa-lock-open friend-icon" onclick="unlockUser(\'' + user + '\')"></i>';
 	fetchFriend(user, 'block');
@@ -21,6 +22,7 @@ function blockUser(user)
 
 function unlockUser(user)
 {
+	document.getElementById("chat-" + user).innerHTML = '<i class="fas fa-comment friend-icon link" href="/chat/?user=' + user + '" ></i>';
 	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + user + '\')"></i>';
 	document.getElementById("block-" + user).innerHTML = '<i class="fas fa-ban friend-icon" onclick="blockUser(\'' + user + '\')" style="color: brown;"></i>';
 	fetchFriend(user, 'unlock');
@@ -28,24 +30,21 @@ function unlockUser(user)
 
 function fetchFriend(user, rule)
 {
-	/* let token = getJWTToken();
-	if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
-		console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
-		refreshJWT('/users/friends/' + rule + '/?' + rule + '=' + user);
-		console.log("El token ha renovado");
-		return ;
-	} */
-	if (checkAccess('/users/friends/' + rule + '/?' + rule + '=' + user) != 0)
+	//if (checkAccess('/users/friends/' + rule + '/?' + rule + '=' + user) != 0)
+	if (checkAccess('/users/friends/edit/'+ '/?' + rule + '=' + user) != 0)
         return ;
-	//fetch(base + ':8000/users/friends/' + rule + '/?' + rule + '=' + user, {
-	fetch(base + '/api' + '/users/friends/' + rule + '/?' + rule + '=' + user, {
+	//fetch(base + '/api' + '/users/friends/' + rule + '/?' + rule + '=' + user, {
+	fetch(base + '/api' + '/users/friends/edit/', {
 		method: "POST",
 		headers: {
 			'Authorization': `Bearer ${getJWTToken()}`,
 			"Content-Type": "application/json",
 			'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
 		},
-		body: JSON.stringify({'user': user}),
+		body: JSON.stringify({
+			'user': user,
+			'rule': rule
+		}),
 	})
 	.then(response => response.json())
     .then(data => {
