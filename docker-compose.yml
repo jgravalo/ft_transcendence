@@ -165,6 +165,14 @@ services:
     networks:
       - pongnet
     restart: unless-stopped
+  
+  alertmanager:
+    image: alertmanager
+    build:
+      context: ./alertmanager
+    container_name: alertmanager
+    networks:
+      - pongnet
 
   grafana:
     image: grafana
