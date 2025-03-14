@@ -94,42 +94,70 @@ def close_logout(request):
 @csrf_exempt
 def set_login(request):
     if request.method == "POST":
-        #Fetch and Activate the langage for embedded translations
-        selected_language = request.headers.get('Accept-Language', 'en')  # Default to English
-        activate(selected_language)
         try:
             username = request.POST.get('username')
             password = request.POST.get('password')
-            print('password:', password)
+            
             try:
-                if not '@' in username:
+                if '@' not in username:
                     user = User.objects.get(username=username)
                 else:
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
-                return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
-            if not user.check_password(password): # hashed
-                return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
-            #user = authenticate(username=username, password=password)
-            #if user:
-            login(request, user)  # Aquí Django asigna `request.user`
-            if not user.two_fa_enabled:
-                content = render_to_string('close_login.html') # online_bar
-                next_path = '/users/profile/'
-            else:
-                content = render_to_string('close_logout.html') # offline_bar
-                next_path = '/two_fa/verify/'
-            data = {
-                "access": make_token(user, 'access'),
-                "refresh": make_token(user, 'refresh'),
+                return JsonResponse({
+                    'type': 'errorName',
+                    'error': "Usuario no existe"
+                })
+
+            if not user.check_password(password):
+                return JsonResponse({
+                    'type': 'errorPassword',
+                    'error': 'Contraseña incorrecta'
+                })
+
+            login(request, user)
+
+            # Generar tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
+            response = JsonResponse({
+                "access": access_token,
+                "refresh": str(refresh),
                 "error": "Success",
                 "element": 'bar',
-                "content": content,
-                "next_path": next_path
-            }
-            return JsonResponse(data)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+                "content": render_to_string('close_login.html'),
+                "next_path": '/users/profile/'
+            })
+
+            # Establecer cookies
+            response.set_cookie(
+                'access',
+                access_token,
+                max_age=3600,
+                httponly=True,
+                samesite='Lax'
+            )
+
+            response.set_cookie(
+                'refresh',
+                str(refresh),
+                max_age=86400,
+                httponly=True,
+                samesite='Lax'
+            )
+
+            return response
+
+        except Exception as e:
+            print(f"Error en login: {str(e)}")
+            return JsonResponse({
+                'error': 'Error interno del servidor'
+            }, status=500)
+
+    return JsonResponse({
+        "error": "Método no permitido"
+    }, status=405)
 
 @csrf_exempt
 def get_register(request):
