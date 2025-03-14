@@ -343,22 +343,74 @@ async function anonymizeUserAccount() {
     }
 }
 
+async function downloadUserData() {
+    console.log("Iniciando descarga de datos de usuario");
 
-function downloadUserData() {
-    console.log("Downloading user data");
-    fetch(base + '/api/users/download/', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${getJWTToken()}`,
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+    const token = getJWTToken();
+    if (!token) {
+        alert('No hay sesión activa. Por favor, inicia sesión nuevamente.');
+        window.location.href = '/';
+        return;
+    }
+
+    if (isTokenExpired(token)) {
+        console.log('Token expirado, intentando renovar...');
+        try {
+            const refreshToken = sessionStorage.getItem('refresh');
+            if (!refreshToken) {
+                throw new Error('No hay refresh token disponible');
+            }
+
+            const response = await fetch(base + '/api/users/refresh/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refresh: refreshToken })
+            });
+
+            if (!response.ok) {
+                throw new Error('No se pudo renovar el token');
+            }
+
+            const data = await response.json();
+            sessionStorage.setItem('access', data.access);
+        } catch (error) {
+            console.error('Error al renovar token:', error);
+            alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            sessionStorage.removeItem('access');
+            sessionStorage.removeItem('refresh');
+            window.location.href = '/';
+            return;
         }
-        return response.blob();
-    })
-    .then(blob => {
+    }
+
+    const currentToken = getJWTToken();
+    console.log('Iniciando descarga de datos...');
+
+    try {
+        const response = await fetch(base + '/api/users/download/', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${currentToken}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || errorData.detail || 'Error al descargar los datos');
+        }
+
+        // if (!response) {
+            // const errorData = await response.json();
+            // throw new Error(errorData.error || errorData.detail || 'Error al descargar los datos');
+        // }
+
+        // console.log('Respuesta del servidor:', response);
+
+        const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -367,11 +419,12 @@ function downloadUserData() {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-    })
-    .catch(error => {
-        console.error('Error downloading user data:', error);
-        alert('Error al descargar los datos del usuario');
-    });
+        
+        console.log('Datos descargados exitosamente');
+    } catch (error) {
+        console.error('Error detallado al descargar datos:', error);
+        alert('Error al descargar los datos: ' + error.message);
+    }
 }
 
 /*
