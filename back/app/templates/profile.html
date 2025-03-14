@@ -58,21 +58,14 @@
 			</div>
 			<div class="match-score">XXX - XXX</div>
 		</div>
-		
+		{% for match in matches %}
 		<div class="match-item">
 			<div>
-				<div class="match-players">XXX vs XXX</div>
-				<div class="match-time">XXX hours ago</div>
+				<div class="match-players">{{ match.player1 }} vs {{ match.player2 }}</div>
+				<div class="match-time">{{ match.date }}</div>
 			</div>
-			<div class="match-score">XXX - XXX</div>
+			<div class="match-score">{{ match.score1 }} - {{ match.score2 }}</div>
 		</div>
-		
-		<div class="match-item">
-			<div>
-				<div class="match-players">XXX vs XXX</div>
-				<div class="match-time">XXX hours ago</div>
-			</div>
-			<div class="match-score">XXX - XXX</div>
-		</div>
+		{% endfor %}
 	</div>
 </div>

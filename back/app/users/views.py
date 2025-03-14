@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
+from game.models import Match
 from .token import decode_token, make_token
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,6 +17,8 @@ from rest_framework import status
 import requests
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
+from django.db.models import Q
+from .faker import create_fake_matches, create_fake_users
 
 # def iniciar_sesion(request):
 #     usuario = authenticate(username="juan", password="secreto123")
@@ -208,8 +211,12 @@ def profile(request):
     except:
        return JsonResponse({'error': 'Forbidden'}, status=403)
     # print("url =", user.image.url)
+    create_fake_users()
+    create_fake_matches()
+    matches = Match.objects.filter(Q(player1=user) | Q(player2=user))
     context = {
-        'user': user
+        'user': user,
+        'matches': matches
     }
     content = render_to_string('profile.html', context)
     data = {
@@ -261,18 +268,10 @@ def set_update(request):
             except:
                 return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
-                #image = data.get('image')
-                # Acceder al archivo 'image' desde request.FILES
-                # file = request.FILES['image']
-                # user.image.save(file.name, file)
                 file = request.FILES.get('image')  # Asegúrate de obtener la imagen correctamente
                 if file:
-                    #file_path = default_storage.save('profile_images/' + file.name, file)
-                    user.image = file#_path  # Asigna el archivo al campo image
+                    user.image = file # Asigna el archivo al campo image
                     user.save()  # Guarda el usuario con la imagen
-                # print('funciono request.FILES')
-                # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
-                # print('funciono image.save')
             except:
                 print("fallo al subir image")
             username = request.POST.get('username')
@@ -314,6 +313,35 @@ def set_update(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
+
+@csrf_exempt
+def history(request):
+    try:
+        user = User.get_user(request)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    matches = Match.objects.filter(Q(player1=user) | Q(player2=user))
+    history = []
+    for match in matches:
+        opponent = match.player2 if match.player1 == user else match.player1
+        result = "Win" if match.winner == user else "Lose" if match.winner else "Draw"
+        history.append({
+            "opponent": opponent.username,  # Puedes usar .id o .get_full_name() si prefieres
+            "result": result,
+            "won": match.winner == user,
+            "date": match.date.strftime("%Y-%m-%d %H:%M")  # Formato legible para la plantilla
+        })
+    context = {
+        'user': user,
+        'matches': history,
+    }
+    content = render_to_string('history.html', context)
+    data = {
+        "element": 'content',
+        "content": content,
+    }
+    return JsonResponse(data)
+
 @csrf_exempt
 def friends(request):
     try:
@@ -336,6 +364,33 @@ def friends(request):
     }
     return JsonResponse(data)
 
+
+@csrf_exempt
+def edit_friend(request):
+    try:
+        print('user1')
+        user1 = User.get_user(request)
+        print('data')
+        data = json.loads(request.body)
+        print('username')
+        user_id = data.get("user", "")
+        rule = data.get("rule", "")
+        print('user2')
+        user2 = User.objects.get(id=user_id)
+        print('user2')
+        if rule == 'add':
+            user1.friends.add(user2)
+        elif rule == 'delete':
+            user1.friends.remove(user2)
+        elif rule == 'block':
+            user1.blocked.add(user2)
+        elif rule == 'unlock':
+            user1.blocked.remove(user2)
+        data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
+        return JsonResponse(data)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+""" 
 @csrf_exempt
 def add_friend(request):
     friends_name = request.GET.get('add', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
@@ -343,7 +398,7 @@ def add_friend(request):
         user2 = User.objects.get(username=friends_name)
     except: #Does not exist
         print(f"user {friends_name} does not exist")
-    # print(user2.email)
+    print(user2.email)
     try:
         user1 = User.get_user(request)
     except:
@@ -355,7 +410,7 @@ def add_friend(request):
 @csrf_exempt
 def delete_friend(request):
     friends_name = request.GET.get('delete', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-    # print(friends_name)
+    print(friends_name)
     try:
         user2 = User.objects.get(username=friends_name)
     except: #Does not exist
@@ -375,7 +430,7 @@ def block_user(request):
         user2 = User.objects.get(username=blocked_name)
     except: #Does not exist
         print(f"user {blocked_name} does not exist")
-    # print(user2.email)
+    print(user2.email)
     try:
         user1 = User.get_user(request)
     except:
@@ -393,7 +448,7 @@ def unlock_user(request):
         user2 = User.objects.get(username=blocked_name)
     except: #Does not exist
         print(f"user {blocked_name} does not exist")
-    # print(user2.email)
+    print(user2.email)
     try:
         user1 = User.get_user(request)
     except:
@@ -401,7 +456,7 @@ def unlock_user(request):
     user1.blocked.remove(user2)
     data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
     return JsonResponse(data)
-
+ """
 @csrf_exempt
 def fortytwo_auth(request):
     if request.method == "GET":

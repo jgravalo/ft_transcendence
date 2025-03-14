@@ -74,22 +74,21 @@ function handleLink(event)
     fetchLink(path);
 }
 
-/* async */ function fetchLink(path)
+function fetchLink(path)
 {
-    let token = getJWTToken();
+    /* let token = getJWTToken();
     // console.log("JWT before GET:", getJWTToken());
     //console.log("token =", token);
     if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
         console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
-        refreshJWT(path/* , path => {
-            fetchLink(path);
-        } */);
+        refreshJWT(path);
         console.log("El token ha renovado");
         return ;
-    }
+    } */
     //console.log("token before fetch =", getJWTToken());
+    if (checkAccess(path) != 0)
+        return ;
 	console.log('path for GET =', path);
-    
     // fetch(base + ":8000" + path, {
     var get = '/api' + path;
         if (path == "")

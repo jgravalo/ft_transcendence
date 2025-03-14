@@ -71,13 +71,6 @@
 		<!-- Main content -->
 		<div id="all">
 			<div id="content">
-				<!-- <div class="mb-2" style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-					<h1 id="header" data-i18n="home.welcome">Welcome to the cosmic</h1>
-					<a id="pongname">42Pong</a>
-				</div>
-				<div id="game">
-					<div><button id="gameButton" class="link" href="/game" data-i18n="home.start">Start the game</button></div>
-				</div> -->
 			</div>
 		</div>
 		<!-- Footer -->
@@ -102,35 +95,10 @@
 		<script src="/js/navlinks.js"></script>
 		<script src="/js/login.js"></script>
 		<script src="/js/game.js"></script>
-		<script src="/js/websocket.js"></script>
 		<script src="/js/friends.js"></script>
-		<script src="/js/jwt.js" type="module"></script>
 		<script src="/js/lang.js"></script>
 		<script src="/js/tokens.js"></script>
 		<script src="/js/status.js"></script>
 		<script src="/js/chat.js"></script>
-		<script>
-			// Cargar la barra de usuario autenticado, 42 auth
-		window.onload = function() {
-			// Si hay un token de acceso, cargar la barra de usuario autenticado
-			if (sessionStorage.getItem('access')) {
-				fetch(window.location.origin + '/api/users/login/close/', {
-					headers: {
-						'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
-						'Content-Type': 'application/json',
-						// 'X-CSRFToken': getCSRFToken()
-					}
-				})
-				// .then(response => response.json())
-				.then(response => response.json())
-				.then(data => {
-					if (data.content) {
-						document.getElementById('bar').innerHTML = data.content;
-					}
-					loginSock();
-				});
-			}
-		}
-		</script>
 	</body>
 </html>

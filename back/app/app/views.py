@@ -5,7 +5,8 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 
 import game.routing
-#import users.models.User
+from users.models import User
+from users.views import profile
 
 #from .models import Match
 #from .serializers import MatchSerializer
@@ -14,7 +15,11 @@ import game.routing
 
 #def home(request):
 def get_home(request):
-    content = render_to_string('index.html')
+    try:
+        user = User.get_user(request)
+        return profile(request)
+    except:
+        content = render_to_string('index.html')
     data = {
         "element": 'content',
         "content": content

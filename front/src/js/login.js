@@ -9,16 +9,18 @@ function make2FA()
 
 function makeLogout()
 {
-    document.getElementById('close-session').addEventListener('click', () => {
+    /* document.getElementById('close-session').addEventListener('click', () => {
+    }); */
         // console.log('El botón de cerrar sesion ha sido pulsado');
         removeStorage('access');
         removeStorage('refresh');
-        document.getElementById('cancel-logout').click();
-        connSocket.close();
+        if (document.getElementById('cancel-logout'))
+            document.getElementById('cancel-logout').click();
+        if (connSocket)
+            connSocket.close();
         fetchLink('/users/logout/close/');
         fetchLink('/');
         handleLinks();
-    });
 }
 
 function deleteUser(path)
@@ -45,7 +47,9 @@ function makeModal(path) //modalHTML)
 
     // Manejador del evento de envío del formulario
     if (path == "/users/logout/")
-        makeLogout();
+        document.getElementById('close-session').addEventListener('click', () => {
+            makeLogout();
+        });
     if (path == "/two_fa/")
         make2FA();
     makePost(path);
@@ -68,44 +72,46 @@ function makePost(path)
 
 function makeSubmit(path)
 {
-    let token = getJWTToken();
     // Obtener los valores de los inputs
-        if (path === '/users/login/' ||
-        path === '/users/register/' ||
-        path === '/users/update/' ||
-        path === '/two_fa/verify/')
-            info = getInfo();
-        /* if (path != '/users/update/')
-            info = JSON.stringify(info) */
-        let post = path + "set/";
-        console.log("username:", info.get("username"));
-        console.log("email:", info.get("email"));
-        console.log("password:", info.get("password"));
-        console.log("info =", info);
-        if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
-            console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
-            refreshJWT(post);
-            console.log("El token ha renovado");
-            return ;
-        }
-    	console.log('path for POST =', post);
-            //"Content-Type": "application/json",
-        fetch(base + '/api' + post, {
-            method: "POST",
-            headers: {
-                'Authorization': `Bearer ${getJWTToken()}`,
-                'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
-                'Accept-Language': localStorage.getItem("selectedLanguage") || "en" //send the language to backend (set to en default)
-            },
-            body: info,
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("data POST:", data);
-            if (`${data.error}` == "Success")// CAMBIAR POR STATUS !!
-            {
-                //console.log("JWT after POST:", getJWTToken());
-                if (path == '/users/login/' || path == '/users/register/')
+    if (path === '/users/login/' ||
+    path === '/users/register/' ||
+    path === '/users/update/' ||
+    path === '/two_fa/verify/')
+    info = getInfo();
+    /* if (path != '/users/update/')
+        info = JSON.stringify(info) */
+    let post = path + "set/";
+    console.log("username:", info.get("username"));
+    console.log("email:", info.get("email"));
+    console.log("password:", info.get("password"));
+    console.log("info =", info);
+    /* let token = getJWTToken();
+    if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
+        console.log("POST: El token ha expirado. Solicita uno nuevo usando el refresh token.");
+        refreshJWT(post);
+        console.log("El token ha renovado");
+        return ;
+    } */
+    if (checkAccess(post) != 0)
+        return ;
+    console.log('path for POST =', post);
+    //"Content-Type": "application/json",
+    fetch(base + '/api' + post, {
+        method: "POST",
+        headers: {
+            'Authorization': `Bearer ${getJWTToken()}`,
+            'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
+            'Accept-Language': localStorage.getItem("selectedLanguage") || "en" //send the language to backend (set to en default)
+        },
+        body: info,
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("data POST:", data);
+        if (`${data.error}` == "Success")// CAMBIAR POR STATUS !!
+        {
+            //console.log("JWT after POST:", getJWTToken());
+            if (path == '/users/login/' || path == '/users/register/')
                 {
                     //getJWTPair(info);
                     //saveJWTToken(`${data.access}`);
@@ -118,10 +124,10 @@ function makeSubmit(path)
                 if (path != '/users/update/')
                     document.getElementById('close').click();
                 if (`${data.element}`)
-                {
-                    var dest = `${data.element}`;
-                    document.getElementById(dest).innerHTML = `${data.content}`;
-                }
+                    {
+                        var dest = `${data.element}`;
+                        document.getElementById(dest).innerHTML = `${data.content}`;
+                    }
                 fetchLink(`${data.next_path}`);
                 handleLinks();
             }
@@ -160,7 +166,7 @@ function getInfo()
         //console.log("key =", key, "value =", value);
     });
     //console.log("formDataObject =", formDataObject);
-    return (formDataObject)
+    return JSON.stringify(formDataObject)
 }
 
 function loginSock() // por definir
@@ -176,6 +182,26 @@ function loginSock() // por definir
         //fetchLink('/users/login/close/');
         //const data = JSON.parse(event.data);
         //document.getElementById('bar').innerHTML = data.content;
+        fetchLink('/users/login/close/');
+        /* fetch(window.location.origin + '/api/users/login/close/', {
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
+                'Content-Type': 'application/json',
+                // 'X-CSRFToken': getCSRFToken()
+            }
+        })
+        // .then(response => response.json())
+        .then(response => response.json())
+        .then(data => {
+            if (data.content) {
+                document.getElementById('bar').innerHTML = data.content;
+            }
+        }); */
+        /* document.getElementById('page_links').innerHTML = `
+            <div class="bar-links"><a id="Home" class="link" href="/" data-i18n="button.home">Home</a></div>`;
+        document.getElementById('log_links').innerHTML = `
+            <div class="bar-links"><a class="link" href="/users/login" data-i18n="button.login">Log in</a></div>
+		    <div class="bar-links"><a class="link" href="/users/register" data-i18n="button.register">Sign up</a></div>`; */
         connSocket.send(JSON.stringify({ message: "Hola desde el frontend" }));
     };
     // Escuchar mensajes desde el servidor
@@ -187,6 +213,10 @@ function loginSock() // por definir
     connSocket.onclose = function (event) {
         //const data = JSON.parse(event.data);
         fetchLink('/users/logout/close/');
+        /* document.getElementById('page_links').innerHTML = `
+            <div class="bar-links"><a id="Home" class="link" href="/users/profile" data-i18n="button.home">Home</a></div>`;
+        document.getElementById('log_links').innerHTML = `
+            <div class="bar-links"><a class="link" href="/users/logout" data-i18n="button.logout">Log out</a></div>`; */
         // document.getElementById('bar').innerHTML = data.content;
         console.log("WebSocket desconectado");
     };
