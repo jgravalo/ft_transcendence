@@ -1,6 +1,6 @@
 global:
-  scrape_interval: 15s       # How often Prometheus scrapes metrics
-  evaluation_interval: 5s   # How often rules (alerts) are evaluated
+  scrape_interval: 15s
+  evaluation_interval: 5s
 
 scrape_configs:
   - job_name: 'backend'

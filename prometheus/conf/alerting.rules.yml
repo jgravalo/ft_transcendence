@@ -1,14 +1,4 @@
 groups:
-#  - name: test_alerts
-#    rules:
-#     - alert: SlackTestAlert2
-#        expr: 1 == bool 1
-#        for: 10s
-#        labels:
-#          severity: critical
-#        annotations:
-#          summary: "Test Alert"
-#          description: "This is a test alert sent to Slack."
   - name: system_alerts
     rules:
       - alert: HighCPUUsage

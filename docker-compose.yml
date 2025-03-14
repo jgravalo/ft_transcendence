@@ -17,6 +17,7 @@ services:
     restart: always
     networks:
       - pongnet
+      - monitoring_net
     volumes:
       - ./waf/conf/nginx.modsecurity.conf.template:/etc/nginx/templates/conf.d/modsecurity.conf.template
       - ./waf/conf/setup.conf.template:/etc/nginx/templates/modsecurity.d/setup.conf.template
@@ -51,6 +52,7 @@ services:
         condition: service_healthy
     networks:
       - pongnet
+      - monitoring_net
     volumes:
       - media:/app/img
     restart: unless-stopped
@@ -70,6 +72,7 @@ services:
       - ./db/.env
     networks:
       - pongnet
+      - monitoring_net
     volumes:
       - pgdata:/var/lib/postgresql/data
     depends_on:
@@ -89,12 +92,11 @@ services:
     env_file:
       - ./vault/.env.${ENVIRONMENT}
     container_name: vault
-    ports:
-      - "8200:8200"
     volumes:
       - ./vault/data:/vault/data
     networks:
       - pongnet
+      - monitoring_net
     cap_add:
       - IPC_LOCK
     restart: unless-stopped
@@ -120,10 +122,10 @@ services:
     container_name: prometheus
     env_file:
       - ./prometheus/.env
+    volumes:
+      - prometheus_data:/etc/prometheus
     networks:
-      - pongnet
-    ports:
-      - "9090:9090"
+      - monitoring_net
     restart: unless-stopped
 
   db-exporter:
@@ -134,7 +136,7 @@ services:
     env_file:
       - ./db-exporter/.env
     networks:
-      - pongnet
+      - monitoring_net
     depends_on:
       vault:
         condition: service_healthy
@@ -150,9 +152,7 @@ services:
       context: ./waf-exporter
     container_name: waf-exporter
     networks:
-      - pongnet
-    ports:
-      - "9187:9187"
+      - monitoring_net
     depends_on:
       - waf
     volumes:
@@ -163,7 +163,7 @@ services:
     image: prom/node-exporter:latest
     container_name: node-exporter
     networks:
-      - pongnet
+      - monitoring_net
     restart: unless-stopped
   
   alertmanager:
@@ -172,7 +172,7 @@ services:
       context: ./alertmanager
     container_name: alertmanager
     networks:
-      - pongnet
+      - monitoring_net
 
   grafana:
     image: grafana
@@ -181,15 +181,14 @@ services:
     container_name: grafana
     env_file:
       - ./grafana/.env
+    ports:
+      - 3000:3000
     networks:
       - pongnet
-    ports:
-      - "3000:3000"
+      - monitoring_net
     volumes:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     restart: unless-stopped
-
-
 
 volumes:
   pgdata:
@@ -198,9 +197,14 @@ volumes:
     name: media
   nginx_logs:
     name: nginx_logs
-  
+  prometheus_data:
+    name: prometheus_data
   
 networks:
   pongnet:
     name: pongnet
     driver: bridge
+  monitoring_net:
+    name: monitoring_net
+    driver: bridge
+    internal: true 

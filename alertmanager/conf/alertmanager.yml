@@ -5,7 +5,7 @@ route:
   receiver: "slack"
   group_wait: 10s
   group_interval: 5m
-  repeat_interval: 30m
+  repeat_interval: 30m #How long to "snooze" alerts
 
 receivers:
   - name: "slack"

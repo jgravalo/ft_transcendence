@@ -6,7 +6,6 @@ WORKDIR /etc/nginx
 
 # Copy the template configuration files into the correct locations
 COPY ./conf/default.conf templates/conf.d/default.conf.template
-COPY ./conf/metrics.conf templates/conf.d/metrics.conf.template
 COPY ./conf/proxy_frontend.conf templates/includes/proxy_frontend.conf.template
 COPY ./conf/proxy_api.conf templates/includes/proxy_api.conf.template
 COPY ./conf/proxy_websocket.conf templates/includes/proxy_websocket.conf.template
