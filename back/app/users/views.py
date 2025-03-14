@@ -533,6 +533,12 @@ def download_user_data(request):
                 'losses': user.losses,
                 'win_rate': f"{(user.wins / user.matches * 100) if user.matches > 0 else 0:.2f}%"
             }
+            #             user_data['statistics'] = {
+            #     'total_matches': user.matches,
+            #     'wins': user.wins,
+            #     'losses': user.losses,
+            #     'win_rate': f"{(user.wins / user.matches * 100) if user.matches > 0 else 0:.2f}%"
+            # }
             
             user_data['friends_list'] = list(user.friends.values_list('username', flat=True))
             
@@ -559,105 +565,81 @@ def download_user_data(request):
 
 @csrf_exempt
 def anonymize_user(request):
-    print("Iniciando proceso de anonimización")
-    
     if request.method != "POST":
-        print("Método incorrecto:", request.method)
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
-    # Verificar que el token existe
-    auth_header = request.headers.get('Authorization')
-    print("Auth header:", auth_header)
-    
-    if not auth_header:
-        print("No se encontró header de autorización")
-        return JsonResponse({'error': 'No se proporcionó token de autorización'}, status=401)
-    
     try:
-        # Extraer y validar el token
-        token = auth_header.split(" ")[1]
-        print("Token extraído:", token[:10] + "...")
-        
-        if not token:
-            print("Token vacío después de split")
-            return JsonResponse({'error': 'Token de autorización inválido'}, status=401)
-        
-        # Obtener usuario
-        try:
-            user = User.get_user(request)
-            print(f"Usuario encontrado: {user.username}")
-        except Exception as e:
-            print(f"Error al obtener usuario: {str(e)}")
-            return JsonResponse({'error': f'Error al obtener usuario: {str(e)}'}, status=403)
-        
+        user = User.get_user(request)
         if not user:
-            print("Usuario no encontrado después de get_user")
             return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
         
+        salt = secrets.token_hex(8)
+        hash_base = hashlib.sha256((user.username + salt).encode()).hexdigest()
+        
+        anon_username = f"anon_{hash_base[:8]}"
+        anon_email = f"{hash_base[:12]}@anonymous.com"
+        
+        if User.objects.filter(username=anon_username).exists():
+            return JsonResponse({'error': 'Error interno: nombre de usuario duplicado'}, status=409)
+        
+        old_username = user.username
+        
+        user.username = anon_username
+        user.email = anon_email
+        user.first_name = ""
+        user.last_name = ""
+        
+        if user.image and user.image.name != 'default.jpg':
+            try:
+                user.image.delete(save=False)
+            except Exception as e:
+                print(f"Error al eliminar imagen: {str(e)}")
+        user.image = 'default.jpg'
+        
+        user.friends.clear()
+        user.blocked.clear()
+        
+        user.set_password(secrets.token_urlsafe(32))
+        
         try:
-            # Crear hash para anonimización
-            salt = secrets.token_hex(8)
-            hash_base = hashlib.sha256((user.username + salt).encode()).hexdigest()
-            print(f"Hash generado para {user.username}")
-            
-            # Crear nuevo username y email anónimos
-            anon_username = f"anon_{hash_base[:8]}"
-            anon_email = f"{hash_base[:12]}@anonymous.com"
-            print(f"Nuevos datos generados: {anon_username}, {anon_email}")
-            
-            # Verificar que el nuevo username no existe
-            if User.objects.filter(username=anon_username).exists():
-                print("Username anónimo ya existe")
-                return JsonResponse({'error': 'Error interno: nombre de usuario duplicado'}, status=409)
-            
-            # Backup de datos antiguos para logging
-            old_username = user.username
-            
-            # Limpiar datos personales
-            user.username = anon_username
-            user.email = anon_email
-            user.first_name = ""
-            user.last_name = ""
-            
-            # Restablecer imagen a default
-            if user.image and user.image.name != 'default.jpg':
-                try:
-                    user.image.delete(save=False)
-                    print("Imagen de perfil eliminada")
-                except Exception as e:
-                    print(f"Error al eliminar imagen: {str(e)}")
-            user.image = 'default.jpg'
-            
-            # Eliminar conexiones sociales
-            user.friends.clear()
-            user.blocked.clear()
-            print("Conexiones sociales eliminadas")
-            
-            # Cambiar contraseña a algo aleatorio
-            user.set_password(secrets.token_urlsafe(32))
-            
-            # Guardar cambios
-            user.save()
-            print(f"Usuario {old_username} anonimizado exitosamente a {anon_username}")
-            
-            # Cerrar sesión del usuario
-            logout(request)
-            
-            return JsonResponse({
-                "status": "success",
-                "message": "Cuenta anonimizada correctamente"
-            })
-            
+            # from rest_framework_simplejwt.token_blacklist import OutstandingToken, BlacklistedToken
+            from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+
+            tokens = OutstandingToken.objects.filter(user=user)
+            for token in tokens:
+                BlacklistedToken.objects.get_or_create(token=token)
         except Exception as e:
-            print(f"Error durante la anonimización: {str(e)}")
-            return JsonResponse({
-                "error": "Error durante la anonimización",
-                "detail": str(e)
-            }, status=500)
-            
+            print(f"Error al invalidar tokens: {str(e)}")
+        
+        # Guardar cambios
+        user.save()
+        print(f"Usuario {old_username} anonimizado exitosamente a {anon_username}")
+        
+        # Cerrar sesión del usuario
+        logout(request)
+        
+        # response = JsonResponse({
+        #     "status": "error",
+        #     "message": "Cuenta anonimizada correctamente"
+        # })
+
+        response = JsonResponse({
+            "status": "success",
+            "message": "Cuenta anonimizada correctamente"
+        })
+        
+        response.delete_cookie('access')
+        response.delete_cookie('refresh')
+        response.delete_cookie('sessionid')
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        
+        return response
+        
     except Exception as e:
-        print(f"Error general en anonimización: {str(e)}")
+        print(f"Error en anonimización: {str(e)}")
         return JsonResponse({
-            "error": "Error general en la anonimización",
+            "error": "Error durante la anonimización",
             "detail": str(e)
         }, status=500)
