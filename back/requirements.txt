@@ -61,10 +61,8 @@ hvac==2.2.0
 # To create json formatted logs
 python-json-logger==3.2.1
 
-<<<<<<< HEAD
 #Django data exporter module for Prometheus 
 django-prometheus==2.3.1
-=======
+
 # Para generar modelos random
 Faker==20.1.0
->>>>>>> main
