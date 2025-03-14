@@ -71,6 +71,7 @@
 		<!-- Main content -->
 		<div id="all">
 			<div id="content">
+				 <!--
 				<div class="profile-container">
 					<div class="profile">
 						<div class="profile-photo">
@@ -96,7 +97,6 @@
 							<div class="stat-label" data-i18n="profile.dash.wins">Total Wins</div>
 						</div>
 				
-						<!-- loses -->
 						<div class="stat-card">
 							<div class="stat-icon trophy">XXX</div>
 							<div class="stat-value">{{ user.losses }}</div>
@@ -118,7 +118,6 @@
 				
 					<div class="tabs">
 						<button class="tab active">Match History</button>
-						<!-- <button class="tab" onclick="window.location.href='/users/friends'">Friends</button> -->
 						<button class="tab link" href="/users/friends">Friends</button>
 						<button class="tab">Achievements</button>
 					</div>
@@ -141,7 +140,30 @@
 						</div>
 						{% endfor %}
 					</div>
+				</div> -->
+				<div class="profile-container">
+				<!--  -->
+				<div class="chat-profile link" href="/users/profile/foreign/?user={{ user.username }}">
+					<div class="chat-photo">
+						<img src="img/España.webp">
+					</div>
+					<div class="chat-info">
+						<h1 id="username">{{ user.username }}</h1>
+						<div>
+							<h2>wins: {{ user.wins }}</h2>
+						</div>
+					</div>
 				</div>
+				<!-- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> -->
+				<div class="chat-container">
+					<div class="chat-log" id="chat-box"></div>
+				</div>
+				<form id="message-bar" class="message-bar"> <!-- action="/search" method="get"-->
+					<input id="message-input" type="text" size="80" type="text" name="message" placeholder="Write..." />
+					<button type="submit"><i class="fas fa-paper-plane"></i></button> <!-- onclick="sendMessage()" -->
+				</form>
+				</div>
+				<!--  -->
 			</div>
 		</div>
 		<!-- Footer -->
