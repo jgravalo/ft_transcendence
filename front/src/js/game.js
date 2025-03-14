@@ -1,9 +1,23 @@
 
 function game()
 {
-    document.getElementById("get-challenges").addEventListener("click", getChallenges);
+    // document.getElementById("get-challenges").addEventListener("click", getChallenges);
     let message = null;
     let gameInstance = null;
+
+    const socket_game = new WebSocket('ws://localhost:8000/ws/game/');
+    document.addEventListener("DOMContentLoaded", function () {
+        message = "Click here to play!";
+        if (socket_game !== null) {
+            socket_game.onopen = () => {
+                socket_game.send(JSON.stringify({
+                        step: 'handshake'
+                    }
+                ));
+            }
+        }
+        gameInstance = new PongGame('auto-play');
+    });
 
     class PongGame {
         constructor(mode="auto-play", player1Name = "player1", player2Name = "player2") {
@@ -37,18 +51,7 @@ function game()
                 this.opponentName = "Hal42";
             }
             // --- Remote Vars
-            this.socket = null;
-            if (this.mode === 'remote-ai') {
-                this.socket = new WebSocket('ws://localhost:8000/ws/gamehal/');
-            } else if (this.mode === "remote") {
-                this.socket = new WebSocket('ws://localhost:8000/ws/game/');
-            }
-            if (this.socket !== null) {
-                this.listening = true;
-                this.connectSocket();
-                this.socketListener();
-            }
-
+            this.socket = socket_game;
             this.player = {
                 playerName: this.playerName,
                 role: 'player1',
@@ -112,6 +115,16 @@ function game()
             this.initUIListeners();
             this.initCanvasListeners("auto-play", "overlay");
             this.initCanvasListeners("remote", "cancel-wait");
+            if (this.mode === "remote-ai" || this.mode === "remote") {
+                this.socket.send(JSON.stringify({
+                    step: 'join',
+                    username: this.playerName,
+                    player: this.player,
+                    mode: this.mode}
+                ));
+                this.listening = true;
+                this.socketListener();
+            }
             if (this.mode !== "menu") {
                 this.gameLoop();
             }
@@ -119,13 +132,16 @@ function game()
         destroy() {
             this.running = false;
             this.listening = false;
-            if (this.socket !== null) {
-                this.socket.close();
-            }
             document.removeEventListener('keydown', this.keydownHandler);
             document.removeEventListener('keyup', this.keyUpHandler);
             this.canvas.removeEventListener("click", this.canvasClickHandler);
             document.removeEventListener("click", this.documentClickHandler);
+            if (this.socket) {
+                this.socket.send(JSON.stringify({
+                    'step': 'end',
+                    'mode': this.mode
+                }))
+            }
         }
         // -- Game Loop
         gameLoop(lastTime = 0) {
@@ -213,29 +229,30 @@ function game()
             this.drawOpponentName();
         }
         // -- Remote Mode
-        connectSocket() {
-            this.socket.onopen = () => {
-                this.socket.send(JSON.stringify({
-                    step: 'join',
-                    username: this.playerName,
-                    player: this.player,
-                    mode: this.mode}
-                ));
-            };
-            // if (this.mode === "remote") {
-            //     this.socket.send(JSON.stringify({
-            //         step: 'join',
-            //         username: this.playerName,
-            //         player: this.player,
-            //         mode: this.mode}
-            //     ));
-            // } else if (this.mode === "menu") {
-            //     this.socket.send(JSON.stringify({
-            //         step: 'challenges',
-            //         action: 'get'}
-            //     ));
-            // }
-        }
+        // connectSocket() {
+        //     alert("por aqui...");
+        //     this.socket.onopen = () => {
+        //         this.socket.send(JSON.stringify({
+        //             step: 'join',
+        //             username: this.playerName,
+        //             player: this.player,
+        //             mode: this.mode}
+        //         ));
+        //     };
+        //     // if (this.mode === "remote") {
+        //     //     this.socket.send(JSON.stringify({
+        //     //         step: 'join',
+        //     //         username: this.playerName,
+        //     //         player: this.player,
+        //     //         mode: this.mode}
+        //     //     ));
+        //     // } else if (this.mode === "menu") {
+        //     //     this.socket.send(JSON.stringify({
+        //     //         step: 'challenges',
+        //     //         action: 'get'}
+        //     //     ));
+        //     // }
+        // }
 
         socketListener () {
             this.socket.onmessage = (event) => {
@@ -313,10 +330,11 @@ function game()
             this.ballBounce();
             this.drawRect(this.ball.x - this.ball.size / 2, this.ball.y - this.ball.size / 2, this.ball.size, this.ball.size, this.ball.color);
             requestAnimationFrame(() => this.waitingLoop(msg));
+
         }
 
         startingLoop(msg) {
-            if (!this.running) {
+            if (!this.running && !this.waiting) {
                 this.movePaddle(this.player);
                 this.drawMessage(msg);
                 this.drawDashedLine();
@@ -701,25 +719,8 @@ function game()
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        message = "Click here to play!";
-        gameInstance = new PongGame('auto-play');
-    });
-    // -- GAME INFO
 
-    function getChallenges() {
-        socket = new WebSocket('ws://localhost:8000/ws/challenges/');
-        socket.onopen = () => {
-            alert("here..");
-            socket.send(JSON.stringify({
-                step: 'get'}
-            ));
-        };
-        socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            alert(data);
-        };
-    }
+    // -- GAME INFO
 }
 
 game();
