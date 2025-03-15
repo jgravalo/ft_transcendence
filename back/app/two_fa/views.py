@@ -6,7 +6,7 @@ import json
 
 from .models import TwoFactorAuth
 from users.models import User
-from users.views import decode_token
+from rest_framework_simplejwt.tokens import AccessToken
 
 from .opt import send_email_otp, generate_qr_code
 

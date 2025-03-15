@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from .token import decode_token
 import uuid
 
 # Create your models here.
@@ -50,11 +49,11 @@ class User(AbstractUser):
 			if not token:
 				raise ValueError("Token de autorización vacío")
 			
-			data = decode_token(token)
-			if not data or "id" not in data:
-				raise ValueError("Token inválido o malformado")
+			from rest_framework_simplejwt.tokens import AccessToken
+			token_obj = AccessToken(token)
+			user_id = token_obj['user_id']
 			
-			user = cls.objects.get(id=data["id"])
+			user = cls.objects.get(id=user_id)
 			if not user:
 				raise ValueError("Usuario no encontrado")
 			
@@ -69,3 +68,31 @@ class User(AbstractUser):
 
 	def num_friends(self):
 		return self.friends.count()
+
+	def delete(self, *args, **kwargs):
+		# Limpiar relaciones
+		self.friends.clear()
+		self.blocked.clear()
+		self.groups.clear()
+		self.user_permissions.clear()
+		
+		# Eliminar imagen si no es la default
+		if self.image and self.image.name != 'default.jpg':
+			try:
+				self.image.delete(save=False)
+			except Exception as e:
+				print(f"Error al eliminar imagen: {str(e)}")
+		
+		# Eliminar tokens JWT
+		try:
+			from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+			OutstandingToken.objects.filter(user=self).delete()
+		except Exception as e:
+			print(f"Error al eliminar tokens: {str(e)}")
+		
+		# Eliminar sesiones
+		from django.contrib.sessions.models import Session
+		Session.objects.filter(session_data__contains=str(self.id)).delete()
+		
+		# Eliminar completamente el usuario y todos sus datos
+		super().delete(*args, **kwargs)

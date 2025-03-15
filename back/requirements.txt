@@ -27,7 +27,7 @@ channels-redis>=4.0
 Pillow>=10.0.0 
 
 # Para autenticación con JWT
-djangorestframework-simplejwt==5.2.2
+djangorestframework-simplejwt[token-blacklist]==5.2.2
 
 # Base para 2FA
 #django-otp==1.0.4

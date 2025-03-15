@@ -9,7 +9,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
-from .token import decode_token, make_token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -52,14 +51,38 @@ def refresh(request):
 
 @csrf_exempt
 def delete_user(request):
-    if request.method == "DELETE":
-        try:
-            user = User.get_user(request)
-        except:
-            return JsonResponse({'error': 'Forbidden'}, status=403)
-        user.delete()
-        return JsonResponse({"message": "Usuario borrado con éxito."}, status=200)
-    return JsonResponse({"error": "Método no permitido."}, status=405)
+    if request.method != "DELETE":
+        return JsonResponse({"error": "Método no permitido."}, status=405)
+    
+    try:
+        user = User.get_user(request)
+        if not user:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+        username = user.username
+        user.delete()  # Esto ahora usa nuestro método personalizado
+        print(f"Usuario {username} eliminado exitosamente")
+
+        response = JsonResponse({
+            "status": "success",
+            "message": "Usuario borrado con éxito."
+        })
+
+        # Limpiar cookies y cache
+        response.delete_cookie('access')
+        response.delete_cookie('refresh')
+        response.delete_cookie('sessionid')
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+
+        return response
+
+    except Exception as e:
+        print(f"Error al eliminar usuario: {str(e)}")
+        return JsonResponse({
+            'error': f'Error al eliminar usuario: {str(e)}'
+        }, status=500)
 
 # Create your views here.
 def get_login(request):
@@ -104,6 +127,13 @@ def set_login(request):
                 else:
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
+                return JsonResponse({
+                    'type': 'errorName',
+                    'error': "Usuario no existe"
+                })
+
+            # Solo verificamos is_active si el usuario tiene 2FA habilitado
+            if user.two_fa_enabled and not user.is_active:
                 return JsonResponse({
                     'type': 'errorName',
                     'error': "Usuario no existe"
@@ -198,26 +228,54 @@ def set_register(request):
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
-            user = User.objects.create_user(username=username, email=email, password=password) # hashed
+            user = User.objects.create_user(username=username, email=email, password=password)
             print("password hashed:", user.password)
-            login(request, user)  # Aquí Django asigna `request.user`
+            login(request, user)
+
+            # Generar tokens usando SimpleJWT
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
             if not user.two_fa_enabled:
-                content = render_to_string('close_login.html') # online_bar
+                content = render_to_string('close_login.html')
                 next_path = '/users/profile/'
             else:
-                content = render_to_string('close_logout.html') # offline_bar
+                content = render_to_string('close_logout.html')
                 next_path = '/two_fa/verify/'
-            data = {
-                "access": make_token(user, 'access'),
-                "refresh": make_token(user, 'refresh'),
+
+            response = JsonResponse({
+                "access": access_token,
+                "refresh": str(refresh),
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
                 "next_path": next_path
-            }
-            return JsonResponse(data)
+            })
+
+            # Establecer cookies
+            response.set_cookie(
+                'access',
+                access_token,
+                max_age=3600,
+                httponly=True,
+                samesite='Lax'
+            )
+
+            response.set_cookie(
+                'refresh',
+                str(refresh),
+                max_age=86400,
+                httponly=True,
+                samesite='Lax'
+            )
+
+            return response
+
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+        except Exception as e:
+            print(f"Error en registro: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
 
 def get_logout(request):
     content = render_to_string('logout.html')
@@ -447,10 +505,8 @@ def fortytwo_auth(request):
 # 42 callback, devuelve JSON y redirige a profile o html
 @csrf_exempt
 def fortytwo_callback(request):
-    # print("Callback recibido!")
     if request.method == "GET":
         code = request.GET.get('code')
-        # Si la petición viene con el header de JSON, procesar como API
         if request.headers.get('Content-Type') == 'application/json':
             try:
                 token_url = "https://api.intra.42.fr/oauth/token"
@@ -463,7 +519,7 @@ def fortytwo_callback(request):
                 }
 
                 token_response = requests.post(token_url, data=token_data)
-                token_response.raise_for_status()  # Esto lanzará una excepción si hay error
+                token_response.raise_for_status()
                 access_token = token_response.json().get('access_token')
 
                 if not access_token:
@@ -475,8 +531,6 @@ def fortytwo_callback(request):
                 user_response.raise_for_status()
                 user_data = user_response.json()
 
-                # print("user_data =", user_data)
-                # print("user_data['image_url'] =", user_data['image_url'])
                 try:
                     user = User.objects.get(email=user_data['email'])
                 except User.DoesNotExist:
@@ -485,16 +539,39 @@ def fortytwo_callback(request):
                         email=user_data['email'],
                         password='42auth'
                     )
-                login(request, user)  # Aquí Django asigna `request.user`
-                data = {
-                    "access": make_token(user, 'access'),
-                    "refresh": make_token(user, 'refresh'),
+                login(request, user)
+
+                # Generar tokens usando SimpleJWT
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+
+                response = JsonResponse({
+                    "access": access_token,
+                    "refresh": str(refresh),
                     "error": "Success",
                     "element": 'bar',
                     "content": render_to_string('close_login.html'),
                     "next_path": '/users/profile/'
-                }
-                return JsonResponse(data)
+                })
+
+                # Establecer cookies
+                response.set_cookie(
+                    'access',
+                    access_token,
+                    max_age=3600,
+                    httponly=True,
+                    samesite='Lax'
+                )
+
+                response.set_cookie(
+                    'refresh',
+                    str(refresh),
+                    max_age=86400,
+                    httponly=True,
+                    samesite='Lax'
+                )
+
+                return response
             
             except requests.exceptions.RequestException as e:
                 return JsonResponse({'error': str(e)}, status=400)
@@ -573,22 +650,20 @@ def anonymize_user(request):
         if not user:
             return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
         
+        # Generar identificador anónimo único
         salt = secrets.token_hex(8)
-        hash_base = hashlib.sha256((user.username + salt).encode()).hexdigest()
-        
-        anon_username = f"anon_{hash_base[:8]}"
-        anon_email = f"{hash_base[:12]}@anonymous.com"
-        
-        if User.objects.filter(username=anon_username).exists():
-            return JsonResponse({'error': 'Error interno: nombre de usuario duplicado'}, status=409)
+        hash_base = hashlib.sha256((str(user.id) + salt).encode()).hexdigest()
         
         old_username = user.username
         
-        user.username = anon_username
-        user.email = anon_email
+        # Anonimizar datos personales pero mantener estadísticas
+        user.username = f"anon_{hash_base[:8]}"
+        user.email = f"{hash_base[:12]}@anonymous.user"
         user.first_name = ""
         user.last_name = ""
+        user.set_password(secrets.token_urlsafe(32))
         
+        # Eliminar imagen personal pero mantener una por defecto
         if user.image and user.image.name != 'default.jpg':
             try:
                 user.image.delete(save=False)
@@ -596,38 +671,33 @@ def anonymize_user(request):
                 print(f"Error al eliminar imagen: {str(e)}")
         user.image = 'default.jpg'
         
+        # Limpiar relaciones personales pero mantener el usuario
         user.friends.clear()
         user.blocked.clear()
         
-        user.set_password(secrets.token_urlsafe(32))
-        
+        # Invalidar tokens y sesiones actuales
         try:
-            # from rest_framework_simplejwt.token_blacklist import OutstandingToken, BlacklistedToken
-            from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
-
-            tokens = OutstandingToken.objects.filter(user=user)
-            for token in tokens:
-                BlacklistedToken.objects.get_or_create(token=token)
+            from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+            OutstandingToken.objects.filter(user=user).delete()
         except Exception as e:
             print(f"Error al invalidar tokens: {str(e)}")
         
-        # Guardar cambios
-        user.save()
-        print(f"Usuario {old_username} anonimizado exitosamente a {anon_username}")
+        from django.contrib.sessions.models import Session
+        Session.objects.filter(session_data__contains=str(user.id)).delete()
         
-        # Cerrar sesión del usuario
+        # Guardar el usuario anonimizado
+        user.save()
+        print(f"Usuario {old_username} anonimizado exitosamente a {user.username}")
+        
+        # Cerrar sesión
         logout(request)
         
-        # response = JsonResponse({
-        #     "status": "error",
-        #     "message": "Cuenta anonimizada correctamente"
-        # })
-
         response = JsonResponse({
             "status": "success",
             "message": "Cuenta anonimizada correctamente"
         })
         
+        # Limpiar cookies y cache
         response.delete_cookie('access')
         response.delete_cookie('refresh')
         response.delete_cookie('sessionid')

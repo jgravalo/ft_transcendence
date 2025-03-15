@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'channels', #channels
 
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',  # Para blacklist de tokens JWT
     # 'django_otp',
     # 'django_otp.plugins.otp_totp',  # OTP basado en tiempo (Google Authenticator)
     # 'django_otp.plugins.otp_email',  # OTP vía email
@@ -233,6 +234,10 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
     'VERIFYING_KEY': None,
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
 }
 
 # settings.py
