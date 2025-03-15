@@ -141,7 +141,8 @@
 						{% endfor %}
 					</div>
 				</div> -->
-				<div class="profile-container">
+				<!-- <div class="profile-container"> -->
+				<div class="chat-content">
 				<!--  -->
 				<div class="chat-profile link" href="/users/profile/foreign/?user={{ user.username }}">
 					<div class="chat-photo">
@@ -154,13 +155,12 @@
 						</div>
 					</div>
 				</div>
-				<!-- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> -->
 				<div class="chat-container">
 					<div class="chat-log" id="chat-box"></div>
 				</div>
-				<form id="message-bar" class="message-bar"> <!-- action="/search" method="get"-->
+				<form id="message-bar" class="message-bar">
 					<input id="message-input" type="text" size="80" type="text" name="message" placeholder="Write..." />
-					<button type="submit"><i class="fas fa-paper-plane"></i></button> <!-- onclick="sendMessage()" -->
+					<button type="submit"><i class="fas fa-paper-plane"></i></button>
 				</form>
 				</div>
 				<!--  -->

@@ -1,19 +1,21 @@
-<div class="chat-profile link" href="/users/profile/foreign/?user={{ user.username }}">
-	<div class="chat-photo">
-		<img src="{{ user.image.url }}">
-	</div>
-	<div class="chat-info">
-		<h1 id="username">{{ user.username }}</h1>
-		<div>
-			<h2>wins: {{ user.wins }}</h2>
+<div class="chat-content">
+	<div class="chat-profile link" href="/users/profile/foreign/?user={{ user.username }}">
+		<div class="chat-photo">
+			<img src="{{ user.image.url }}">
+		</div>
+		<div class="chat-info">
+			<h1 id="username">{{ user.username }}</h1>
+			<div>
+				<h2>wins: {{ user.wins }}</h2>
+			</div>
 		</div>
 	</div>
-</div>
-<!-- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> -->
-<div class="chat-container">
-	<div class="chat-log" id="chat-box"></div>
-	<form id="message-bar" class="message-bar"> <!-- action="/search" method="get"-->
-		<input id="message-input" type="text" size="80" type="text" name="message" placeholder="Write..." />
-		<button type="submit"><i class="fas fa-paper-plane"></i></button> <!-- onclick="sendMessage()" -->
-	</form>
+	<!-- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> -->
+	<div class="chat-container">
+		<div class="chat-log" id="chat-box"></div>
+		<form id="message-bar" class="message-bar"> <!-- action="/search" method="get"-->
+			<input id="message-input" type="text" size="80" type="text" name="message" placeholder="Write..." />
+			<button type="submit"><i class="fas fa-paper-plane"></i></button> <!-- onclick="sendMessage()" -->
+		</form>
+	<div>
 <div>
