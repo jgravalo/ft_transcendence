@@ -1,5 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from django.contrib.sessions.models import Session
+
+
 import uuid
 
 # Create your models here.
@@ -46,11 +52,12 @@ class User(AbstractUser):
 				return None
 			
 			token = auth_header.split(" ")[1]
+			# print("token =", token)
+			# token = auth_header.split(" ")[0]
 			if not token:
 				return None
 			
-			from rest_framework_simplejwt.tokens import AccessToken
-			from rest_framework_simplejwt.exceptions import TokenError
+
 			try:
 				token_obj = AccessToken(token)
 				user_id = token_obj['user_id']
@@ -85,13 +92,11 @@ class User(AbstractUser):
 		
 		# Eliminar tokens JWT
 		try:
-			from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 			OutstandingToken.objects.filter(user=self).delete()
 		except Exception as e:
 			print(f"Error al eliminar tokens: {str(e)}")
 		
 		# Eliminar sesiones
-		from django.contrib.sessions.models import Session
 		Session.objects.filter(session_data__contains=str(self.id)).delete()
 		
 		# Eliminar completamente el usuario y todos sus datos

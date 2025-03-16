@@ -10,7 +10,7 @@ ENV POSTGRES_PASSWORD=mypassword
 WORKDIR /docker-entrypoint-initdb.d/
 
 # Copiar scripts SQL de inicialización (opcional)
-COPY ./init.sql .
+# COPY ./init.sql .
 
 # El puerto por defecto de PostgreSQL es 5432
 EXPOSE 5432
