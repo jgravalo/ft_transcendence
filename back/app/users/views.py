@@ -421,69 +421,93 @@ def friends(request):
 
 @csrf_exempt
 def add_friend(request):
-    friends_name = request.GET.get('add', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    friends_name = request.GET.get('add', '')
+    if not friends_name:
+        return JsonResponse({'error': 'Nombre de usuario no proporcionado'}, status=400)
+    
     try:
         user2 = User.objects.get(username=friends_name)
-    except: #Does not exist
-        print(f"user {friends_name} does not exist")
-    # print(user2.email)
-    try:
-        user1 = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    except User.DoesNotExist:
+        return JsonResponse({'error': f'Usuario {friends_name} no existe'}, status=404)
+    
+    user1 = User.get_user(request)
+    if not user1:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    if user1.blocked.filter(username=user2.username).exists():
+        return JsonResponse({'error': 'No puedes agregar a un usuario bloqueado'}, status=400)
+    
+    if user2.blocked.filter(username=user1.username).exists():
+        return JsonResponse({'error': 'Este usuario te ha bloqueado'}, status=400)
+    
     user1.friends.add(user2)
-    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-    return JsonResponse(data)
+    return JsonResponse({'mensaje': 'Amigo agregado correctamente'})
 
 @csrf_exempt
 def delete_friend(request):
-    friends_name = request.GET.get('delete', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-    # print(friends_name)
+    friends_name = request.GET.get('delete', '')
+    if not friends_name:
+        return JsonResponse({'error': 'Nombre de usuario no proporcionado'}, status=400)
+    
     try:
         user2 = User.objects.get(username=friends_name)
-    except: #Does not exist
-        print(f"user {friends_name} does not exist")
-    try:
-        user1 = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    except User.DoesNotExist:
+        return JsonResponse({'error': f'Usuario {friends_name} no existe'}, status=404)
+    
+    user1 = User.get_user(request)
+    if not user1:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    if not user1.friends.filter(username=user2.username).exists():
+        return JsonResponse({'error': 'Este usuario no es tu amigo'}, status=400)
+    
     user1.friends.remove(user2)
-    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-    return JsonResponse(data)
+    return JsonResponse({'mensaje': 'Amigo eliminado correctamente'})
 
 @csrf_exempt
 def block_user(request):
-    blocked_name = request.GET.get('block', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    blocked_name = request.GET.get('block', '')
+    if not blocked_name:
+        return JsonResponse({'error': 'Nombre de usuario no proporcionado'}, status=400)
+    
     try:
         user2 = User.objects.get(username=blocked_name)
-    except: #Does not exist
-        print(f"user {blocked_name} does not exist")
-    # print(user2.email)
-    try:
-        user1 = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    except User.DoesNotExist:
+        return JsonResponse({'error': f'Usuario {blocked_name} no existe'}, status=404)
+    
+    user1 = User.get_user(request)
+    if not user1:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    if user1.username == user2.username:
+        return JsonResponse({'error': 'No puedes bloquearte a ti mismo'}, status=400)
+    
     if user1.friends.filter(username=user2.username).exists():
         user1.friends.remove(user2)
+    
     user1.blocked.add(user2)
-    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-    return JsonResponse(data)
+    return JsonResponse({'mensaje': 'Usuario bloqueado correctamente'})
 
 @csrf_exempt
 def unlock_user(request):
-    blocked_name = request.GET.get('unlock', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    blocked_name = request.GET.get('unlock', '')
+    if not blocked_name:
+        return JsonResponse({'error': 'Nombre de usuario no proporcionado'}, status=400)
+    
     try:
         user2 = User.objects.get(username=blocked_name)
-    except: #Does not exist
-        print(f"user {blocked_name} does not exist")
-    # print(user2.email)
-    try:
-        user1 = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    except User.DoesNotExist:
+        return JsonResponse({'error': f'Usuario {blocked_name} no existe'}, status=404)
+    
+    user1 = User.get_user(request)
+    if not user1:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    if not user1.blocked.filter(username=user2.username).exists():
+        return JsonResponse({'error': 'Este usuario no está bloqueado'}, status=400)
+    
     user1.blocked.remove(user2)
-    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-    return JsonResponse(data)
+    return JsonResponse({'mensaje': 'Usuario desbloqueado correctamente'})
 
 @csrf_exempt
 def fortytwo_auth(request):

@@ -43,28 +43,28 @@ class User(AbstractUser):
 		try:
 			auth_header = request.headers.get('Authorization')
 			if not auth_header:
-				raise ValueError("No se proporcionó token de autorización")
+				return None
 			
 			token = auth_header.split(" ")[1]
 			if not token:
-				raise ValueError("Token de autorización vacío")
+				return None
 			
 			from rest_framework_simplejwt.tokens import AccessToken
-			token_obj = AccessToken(token)
-			user_id = token_obj['user_id']
+			from rest_framework_simplejwt.exceptions import TokenError
+			try:
+				token_obj = AccessToken(token)
+				user_id = token_obj['user_id']
+			except TokenError:
+				return None
 			
-			user = cls.objects.get(id=user_id)
-			if not user:
-				raise ValueError("Usuario no encontrado")
-			
-			return user
+			try:
+				user = cls.objects.get(id=user_id)
+				return user
+			except cls.DoesNotExist:
+				return None
 		
-		except cls.DoesNotExist:
-			raise ValueError("Usuario no encontrado en la base de datos")
-		except ValueError as e:
-			raise ValueError(str(e))
-		except Exception as e:
-			raise ValueError(f"Error al obtener usuario: {str(e)}")
+		except Exception:
+			return None
 
 	def num_friends(self):
 		return self.friends.count()
