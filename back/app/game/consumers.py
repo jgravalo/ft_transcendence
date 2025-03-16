@@ -30,6 +30,158 @@ WAITING_MUTEX = threading.Lock()
 CHALLENGE_MUTEX = threading.Lock()
 CLIENT_MUTEX = threading.Lock()
 
+# ----
+from channels.db import database_sync_to_async
+from app.game.models import Match
+
+@database_sync_to_async
+def create_match_and_update_users(player1, player2, score1, score2):
+    match = Match.objects.create(
+        player1=player1,
+        player2=player2,
+        score_player1=score1,
+        score_player2=score2
+    )
+    if score1 > score2:
+        player1.wins += 1
+        player2.losses += 1
+    elif score2 > score1:
+        player2.wins += 1
+        player1.losses += 1
+
+    player1.matches += 1
+    player2.matches += 1
+
+    player1.save()
+    player2.save()
+
+    return match
+# ----
+
+
+
+async def logger_to_client(client, message):
+    """
+    Send a message to log section.
+
+    :param client: instance of client to send a message.
+    :param message: message to send.
+    """
+    try:
+        await client.send(text_data=json.dumps({
+            "payload_update": "log-update",
+            "detail": message
+        }))
+        logger.info(f"Log message sent. {message}.", extra={"corr": client.cnn_id})
+    except Exception as e:
+        logger.warning(f"Error sending log update message.{e} {message}", extra={"corr": client.cnn_id})
+
+class Clients:
+    """
+    Class to control all users connected to app
+    """
+    clients = []
+    challenges = []
+
+    def __init__(self):
+        self.clients_mutex = threading.Lock()
+        self.challenges_mutex = threading.Lock()
+
+    async def append_client(self, client):
+        """
+        Append client instance to control all the environment.
+
+        :param client: client instance
+        """
+        with self.clients_mutex:
+            if client not in self.clients:
+                self.clients.append(client)
+        await self.broadcast_connected_users()
+
+    def delete_client(self, client):
+        """
+        Delete a client instance from clients control.
+
+        :param client: client instance.
+        """
+        with self.clients_mutex:
+            if client in self.clients:
+                self.clients.remove(client)
+        self.broadcast_connected_users()
+
+    async def append_random_challenge(self, challenger):
+        """
+        Append a random challenge.
+
+        :param challenger: Client instance.
+        """
+        with self.challenges_mutex:
+            if challenger not in self.challenges:
+                self.challenges.append(challenger)
+                await logger_to_client(challenger, "Random challenge created.")
+            else:
+                return
+        await self.broadcast_challenges()
+
+    async def remove_random_challenge(self, challenger):
+        """
+        Delete a random challenge.
+
+        :param challenger: Client instance to remove.
+        """
+        with self.challenges_mutex:
+            if challenger in self.challenges:
+                self.challenges.remove(challenger)
+                await logger_to_client(challenger, "Your random challenge was deleted.")
+            else:
+                return
+        await self.broadcast_challenges()
+
+    def get_opponent(self, challenger):
+        """
+        Get a random opponent (first from the list).
+
+        :param challenger: Client instance to avoid double challenges.
+        """
+        with self.challenges_mutex:
+            if len(self.challenges) and challenger not in self.challenges:
+                opponent = self.challenges.pop(0)
+            else:
+                return None
+        self.broadcast_challenges()
+        return opponent
+
+    async def broadcast_connected_users(self):
+        """
+        Broadcast to all users an update of connected users.
+        """
+        with self.clients_mutex:
+            msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.clients]
+        msg = msg if len(msg) else "empty"
+        for client in self.clients:
+            await client.send(text_data=json.dumps({
+                "payload_update": "connected-users",
+                "detail": msg
+            }))
+
+    async def broadcast_challenges(self):
+        """
+        Broadcast to all users an update of available challenges.
+        """
+        if not len(self.challenges):
+            return
+        with self.clients_mutex:
+            msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challenges]
+        msg = msg if len(msg) else "empty"
+        for client in self.clients:
+            await client.send(text_data=json.dumps({
+                "payload_update": "challenges-update",
+                "detail": msg
+            }))
+
+ClientsHandler = Clients()
+
+
 class GameSession:
     """
     Game Session class to control and update the game.
@@ -440,423 +592,16 @@ class GameSession:
         if self.paddles['player1']['score'] == 5 or self.paddles['player2']['score'] == 5:
             self.winner = 'player1' if self.paddles['player1']['score'] == 5 else 'player2'
 
+    async def end_game_db(self):
+        user1 = self.players["player1"].scope["user"]
+        user2 = self.players["player2"].scope["user"]
 
+        score1 = self.paddles["player1"]["score"]
+        score2 = self.paddles["player2"]["score"]
 
-# class Match(AsyncWebsocketConsumer):
-#     cnn_id = None
-#     match_id = None
-#     players = {}
-#     active_match = []
-#     status = None
-#     canvas = {'width': 400, 'height': 800}
-#     opponent = None
-#     opponent_name = None
-#     username = None
-#     logged = False
-#     player_role = None
-#     other_list = []
-#     global matches
-#     ball = {
-#         'x': canvas['width'] / 2,
-#         'y': canvas['height'] / 2,
-#         'size': 15,
-#         'speedX': 4,
-#         'speedY': 4,
-#         'baseSpeed': 4
-#     }
-#     opponent_ball = {
-#         'x': canvas['width'] / 2,
-#         'y': canvas['height'] / 2,
-#         'size': 15,
-#         'speedX': 4,
-#         'speedY': 4,
-#         'baseSpeed': 4
-#     }
-#
-#     async def connect(self):
-#         self.cnn_id = str(uuid.uuid4())
-#         try:
-#             await self.accept()
-#             # TODO: Delete when remote game is fully implemented.
-#             logger.info(f"Session attributes: {vars(self.scope['session'])}")
-#             user = self.scope['user']
-#             if user.is_authenticated:
-#                 self.username = user.username
-#                 self.logged = True
-#                 logger.info(f'Logged user connected: conn {self.cnn_id} - user {self.username}',
-#                             extra={"corr": self.cnn_id})
-#             else:
-#                 random_number = str(random.randint(1, 999)).zfill(3)
-#                 self.username = f'shy_guy-{random_number}'
-#                 logger.info(f'Anonymous user connected: conn {self.cnn_id} - user {self.username}',
-#                             extra={"corr": self.cnn_id})
-#         except Exception as e:
-#             logger.error(f'Connection Error {self.cnn_id} - Detail {e}',
-#                         extra={"corr": self.cnn_id})
-#
-#     async def challenges(self, data):
-#         """
-#         Handle for challenges. Instead, a random game we can play with a specific
-#         challenge, previously created.
-#         """
-#         if data.get("action") == "get":
-#             async with MUTEX:
-#                 challenges = [usr.username for usr in waiting_list]
-#                 await self.send(text_data=json.dumps({
-#                     "step": "challenges",
-#                     "action": "get",
-#                     "challenges": challenges
-#                 }))
-#         if data.get("action") == "create":
-#             async with MUTEX:
-#                 waiting_list.append(self)
-#                 await self.send(text_data=json.dumps({
-#                     "step": "wait",
-#                     "playerName": self.username
-#                 }))
-#         if data.get("action") == "accept":
-#             async with MUTEX:
-#                 challenger = data.get("username")
-#                 opponent = None
-#                 for i, user in enumerate(waiting_list):
-#                     if user.username == challenger:
-#                         opponent = waiting_list.pop(i)
-#                         break
-#                 if opponent:
-#                     await self.playball(opponent)
-#                 else:
-#                     await self.send(text_data=json.dumps({
-#                         "step": "challenges",
-#                         "detail": "error"
-#                     }))
-#
-#     async def playball(self, players, opponent):
-#         self.opponent = opponent
-#         self.match_id = str(uuid.uuid4())
-#         self.opponent.match_id = self.match_id
-#         self.opponent.opponent = self
-#         game = GameSession(self.match_id, players)
-#         logger.info(f"Match Created.", extra={"corr": self.match_id})
-#         logger.info(f"Players {self.username} - {self.opponent.username}", extra={"corr": self.match_id})
-#         self.player_role = game.get_role(self)
-#         self.opponent.player_role = game.get_role(self.opponent)
-#         logger.info(f'Random roles assigned', extra={"corr": self.match_id})
-#         matches[self.match_id] = {
-#             "players": players,
-#             "game": game
-#         }
-#         await self.send_start_screen(game)
-#
-#     async def receive(self, text_data):
-#         """
-#         Process received message.
-#
-#         :param self: connection instance.
-#         :param text_data: json object received.
-#         """
-#         data = json.loads(text_data)
-#         # Join to remote mode
-#         if not "step" in data:
-#             logger.error(f"Connection {self.cnn_id} wrong request data: {data}.", extra={"corr": self.cnn_id})
-#             await self.send(text_data=json.dumps({
-#                 "step": "error",
-#                 "detail": "Wrong"
-#             }))
-#             await self.close(code=4001)
-#         if data.get("step") == "handshake":
-#             await self.send(text_data=json.dumps({
-#                 "step": "handshake"
-#             }))
-#         if data.get("step") == "challenges":
-#             await self.challenges(data)
-#         if data.get("step") == "rematch":
-#             logger.info(f"Rematch accepted by player {self.username} for match {self.match_id}.", extra={"corr": self.cnn_id})
-#             if self.match_id not in rematch:
-#                 rematch[self.match_id] = matches[self.match_id]
-#                 del matches[self.match_id]
-#             else:
-#                 players = rematch[self.match_id]["players"]
-#                 changed_roles = {}
-#                 for key, value in players:
-#                     changed_roles["player1" if key == "player2" else "player2"] = value
-#                 del rematch[self.match_id]["game"]
-#                 del rematch[self.match_id]
-#                 self.match_id = str(uuid.uuid4())
-#                 game = GameSession(self, changed_roles)
-#                 logger.info(f"Re match Created.", extra={"corr": self.match_id})
-#                 logger.info(f"Players {self.username} - {self.opponent.username}", extra={"corr": self.match_id})
-#                 self.player_role = game.get_role(self)
-#                 self.opponent.player_role = game.get_role(self.opponent)
-#                 matches[self.match_id] = {
-#                     "players": changed_roles,
-#                     "game": game
-#                 }
-#                 await self.send_start_screen(game)
-#         if data.get("step") == "join":
-#             if data.get("mode") != 'remote':
-#                 logger.error(f"Connection {self.cnn_id} requested a wrong game mode.", extra={"corr": self.cnn_id})
-#                 await self.send(text_data=json.dumps({
-#                     "step": "error",
-#                     "detail": "Wrong game mode"
-#                 }))
-#                 await self.close(code=4001)
-#             logger.info("Join remote game request.", extra={"corr": self.cnn_id})
-#             logger.info(f"Players waiting to play: {len(waiting_list)}", extra={"corr": self.cnn_id})
-#             if waiting_list and self not in waiting_list:
-#                 logger.info(f"Players Waiting. Create a new game.", extra={"corr": self.cnn_id})
-#                 # Get Opponent to the match.
-#                 opponent = waiting_list.pop(0)
-#                 role = f"player{str(random.randint(1, 2))}"
-#                 players = {
-#                     role: self,
-#                     "player1" if role == "player2" else "player2": opponent
-#                 }
-#                 logger.info(f'hello {players}')
-#                 await self.playball(players, opponent)
-#             else:
-#                 await self.send(text_data=json.dumps({
-#                     "step": "wait",
-#                     "playerName": self.username
-#                 }))
-#                 waiting_list.append(self)
-#
-#         elif data.get("step") == "update":
-#             """
-#             Get update game from player, update paddle position and
-#             return game data updated
-#             """
-#             role = data.get("role")
-#             matches[self.match_id]['game'].update_paddle_position(role, data.get('position'))
-#             game_info = matches[self.match_id]
-#             paddles, power_ups, ball, winner = game_info['game'].update_game()
-#             if winner:
-#                 logger.info("llego un ganador..")
-#                 await self.end_game_winner(paddles, winner)
-#             keys_to_remove = ["role", "y", "height"]
-#             for role in PLAYER_ROLES:
-#                 opp = 'player1' if role == 'player2' else 'player2'
-#                 player = {key: value for key, value in paddles[role].items() if key not in keys_to_remove}
-#                 await game_info["players"][role].send(text_data=json.dumps({
-#                     "step": "update",
-#                     "score1": paddles['player1']['score'],
-#                     "score2": paddles['player2']['score'],
-#                     "playerRole": role,
-#                     "player": player,
-#                     "opponent": paddles[opp],
-#                     "ball": ball,
-#                     "powerUps": power_ups
-#                 }))
-#
-#     async def end_game_winner(self, paddles, winner):
-#         game_info = matches[self.match_id]
-#         for role in PLAYER_ROLES:
-#             winner_msg = f"You won {paddles[winner]['points']} points!"
-#             await game_info["players"][role].send(text_data=json.dumps({
-#                 "step": "endOfGame",
-#                 "message": winner_msg if role == winner else "You lost!"
-#             }))
-#             if role == winner:
-#                 save_match_result(self.username, paddles[role]['points'])
-#
-#
-#     async def send_start_screen(self, game):
-#         """
-#         Send start game, to get user attention before the game is started.
-#
-#         :param game: game instance.
-#         """
-#         logger.info('Send start screen messages', extra={"corr": self.match_id})
-#         await self.broadcast_message("Be prepare to fight!")
-#         await asyncio.sleep(3)
-#         await self.broadcast_message("2 seconds to go!")
-#         await asyncio.sleep(2)
-#         await self.broadcast_message("GO!", "go")
-#         await asyncio.sleep(0.5)
-#         logger.info('Prepare message sent.', extra={"corr": self.match_id})
-#
-#
-#     async def broadcast_message(self, message, step="ready"):
-#         """
-#         Broadcast a message to users involved at game.
-#
-#         :param message: Detailed message to sent to each user.
-#         :param step: step sent
-#         """
-#         game_info = matches[self.match_id]
-#         paddles, power_ups, ball, winner = game_info['game'].update_game()
-#         for role in PLAYER_ROLES:
-#             opp = 'player1' if role == 'player2' else 'player2'
-#             await game_info["players"][role].send(text_data=json.dumps({
-#                 "step": step,
-#                 "message": message,
-#                 "playerRole": game_info["players"][role].player_role,
-#                 "playerName": game_info["players"][role].username,
-#                 "opponentName": game_info["players"][opp].username,
-#                 "player1Name": game_info["players"]['player1'].username,
-#                 "player2Name": game_info["players"]['player2'].username,
-#                 "player1": paddles["player1"],
-#                 "player2": paddles["player2"],
-#                 "ball": ball
-#             }))
-#
-#
-#     async def disconnect(self, close_code):
-#         logger.warning(f"Client disconnected {close_code}", extra={"corr": self.cnn_id})
-#         if self.match_id:
-#             logger.warning(f"Active Match was found {self.match_id}", extra={"corr": self.cnn_id})
-#             game_info = matches[self.match_id]
-#             for role in PLAYER_ROLES:
-#                 try:
-#                     await game_info["players"][role].send(text_data=json.dumps({
-#                         "step": "disconnection"
-#                     }))
-#                     logger.warning(f"Disconnection message was sent {self.match_id}", extra={"corr": self.cnn_id})
-#                 except Exception as e:
-#                     logger.warning(f"Disconnection message was not sent to {game_info['players'][role].cnn_id}", extra={"corr": self.cnn_id})
-#                     continue
-#             del matches[self.match_id]
-#         if self in waiting_list:
-#             logger.warning(f"Client Removed from waiting list {close_code}.", extra={"corr": self.cnn_id})
-#             waiting_list.remove(self)
-#         # if self.player_id and self.player_id in self.players:
-#         #     del self.players[self.player_id]
-#         #     print(f"Jugador {self.player_id} eliminado del juego.")
+        # Llamar a la función que crea el Match y actualiza estadísticas
+        await create_match_and_update_users(user1, user2, score1, score2)
 
-
-from django.db import connection
-from channels.db import database_sync_to_async
-
-# @database_sync_to_async
-def save_match_result():
-    """Guarda el resultado del partido y actualiza los puntos en la tabla users."""
-    logger.info("ENtramos aqui...")
-    with connection.cursor() as cursor:
-        logger.info("Y aqui también...")
-        # Obtener IDs de los jugadores
-        # cursor.execute("SELECT id FROM users WHERE username = %s", [player])
-        cursor.execute("SELECT id FROM users")
-        logger.info(f"? {cursor}")
-        player_id = cursor.fetchone()
-        logger.info(f"2? {cursor.fetchonet()}")
-        # if not player_id:
-        #     return
-        #
-        # player_id = player_id[0]
-        #
-        # cursor.execute("UPDATE users SET wins = wins + 1, matches = matches + 1, points = points + %s WHERE id = %s",
-        #                [points, player_id])
-
-async def logger_to_client(client, message):
-    try:
-        await client.send(text_data=json.dumps({
-            "payload_update": "log-update",
-            "detail": message
-        }))
-        logger.info(f"Log message sent. {message}.", extra={"corr": client.cnn_id})
-    except Exception as e:
-        logger.warning(f"Error sending log update message.{e} {message}", extra={"corr": client.cnn_id})
-
-class Clients:
-    clients = []
-    challenges = []
-
-    def __init__(self):
-        self.clients_mutex = threading.Lock()
-        self.challenges_mutex = threading.Lock()
-
-    async def append_client(self, client):
-        """
-        Append client instance to control all the environment.
-
-        :param client: client instance
-        """
-        with self.clients_mutex:
-            if client not in self.clients:
-                self.clients.append(client)
-        await self.broadcast_connected_users()
-
-    def delete_client(self, client):
-        """
-        Delete a client instance from clients control.
-
-        :param client: client instance.
-        """
-        with self.clients_mutex:
-            if client in self.clients:
-                self.clients.remove(client)
-        self.broadcast_connected_users()
-
-    async def append_random_challenge(self, challenger):
-        """
-        Append a random challenge.
-
-        :param challenger: Client instance.
-        """
-        with self.challenges_mutex:
-            if challenger not in self.challenges:
-                self.challenges.append(challenger)
-                await logger_to_client(challenger, "Random challenge created.")
-            else:
-                return
-        await self.broadcast_challenges()
-
-    async def remove_random_challenge(self, challenger):
-        """
-        Delete a random challenge.
-
-        :param challenger: Client instance to remove.
-        """
-        with self.challenges_mutex:
-            if challenger in self.challenges:
-                self.challenges.remove(challenger)
-                await logger_to_client(challenger, "Your random challenge was deleted.")
-            else:
-                return
-        await self.broadcast_challenges()
-
-    def get_opponent(self, challenger):
-        """
-        Get a random opponent (first from the list).
-
-        :param challenger: Client instance to avoid double challenges.
-        """
-        with self.challenges_mutex:
-            if len(self.challenges) and challenger not in self.challenges:
-                opponent = self.challenges.pop(0)
-            else:
-                return None
-        self.broadcast_challenges()
-        return opponent
-
-    async def broadcast_connected_users(self):
-        """
-        Broadcast to all users an update of connected users.
-        """
-        with self.clients_mutex:
-            msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.clients]
-        msg = msg if len(msg) else "empty"
-        for client in self.clients:
-            await client.send(text_data=json.dumps({
-                "payload_update": "connected-users",
-                "detail": msg
-            }))
-
-    async def broadcast_challenges(self):
-        """
-        Broadcast to all users an update of available challenges.
-        """
-        if not len(self.challenges):
-            return
-        with self.clients_mutex:
-            msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challenges]
-        msg = msg if len(msg) else "empty"
-        for client in self.clients:
-            await client.send(text_data=json.dumps({
-                "payload_update": "challenges-update",
-                "detail": msg
-            }))
-
-ClientsHandler = Clients()
 
 class PongBack(AsyncWebsocketConsumer):
     cnn_id = None
