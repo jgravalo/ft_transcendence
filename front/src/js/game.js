@@ -130,7 +130,9 @@ function game() {
             if (this.socket) {
                 this.socket.send(JSON.stringify({
                     'step': 'end',
-                    'mode': this.mode
+                    'mode': this.mode,
+                    'score1': this.player["score"],
+                    'score2': this.opponent["score"]
                 }))
             }
         }
@@ -833,6 +835,15 @@ function game() {
       });
     }
 
+    function append_message(message) {
+        const container = document.getElementById("game-log");
+        const li = document.createElement("li");
+        const textNode = document.createTextNode(message);
+        li.appendChild(textNode);
+        container.appendChild(li);
+        li.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+
     function socket_listener() {
         socket_game.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -844,6 +855,9 @@ function game() {
                 }
                 if (data.payload_update === "connected-users") {
                     renderChallenges("connected-users-data", data.detail, false, false);
+                }
+                if (data.payload_update === "log-update") {
+                    append_message(data.detail);
                 }
             }
         };

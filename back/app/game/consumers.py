@@ -726,21 +726,35 @@ class GameSession:
 from django.db import connection
 from channels.db import database_sync_to_async
 
-@database_sync_to_async
-def save_match_result(player, points):
+# @database_sync_to_async
+def save_match_result():
     """Guarda el resultado del partido y actualiza los puntos en la tabla users."""
+    logger.info("ENtramos aqui...")
     with connection.cursor() as cursor:
+        logger.info("Y aqui también...")
         # Obtener IDs de los jugadores
-        cursor.execute("SELECT id FROM users WHERE username = %s", [player])
+        # cursor.execute("SELECT id FROM users WHERE username = %s", [player])
+        cursor.execute("SELECT id FROM users")
+        logger.info(f"? {cursor}")
         player_id = cursor.fetchone()
+        logger.info(f"2? {cursor.fetchonet()}")
+        # if not player_id:
+        #     return
+        #
+        # player_id = player_id[0]
+        #
+        # cursor.execute("UPDATE users SET wins = wins + 1, matches = matches + 1, points = points + %s WHERE id = %s",
+        #                [points, player_id])
 
-        if not player_id:
-            return
-
-        player_id = player_id[0]
-
-        cursor.execute("UPDATE users SET wins = wins + 1, matches = matches + 1, points = points + %s WHERE id = %s",
-                       [points, player_id])
+async def logger_to_client(client, message):
+    try:
+        await client.send(text_data=json.dumps({
+            "payload_update": "log-update",
+            "detail": message
+        }))
+        logger.info(f"Log message sent. {message}.", extra={"corr": client.cnn_id})
+    except Exception as e:
+        logger.warning(f"Error sending log update message.{e} {message}", extra={"corr": client.cnn_id})
 
 class Clients:
     clients = []
@@ -781,6 +795,7 @@ class Clients:
         with self.challenges_mutex:
             if challenger not in self.challenges:
                 self.challenges.append(challenger)
+                await logger_to_client(challenger, "Random challenge created.")
             else:
                 return
         await self.broadcast_challenges()
@@ -794,6 +809,7 @@ class Clients:
         with self.challenges_mutex:
             if challenger in self.challenges:
                 self.challenges.remove(challenger)
+                await logger_to_client(challenger, "Your random challenge was deleted.")
             else:
                 return
         await self.broadcast_challenges()
@@ -868,7 +884,9 @@ class PongBack(AsyncWebsocketConsumer):
             logger.error(f'Connection Error {self.cnn_id} - Detail {e}',
                          extra={"corr": self.cnn_id})
             return
+        await logger_to_client(self, f"You are connected as {self.username}")
         await ClientsHandler.append_client(self)
+
 
 
     async def receive(self, text_data):
@@ -882,18 +900,18 @@ class PongBack(AsyncWebsocketConsumer):
         # Join to remote mode
         if not "step" in data:
             logger.error(f"Connection {self.cnn_id} wrong request data: {data}.", extra={"corr": self.cnn_id})
-            await self.send(text_data=json.dumps({
-                "step": "error",
-                "detail": "Wrong"
-            }))
+            await logger_to_client(self, f"Error. Wrong request.")
             await self.close(code=4001)
         if data.get("step") == "end":
             if data.get("mode") == "remote-ai":
+                msg = "Yo beat HAL!" if data.get("score1") > data.get("score1") else "Hal Crushed you!"
+                await logger_to_client(self, msg)
                 del self.module
             self.module = None
         if data.get("step") == "join":
             if data.get("mode") == "remote-ai":
                 self.module = MatchHAL(self)
+                await logger_to_client(self, f"You are ready to play with HAL!")
                 await self.module.receive(data)
                 # await self.module.game_loop()
             if data.get("mode") == "remote":
@@ -949,10 +967,8 @@ class PongBack(AsyncWebsocketConsumer):
         if self.module:
             self.module.disconnect_game()
             logger.info(f"User disconnected from game.", extra={"corr": self.cnn_id})
-        if self in waiting_list:
-            with WAITING_MUTEX:
-                waiting_list.remove(self)
-            logger.info(f"User removed from waiting list.", extra={"corr": self.cnn_id})
+        await ClientsHandler.remove_random_challenge(self)
+        logger.info(f"User removed from waiting list.", extra={"corr": self.cnn_id})
         logger.info(f"User disconnection managed.", extra={"corr": self.cnn_id})
 
 

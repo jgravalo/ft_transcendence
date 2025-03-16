@@ -192,6 +192,32 @@ ul.tab-content > div > li:hover {
 	display: block;
 }
 
+ul#game-log {
+	color: white;
+	background-color: #1b1b1b;
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	list-style-type: none;
+	overflow: scroll;
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	font-style: italic;
+	font-size: 17px;
+}
+
+ul#game-log > li::before {
+	content: "(42-pong): ";
+	color: #4ac1f7;
+}
+
+ul#game-log > li {
+	text-align: left;
+	padding: 2px;
+
+}
 
 ul.info-tab {
 	display: table;
