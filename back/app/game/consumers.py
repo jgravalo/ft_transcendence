@@ -818,6 +818,7 @@ class Clients:
         """
         with self.clients_mutex:
             msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.clients]
+        msg = msg if len(msg) else "empty"
         for client in self.clients:
             await client.send(text_data=json.dumps({
                 "payload_update": "connected-users",
@@ -832,6 +833,7 @@ class Clients:
             return
         with self.clients_mutex:
             msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challenges]
+        msg = msg if len(msg) else "empty"
         for client in self.clients:
             await client.send(text_data=json.dumps({
                 "payload_update": "challenges-update",

@@ -794,10 +794,8 @@ function game() {
     function renderChallenges(element, data, accept, reject) {
       const container = document.getElementById(element);
       container.innerHTML = "";
-      if (data.empty()) return;
       data.forEach((challenge) => {
         const li = document.createElement("li");
-
         const textNode = document.createTextNode(challenge.username);
         li.appendChild(textNode);
         const iconsDiv = document.createElement("div");
