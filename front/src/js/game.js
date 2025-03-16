@@ -1,31 +1,19 @@
 
-function game()
-{
+function game() {
     // document.getElementById("get-challenges").addEventListener("click", getChallenges);
     let message = null;
     let gameInstance = null;
 
     const socket_game = new WebSocket('ws://localhost:8000/ws/game/');
-    document.addEventListener("DOMContentLoaded", function () {
-        message = "Click here to play!";
-        if (socket_game !== null) {
-            socket_game.onopen = () => {
-                socket_game.send(JSON.stringify({
-                        step: 'handshake'
-                    }
-                ));
-            }
-        }
-        gameInstance = new PongGame('auto-play');
-    });
 
     class PongGame {
-        constructor(mode="auto-play", player1Name = "player1", player2Name = "player2") {
+        constructor(mode = "auto-play", player1Name = "player1", player2Name = "player2") {
             // --- Game Mode and status
             this.mode = mode;
             this.running = true;
             this.waiting = false;
             this.listening = false;
+            this.id = null;
             // --- Canvas
             this.canvas = document.getElementById('pongCanvas');
             this.ctx = this.canvas.getContext('2d');
@@ -44,6 +32,8 @@ function game()
             this.collisionCount = 0;
             this.playerName = player1Name;
             this.opponentName = player2Name;
+            this.score1 = 0;
+            this.score2 = 0;
             if (this.mode !== "auto-play") {
                 message = null;
             } else {
@@ -87,7 +77,7 @@ function game()
             };
 
             this.ball = {
-                x: this.canvas.innerText / 2,
+                x: this.canvas.width / 2,
                 y: this.canvas.height / 2,
                 size: 15,
                 speedX: 4,
@@ -117,18 +107,19 @@ function game()
             this.initCanvasListeners("remote", "cancel-wait");
             if (this.mode === "remote-ai" || this.mode === "remote") {
                 this.socket.send(JSON.stringify({
-                    step: 'join',
-                    username: this.playerName,
-                    player: this.player,
-                    mode: this.mode}
+                        step: 'join',
+                        username: this.playerName,
+                        player: this.player,
+                        mode: this.mode
+                    }
                 ));
                 this.listening = true;
-                this.socketListener();
             }
             if (this.mode !== "menu") {
                 this.gameLoop();
             }
         }
+
         destroy() {
             this.running = false;
             this.listening = false;
@@ -143,6 +134,7 @@ function game()
                 }))
             }
         }
+
         // -- Game Loop
         gameLoop(lastTime = 0) {
             if (!this.running) return;
@@ -214,9 +206,10 @@ function game()
                 }
             }
         }
+
         drawGame() {
             this.drawRect(0, 0, this.canvas.width, this.canvas.height, '#000');
-            if (message  !== null) {
+            if (message !== null) {
                 this.drawMessage(message);
             }
             this.drawDashedLine();
@@ -228,99 +221,157 @@ function game()
             this.drawPlayerName();
             this.drawOpponentName();
         }
-        // -- Remote Mode
-        // connectSocket() {
-        //     alert("por aqui...");
-        //     this.socket.onopen = () => {
-        //         this.socket.send(JSON.stringify({
-        //             step: 'join',
-        //             username: this.playerName,
-        //             player: this.player,
-        //             mode: this.mode}
-        //         ));
-        //     };
-        //     // if (this.mode === "remote") {
-        //     //     this.socket.send(JSON.stringify({
-        //     //         step: 'join',
-        //     //         username: this.playerName,
-        //     //         player: this.player,
-        //     //         mode: this.mode}
-        //     //     ));
-        //     // } else if (this.mode === "menu") {
-        //     //     this.socket.send(JSON.stringify({
-        //     //         step: 'challenges',
-        //     //         action: 'get'}
-        //     //     ));
-        //     // }
-        // }
 
-        socketListener () {
-            this.socket.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (!this.listening) {
-                    if (data.step !== 'close') return;
-                }
-                if (data.step === 'error') {
-                    message = "Error at game";
-                    this.clickMode(message, "auto-play", "remote-match");
-                } else if (data.step === 'wait') {
-                    this.running = false;
-                    this.waiting = true;
-                    this.resetBall();
+        game_listener(data) {
+            if (!this.listening) {
+                if (data.step !== 'close') return;
+            }
+            if (data.step === 'challenges-update') {
+                alert("new challenge " + data.detail)
+            } else if (data.step === 'error') {
+                message = "Error at game";
+                this.clickMode(message, "auto-play", "remote-match");
+            } else if (data.step === 'wait') {
+                this.running = false;
+                this.waiting = true;
+                this.resetBall();
+                this.playerName = data.playerName;
+                this.waitingLoop('Waiting for a victim!');
+            } else if (data.step === 'ready') {
+                this.waiting = false;
+                this.running = false;
+                if (data.playerRole === 'player1') {
+                    Object.assign(this.player, data.player1);
                     this.playerName = data.playerName;
-                    this.waitingLoop('Waiting for a victim!');
-                } else if (data.step === 'ready') {
-                    this.waiting = false;
-                    this.running = false;
-                    if (data.playerRole === 'player1') {
-                        Object.assign(this.player, data.player1);
-                        this.playerName = data.playerName;
-                        this.opponentName = data.opponentName;
-                    } else {
-                        Object.assign(this.player, data.player2);
-                        this.playerName = data.opponentName;
-                        this.opponentName = data.playerName;
-                    }
-                    this.startingLoop(data.message);
-                } else if (data.step === 'start') {
-                    this.waiting = false;
-                    this.running = true;
                     this.opponentName = data.opponentName;
-                    this.playerName = data.playerName;
-                    this.gameLoop();
-                } else if (data.step === 'go') {
-                    this.waiting = false;
-                    this.running = true;
-                    this.playerName = data.player1Name;
-                    this.opponentName = data.player2Name;
-                    if (this.player.role === 'player1') {
-                        Object.assign(this.opponent, data.player2);
-                        Object.assign(this.player, data.player1);
-                    } else {
-                        Object.assign(this.opponent, data.player1);
-                        Object.assign(this.player, data.player2);
-                    }
-                    Object.assign(this.ball, data.ball);
-                    this.updateRemoteGame();
-                    this.gameLoop();
-                } else if (data.step === 'endOfGame') {
-                    this.listening = false;
-                    this.running = false;
-                    this.openMenu("remote-match");
-                    this.startCountdown(10, "rematch-countdown", () => {
-                        this.clickMode(message, "auto-play", "remote-match");
-                    });
-                } else if (data.step === 'move') {
-                    this.opponent.x = data.position;
-                } else if (data.step === 'update') {
-                    Object.assign(this.opponent, data.opponent);
-                    Object.assign(this.player, data.player);
-                    Object.assign(this.ball, data.ball);
-                    this.powerUps = data.powerUps;
+                } else {
+                    Object.assign(this.player, data.player2);
+                    this.playerName = data.opponentName;
+                    this.opponentName = data.playerName;
                 }
-            };
+                this.startingLoop(data.message);
+            } else if (data.step === 'start') {
+                console.log(data.id);
+                this.id = data.id;
+                this.waiting = false;
+                this.running = true;
+                this.opponentName = data.opponentName;
+                this.playerName = data.playerName;
+                this.gameLoop();
+            } else if (data.step === 'go') {
+                console.log(data.id);
+                this.waiting = false;
+                this.running = true;
+                this.id = data.id;
+                this.playerName = data.player1Name;
+                this.opponentName = data.player2Name;
+                if (this.player.role === 'player1') {
+                    Object.assign(this.opponent, data.player2);
+                    Object.assign(this.player, data.player1);
+                } else {
+                    Object.assign(this.opponent, data.player1);
+                    Object.assign(this.player, data.player2);
+                }
+                Object.assign(this.ball, data.ball);
+                this.updateRemoteGame();
+                this.gameLoop();
+            } else if (data.step === 'endOfGame') {
+                this.listening = false;
+                this.running = false;
+                this.openMenu("remote-match");
+                this.startCountdown(10, "rematch-countdown", () => {
+                    this.clickMode(message, "auto-play", "remote-match");
+                });
+            } else if (data.step === "end") {
+                this.clickMode(message, "auto-play", "remote-match")
+            } else if (data.step === 'move') {
+                this.opponent.x = data.position;
+            } else if (data.step === 'update') {
+                Object.assign(this.opponent, data.opponent);
+                Object.assign(this.player, data.player);
+                Object.assign(this.ball, data.ball);
+                this.score1 = data.score1;
+                this.score2 = data.score2;
+                this.powerUps = data.powerUps;
+            }
         }
 
+// socketListener () {
+//             this.socket.onmessage = (event) => {
+//                 const data = JSON.parse(event.data);
+//                 if (!this.listening) {
+//                     if (data.step !== 'close') return;
+//                 }
+//                 if (data.step === 'challenges-update'){
+//                     alert("new challenge " + data.detail)
+//                 } else if (data.step === 'error') {
+//                     message = "Error at game";
+//                     this.clickMode(message, "auto-play", "remote-match");
+//                 } else if (data.step === 'wait') {
+//                     this.running = false;
+//                     this.waiting = true;
+//                     this.resetBall();
+//                     this.playerName = data.playerName;
+//                     this.waitingLoop('Waiting for a victim!');
+//                 } else if (data.step === 'ready') {
+//                     this.waiting = false;
+//                     this.running = false;
+//                     if (data.playerRole === 'player1') {
+//                         Object.assign(this.player, data.player1);
+//                         this.playerName = data.playerName;
+//                         this.opponentName = data.opponentName;
+//                     } else {
+//                         Object.assign(this.player, data.player2);
+//                         this.playerName = data.opponentName;
+//                         this.opponentName = data.playerName;
+//                     }
+//                     this.startingLoop(data.message);
+//                 } else if (data.step === 'start') {
+//                     console.log(data.id);
+//                     this.id = data.id;
+//                     this.waiting = false;
+//                     this.running = true;
+//                     this.opponentName = data.opponentName;
+//                     this.playerName = data.playerName;
+//                     this.gameLoop();
+//                 } else if (data.step === 'go') {
+//                     console.log(data.id);
+//                     this.waiting = false;
+//                     this.running = true;
+//                     this.id = data.id;
+//                     this.playerName = data.player1Name;
+//                     this.opponentName = data.player2Name;
+//                     if (this.player.role === 'player1') {
+//                         Object.assign(this.opponent, data.player2);
+//                         Object.assign(this.player, data.player1);
+//                     } else {
+//                         Object.assign(this.opponent, data.player1);
+//                         Object.assign(this.player, data.player2);
+//                     }
+//                     Object.assign(this.ball, data.ball);
+//                     this.updateRemoteGame();
+//                     this.gameLoop();
+//                 } else if (data.step === 'endOfGame') {
+//                     this.listening = false;
+//                     this.running = false;
+//                     this.openMenu("remote-match");
+//                     this.startCountdown(10, "rematch-countdown", () => {
+//                         this.clickMode(message, "auto-play", "remote-match");
+//                     });
+//                 } else if (data.step === "end") {
+//                     this.clickMode(message, "auto-play", "remote-match")
+//                 } else if (data.step === 'move') {
+//                     this.opponent.x = data.position;
+//                 } else if (data.step === 'update') {
+//                     Object.assign(this.opponent, data.opponent);
+//                     Object.assign(this.player, data.player);
+//                     Object.assign(this.ball, data.ball);
+//                     this.score1 = data.score1;
+//                     this.score2 = data.score2;
+//                     this.powerUps = data.powerUps;
+//                 }
+//             };
+//         }
         // -- Remote Mode loops
         waitingLoop(msg) {
             if (!this.waiting) return;
@@ -344,6 +395,7 @@ function game()
                 requestAnimationFrame(() => this.startingLoop(msg));
             }
         }
+
         // -- Rematch countdown
         startCountdown(seconds, elementId, callback) {
             let counter = seconds;
@@ -357,14 +409,15 @@ function game()
                 countdownElement.innerText = counter;
 
                 if (counter <= 0) {
-                  clearInterval(this.countdownInterval);
-                  this.countdownInterval = null;
-                  if (typeof callback === "function") {
-                    callback();
-                  }
+                    clearInterval(this.countdownInterval);
+                    this.countdownInterval = null;
+                    if (typeof callback === "function") {
+                        callback();
+                    }
                 }
             }, 1000);
         }
+
         // -- Listeners
         initEventListeners() {
             this.keydownHandler = (e) => {
@@ -397,11 +450,21 @@ function game()
                     'step': 'rematch'
                 }))
             } else {
-                this.clickMode(message, "auto-play", "remote-match")
+                this.socket.send(JSON.stringify({
+                    'step': 'rematch-cancel',
+                    'id': this.id
+                }))
             }
         }
 
-        clickMode (msg, mode, element="overlay") {
+        abort_waiting() {
+            this.socket.send(JSON.stringify({
+                    'step': 'abort-waiting'
+                }))
+            this.clickMode("Clic here to play!", 'auto-play', "cancel-wait");
+        }
+
+        clickMode(msg, mode, element = "overlay") {
             clearInterval(this.countdownInterval);
             this.countdownInterval = null
             this.closeMenu(element);
@@ -415,7 +478,7 @@ function game()
                 remoteAI: () => this.clickMode(null, "remote-ai"),
                 rematch_ok: () => this.rematch('join'),
                 rematch_cancel: () => this.rematch('cancel'),
-                waiting_cancel: () => this.clickMode("Clic here to play!", 'auto-play', "cancel-wait")
+                waiting_cancel: () => this.abort_waiting()
             };
 
             document.getElementById("local-game").addEventListener("click", this.uiHandlers.local);
@@ -459,6 +522,7 @@ function game()
             this.canvas.addEventListener("click", this.canvasClickHandler);
             document.addEventListener("click", this.documentClickHandler);
         }
+
         // -- Game Control
         moveAI(paddle) {
             const reactionTime = 2;
@@ -485,6 +549,7 @@ function game()
             }
             paddle.x = Math.max(0, Math.min(paddle.x, this.canvas.width - paddle.width));
         }
+
         // -- Ball Functions
         moveBall() {
             this.ballPlay();
@@ -557,6 +622,7 @@ function game()
 
             return collision;
         }
+
         // --- Power Ups
         movePowerUps() {
             for (let i = this.powerUps.length - 1; i >= 0; i--) {
@@ -689,8 +755,14 @@ function game()
             this.ctx.font = "70px Silkscreen";
             this.ctx.fillStyle = "#fff";
             this.ctx.textAlign = "right";
-            this.ctx.fillText(this.player.score, this.canvas.width - 20, this.canvas.height / 2 + 140);
-            this.ctx.fillText(this.opponent.score, this.canvas.width - 20, this.canvas.height / 2 - 100);
+            if (this.mode === 'remote') {
+                this.ctx.fillText(this.score1, this.canvas.width - 20, this.canvas.height / 2 + 140);
+                this.ctx.fillText(this.score2, this.canvas.width - 20, this.canvas.height / 2 - 100);
+            } else {
+                this.ctx.fillText(this.player.score, this.canvas.width - 20, this.canvas.height / 2 + 140);
+                this.ctx.fillText(this.opponent.score, this.canvas.width - 20, this.canvas.height / 2 - 100);
+            }
+
         }
 
         drawPowerUps() {
@@ -703,7 +775,7 @@ function game()
             }
         }
 
-        endGame(msg, mode="auto-play") {
+        endGame(msg, mode = "auto-play") {
             message = msg;
             this.running = false;
             this.destroy();
@@ -719,8 +791,97 @@ function game()
         }
     }
 
+    function renderChallenges(element, data, accept, reject) {
+      const container = document.getElementById(element);
+      container.innerHTML = "";
 
-    // -- GAME INFO
+      data.forEach((challenge) => {
+        const li = document.createElement("li");
+
+        const textNode = document.createTextNode(challenge.username);
+        li.appendChild(textNode);
+        const iconsDiv = document.createElement("div");
+        if (accept) {
+            const acceptSpan = document.createElement("span");
+            acceptSpan.classList.add("material-symbols-outlined");
+            acceptSpan.textContent = "play_arrow";
+            acceptSpan.title = "Accept";
+            acceptSpan.addEventListener("click", (event) => {
+              event.stopPropagation();
+              socket_game.send(JSON.stringify({
+                step: "accept_challenge",
+                challenge_id: challenge.id
+              }));
+            });
+            iconsDiv.appendChild(acceptSpan);
+        }
+        if (reject) {
+            const rejectSpan = document.createElement("span");
+            rejectSpan.classList.add("material-symbols-outlined");
+            rejectSpan.textContent = "close";
+            rejectSpan.title = "Reject";
+            rejectSpan.addEventListener("click", (event) => {
+                event.stopPropagation();
+                socket_game.send(JSON.stringify({
+                    step: "reject_challenge",
+                    challenge_id: challenge.id
+                }));
+            });
+            iconsDiv.appendChild(rejectSpan);
+        }
+
+        li.appendChild(iconsDiv);
+        container.appendChild(li);
+      });
+    }
+
+    function socket_listener() {
+        socket_game.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (gameInstance && ("step" in data)) {
+                gameInstance.game_listener(data);
+            } else {
+                if (data.payload_update === "challenges-update") {
+                    renderChallenges("random-challenges-data", data.detail, true, true);
+                }
+                if (data.payload_update === "connected-users") {
+                    renderChallenges("connected-users-data", data.detail, false, false);
+                }
+            }
+        };
+    }
+    // --- GENERAL MANAGEMENT
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabButtons = document.querySelectorAll('.tab-button');
+
+        tabButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const targetTabId = button.getAttribute('data-tab');
+
+            document.querySelectorAll('.tab-content').forEach(tabSection => {
+              tabSection.style.display = 'none';
+            });
+
+            const targetTab = document.getElementById(targetTabId);
+            if (targetTab) {
+              targetTab.style.display = 'block';
+            }
+          });
+        });
+
+        message = "Click here to play!";
+        if (socket_game !== null) {
+            socket_game.onopen = () => {
+                socket_game.send(JSON.stringify({
+                        step: 'handshake'
+                    }
+                ));
+            }
+        }
+        gameInstance = new PongGame('auto-play');
+        socket_listener();
+    });
 }
 
 game();

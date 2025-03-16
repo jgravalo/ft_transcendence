@@ -19,7 +19,9 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
-	</head>
+	    <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close,play_arrow" />
+    </head>
 	<body>
 		<!-- Background design -->
 		<div class="star"></div>
@@ -98,8 +100,32 @@
 				</div>
             </div>
             <div id="game-info">
-            <button id="get-challenges">challenges</button>
-            <button id="tournaments">tournaments</button>
+                    <ul id="game-info-tab" class="info-tab">
+                        <li id="connected-users" class="tab-button" data-tab="connected-users-data">online players</li>
+                        <li id="random-challenges" class="tab-button" data-tab="random-challenges-data">challenges</li>
+                        <li id="tournaments" class="tab-button" data-tab="tournaments-data">tournaments</li>
+                    </ul>
+                <div id="game-info-details" class="play-info">
+                    <ul id="connected-users-data" class="detailed-info" style="display: none;">
+                    </ul>
+                    <ul id="random-challenges-data" class="detailed-info" style="display: none;">
+                    </ul>
+                    <ul id="tournaments-data" class="detailed-info" style="display: none;">
+                    </ul>
+                </div>
+                    <ul id="game-info-tab" class="info-tab">
+                        <li id="connected-friends" class="tab-button" data-tab="connected-friends-data">friends</li>
+                        <li id="my-challenges" class="tab-button" data-tab="my-challenges-data">my tournaments</li>
+                        <li id="my-tournaments" class="tab-button" data-tab="my-tournaments-data">my tournaments</li>
+                    </ul>
+                <div id="game-user-details" class="play-info">
+                    <ul id="connected-friends-data" class="detailed-info" style="display: none;">
+                    </ul>
+                    <ul id="my-challenges-data" class="detailed-info" style="display: none;">
+                    </ul>
+                    <ul id="my-tournaments-data" class="detailed-info" style="display: none;">
+                    </ul>
+                </div>
             </div>
         </div>
 <!--			<div id="content">-->
