@@ -17,7 +17,7 @@ function game()
     const menu = document.getElementById('game-menu');
     const canvasContainer = document.getElementById('canvas-container');
 // TODO: User name should be placed properly
-    const playerName = document.getElementById('playerName').textContent;
+    // const playerName = document.getElementById('playerName').textContent;
 
     /*
     * @brief: General function to draw a rectangle.
@@ -148,11 +148,12 @@ function game()
     let isGameRunning = false;
     let gameWinner = null;
     let gameMode = null;
-    let userName = "unregistered"
+    let playerName = "unregistered"
     let opponentName = "unregistered";
 
     const player = {
-        playerName: userName,
+        playerName: playerName,
+        role: 'player1',
         left: false,
         right: false,
         x: canvas.width / 2 - paddleWidth / 2,
@@ -161,11 +162,13 @@ function game()
         height: paddleHeight,
         color: '#fff',
         powerUp: null,
+        score: 0,
         speedModifier: 1
     };
 
     const opponent = {
         playerName: opponentName,
+        role: 'player2',
         left: false,
         right: false,
         x: canvas.width / 2 - paddleWidth / 2,
@@ -174,6 +177,7 @@ function game()
         height: paddleHeight,
         color: '#fff',
         powerUp: null,
+        score: 0,
         speedModifier: 1
     };
 
@@ -239,27 +243,37 @@ function game()
             } else if (data.step === 'ready') {
                 isGameRunning = true;
                 if (data.playerRole === 'player1') {
-                    userName = data.playerName;
+                    Object.assign(player, data.player1);
+                    playerName = player.playerName;
                     opponentName = data.opponentName;
                 } else {
-                    userName = data.opponentName;
-                    opponentName = data.playerName;
+                    Object.assign(player, data.player2);
+                    playerName = data.opponentName;
+                    opponentName = player.playerName;
                 }
-                player.x = data.startX;
-                player.y = data.startY;
-                startingLoop("Be prepare to fight!");
+                startingLoop(data.message);
             }
             if (data.step === 'start') {
-                opponent.playerName = data.opponentName;
-                startGame();
+                if (gameMode === 'remote-ai') {
+                    opponentName = data.opponentName;
+                    opponent.playerName = data.opponentName;
+                    startGame();
+                } else {
+                    gameLoop()
+                }
             }
             if (data.step === 'move') {
                 console.log(data)
                 opponent.x = data.position;
             }
             if (data.step === 'update') {
-                console.log(data)
-                opponent.x = canvas.width - (data.position.x + data.position.width);
+                if (data.playerRole === 'player1') {
+                    Object.assign(player, data.player1);
+                    Object.assign(opponent, data.player2);
+                } else {
+                    Object.assign(player, data.player2);
+                    Object.assign(opponent, data.player1);
+                }
             }
             if (data.step === 'join-ia') {
                 socket.send(JSON.stringify({
@@ -276,36 +290,7 @@ function game()
         };
     }
 
-    function waitingLoop(msg) {
-        playerSpeed = movePaddle(player, playerSpeed);
-        updateGame();
-        drawMessage(msg);
-        ballPlay();
-        ballBounce();
-        drawRect(ball.x - ball.size / 2, ball.y - ball.size / 2, ball.size, ball.size, ball.color);
-        requestAnimationFrame(() => waitingLoop(msg));
-    }
 
-    function startingLoop(msg) {
-
-        // drawRect(0, 0, canvas.width, canvas.height, '#000');
-        // drawDashedLine();
-        // drawRect(player.x, player.y, player.width, player.height, player.color);
-        // drawRect(opponent.x, opponent.y, opponent.width, opponent.height, opponent.color);
-        // drawRect(ball.x - ball.size / 2, ball.y - ball.size / 2, ball.size, ball.size, ball.color);
-        // drawPowerUps();
-        // drawScore();
-        // drawPlayerName();
-        // drawOpponentName();
-        drawRect(0, 0, canvas.width, canvas.height, '#000');
-        drawDashedLine();
-        playerSpeed = movePaddle(player, playerSpeed);
-        drawRect(player.x, player.y, player.width, player.height, player.color);
-        drawMessage(msg);
-        drawPlayerName();
-        drawOpponentName();
-        requestAnimationFrame(() => startingLoop(msg));
-    }
 
     function listener() {
         if (gameMode === 'remote-ai') {
@@ -316,9 +301,8 @@ function game()
             }))
         } else {
             socket.send(JSON.stringify({
-                'step': 'move',
-                'position': player,
-                'ball': ball
+                'step': 'update',
+                'position': player.x
             }))
         }
 
@@ -576,9 +560,16 @@ function game()
         if (!isGameRunning) return;
 
         playerSpeed = movePaddle(player, playerSpeed);
+        if (gameMode === 'remote') {
+            socket.send(JSON.stringify({
+                'step': 'update',
+                'position': player.x
+            }))
+        }
+
         if (gameMode === 'local' || gameMode === 'remote') {
             opponentSpeed = movePaddle(opponent, opponentSpeed);
-        } else {
+        } else if (gameMode === 'remote-ai') {
             listener();
             opponentSpeed = movePaddle(opponent, opponentSpeed);
         }
@@ -648,9 +639,12 @@ function game()
     }
 
     /*
-     * @brief: Game loop
+     * @section: Game Loops.
      *
-     * Game loop start the game workflow.
+     * @note:
+     *  - gameLoop
+     *  - waitingLoop
+     *  - startLoop
     */
     function gameLoop() {
         if (isGameRunning) {
@@ -660,6 +654,26 @@ function game()
         }
     }
 
+    function waitingLoop(msg) {
+        playerSpeed = movePaddle(player, playerSpeed);
+        updateGame();
+        drawMessage(msg);
+        ballPlay();
+        ballBounce();
+        drawRect(ball.x - ball.size / 2, ball.y - ball.size / 2, ball.size, ball.size, ball.color);
+        requestAnimationFrame(() => waitingLoop(msg));
+    }
+
+    function startingLoop(msg) {
+        playerSpeed = movePaddle(player, playerSpeed);
+        drawMessage(msg);
+        drawDashedLine();
+        drawRect(player.x, player.y, player.width, player.height, player.color);
+        drawPlayerName();
+        drawOpponentName();
+        requestAnimationFrame(() => startingLoop(msg));
+    }
+
     /*
      * @section: Main screen.
      *
@@ -667,5 +681,6 @@ function game()
     */
     menu.style.display = 'flex';
     canvasContainer.style.display = 'none';
-
 }
+
+game();
