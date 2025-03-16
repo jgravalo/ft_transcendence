@@ -132,7 +132,7 @@ canvas {
 	color: white;
 }
 
-ul.detailed-info {
+ul.tab-content {
 	width: 100%;
 	font-size: 25px;
 	display: block;
@@ -140,7 +140,7 @@ ul.detailed-info {
 	padding: 0;
 }
 
-ul.detailed-info > li {
+ul.tab-content > li {
 	cursor: pointer;
 	width: 100%;
 	display: flex;
@@ -151,19 +151,19 @@ ul.detailed-info > li {
 	list-style: none;
 }
 
-ul.detailed-info > li > div {
+ul.tab-content > li > div {
 	display: inline-flex;
 	margin-right: 0;
 }
 
-ul.detailed-info > li > div > span{
+ul.tab-content > li > div > span{
 	padding: 5px;
 }
-ul.detailed-info > li > div > span:hover {
+ul.tab-content > li > div > span:hover {
 	background-color: #555;
 }
 
-ul.detailed-info > div > li:hover {
+ul.tab-content > div > li:hover {
 	background-color: #555;
 }
 

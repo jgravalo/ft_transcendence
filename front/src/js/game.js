@@ -486,7 +486,7 @@ function game() {
             document.getElementById("remote-ia-game").addEventListener("click", this.uiHandlers.remoteAI);
             document.getElementById("accept-rematch").addEventListener("click", this.uiHandlers.rematch_ok);
             document.getElementById("reject-rematch").addEventListener("click", this.uiHandlers.rematch_cancel);
-            document.getElementById("cancel-wait").addEventListener("click", this.uiHandlers.waiting_cancel);
+            document.getElementById("end-waiting").addEventListener("click", this.uiHandlers.waiting_cancel);
         }
 
         openMenu(element) {
@@ -794,7 +794,7 @@ function game() {
     function renderChallenges(element, data, accept, reject) {
       const container = document.getElementById(element);
       container.innerHTML = "";
-
+      if (data.empty()) return;
       data.forEach((challenge) => {
         const li = document.createElement("li");
 

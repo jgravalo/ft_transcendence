@@ -751,18 +751,33 @@ class Clients:
         self.challenges_mutex = threading.Lock()
 
     async def append_client(self, client):
+        """
+        Append client instance to control all the environment.
+
+        :param client: client instance
+        """
         with self.clients_mutex:
             if client not in self.clients:
                 self.clients.append(client)
         await self.broadcast_connected_users()
 
     def delete_client(self, client):
+        """
+        Delete a client instance from clients control.
+
+        :param client: client instance.
+        """
         with self.clients_mutex:
             if client in self.clients:
                 self.clients.remove(client)
         self.broadcast_connected_users()
 
     async def append_random_challenge(self, challenger):
+        """
+        Append a random challenge.
+
+        :param challenger: Client instance.
+        """
         with self.challenges_mutex:
             if challenger not in self.challenges:
                 self.challenges.append(challenger)
@@ -770,13 +785,25 @@ class Clients:
                 return
         await self.broadcast_challenges()
 
-    def remove_random_challenge(self, challenger):
+    async def remove_random_challenge(self, challenger):
+        """
+        Delete a random challenge.
+
+        :param challenger: Client instance to remove.
+        """
         with self.challenges_mutex:
             if challenger in self.challenges:
                 self.challenges.remove(challenger)
-        self.broadcast_challenges()
+            else:
+                return
+        await self.broadcast_challenges()
 
     def get_opponent(self, challenger):
+        """
+        Get a random opponent (first from the list).
+
+        :param challenger: Client instance to avoid double challenges.
+        """
         with self.challenges_mutex:
             if len(self.challenges) and challenger not in self.challenges:
                 opponent = self.challenges.pop(0)
@@ -786,26 +813,30 @@ class Clients:
         return opponent
 
     async def broadcast_connected_users(self):
+        """
+        Broadcast to all users an update of connected users.
+        """
         with self.clients_mutex:
-            msg = [{"id": clt.cnn_id, "challenger": clt.username} for clt in self.clients]
+            msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.clients]
         for client in self.clients:
-            if client.free and msg:
-                await client.send(text_data=json.dumps({
-                    "payload_update": "connected-users",
-                    "detail": msg
-                }))
+            await client.send(text_data=json.dumps({
+                "payload_update": "connected-users",
+                "detail": msg
+            }))
 
     async def broadcast_challenges(self):
+        """
+        Broadcast to all users an update of available challenges.
+        """
         if not len(self.challenges):
             return
         with self.clients_mutex:
-            msg = [{"id": clt.cnn_id, "challenger": clt.username} for clt in self.challenges]
+            msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challenges]
         for client in self.clients:
-            if msg and client.free:
-                await client.send(text_data=json.dumps({
-                    "payload_update": "challenges-update",
-                    "detail": msg
-                }))
+            await client.send(text_data=json.dumps({
+                "payload_update": "challenges-update",
+                "detail": msg
+            }))
 
 ClientsHandler = Clients()
 
@@ -815,7 +846,7 @@ class PongBack(AsyncWebsocketConsumer):
     logged = False
     module = None
     modes = ["remote", "remote-ai"]
-    free = True
+    # free = True
     async def connect(self):
         self.cnn_id = str(uuid.uuid4())
         try:
@@ -875,12 +906,12 @@ class PongBack(AsyncWebsocketConsumer):
                 logger.info(f'?? {data.get("id")} {self.module.match_id}')
                 pass
             else:
-                logger.info("aquistamos")
                 self.module.rematch_reject()
                 logger.error(f"User rejects rematch {self.module.match_id}", extra={"corr": self.cnn_id})
             pass
         if data.get("step") == "abort-waiting":
-            ClientsHandler.remove_random_challenge(self)
+            logger.info(f"User remove random challenge.", extra={"corr": self.cnn_id})
+            await ClientsHandler.remove_random_challenge(self)
         else:
             if self.module:
                 await self.module.receive(data)
