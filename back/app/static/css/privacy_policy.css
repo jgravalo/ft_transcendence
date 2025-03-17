@@ -1,0 +1,62 @@
+.privacy-policy {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: #e4e4e4;
+}
+
+.privacy-policy h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section {
+    margin-bottom: 3rem;
+}
+
+.section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+}
+
+.section p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.section ul li {
+    margin-bottom: 0.5rem;
+}
+
+.section strong {
+    display: block;
+    font-size: 1.2rem;
+    color: #64B5F6;
+    margin: 1.5rem 0 0.8rem 0;
+}
+
+.section ul ul {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.section ul ul li {
+    position: relative;
+    padding-left: 1rem;
+}
+
+.section ul ul li::before {
+    content: "•";
+    color: #64B5F6;
+    position: absolute;
+    left: -0.5rem;
+    top: 0;
+} 

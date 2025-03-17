@@ -95,6 +95,8 @@ wait_for_db
 echo "Aplicando migraciones..."
 python manage.py makemigrations
 python manage.py migrate
+python manage.py makemigrations token_blacklist
+python manage.py migrate token_blacklist
 
 # Compila los archivos de traducción (.po>.mo)
 python manage.py compilemessages

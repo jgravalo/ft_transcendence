@@ -16,19 +16,24 @@ class Connection(WebsocketConsumer):
         print("username from ws:", user.username)
         self.accept()
         print('llego a accept')
-        user.is_online=True
-        user.save()
+        
+        # Solo guardar si el usuario está autenticado
+        if user.is_authenticated:
+            user.is_active = True
+            user.save()
+            
         self.send(text_data=json.dumps({
             "message": "Conexión WebSocket exitosa from Django",
-            "status": user.is_active,
+            "status": user.is_active if user.is_authenticated else False,
             "content": render_to_string("close_login.html")
-            }))
+        }))
 
     def disconnect(self, close_code):
         print('desconexion desde el front')
         user = self.scope['user']
-        user.is_online=False
-        user.save()
+        if user.is_authenticated:
+            user.is_active = False
+            user.save()
         # logout(request)
         self.close()
         # pass
