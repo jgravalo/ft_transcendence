@@ -15,6 +15,13 @@ from rest_framework import status
 import requests
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
+import zipfile
+from io import BytesIO
+from django.http import HttpResponse
+from .serializers import UserSerializer
+import os
+import hashlib
+import secrets
 
 # def iniciar_sesion(request):
 #     usuario = authenticate(username="juan", password="secreto123")
@@ -38,9 +45,6 @@ def refresh(request):
         data = {
             "access": new_access_token
         }
-        # decoded_payload = jwt.decode(refresh.access_token, settings.SECRET_KEY, algorithms=["HS256"])
-        # user = User.objects.get(id=decoded_payload['id'])
-        # login(request, user)
         return JsonResponse(data)
     except Exception as e:
         return JsonResponse({'error': "Invalid refresh token:" + str(e)}, status=400)
@@ -90,14 +94,6 @@ def get_login(request):
     return JsonResponse(data)
 
 def close_login(request):
-    try:
-        user = User.get_user(request)
-        print("Antes de login:", request.user)
-        login(request, user)  # Aquí Django asigna `request.user`
-        print("Después de login:", request.user)
-        print('LOGGED')
-    except:
-        None
     content = render_to_string('close_login.html')
     data = {
         "element": 'bar',
@@ -108,7 +104,7 @@ def close_login(request):
 def close_logout(request):
     try:
         logout(request)  # Aquí Django desasigna `request.user`
-        print('UNLOGGED')
+        print('unlogged')
     except:
         None
     content = render_to_string('close_logout.html')
@@ -295,12 +291,8 @@ def profile(request):
     except:
        return JsonResponse({'error': 'Forbidden'}, status=403)
     # print("url =", user.image.url)
-    create_fake_users()
-    create_fake_matches()
-    matches = Match.objects.filter(Q(player1=user) | Q(player2=user))
     context = {
-        'user': user,
-        'matches': matches
+        'user': user
     }
     content = render_to_string('profile.html', context)
     data = {
@@ -352,10 +344,18 @@ def set_update(request):
             except:
                 return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
+                #image = data.get('image')
+                # Acceder al archivo 'image' desde request.FILES
+                # file = request.FILES['image']
+                # user.image.save(file.name, file)
                 file = request.FILES.get('image')  # Asegúrate de obtener la imagen correctamente
                 if file:
-                    user.image = file # Asigna el archivo al campo image
+                    #file_path = default_storage.save('profile_images/' + file.name, file)
+                    user.image = file#_path  # Asigna el archivo al campo image
                     user.save()  # Guarda el usuario con la imagen
+                # print('funciono request.FILES')
+                # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
+                # print('funciono image.save')
             except:
                 print("fallo al subir image")
             username = request.POST.get('username')
@@ -397,35 +397,6 @@ def set_update(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
-
-@csrf_exempt
-def history(request):
-    try:
-        user = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
-    matches = Match.objects.filter(Q(player1=user) | Q(player2=user))
-    history = []
-    for match in matches:
-        opponent = match.player2 if match.player1 == user else match.player1
-        result = "Win" if match.winner == user else "Lose" if match.winner else "Draw"
-        history.append({
-            "opponent": opponent.username,  # Puedes usar .id o .get_full_name() si prefieres
-            "result": result,
-            "won": match.winner == user,
-            "date": match.date.strftime("%Y-%m-%d %H:%M")  # Formato legible para la plantilla
-        })
-    context = {
-        'user': user,
-        'matches': history,
-    }
-    content = render_to_string('history.html', context)
-    data = {
-        "element": 'content',
-        "content": content,
-    }
-    return JsonResponse(data)
-
 @csrf_exempt
 def friends(request):
     try:
@@ -447,7 +418,6 @@ def friends(request):
         "content": content,
     }
     return JsonResponse(data)
-
 
 @csrf_exempt
 def edit_friend(request):
@@ -474,7 +444,7 @@ def edit_friend(request):
         return JsonResponse(data)
     except:
         return JsonResponse({'error': 'Forbidden'}, status=403)
-""" 
+
 @csrf_exempt
 def add_friend(request):
     friends_name = request.GET.get('add', '')
