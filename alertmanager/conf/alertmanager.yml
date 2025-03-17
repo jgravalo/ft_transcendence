@@ -1,0 +1,22 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: "slack"
+  group_wait: 10s
+  group_interval: 5m
+  repeat_interval: 30m #How long to "snooze" alerts
+
+receivers:
+  - name: "slack"
+    slack_configs:
+      - channel: "#alerts"
+        api_url: "https://hooks.slack.com/services/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"
+        title: "[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }} ({{ .CommonLabels.severity }})"
+        text: |-
+          *Alert:* {{ .CommonLabels.alertname }}
+          *Status:* {{ .Status }}
+          *Instance:* {{ .CommonLabels.instance }}
+          *Severity:* {{ .CommonLabels.severity }}
+          *Summary:* {{ .CommonAnnotations.summary }}
+          *Description:* {{ .CommonAnnotations.description }}

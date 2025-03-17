@@ -66,10 +66,6 @@ vault policy read new_policy
 #Create the new role and attach the new policy to it
 vault write auth/approle/role/new_service token_policies="new_service_policy"
 
-
-#Register the policy to Vault
-vault policy write new_service_policy my_policy.hcl
-
 #Check that the policy is attached to the role (token_policies = ...)
 vault read auth/approle/role/new_service
 ```
@@ -83,6 +79,14 @@ vault read auth/approle/role/new_service/role-id
 
 #Secret ID
 vault write -f auth/approle/role/new_service/secret-id
+```
+
+### Step 4 : Add the new secrets
+To add a new secret use the kv put function.
+
+```sh
+#For the new_service container
+vault kv put secret/new_service secret_1="user" secret_2="password"
 ```
 
 ## 3. Fetching Secrets in Python
@@ -189,3 +193,39 @@ fi
 # ---------------------------------------------------------------
 export NEW_PASSWORD
 ```
+
+## 5. Recreating a Root Token (If Lost)
+
+If you ever lose or invalidate your root token, you can generate a new one. Here’s the process:
+
+### Step 1: Unseal Vault (if needed).
+
+If Vault is sealed, use your unseal keys:
+
+```bash
+vault operator unseal
+Repeat until sealed: false. You need the unseal keys from your initial Vault setup.
+Generate a Root Token.
+```
+
+Start the “generate-root” process:
+
+```bash
+vault operator generate-root -init
+```
+
+You’ll see a `nonce` in the output and an `OTP`, bot will be used after.
+Generate the token usisng the nonse and the unseal_key available in `/data/.keys`
+
+```bash
+vault operator generate-root -nonce=<your_nonce> <unseal_key>
+```
+
+Decode the Encoded Token with :
+```bash
+vault operator generate-root -otp -decode <encoded_token_here>
+```
+
+This prints a new root token (for example, hvs.K3DK...).
+Update /vault/conf/keys.backup (or your secret manager) with this new root token.
+

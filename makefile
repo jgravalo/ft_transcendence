@@ -25,7 +25,7 @@ back:
 
 db:
 	docker build --build-arg ENVIRONMENT=$(ENVIRONMENT) --build-arg ENVIRONMENT=$(ENVIRONMENT) -t db ./db
-	docker run -d -p 5432:5432 db
+	docker run -d db
 
 restart-waf:
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml restart waf
@@ -48,9 +48,9 @@ ls:
 	@docker network ls 
 
 clean:
-	rm -rf vault/data/sys/token/id/*
-	rm -rf vault/data/sys/token/accessor/*
-	rm -rf vault/data/sys/expire/id/auth/approle/login/*
+#	rm -rf vault/data/sys/token/id/*
+#	rm -rf vault/data/sys/token/accessor/*
+#	rm -rf vault/data/sys/expire/id/auth/approle/login/*
 	@echo "Deteniendo y eliminando contenedores..."
 	docker compose --env-file $(ENV_FILE) -f docker-compose.yml down
 	@if [ ! -z "$$(docker ps -aq)" ]; then \

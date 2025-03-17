@@ -17,9 +17,11 @@ services:
     restart: always
     networks:
       - pongnet
+      - monitoring_net
     volumes:
       - ./waf/conf/nginx.modsecurity.conf.template:/etc/nginx/templates/conf.d/modsecurity.conf.template
       - ./waf/conf/setup.conf.template:/etc/nginx/templates/modsecurity.d/setup.conf.template
+      - nginx_logs:/var/log/nginx
 
   front:
     container_name: front
@@ -50,6 +52,7 @@ services:
         condition: service_healthy
     networks:
       - pongnet
+      - monitoring_net
     volumes:
       - media:/app/img
     restart: unless-stopped
@@ -69,13 +72,13 @@ services:
       - ./db/.env
     networks:
       - pongnet
-    ports:
-      - "5432:5432"
+      - monitoring_net
     volumes:
       - pgdata:/var/lib/postgresql/data
     depends_on:
       vault:
         condition: service_healthy
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -89,21 +92,19 @@ services:
     env_file:
       - ./vault/.env.${ENVIRONMENT}
     container_name: vault
-    ports:
-      - "8200:8200"
     volumes:
       - ./vault/data:/vault/data
-    restart: always
     networks:
       - pongnet
+      - monitoring_net
     cap_add:
       - IPC_LOCK
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "sh", "-c", "vault status | grep -q 'Sealed.*false'"]
       interval: 5s
       timeout: 5s
       retries: 5
-
 
   redis:
     image: redis:latest
@@ -114,13 +115,96 @@ services:
       - pongnet
     restart: always
 
+  prometheus:
+    image: prometheus
+    build:
+      context: ./prometheus
+    container_name: prometheus
+    env_file:
+      - ./prometheus/.env
+    volumes:
+      - prometheus_data:/etc/prometheus
+    networks:
+      - monitoring_net
+    restart: unless-stopped
+
+  db-exporter:
+    image: db-exporter
+    build:
+      context: ./db-exporter
+    container_name: db-exporter
+    env_file:
+      - ./db-exporter/.env
+    networks:
+      - monitoring_net
+    depends_on:
+      vault:
+        condition: service_healthy
+      db:
+        condition: service_started
+      prometheus:
+        condition: service_started
+    restart: unless-stopped
+
+  waf-exporter:
+    image: waf-exporter
+    build:
+      context: ./waf-exporter
+    container_name: waf-exporter
+    networks:
+      - monitoring_net
+    depends_on:
+      - waf
+    volumes:
+      - nginx_logs:/var/log/nginx
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    networks:
+      - monitoring_net
+    restart: unless-stopped
+  
+  alertmanager:
+    image: alertmanager
+    build:
+      context: ./alertmanager
+    container_name: alertmanager
+    networks:
+      - monitoring_net
+
+  grafana:
+    image: grafana
+    build:
+      context: ./grafana
+    container_name: grafana
+    env_file:
+      - ./grafana/.env
+    ports:
+      - 3000:3000
+    networks:
+      - pongnet
+      - monitoring_net
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    restart: unless-stopped
+
 volumes:
   pgdata:
     name: pgdata
   media:
     name: media
-
+  nginx_logs:
+    name: nginx_logs
+  prometheus_data:
+    name: prometheus_data
+  
 networks:
   pongnet:
     name: pongnet
     driver: bridge
+  monitoring_net:
+    name: monitoring_net
+    driver: bridge
+    internal: true 

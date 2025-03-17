@@ -1,169 +1,222 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+		<title>Pong42</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/game.css">
+		<link rel="stylesheet" href="css/page.css">
+		<link rel="stylesheet" href="css/profile.css">
+		<link rel="stylesheet" href="css/update.css">
+		<link rel="stylesheet" href="css/friends.css">
+		<link rel="stylesheet" href="css/chat.css">
+		<link rel="stylesheet" href="css/privacy-policy.css">
 
-<head>
-	<title>42Pong</title>
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.7.0/css/flag-icon.min.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/game.css">
-	<link rel="stylesheet" href="css/page.css">
-	<link rel="stylesheet" href="css/profile.css">
-	<link rel="stylesheet" href="css/update.css">
-	<link rel="stylesheet" href="css/friends.css">
-	<link rel="stylesheet" href="css/languages.css">
-	<link rel="stylesheet" href="css/chat.css">
-</head>
+		<!-- google fonts / Silkscreen -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<!-- Background design -->
+		<div class="star"></div>
+		<div class="meteor-1"></div>
+		<div class="meteor-2"></div>
+		<div class="meteor-3"></div>
+		<div class="meteor-4"></div>
+		<div class="meteor-5"></div>
+		<div class="meteor-6"></div>
+		<div class="meteor-7"></div>
+		<div class="meteor-8"></div>
+		<div class="meteor-9"></div>
+		<div class="meteor-10"></div>
+		<div class="meteor-11"></div>
+		<div class="meteor-12"></div>
+		<div class="meteor-13"></div>
+		<div class="meteor-14"></div>
+		<div class="meteor-15"></div>
 
-<body>
-	<div id="bar">
-		<div id="page_links">
-			<div class="bar-links"><a id="Home" class="link" href="/">Home</a></div>
-		</div>
-		<div id="modalContainer"></div>
-		<div id="output"></div>
-		<div id="log_links">
-			<!-- <nav class="menu">
-				<ul>
-					<li><a href="#">Inicio</a></li>
-					<li class="dropdown">
-						<a href="#">Servicios</a>
-						<ul class="submenu">
-							<li><a href="#">Diseño Web</a></li>
-							<li><a href="#">SEO</a></li>
-							<li><a href="#">Marketing</a></li>
-						</ul>
-					</li>
-					<li><a href="#">Contacto</a></li>
-				</ul>
-			</nav> -->
-			<!-- <div class="bar-links"> -->
-			<select id="opciones" style="color: white; background-color: black;">
-				<option value="opcion2">ES🇪🇸<span class="flag-icon flag-icon-es"></span></option>
-				<option value="opcion2">US<span class="flag-icon flag-icon-us"></span></option>
-				<option value="opcion3">Opción 3</option>
-			</select>
-			<!-- <details>
-				<summary>Selecciona una opción</summary>
-				<ul>
-					<li>Opción 1</li>
-					<li>Opción 2</li>
-					<li>Opción 3</li>
-				</ul>
-			</details>
-			<div class="dropdown">
-				<input type="radio" id="opcion1" name="dropdown" />
-				<label for="opcion1" data-value="Opción 1">Selecciona una opción</label>
-				<ul>
-					<li><label for="opcion1">Opción 1</label></li>
-					<li><label for="opcion2">Opción 2</label></li>
-					<li><label for="opcion3">Opción 3</label></li>
-				</ul>
-			</div> -->
-			<div class="bar-links"><a class="link" href="/users/login" class="btn btn-link">Log in</a></div>
-			<div class="bar-links"><a class="link" href="/users/sign_up" class="btn btn-link">Sign up</a></div>
-		</div>
-	</div>
-	<div id="all">
-		<div id="content">
-			<!-- <h5 style="color: white;" data-i18n="friends.other.title">Other users</h1>
-				<table class="user">
-					<thead>
-						<tr>
-							<th data-i18n="friends.table.index">#</th>
-							<th data-i18n="friends.table.username">Username</th>
-							<th data-i18n="friends.table.email">Email</th>
-							<th data-i18n="friends.table.record">Record</th>
-							<th data-i18n="friends.table.action">-</th>
-							<th data-i18n="friends.table.action">-</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for user in users %}
-						<tr>
-							<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
-								<img src="img/España.webp">
-							</div></td>
-							<td>{{ user.username }}</td>
-							<td>{{ user.email }}</td>
-							<td>{{ user.wins }}-{{ user.losses }}</td>
-							<td id="user{{ forloop.counter }}-follow">
-								<i class="fas fa-plus friend-icon" onclick="addFriend('user{{ forloop.counter }}', '{{ user.username }}')"></i>
-							</td>
-							<td id="user{{ forloop.counter }}-block">
-								<i class="fas fa-ban friend-icon" onclick="BlockUser('user{{ forloop.counter }}', '{{ user.username }}')" style="color: brown;"></i>
-							</td>
-						</tr>
-						{% empty %}
-						<tr>
-							<td colspan="4" data-i18n="friends.other.empty">There are not users.</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table> -->
-
-				<div class="modal-body">
-
-					<!-- Formulario de Login -->
-					<form id="loginForm">
-						<div class="mb-3">
-							<label for="username" class="form-label" data-i18n="register.username">Nombre de usuario</label>
-							<input type="text" class="form-control" name="username" id="username" required>
-							<span id="errorName" class="error"></span><br>
-						</div>
-						<div class="mb-3">
-							<label for="email" class="form-label" data-i18n="register.email">Correo Electrónico</label>
-							<input type="email" class="form-control" name="email" id="email" required>
-							<span id="errorEmail" class="error"></span><br>
-						</div>
-						<div class="mb-3">
-							<label for="password" class="form-label" data-i18n="register.password">Contraseña</label>
-							<input type="password" class="form-control" name="password" id="password" required>
-							<span id="errorPassword" class="error"></span><br>
-						</div>
-						<div class="mt-3">
-							<button type="submit" class="btn btn-primary w-100" data-i18n="login.submit">Ingresar</button>
-						</div>
-					</form>
-					<div class="separator">
-						<div ></div>
-						<span>O</span>
-						<div ></div>
-					</div>
-					<!-- Botón de login con 42 -->
-					<div class="mt-3">
-						<a href="/api/users/auth/42/login/" class="btn btn-primary w-100">
-							<i class="fas"></i> Login with 42
+		<!-- Navigation bar -->
+		<div id="bar">
+			<div id="page_links">
+				<div class="bar-links"><a id="Home" class="link" href="/" data-i18n="button.home">Home</a></div>
+			</div>
+			<div id="modalContainer"></div>
+			<div id="output"></div>
+			<div id="log_links">
+				<div class="language-menu">
+					<button class="language-button">
+						<img id="currentFlag" src="/img/en.svg" alt="English" width="24" height="18">
+					</button>
+					<div class="language-options">
+						<a href="#" onclick="changeLanguage('en'); return false;">
+							<img src="/img/en.svg" alt="English"> English
+						</a>
+						<a href="#" onclick="changeLanguage('es'); return false;">
+							<img src="/img/es.svg" alt="Español"> Español
+						</a>
+						<a href="#" onclick="changeLanguage('fr'); return false;">
+							<img src="/img/fr.svg" alt="Français"> Français
 						</a>
 					</div>
 				</div>
+				<div class="bar-links"><a class="link" href="/users/login" data-i18n="button.login">Log in</a></div>
+				<div class="bar-links"><a class="link" href="/users/register" data-i18n="button.register">Sign up</a></div>
+			</div>
+		</div>
 
-			<!-- <div class="chat-profile">
-				<div class="chat-photo">
-					<img src="img/España.webp">
+		<!-- Main content -->
+		<div id="all">
+			<div id="content">
+				 <!--
+				<div class="profile-container">
+					<div class="profile">
+						<div class="profile-photo">
+							<img src="{{ user.image.url }}">
+						</div>
+						<div class="info">
+							<div class="username-container">
+								<h1 class="username">{{ user.username }}</h1>
+								<div class="settings-icon">
+									<i class="fas fa-cog link" href="/users/update"></i>
+								</div>
+							</div>
+							<div class="actions">
+								<button class="link challenge-btn" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
+							</div>
+						</div>
+					</div>
+				
+					<div class="stats">
+						<div class="stat-card">
+							<div class="stat-icon trophy">🏆</div>
+							<div class="stat-value">{{ user.wins }}</div>
+							<div class="stat-label" data-i18n="profile.dash.wins">Total Wins</div>
+						</div>
+				
+						<div class="stat-card">
+							<div class="stat-icon trophy">XXX</div>
+							<div class="stat-value">{{ user.losses }}</div>
+							<div class="stat-label" data-i18n="profile.dash.losses">Total Losses</div>
+						</div>
+						
+						<div class="stat-card">
+							<div class="stat-icon clock">🕒</div>
+							<div class="stat-value">{{ user.matches }}</div>
+							<div class="stat-label" data-i18n="profile.dash.matches">Games Played</div>
+						</div>
+						
+						<div class="stat-card">
+							<div class="stat-icon tournament">👑</div>
+							<div class="stat-value">XXX</div>
+							<div class="stat-label" data-i18n="profile.dash.tournament">Tournament Wins</div>
+						</div>
+					</div>
+				
+					<div class="tabs">
+						<button class="tab active">Match History</button>
+						<button class="tab link" href="/users/friends">Friends</button>
+						<button class="tab">Achievements</button>
+					</div>
+				
+					<div class="match-history">
+						<div class="match-item">
+							<div>
+								<div class="match-players">XXX vs XXX</div>
+								<div class="match-time">XXX hours ago</div>
+							</div>
+							<div class="match-score">XXX - XXX</div>
+						</div>
+						{% for match in matches %}
+						<div class="match-item">
+							<div>
+								<div class="match-players">{{ match.player1 }} vs {{ match.player2 }}</div>
+								<div class="match-time">{{ match.date }} hours ago</div>
+							</div>
+							<div class="match-score">{{ match.score1 }} - {{ match.score2 }}</div>
+						</div>
+						{% endfor %}
+					</div>
+				</div> -->
+				<div class="profile-container">
+				<!--  -->
+				<div class="chat-profile link" href="/users/profile/foreign/?user={{ user.username }}">
+					<div class="chat-photo">
+						<img src="img/España.webp">
+					</div>
+					<div class="chat-info">
+						<h1 id="username">{{ user.username }}</h1>
+						<div>
+							<h2>wins: {{ user.wins }}</h2>
+						</div>
+					</div>
 				</div>
-				<div class="chat-info">
-					<h1 id="username">{{ user.username }}</h1>
-					<div>
-						<h2>wins: {{ user.wins }}</h2>
+				<!-- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> -->
+				<div class="chat-container">
+					<div class="chat-log" id="chat-box"></div>
+				</div>
+				<form id="message-bar" class="message-bar"> <!-- action="/search" method="get"-->
+					<input id="message-input" type="text" size="80" type="text" name="message" placeholder="Write..." />
+					<button type="submit"><i class="fas fa-paper-plane"></i></button> <!-- onclick="sendMessage()" -->
+				</form>
+				</div>
+				<!--  -->
+			</div>
+		</div>
+		<!-- Footer -->
+		<footer class="text-white text-center py-3">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-md-4">
+						<p class="mb-1" data-i18n="footer.project">© 2025 ft_transcendence project by 42</p>
+					</div>
+					<div class="col-md-4">
+						<p class="mb-1" data-i18n="footer.team">Team Members: Jesus, Manuel, David, Victor, and Louis</p>
+					</div>
+					<div class="col-md-4">
+						<p class="mb-1"><a href="/users/privacy-policy" class="text-white text-decoration-none" data-i18n="footer.privacy">Privacy Policy</a></p>
 					</div>
 				</div>
 			</div>
-			<!- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> ->
-			<div class="chat-box" id="chatBox"></div>
-			<form class="message-bar" action="/search" method="get">
-				<input id="message-input" type="text" size="80" type="text" name="message" placeholder="Write..." />
-				<button onclick="sendMessage()" type="submit"><i class="fas fa-paper-plane"></i></button>
-			</form> -->
-		</div>
-	</div>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="js/navlinks.js"></script>
-	<script src="js/login.js"></script>
-	<script src="js/game.js"></script>
-	<script src="js/websocket.js"></script>
-	<script src="js/friends.js"></script>
-</body>
+		</footer>
 
+		<!-- Scripts -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="/js/navlinks.js"></script>
+		<script src="/js/login.js"></script>
+		<script src="/js/game.js"></script>
+		<script src="/js/websocket.js"></script>
+		<script src="/js/friends.js"></script>
+		<script src="/js/jwt.js" type="module"></script>
+		<script src="/js/lang.js"></script>
+		<script src="/js/tokens.js"></script>
+		<script src="/js/status.js"></script>
+		<script src="/js/chat.js"></script>
+		<script>
+			// Cargar la barra de usuario autenticado, 42 auth
+		window.onload = function() {
+			// Si hay un token de acceso, cargar la barra de usuario autenticado
+			if (sessionStorage.getItem('access')) {
+				fetch(window.location.origin + '/api/users/login/close/', {
+					headers: {
+						'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
+						'Content-Type': 'application/json',
+						// 'X-CSRFToken': getCSRFToken()
+					}
+				})
+				// .then(response => response.json())
+				.then(response => response.json())
+				.then(data => {
+					if (data.content) {
+						document.getElementById('bar').innerHTML = data.content;
+					}
+					loginSock();
+				});
+			}
+		}
+		</script>
+	</body>
 </html>

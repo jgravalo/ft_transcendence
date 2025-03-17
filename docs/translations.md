@@ -80,7 +80,7 @@ Notes on .po Files:
 - You MUST add translations for the 3 languages.
 - Make sure not to duplicate words here if they are already translated beforehand.
 
-### 4: Updating Translations
+## 3: Updating Translations
 To update and compile translations after making changes:
 
 ```python

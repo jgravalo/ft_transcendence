@@ -1,0 +1,49 @@
+groups:
+  - name: system_alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage has been above 80% for more than 5 minutes."
+      - alert: HighRAMUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 80
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High RAM usage on {{ $labels.instance }}"
+          description: "RAM usage has been above 80% for more than 5 minutes."
+  - name: vault_alerts
+    rules:
+      - alert: VaultSealed
+        expr: vault_core_unsealed == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Vault is sealed!"
+          description: "Vault has been sealed for more than 1 minute and is not accessible."
+  - name: nginx_alerts
+    rules:
+      - alert: HighHTTPRequests
+        expr: rate(nginx_http_requests_total[1m]) > 20
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High Http traffic"
+          description: "More than 20 HTTP connections per seconds for the last 2 minutes."
+  - name: django_alerts
+    rules:
+      - alert: HighAverageLatency
+        expr: rate(django_http_requests_latency_seconds_by_view_method_sum[5m]) / rate(django_http_requests_latency_seconds_by_view_method_count[5m]) > 1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High Latency"
+          description: "The average 5min latency for HTTP reauests is above 1s for the past 2 minutes"

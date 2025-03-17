@@ -9,9 +9,9 @@ class Match(models.Model):
     player1 = models.ForeignKey(User, related_name="matches_as_player1", on_delete=models.CASCADE)
     player2 = models.ForeignKey(User, related_name="matches_as_player2", on_delete=models.CASCADE)
     winner = models.ForeignKey(User, related_name="matches_won", on_delete=models.SET_NULL, null=True, blank=True)
-    date_played = models.DateTimeField(auto_now_add=True)
-    score_player1 = models.IntegerField(default=0)
-    score_player2 = models.IntegerField(default=0)
+    date = models.DateTimeField(auto_now_add=True)
+    score1 = models.IntegerField(default=0)
+    score2 = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.player1.username} vs {self.player2.username} - Winner: {self.winner.username if self.winner else 'N/A'}"

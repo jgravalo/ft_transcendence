@@ -82,9 +82,9 @@ function handleLink(event)
 {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
     var path = event.currentTarget.getAttribute('href');
-    if (path == "/")
+    /* if (path == "/")
         path = "";
-    else if (!path.includes('?'))
+    else  */if (!path.includes('?'))
         path += "/";
     var state = base + path;
     console.log("path = " + path);
@@ -93,24 +93,23 @@ function handleLink(event)
     fetchLink(path);
 }
 
-/* async */ function fetchLink(path)
+function fetchLink(path)
 {
-    let token = getJWTToken();
+    /* let token = getJWTToken();
     // console.log("JWT before GET:", getJWTToken());
     //console.log("token =", token);
     if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
         console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
-        refreshJWT(path/* , path => {
-            fetchLink(path);
-        } */);
+        refreshJWT(path);
         console.log("El token ha renovado");
         return ;
-    }
+    } */
     //console.log("token before fetch =", getJWTToken());
+    if (checkAccess(path) != 0)
+        return ;
 	console.log('path for GET =', path);
-    
     // fetch(base + ":8000" + path, {
-        var get = '/api' + path;
+    var get = '/api' + path;
         if (path == "")
             get = path;
     console.log('fetch for GET =', base + get);
@@ -141,7 +140,7 @@ function handleLink(event)
         } */
         else
         {
-            if (path != '/users/logout/close/')
+            if (path != '/users/login/close/' && path != '/users/logout/close/')
                 pushState(path);
             if (path == '/users/update/')
                 makePost(path);

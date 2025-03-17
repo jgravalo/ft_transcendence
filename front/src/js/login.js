@@ -1,5 +1,7 @@
 //import { getInfo2FA } from './two_fa.js';
 
+let connSocket = null;
+
 function make2FA()
 {
     handleLinks();
@@ -7,16 +9,18 @@ function make2FA()
 
 function makeLogout()
 {
-    document.getElementById('close-session').addEventListener('click', () => {
+    /* document.getElementById('close-session').addEventListener('click', () => {
+    }); */
         // console.log('El botón de cerrar sesion ha sido pulsado');
         removeStorage('access');
         removeStorage('refresh');
-        document.getElementById('cancel-logout').click();
-        //socket.close();
+        if (document.getElementById('cancel-logout'))
+            document.getElementById('cancel-logout').click();
+        if (connSocket)
+            connSocket.close();
         fetchLink('/users/logout/close/');
         fetchLink('/');
         handleLinks();
-    });
 }
 
 function deleteUser(path)
@@ -43,7 +47,9 @@ function makeModal(path) //modalHTML)
 
     // Manejador del evento de envío del formulario
     if (path == "/users/logout/")
-        makeLogout();
+        document.getElementById('close-session').addEventListener('click', () => {
+            makeLogout();
+        });
     if (path == "/two_fa/")
         make2FA();
     makePost(path);
@@ -122,28 +128,53 @@ function loginSock() // por definir
     const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/';
     //const route = 'ws://back:8000/ws/connect/';
     console.log('ruta: ', route);
-    const socket = new WebSocket(route);
+    connSocket = new WebSocket(route);
     // Escuchar eventos de conexión
-    socket.onopen = function (event) {
+    connSocket.onopen = function (event) {
         console.log("WebSocket conectado");
-        const data = JSON.parse(event.data);
-        document.getElementById('bar').innerHTML = data.content;
-        socket.send(JSON.stringify({ message: "Hola desde el frontend" }));
+        //fetchLink('/users/login/close/');
+        //const data = JSON.parse(event.data);
+        //document.getElementById('bar').innerHTML = data.content;
+        fetchLink('/users/login/close/');
+        /* fetch(window.location.origin + '/api/users/login/close/', {
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
+                'Content-Type': 'application/json',
+                // 'X-CSRFToken': getCSRFToken()
+            }
+        })
+        // .then(response => response.json())
+        .then(response => response.json())
+        .then(data => {
+            if (data.content) {
+                document.getElementById('bar').innerHTML = data.content;
+            }
+        }); */
+        /* document.getElementById('page_links').innerHTML = `
+            <div class="bar-links"><a id="Home" class="link" href="/" data-i18n="button.home">Home</a></div>`;
+        document.getElementById('log_links').innerHTML = `
+            <div class="bar-links"><a class="link" href="/users/login" data-i18n="button.login">Log in</a></div>
+		    <div class="bar-links"><a class="link" href="/users/register" data-i18n="button.register">Sign up</a></div>`; */
+        connSocket.send(JSON.stringify({ message: "Hola desde el frontend" }));
     };
     // Escuchar mensajes desde el servidor
-    socket.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        console.log(data.message);
+    connSocket.onmessage = function (event) {
+        //const data = JSON.parse(event.data);
+        //console.log(data.message);
     };
     // Manejar desconexión
-    socket.onclose = function (event) {
-        const data = JSON.parse(event.data);
-        fetchLink('/users/logout/close/')
+    connSocket.onclose = function (event) {
+        //const data = JSON.parse(event.data);
+        fetchLink('/users/logout/close/');
+        /* document.getElementById('page_links').innerHTML = `
+            <div class="bar-links"><a id="Home" class="link" href="/users/profile" data-i18n="button.home">Home</a></div>`;
+        document.getElementById('log_links').innerHTML = `
+            <div class="bar-links"><a class="link" href="/users/logout" data-i18n="button.logout">Log out</a></div>`; */
         // document.getElementById('bar').innerHTML = data.content;
         console.log("WebSocket desconectado");
     };
     // Manejar errores
-    socket.onerror = function (error) {
+    connSocket.onerror = function (error) {
         console.error("WebSocket error:", error);
     };
 }

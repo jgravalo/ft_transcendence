@@ -42,7 +42,8 @@ urlpatterns = [
         path('two_fa/', include('two_fa.urls')),
         path('health/', health_check, name='health_check'),
         path('get-translations/', include('language.urls')),
-    ])), 
+    ])),
+    path('', include('django_prometheus.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

@@ -24,7 +24,7 @@ PyJWT==2.8.0
 channels-redis>=4.0
 
 # Libreria Pillow para usar ImageField en Models
-Pillow>=10.0.0 
+Pillow>=10.0.0
 
 # Para autenticación con JWT
 djangorestframework-simplejwt[token-blacklist]==5.2.2
@@ -60,3 +60,9 @@ hvac==2.2.0
 
 # To create json formatted logs
 python-json-logger==3.2.1
+
+#Django data exporter module for Prometheus 
+django-prometheus==2.3.1
+
+# Para generar modelos random
+Faker==20.1.0

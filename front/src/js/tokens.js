@@ -54,6 +54,38 @@ function refreshJWT(path) {
 	fetchJWT('refresh/', info, path);
 }
 
+function isTokenExpired(token) {
+	//console.log("token =", token);
+	const payloadBase64 = token.split('.')[1]; // Extraer el payload
+	//console.log("payload =", payloadBase64);
+	const payload = JSON.parse(atob(payloadBase64)); // Decodificar Base64
+	const expiration = payload.exp * 1000; // Convertir a milisegundos
+	const now = Date.now(); // Hora actual en milisegundos
+	console.log("time =", (expiration - now) / 1000);
+
+	return now > expiration; // Devuelve true si ya expiró
+}
+
+function checkAccess(path) {
+	let token = getStorage('access');
+	let refresh = getStorage('refresh');
+    // console.log("JWT before GET:", getJWTToken());
+    //console.log("token =", token);
+	if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
+		if (refresh && refresh !== undefined && refresh !== "undefined" && isTokenExpired(refresh)) {
+			alert('tu sesion ha expirado');
+			makeLogout();
+			return (1);
+		}
+		console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
+        refreshJWT(path);
+        console.log("El token ha renovado");
+        return (1);
+    }
+    //console.log("token before fetch =", getJWTToken());
+	return (0);
+}
+
 function fetchJWT(rule, info, path) {
 	fetch(base + '/api/users/' + rule, {
 	//fetch(base + ':8000/users/' + rule, {
@@ -106,16 +138,4 @@ function fetchJWT(rule, info, path) {
 		console.log("fetch login catch");
 		console.error('Error:', error);
 	});
-}
-
-function isTokenExpired(token) {
-	//console.log("token =", token);
-    const payloadBase64 = token.split('.')[1]; // Extraer el payload
-	//console.log("payload =", payloadBase64);
-    const payload = JSON.parse(atob(payloadBase64)); // Decodificar Base64
-    const expiration = payload.exp * 1000; // Convertir a milisegundos
-    const now = Date.now(); // Hora actual en milisegundos
-	console.log("time =", (expiration - now) / 1000);
-
-    return now > expiration; // Devuelve true si ya expiró
 }

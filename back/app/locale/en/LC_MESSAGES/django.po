@@ -97,6 +97,10 @@ msgstr "#"
 msgid "There are no users"
 msgstr "There are no users"
 
+#: language/translations.py:23
+msgid "There are no blocked users"
+msgstr "There are no blocked users"
+
 #: language/translations.py:24
 msgid "Start 1vs1"
 msgstr "Start 1vs1"
