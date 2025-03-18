@@ -180,8 +180,6 @@ class Clients:
         """
         Broadcast to all users an update of available challenges.
         """
-        if not len(self.challenges):
-            return
         with self.clients_mutex:
             msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challenges]
         msg = msg if len(msg) else "empty"
@@ -299,6 +297,7 @@ class GameSession:
                     "winner": self.winner,
                     "message": msg
                 }))
+                await logger_to_client(user, msg)
             except Exception as e:
                 logger.warning(f"Error sending end status to {role}.", extra={"corr": self.match_id})
 
