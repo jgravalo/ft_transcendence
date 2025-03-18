@@ -77,6 +77,15 @@ async def logger_to_client(client, message, update_detail="log-update"):
     except Exception as e:
         logger.warning(f"Error sending log update message.{e} {message}", extra={"corr": client.cnn_id})
 
+
+class Tournaments:
+    def __init__(self, participants):
+        self.participants = participants
+        self.matches = []
+        self.winners = []
+        self.loosers = []
+
+
 class Clients:
     """
     Class to control all users connected to app

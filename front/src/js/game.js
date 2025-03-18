@@ -784,7 +784,7 @@ function game() {
                 gameInstance.game_listener(data);
             } else {
                 if (data.payload_update === "challenges-update") {
-                    renderChallenges("random-challenges-tab", data.detail, true, true);
+                    renderChallenges("random-challenges-tab", data.detail, true, false);
                 }
                 else if (data.payload_update === "connected-users") {
                     renderChallenges("connected-users-tab", data.detail, false, false);
