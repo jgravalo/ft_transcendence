@@ -792,10 +792,6 @@ function game() {
                 else if (data.payload_update === "log-update") {
                     append_message(data.detail);
                 }
-                else if (data.payload_update === "challenge-accepted") {
-                    gameInstance.destroy(true);
-                    startNewGame("remote");
-                }
             }
         };
     }

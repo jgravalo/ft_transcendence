@@ -345,6 +345,7 @@ class GameSession:
         :param game: game instance.
         """
         logger.info('Send start screen messages', extra={"corr": self.match_id})
+        await self.broadcast_log()
         await self.broadcast_message("Be prepare to fight!")
         await asyncio.sleep(3)
         await self.broadcast_message("3 seconds to go!")
@@ -354,6 +355,14 @@ class GameSession:
         self.running = True
         await self.send_update_status()
         logger.info('Prepare message sent.', extra={"corr": self.match_id})
+
+    async def broadcast_log(self):
+        """
+        Broadcast logger message to users involved at game.
+        """
+        for role, user in self.players.items() :
+            await logger_to_client(user,
+                                   f"New game {self.players['player1'].username} - {self.players['player2'].username}.")
 
     async def broadcast_message(self, message, step="ready"):
         """
@@ -698,9 +707,6 @@ class PongBack(AsyncWebsocketConsumer):
 
     async def build_game(self, challenger=None):
         opponent = ClientsHandler.get_opponent(self, challenger)
-        # if challenger and opponent:
-        #     logger_to_client(self, f"You are ready to play with {opponent.username}",
-        #                      "challenge-accepted")
         if opponent:
             logger.info(type(opponent))
             logger.info(opponent)
