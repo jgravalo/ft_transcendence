@@ -15,7 +15,7 @@ AUTH_PAYLOAD=$(jq -n --arg role_id "$VAULT_ROLE_ID" --arg secret_id "$VAULT_SECR
 # ---------------------------------------------------------------
 MAX_ATTEMPTS=5
 ATTEMPT=0
-SLEEP_SECS=7
+SLEEP_SECS=10
 
 until VAULT_RESPONSE=$(curl -fs -X POST \
     -H "Content-Type: application/json" \
