@@ -24,4 +24,6 @@ urlpatterns = [
     path('auth/42/login/', views.fortytwo_auth, name='fortytwo-login'),
     path('auth/42/callback/', views.fortytwo_callback, name='fortytwo_callback'),
     path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
+    path('download/', views.download_user_data, name='download_user_data'),
+    path('anonymize/', views.anonymize_user, name='anonymize_user'),
 ]

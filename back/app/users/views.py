@@ -9,16 +9,19 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
-from game.models import Match
-from .token import decode_token, make_token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import requests
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import Q
-from .faker import create_fake_matches, create_fake_users
+import zipfile
+from io import BytesIO
+from django.http import HttpResponse
+from .serializers import UserSerializer
+import os
+import hashlib
+import secrets
 
 # def iniciar_sesion(request):
 #     usuario = authenticate(username="juan", password="secreto123")
@@ -42,22 +45,44 @@ def refresh(request):
         data = {
             "access": new_access_token
         }
-        # decoded_payload = jwt.decode(refresh.access_token, settings.SECRET_KEY, algorithms=["HS256"])
-        # user = User.objects.get(id=decoded_payload['id'])
-        # login(request, user)
         return JsonResponse(data)
     except Exception as e:
         return JsonResponse({'error': "Invalid refresh token:" + str(e)}, status=400)
 
+@csrf_exempt
 def delete_user(request):
-    if request.method == "DELETE":
-        try:
-            user = User.get_user(request)
-        except:
-            return JsonResponse({'error': 'Forbidden'}, status=403)
-        user.delete()
-        return JsonResponse({"message": "Usuario borrado con éxito."}, status=200)
-    return JsonResponse({"error": "Método no permitido."}, status=405)
+    if request.method != "DELETE":
+        return JsonResponse({"error": "Método no permitido."}, status=405)
+    
+    try:
+        user = User.get_user(request)
+        if not user:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+        username = user.username
+        user.delete()  # Esto ahora usa nuestro método personalizado
+        print(f"Usuario {username} eliminado exitosamente")
+
+        response = JsonResponse({
+            "status": "success",
+            "message": "Usuario borrado con éxito."
+        })
+
+        # Limpiar cookies y cache
+        response.delete_cookie('access')
+        response.delete_cookie('refresh')
+        response.delete_cookie('sessionid')
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+
+        return response
+
+    except Exception as e:
+        print(f"Error al eliminar usuario: {str(e)}")
+        return JsonResponse({
+            'error': f'Error al eliminar usuario: {str(e)}'
+        }, status=500)
 
 # Create your views here.
 def get_login(request):
@@ -69,14 +94,6 @@ def get_login(request):
     return JsonResponse(data)
 
 def close_login(request):
-    try:
-        user = User.get_user(request)
-        print("Antes de login:", request.user)
-        login(request, user)  # Aquí Django asigna `request.user`
-        print("Después de login:", request.user)
-        print('LOGGED')
-    except:
-        None
     content = render_to_string('close_login.html')
     data = {
         "element": 'bar',
@@ -87,7 +104,7 @@ def close_login(request):
 def close_logout(request):
     try:
         logout(request)  # Aquí Django desasigna `request.user`
-        print('UNLOGGED')
+        print('unlogged')
     except:
         None
     content = render_to_string('close_logout.html')
@@ -100,42 +117,77 @@ def close_logout(request):
 @csrf_exempt
 def set_login(request):
     if request.method == "POST":
-        #Fetch and Activate the langage for embedded translations
-        selected_language = request.headers.get('Accept-Language', 'en')  # Default to English
-        activate(selected_language)
         try:
             username = request.POST.get('username')
             password = request.POST.get('password')
-            print('password:', password)
+            
             try:
-                if not '@' in username:
+                if '@' not in username:
                     user = User.objects.get(username=username)
                 else:
                     user = User.objects.get(email=username)
             except User.DoesNotExist:
-                return JsonResponse({'type': 'errorName', 'error': _("User does not exist")})
-            if not user.check_password(password): # hashed
-                return JsonResponse({'type': 'errorPassword', 'error': _('Please enter a valid password')})
-            #user = authenticate(username=username, password=password)
-            #if user:
-            login(request, user)  # Aquí Django asigna `request.user`
-            if not user.two_fa_enabled:
-                content = render_to_string('close_login.html') # online_bar
-                next_path = '/users/profile/'
-            else:
-                content = render_to_string('close_logout.html') # offline_bar
-                next_path = '/two_fa/verify/'
-            data = {
-                "access": make_token(user, 'access'),
-                "refresh": make_token(user, 'refresh'),
+                return JsonResponse({
+                    'type': 'errorName',
+                    'error': "Usuario no existe"
+                })
+
+            # Solo verificamos is_active si el usuario tiene 2FA habilitado
+            if user.two_fa_enabled and not user.is_active:
+                return JsonResponse({
+                    'type': 'errorName',
+                    'error': "Usuario no existe"
+                })
+
+            if not user.check_password(password):
+                return JsonResponse({
+                    'type': 'errorPassword',
+                    'error': 'Contraseña incorrecta'
+                })
+
+            login(request, user)
+
+            # Generar tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
+            response = JsonResponse({
+                "access": access_token,
+                "refresh": str(refresh),
                 "error": "Success",
                 "element": 'bar',
-                "content": content,
-                "next_path": next_path
-            }
-            return JsonResponse(data)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+                "content": render_to_string('close_login.html'),
+                "next_path": '/users/profile/'
+            })
+
+            # Establecer cookies
+            response.set_cookie(
+                'access',
+                access_token,
+                max_age=3600,
+                httponly=True,
+                samesite='Lax'
+            )
+
+            response.set_cookie(
+                'refresh',
+                str(refresh),
+                max_age=86400,
+                httponly=True,
+                samesite='Lax'
+            )
+
+            return response
+
+        except Exception as e:
+            print(f"Error en login: {str(e)}")
+            return JsonResponse({
+                'error': 'Error interno del servidor'
+            }, status=500)
+
+    return JsonResponse({
+        "error": "Método no permitido"
+    }, status=405)
 
 @csrf_exempt
 def get_register(request):
@@ -176,26 +228,54 @@ def set_register(request):
             error = parse_data(username, email, password)
             if error != None:
                 return JsonResponse(error)
-            user = User.objects.create_user(username=username, email=email, password=password) # hashed
+            user = User.objects.create_user(username=username, email=email, password=password)
             print("password hashed:", user.password)
-            login(request, user)  # Aquí Django asigna `request.user`
+            login(request, user)
+
+            # Generar tokens usando SimpleJWT
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
             if not user.two_fa_enabled:
-                content = render_to_string('close_login.html') # online_bar
+                content = render_to_string('close_login.html')
                 next_path = '/users/profile/'
             else:
-                content = render_to_string('close_logout.html') # offline_bar
+                content = render_to_string('close_logout.html')
                 next_path = '/two_fa/verify/'
-            data = {
-                "access": make_token(user, 'access'),
-                "refresh": make_token(user, 'refresh'),
+
+            response = JsonResponse({
+                "access": access_token,
+                "refresh": str(refresh),
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
                 "next_path": next_path
-            }
-            return JsonResponse(data)
+            })
+
+            # Establecer cookies
+            response.set_cookie(
+                'access',
+                access_token,
+                max_age=3600,
+                httponly=True,
+                samesite='Lax'
+            )
+
+            response.set_cookie(
+                'refresh',
+                str(refresh),
+                max_age=86400,
+                httponly=True,
+                samesite='Lax'
+            )
+
+            return response
+
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+        except Exception as e:
+            print(f"Error en registro: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
 
 def get_logout(request):
     content = render_to_string('logout.html')
@@ -211,12 +291,8 @@ def profile(request):
     except:
        return JsonResponse({'error': 'Forbidden'}, status=403)
     # print("url =", user.image.url)
-    create_fake_users()
-    create_fake_matches()
-    matches = Match.objects.filter(Q(player1=user) | Q(player2=user))
     context = {
-        'user': user,
-        'matches': matches
+        'user': user
     }
     content = render_to_string('profile.html', context)
     data = {
@@ -268,10 +344,18 @@ def set_update(request):
             except:
                 return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
+                #image = data.get('image')
+                # Acceder al archivo 'image' desde request.FILES
+                # file = request.FILES['image']
+                # user.image.save(file.name, file)
                 file = request.FILES.get('image')  # Asegúrate de obtener la imagen correctamente
                 if file:
-                    user.image = file # Asigna el archivo al campo image
+                    #file_path = default_storage.save('profile_images/' + file.name, file)
+                    user.image = file#_path  # Asigna el archivo al campo image
                     user.save()  # Guarda el usuario con la imagen
+                # print('funciono request.FILES')
+                # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
+                # print('funciono image.save')
             except:
                 print("fallo al subir image")
             username = request.POST.get('username')
@@ -313,35 +397,6 @@ def set_update(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
 
-
-@csrf_exempt
-def history(request):
-    try:
-        user = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
-    matches = Match.objects.filter(Q(player1=user) | Q(player2=user))
-    history = []
-    for match in matches:
-        opponent = match.player2 if match.player1 == user else match.player1
-        result = "Win" if match.winner == user else "Lose" if match.winner else "Draw"
-        history.append({
-            "opponent": opponent.username,  # Puedes usar .id o .get_full_name() si prefieres
-            "result": result,
-            "won": match.winner == user,
-            "date": match.date.strftime("%Y-%m-%d %H:%M")  # Formato legible para la plantilla
-        })
-    context = {
-        'user': user,
-        'matches': history,
-    }
-    content = render_to_string('history.html', context)
-    data = {
-        "element": 'content',
-        "content": content,
-    }
-    return JsonResponse(data)
-
 @csrf_exempt
 def friends(request):
     try:
@@ -363,7 +418,6 @@ def friends(request):
         "content": content,
     }
     return JsonResponse(data)
-
 
 @csrf_exempt
 def edit_friend(request):
@@ -390,73 +444,97 @@ def edit_friend(request):
         return JsonResponse(data)
     except:
         return JsonResponse({'error': 'Forbidden'}, status=403)
-""" 
+
 @csrf_exempt
 def add_friend(request):
-    friends_name = request.GET.get('add', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    friends_name = request.GET.get('add', '')
+    if not friends_name:
+        return JsonResponse({'error': 'Nombre de usuario no proporcionado'}, status=400)
+    
     try:
         user2 = User.objects.get(username=friends_name)
-    except: #Does not exist
-        print(f"user {friends_name} does not exist")
-    print(user2.email)
-    try:
-        user1 = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    except User.DoesNotExist:
+        return JsonResponse({'error': f'Usuario {friends_name} no existe'}, status=404)
+    
+    user1 = User.get_user(request)
+    if not user1:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    if user1.blocked.filter(username=user2.username).exists():
+        return JsonResponse({'error': 'No puedes agregar a un usuario bloqueado'}, status=400)
+    
+    if user2.blocked.filter(username=user1.username).exists():
+        return JsonResponse({'error': 'Este usuario te ha bloqueado'}, status=400)
+    
     user1.friends.add(user2)
-    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-    return JsonResponse(data)
+    return JsonResponse({'mensaje': 'Amigo agregado correctamente'})
 
 @csrf_exempt
 def delete_friend(request):
-    friends_name = request.GET.get('delete', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-    print(friends_name)
+    friends_name = request.GET.get('delete', '')
+    if not friends_name:
+        return JsonResponse({'error': 'Nombre de usuario no proporcionado'}, status=400)
+    
     try:
         user2 = User.objects.get(username=friends_name)
-    except: #Does not exist
-        print(f"user {friends_name} does not exist")
-    try:
-        user1 = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    except User.DoesNotExist:
+        return JsonResponse({'error': f'Usuario {friends_name} no existe'}, status=404)
+    
+    user1 = User.get_user(request)
+    if not user1:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    if not user1.friends.filter(username=user2.username).exists():
+        return JsonResponse({'error': 'Este usuario no es tu amigo'}, status=400)
+    
     user1.friends.remove(user2)
-    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-    return JsonResponse(data)
+    return JsonResponse({'mensaje': 'Amigo eliminado correctamente'})
 
 @csrf_exempt
 def block_user(request):
-    blocked_name = request.GET.get('block', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    blocked_name = request.GET.get('block', '')
+    if not blocked_name:
+        return JsonResponse({'error': 'Nombre de usuario no proporcionado'}, status=400)
+    
     try:
         user2 = User.objects.get(username=blocked_name)
-    except: #Does not exist
-        print(f"user {blocked_name} does not exist")
-    print(user2.email)
-    try:
-        user1 = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    except User.DoesNotExist:
+        return JsonResponse({'error': f'Usuario {blocked_name} no existe'}, status=404)
+    
+    user1 = User.get_user(request)
+    if not user1:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    if user1.username == user2.username:
+        return JsonResponse({'error': 'No puedes bloquearte a ti mismo'}, status=400)
+    
     if user1.friends.filter(username=user2.username).exists():
         user1.friends.remove(user2)
+    
     user1.blocked.add(user2)
-    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-    return JsonResponse(data)
+    return JsonResponse({'mensaje': 'Usuario bloqueado correctamente'})
 
 @csrf_exempt
 def unlock_user(request):
-    blocked_name = request.GET.get('unlock', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    blocked_name = request.GET.get('unlock', '')
+    if not blocked_name:
+        return JsonResponse({'error': 'Nombre de usuario no proporcionado'}, status=400)
+    
     try:
         user2 = User.objects.get(username=blocked_name)
-    except: #Does not exist
-        print(f"user {blocked_name} does not exist")
-    print(user2.email)
-    try:
-        user1 = User.get_user(request)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    except User.DoesNotExist:
+        return JsonResponse({'error': f'Usuario {blocked_name} no existe'}, status=404)
+    
+    user1 = User.get_user(request)
+    if not user1:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    if not user1.blocked.filter(username=user2.username).exists():
+        return JsonResponse({'error': 'Este usuario no está bloqueado'}, status=400)
+    
     user1.blocked.remove(user2)
-    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-    return JsonResponse(data)
- """
+    return JsonResponse({'mensaje': 'Usuario desbloqueado correctamente'})
+
 @csrf_exempt
 def fortytwo_auth(request):
     if request.method == "GET":
@@ -477,10 +555,8 @@ def fortytwo_auth(request):
 # 42 callback, devuelve JSON y redirige a profile o html
 @csrf_exempt
 def fortytwo_callback(request):
-    # print("Callback recibido!")
     if request.method == "GET":
         code = request.GET.get('code')
-        # Si la petición viene con el header de JSON, procesar como API
         if request.headers.get('Content-Type') == 'application/json':
             try:
                 token_url = "https://api.intra.42.fr/oauth/token"
@@ -493,7 +569,7 @@ def fortytwo_callback(request):
                 }
 
                 token_response = requests.post(token_url, data=token_data)
-                token_response.raise_for_status()  # Esto lanzará una excepción si hay error
+                token_response.raise_for_status()
                 access_token = token_response.json().get('access_token')
 
                 if not access_token:
@@ -505,8 +581,6 @@ def fortytwo_callback(request):
                 user_response.raise_for_status()
                 user_data = user_response.json()
 
-                # print("user_data =", user_data)
-                # print("user_data['image_url'] =", user_data['image_url'])
                 try:
                     user = User.objects.get(email=user_data['email'])
                 except User.DoesNotExist:
@@ -515,16 +589,39 @@ def fortytwo_callback(request):
                         email=user_data['email'],
                         password='42auth'
                     )
-                login(request, user)  # Aquí Django asigna `request.user`
-                data = {
-                    "access": make_token(user, 'access'),
-                    "refresh": make_token(user, 'refresh'),
+                login(request, user)
+
+                # Generar tokens usando SimpleJWT
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+
+                response = JsonResponse({
+                    "access": access_token,
+                    "refresh": str(refresh),
                     "error": "Success",
                     "element": 'bar',
                     "content": render_to_string('close_login.html'),
                     "next_path": '/users/profile/'
-                }
-                return JsonResponse(data)
+                })
+
+                # Establecer cookies
+                response.set_cookie(
+                    'access',
+                    access_token,
+                    max_age=3600,
+                    httponly=True,
+                    samesite='Lax'
+                )
+
+                response.set_cookie(
+                    'refresh',
+                    str(refresh),
+                    max_age=86400,
+                    httponly=True,
+                    samesite='Lax'
+                )
+
+                return response
             
             except requests.exceptions.RequestException as e:
                 return JsonResponse({'error': str(e)}, status=400)
@@ -541,3 +638,128 @@ def privacy_policy(request):
         "content": content
     }
     return JsonResponse(data)
+
+@csrf_exempt
+def download_user_data(request):
+    if request.method == "GET":
+        try:
+            user = User.get_user(request)
+        except:
+            return JsonResponse({'error': 'Forbidden'}, status=403)
+        
+        zip_buffer = BytesIO()
+        # zip_buffer = BytesDEFFIO() #Testing 
+
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            user_data = UserSerializer(user).data
+            
+            user_data['statistics'] = {
+                'total_matches': user.matches,
+                'wins': user.wins,
+                'losses': user.losses,
+                'win_rate': f"{(user.wins / user.matches * 100) if user.matches > 0 else 0:.2f}%"
+            }
+            #             user_data['statistics'] = {
+            #     'total_matches': user.matches,
+            #     'wins': user.wins,
+            #     'losses': user.losses,
+            #     'win_rate': f"{(user.wins / user.matches * 100) if user.matches > 0 else 0:.2f}%"
+            # }
+            
+            user_data['friends_list'] = list(user.friends.values_list('username', flat=True))
+            
+            json_data = json.dumps(user_data, indent=4)
+            zip_file.writestr('user_data.json', json_data)
+            
+            if user.image and user.image.name != 'default.jpg':
+                try:
+                    zip_file.write(user.image.path, f'profile_image{os.path.splitext(user.image.name)[1]}')
+                except:
+                    pass
+        
+        zip_buffer.seek(0)
+        # zip_buffer.see
+        response = HttpResponse(zip_buffer.read(), content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename={user.username}_data.zip'
+
+        # response = JsonResponse(zip_buffer.read(), content_type='application/zip')
+        # response['Content'] = f'attachment; filename={user.username}_data.zip'
+        
+        return response
+    
+    return JsonResponse({"error": "Método no permitido."}, status=405)
+
+@csrf_exempt
+def anonymize_user(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+    
+    try:
+        user = User.get_user(request)
+        if not user:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+        
+        # Generar identificador anónimo único
+        salt = secrets.token_hex(8)
+        hash_base = hashlib.sha256((str(user.id) + salt).encode()).hexdigest()
+        
+        old_username = user.username
+        
+        # Anonimizar datos personales pero mantener estadísticas
+        user.username = f"anon_{hash_base[:8]}"
+        user.email = f"{hash_base[:12]}@anonymous.user"
+        user.first_name = ""
+        user.last_name = ""
+        user.set_password(secrets.token_urlsafe(32))
+        
+        # Eliminar imagen personal pero mantener una por defecto
+        if user.image and user.image.name != 'default.jpg':
+            try:
+                user.image.delete(save=False)
+            except Exception as e:
+                print(f"Error al eliminar imagen: {str(e)}")
+        user.image = 'default.jpg'
+        
+        # Limpiar relaciones personales pero mantener el usuario
+        user.friends.clear()
+        user.blocked.clear()
+        
+        # Invalidar tokens y sesiones actuales
+        try:
+            from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+            OutstandingToken.objects.filter(user=user).delete()
+        except Exception as e:
+            print(f"Error al invalidar tokens: {str(e)}")
+        
+        from django.contrib.sessions.models import Session
+        Session.objects.filter(session_data__contains=str(user.id)).delete()
+        
+        # Guardar el usuario anonimizado
+        user.save()
+        print(f"Usuario {old_username} anonimizado exitosamente a {user.username}")
+        
+        # Cerrar sesión
+        logout(request)
+        
+        response = JsonResponse({
+            "status": "success",
+            "message": "Cuenta anonimizada correctamente"
+        })
+        
+        # Limpiar cookies y cache
+        response.delete_cookie('access')
+        response.delete_cookie('refresh')
+        response.delete_cookie('sessionid')
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        
+        return response
+        
+    except Exception as e:
+        print(f"Error en anonimización: {str(e)}")
+        return JsonResponse({
+            "error": "Error durante la anonimización",
+            "detail": str(e)
+        }, status=500)

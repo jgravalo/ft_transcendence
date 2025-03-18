@@ -1,4 +1,3 @@
-
 #uploadForm {
 	display: flex;
 	justify-content: center;
@@ -74,4 +73,31 @@
   input:checked + .slider:before {
 	transform: translateX(25px);
   }
+
+.btn-danger i {
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+
+.btn-danger:hover i {
+    transform: scale(1.1);
+}
+
+.btn-danger {
+    background-color: transparent;
+    border: none;
+    padding: 0.5rem;
+	/* padding: 1rem; */
+
+    color: #dc3545;
+    transition: color 0.2s;
+	/* transition: color 2s; */
+}
+
+.btn-danger:hover {
+    color: #ff4d4d;
+}
   
+/* .btn-danger:hover {
+    color: #c59595;
+} */

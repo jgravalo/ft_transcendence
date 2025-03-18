@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import hvac
 import os
+from datetime import timedelta
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -76,6 +77,7 @@ INSTALLED_APPS = [
     'channels', #channels
 
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',  # Para blacklist de tokens JWT
     # 'django_otp',
     # 'django_otp.plugins.otp_totp',  # OTP basado en tiempo (Google Authenticator)
     # 'django_otp.plugins.otp_email',  # OTP vía email
@@ -105,13 +107,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'app.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True # cors-headers
-
-#CORS_ALLOWED_ORIGINS = [
-#    "http://localhost:8000",
-#    "http://127.0.0.1:8000",
-#    "http://jgravalo.42.fr:8000",
-#]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [#'http://*']
     'http://localhost',  # Dominio del frontend
@@ -231,13 +228,20 @@ REST_FRAMEWORK = {
 }
 
 # Configuración de SimpleJWT
-from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=5), #timedelta(minutes=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1), #timedelta(seconds=12),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
 }
 
 # settings.py

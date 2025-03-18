@@ -19,5 +19,7 @@ jobs:
           script: |
             cd /home/pong42/ft_transcendence
             git checkout main
-            git pull
+            git reset --hard
+            git clean -fd
+            git pull --ff-only
             make all ENVIRONMENT=production

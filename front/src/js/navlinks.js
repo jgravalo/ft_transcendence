@@ -10,6 +10,25 @@ function handleLinks()
     links.forEach(function(link) {
         link.addEventListener('click', handleLink);
     });
+
+    // Escuchando el evento click del botón de eliminación de usuario
+    const deleteButton = document.querySelector('.delete-user-btn');
+    if (deleteButton) {
+        // console.log('Botón de eliminación de usuario encontrado');
+        // deleteButton.addEventListener('dblclick', deleteUserAccount);
+        deleteButton.addEventListener('click', deleteUserAccount);
+
+    }
+
+    const anonymizeButton = document.querySelector('.anonymize-user-btn');
+    if (anonymizeButton) {
+        anonymizeButton.addEventListener('click', anonymizeUserAccount);
+    }
+
+    const downloadUserDataButton = document.querySelector('.download-user-data-btn');
+    if (downloadUserDataButton) {
+        downloadUserDataButton.addEventListener('click', downloadUserData);
+    }
 }
 
 function handleLink(event)
@@ -105,29 +124,3 @@ function setError(error)
         console.error('Error al obtener productos:', error);
     });
 }
-
-
-
-
-
-
-
-
-
-/*
-document.getElementById('fetchData').addEventListener('click', function() {
-    const data = { name: 'John' };
-
-    fetch('http://127.0.0.1:8000/api/my-endpoint/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('output').innerText = JSON.stringify(data);
-    })
-    .catch(error => console.error('Error:', error));
-});*/

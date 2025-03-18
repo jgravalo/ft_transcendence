@@ -25,9 +25,11 @@
                         <input type="password" class="form-control" name="password" id="password" required>
                         <span id="errorPassword" class="error"></span><br>
                     </div>
-                    <div class="mt-3">
-                        <input type="checkbox" id="privacyPolicy" required>
-                        <label for="privacyPolicy" data-i18n="register.privacyPolicy">Al registrarme, confirmo que he leído y acepto la Política de Privacidad y autorizo el uso de mis datos personales según lo indicado en ella.</label>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="privacyPolicy" required>
+                        <label class="form-check-label small" for="privacyPolicy" data-i18n="register.privacyPolicy">
+                            I confirm that I have read and accept the Privacy Policy and authorize the use of my personal data as indicated in it.
+                        </label>
                     </div>
                     <div class="mt-3">
                         <button type="submit" class="btn btn-primary w-100" data-i18n="login.submit">Ingresar</button>

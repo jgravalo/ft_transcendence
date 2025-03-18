@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from .token import decode_token
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from django.contrib.sessions.models import Session
+
+
 import uuid
 
 # Create your models here.
@@ -40,12 +45,60 @@ class User(AbstractUser):
 		return self.username  # Representación amigable del objeto
 
 	@classmethod
+	# More secure way to get the user :)
 	def get_user(cls, request):
-		token = request.headers.get('Authorization').split(" ")[1]
-		#if token == 'empty':
-		data = decode_token(token)
-		print("data =", data)
-		return cls.objects.get(id=data["id"])
+		try:
+			auth_header = request.headers.get('Authorization')
+			if not auth_header:
+				return None
+			
+			token = auth_header.split(" ")[1]
+			# print("token =", token)
+			# token = auth_header.split(" ")[0]
+			if not token:
+				return None
+			
+
+			try:
+				token_obj = AccessToken(token)
+				user_id = token_obj['user_id']
+			except TokenError:
+				return None
+			
+			try:
+				user = cls.objects.get(id=user_id)
+				return user
+			except cls.DoesNotExist:
+				return None
+		
+		except Exception:
+			return None
 
 	def num_friends(self):
 		return self.friends.count()
+
+	def delete(self, *args, **kwargs):
+		# Limpiar relaciones
+		self.friends.clear()
+		self.blocked.clear()
+		self.groups.clear()
+		self.user_permissions.clear()
+		
+		# Eliminar imagen si no es la default
+		if self.image and self.image.name != 'default.jpg':
+			try:
+				self.image.delete(save=False)
+			except Exception as e:
+				print(f"Error al eliminar imagen: {str(e)}")
+		
+		# Eliminar tokens JWT
+		try:
+			OutstandingToken.objects.filter(user=self).delete()
+		except Exception as e:
+			print(f"Error al eliminar tokens: {str(e)}")
+		
+		# Eliminar sesiones
+		Session.objects.filter(session_data__contains=str(self.id)).delete()
+		
+		# Eliminar completamente el usuario y todos sus datos
+		super().delete(*args, **kwargs)
