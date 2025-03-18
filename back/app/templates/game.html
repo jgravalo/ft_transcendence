@@ -1,17 +1,141 @@
-<div id="main-container">
-    <div class="site-container"></div>
-    <div id="game-container">
-        <h3 id="playerName" style="visibility: hidden;">unregistered</h3>
-        <div id="game-menu">
-            <h2 id="menu-message">Welcome to Pong</h2>
-            <button id="local-mode">Local Multiplayer</button>
-            <button id="ai-mode">IA mode</button>
-            <button id="remote-mode">Remote</button>
-        </div>
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="{% static 'css/game.css' %}">
+    <link rel="stylesheet" href="{% static 'css/page.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 800px;
+            margin: 0 auto;
+        }
 
-        <div id="canvas-container">
-            <canvas id="pongCanvas"></canvas>
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #pongCanvas {
+            background: #000;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .overlay_style {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-menu-style {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+        }
+
+        .game-menu-style button {
+            display: block;
+            width: 200px;
+            margin: 10px auto;
+            padding: 10px;
+            background: #4ac1f7;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-family: 'Silkscreen', cursive;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .game-menu-style button:hover {
+            background: #2196f3;
+        }
+
+        #content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 800px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background design -->
+    <div class="star"></div>
+    <div class="meteor-1"></div>
+    <div class="meteor-2"></div>
+    <div class="meteor-3"></div>
+    <div class="meteor-4"></div>
+    <div class="meteor-5"></div>
+
+    <div id="all">
+        <div id="content">
+            <div id="game-container">
+                <div id="canvas-container">
+                    <canvas id="pongCanvas"></canvas>
+                </div>
+                
+                <div id="overlay" class="overlay_style">
+                    <div id="game-menu" class="game-menu-style">
+                        <button id="local-game">Local mode</button>
+                        <button id="remote-game">Remote mode</button>
+                        <button id="remote-ia-game">Remote IA</button>
+                    </div>
+                </div>
+                
+                <div id="remote-match" class="overlay_style">
+                    <div class="game-menu-style">
+                        <h2>Rematch?</h2>
+                        <h2 id="rematch-countdown"></h2>
+                        <button id="accept-rematch">ok</button>
+                        <button id="reject-rematch">cancel</button>
+                    </div>
+                </div>
+                
+                <div id="cancel-wait" class="overlay_style">
+                    <div class="game-menu-style">
+                        <button id="end-waiting">delete random challenge</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="site-container"></div>
-</div>
+
+    <script>
+        console.log('Iniciando configuración del juego');
+        window.GAME_CONFIG = {
+            wsUrl: '{{ ws_url|default:"ws://localhost:8000/ws/game/" }}',
+            staticUrl: '{% static "" %}'
+        };
+        console.log('Configuración:', window.GAME_CONFIG);
+    </script>
+    <script src="{% static 'js/game.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM cargado, verificando función game');
+            if (typeof game === 'function') {
+                console.log('Función game encontrada, iniciando...');
+                game();
+            } else {
+                console.error('Función game no encontrada');
+            }
+        });
+    </script>
+</body>
+</html> 

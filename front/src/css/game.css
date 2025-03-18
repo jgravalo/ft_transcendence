@@ -10,6 +10,27 @@
 	font-style: normal;
 }
 
+.geo-regular {
+  font-family: "Geo", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.geo-regular-italic {
+  font-family: "Geo", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.material-symbols-outlined {
+	font-variation-settings:
+	'FILL' 0,
+	'wght' 400,
+	'GRAD' 0,
+	'opsz' 24
+}
+
+
 #main-container {
 	width: 100%;
 	display: inline-flex;
@@ -22,14 +43,36 @@
 	margin: auto;
 }
 #game-container {
-	width: 450px;
-	background-color: aqua;
-	display: block;
+    width: 400px;
+    height: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    position: relative;
+    background-color: #1b2735;
 }
+
+
+/*#game-container {*/
+/*	width: 400px;*/
+/*	height: 800px;*/
+/*	display: block;*/
+/*}*/
+
+/*#game-info {*/
+/*	!*border: 15px solid #ffffff;*!*/
+/*	width: 400px;*/
+/*	height: 800px;*/
+/*	display: block;*/
+/*	background-color: #4ac1f7;*/
+/*}*/
+
 canvas {
 	border: 15px solid #ffffff;
 	display: block;
 	margin: 20px auto;
+	background-color: #000000;
 }
 
 /* Power-Up placeholder visual */
@@ -41,39 +84,167 @@ canvas {
 	margin: 5px;
 }
 
-#menu {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	height: 100vh;
-	background-color: #000;
-	color: #fff;
-}
-
-#game-menu h2 {
-	font-size: 2rem;
-	margin-bottom: 20px;
-}
-
-#game-menu button {
-	margin: 10px;
-	padding: 10px 20px;
-	font-size: 1.2rem;
-	background-color: #fff;
-	color: #000;
-	border: none;
-	cursor: pointer;
-	border-radius: 5px;
-}
-
-#game-menu button:hover {
-	background-color: #ccc;
-}
-
 #canvas-container {
-	display: none;
+	display: block;
+	width: 100%;
+	height: 100%;
 }
+
+.overlay_style {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	padding: 20px;
+	display: none;
+	background: rgba(0, 0, 0, 0.8);
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+.game-menu-style {
+	font-family: "Silkscreen", sans-serif;
+	background: rgba(255, 255, 255, 0.9);
+	text-align: center;
+	width: 100%;
+	max-width: none;
+	border-radius: 0;
+}
+
+.game-menu-style button {
+	display: block;
+	font-weight: 200;
+	width: 100%;
+	font-size: 18px;
+	border: none;
+	padding: 20px;
+	background: rgba(0, 0, 0, 0.9);
+	color: white;
+	cursor: pointer;
+	border-radius: 0;
+	text-align: center;
+}
+
+.game-menu-style hr {
+	width: 1px;
+}
+
+.game-menu-style button:hover {
+	background: linear-gradient(to right, #b22633, #001695);
+	color: white;
+}
+
+ul.tab-content {
+	width: 100%;
+	font-size: 25px;
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+ul.tab-content > li {
+	cursor: pointer;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px;
+	border-bottom: 1px solid #ddd;
+	list-style: none;
+}
+
+ul.tab-content > li > div {
+	display: inline-flex;
+	margin-right: 0;
+}
+
+ul.tab-content > li > div > span{
+	padding: 5px;
+}
+ul.tab-content > li > div > span:hover {
+	background-color: #555;
+}
+
+ul.tab-content > div > li:hover {
+	background-color: #555;
+}
+
+#game-info {
+    width: 400px;
+    height: 830px;
+    border: 15px solid #ffffff;
+	background-color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    font-family: "Geo", sans-serif;
+}
+
+#game-info > div {
+	clear: both;
+	overflow: scroll;
+}
+
+.play-info {
+	width: 100%;
+	height: 350px;
+	display: block;
+}
+
+ul#game-log {
+	color: white;
+	background-color: #1b1b1b;
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	list-style-type: none;
+	overflow: scroll;
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	font-style: italic;
+	font-size: 17px;
+}
+
+ul#game-log > li::before {
+	content: "(42-pong): ";
+	color: #4ac1f7;
+}
+
+ul#game-log > li {
+	text-align: left;
+	padding: 2px;
+
+}
+
+ul.info-tab {
+	display: table;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	clear: both;
+	font-family: "Geo", sans-serif;
+	font-size: 20px;
+	position: relative;
+	width: 100%;
+	border: 2px solid white;
+}
+ul.info-tab>li {
+	float: left;
+	padding: 10px;
+}
+
+
+ul.info-tab>li:hover {
+	background-color: #6f94c6;
+}
+
 
 
 
@@ -81,12 +252,6 @@ canvas {
 /*.silkscreen-regular {*/
 /*	font-family: "Silkscreen", sans-serif;*/
 /*	font-weight: 400;*/
-/*	font-style: normal;*/
-/*}*/
-
-/*.silkscreen-bold {*/
-/*	font-family: "Silkscreen", sans-serif;*/
-/*	font-weight: 700;*/
 /*	font-style: normal;*/
 /*}*/
 
@@ -207,3 +372,19 @@ canvas {
 /*	50% { left: calc(100% - 100px); top: calc(100% - 100px); } !* Se mueve a la derecha *!*/
 /*	100% { left: 0; top: 0; } !* Vuelve a la posición inicial *!*/
 /*}*/
+
+/* Asegurarse de que el juego esté centrado en la página */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #1b2735;
+}
+
+/* Asegurarse de que el canvas tenga las dimensiones correctas */
+#pongCanvas {
+    width: 400px;
+    height: 800px;
+}
