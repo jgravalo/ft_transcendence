@@ -94,40 +94,25 @@
 						<button id="end-waiting">delete random challenge</button>
 					</div>
 				</div>
-
-				<div id="canvas-container">
-					<canvas id="pongCanvas"></canvas>
-				</div>
+				<canvas id="pongCanvas" class="game-console"></canvas>
             </div>
             <div id="game-info">
                     <ul id="game-info-tab" class="info-tab">
-                        <li id="connected-users" class="tab-button" data-tab="connected-users-data"><span class="material-symbols-outlined">terminal</span></li>
-                        <li id="random-challenges" class="tab-button" data-tab="random-challenges-data"><span class="material-symbols-outlined">shuffle</span></li>
-                        <li id="tournaments" class="tab-button" data-tab="tournaments-data"><span class="material-symbols-outlined">trophy</span></li>
+                        <li id="game-log" class="tab-button" data-tab="game-log-tab"><span class="material-symbols-outlined">terminal</span></li>
+                        <li id="random-challenges" class="tab-button" data-tab="random-challenges-tab"><span class="material-symbols-outlined">shuffle</span></li>
+                        <li id="tournaments" class="tab-button" data-tab="tournaments-tab"><span class="material-symbols-outlined">trophy</span></li>
+						<li id="connected-users" class="tab-button" data-tab="connected-users-tab"><span class="material-symbols-outlined">person</span></li>
+						<li id="my-challenges" class="tab-button" data-tab="my-challenges-tab"><span class="material-symbols-outlined">my_location</span></li>
+						<li id="my-tournaments" class="tab-button" data-tab="my-tournaments-tab"><span class="material-symbols-outlined">local_activity</span></li>
+						<li id="my-friends" class="tab-button" data-tab="my-friends-tab"><span class="material-symbols-outlined">diversity_4</span></li>
                     </ul>
-                <div id="game-info-details" class="play-info">
-                    <ul id="connected-users-data" class="tab-content" style="display: none;">
-                    </ul>
-                    <ul id="random-challenges-data" class="tab-content" style="display: none;">
-                    </ul>
-                    <ul id="tournaments-data" class="tab-content" style="display: none;">
-                    </ul>
-                </div>
-<!--                    <ul id="game-info-tab" class="info-tab">
-                        <li id="connected-friends" class="tab-button" data-tab="connected-friends-data">friends</li>
-                        <li id="my-challenges" class="tab-button" data-tab="my-challenges-data">my tournaments</li>
-                        <li id="my-tournaments" class="tab-button" data-tab="my-tournaments-data">my tournaments</li>
-                    </ul> -->
-                <div id="game-user-details" class="play-info">
-                    <ul id ="game-log">
-                    </ul>
-<!--                    <ul id="connected-friends-data" class="tab-content" style="display: none;">
-                    </ul>
-                    <ul id="my-challenges-data" class="tab-content" style="display: none;">
-                    </ul>
-                    <ul id="my-tournaments-data" class="tab-content" style="display: none;">
-                    </ul> -->
-                </div>
+						<ul id ="game-log-tab" class="tab-data"></ul>
+						<ul id ="random-challenges-tab" class="tab-data big_data" style="display: none;"></ul>
+						<ul id ="tournaments-tab" class="tab-data" style="display: none;"></ul>
+						<ul id ="connected-users-tab" class="tab-data big_data" style="display: none;"></ul>
+						<ul id ="my-challenges-tab" class="tab-data" style="display: none;"></ul>
+						<ul id ="my-tournaments-tab" class="tab-data" style="display: none;"></ul>
+						<ul id ="my-friends-tab" class="tab-data" style="display: none;"></ul>
             </div>
         </div>
 <!--			<div id="content">-->
@@ -167,6 +152,6 @@
 		<script src="/js/tokens.js"></script>
 		<script src="/js/status.js"></script>
 		<script src="/js/chat.js"></script>
-		<script src="/js/game.js" onload="game()"></script>
+		<script src="/js/game.js" type="module"></script>
 	</body>
 </html>

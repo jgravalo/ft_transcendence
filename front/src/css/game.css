@@ -31,59 +31,26 @@
 }
 
 
-#main-container {
-	width: 100%;
-	display: inline-flex;
-	background-color: bisque;
-}
-.site-container {
-	width: 30%;
-	min-width: 400px;
-	display: block;
-	margin: auto;
-}
 #game-container {
     width: 400px;
     height: 800px;
     display: flex;
     justify-content: center;
     align-items: center;
+	/*border: 15px solid #ffffff;*/
 }
 
+.game-console {
+	display: block;
+	width: 400px;
+	height: 800px;
+	margin: 0;
+}
 
-/*#game-container {*/
-/*	width: 400px;*/
-/*	height: 800px;*/
-/*	display: block;*/
-/*}*/
-
-/*#game-info {*/
-/*	!*border: 15px solid #ffffff;*!*/
-/*	width: 400px;*/
-/*	height: 800px;*/
-/*	display: block;*/
-/*	background-color: #4ac1f7;*/
-/*}*/
-
-canvas {
+#pongCanvas {
 	border: 15px solid #ffffff;
-	display: block;
-	margin: 20px auto;
+	border-collapse: collapse;
 	background-color: #006b1b;
-}
-
-/* Power-Up placeholder visual */
-.power-up {
-	background-color: #007bff;
-	border: 1px solid #fff;
-	width: 30px;
-	height: 30px;
-	margin: 5px;
-}
-
-#canvas-container {
-	display: block;
-	background-color: #1b2735;
 }
 
 .overlay_style {
@@ -169,205 +136,101 @@ ul.tab-content > div > li:hover {
 
 #game-info {
     width: 400px;
-    height: 830px;
-    border: 15px solid #ffffff;
+    height: 800px;
+    border-top: 15px solid #ffffff;
+	border-right: 15px solid #ffffff;
+	border-bottom: 15px solid #ffffff;
 	background-color: black;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
     color: white;
     font-family: "Geo", sans-serif;
+	box-sizing: border-box;
 }
 
-#game-info > div {
-	clear: both;
-	overflow: scroll;
-}
-
-.play-info {
-	width: 100%;
-	height: 350px;
+.tab-data {
+	margin-top: 15px;
 	display: block;
-}
-
-ul#game-log {
-	color: white;
-	background-color: #1b1b1b;
 	display: block;
 	width: 100%;
 	height: 100%;
-	margin: 0;
 	padding: 0;
 	clear: both;
+	overflow: auto;
+	overflow-style: marquee-line;
+}
+
+ul.big_data {
+	font-size: 25px;
+}
+
+ul.big_data > li {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	padding: 5px;
+}
+
+ul.big_data > li > div {
+	display: flex;
+	cursor: pointer;
+}
+
+ul.big_data > li > div > span:hover {
+	display: flex;
+	background-color: #00a0b5;
+}
+
+ul#game-log-tab {
+	color: white;
 	list-style-type: none;
-	overflow: scroll;
 	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 	font-style: italic;
 	font-size: 17px;
+
 }
 
-ul#game-log > li::before {
+ul#game-log-tab > li::before {
 	content: "(42-pong): ";
 	color: #4ac1f7;
 }
 
-ul#game-log > li {
+ul#game-log-tab > li {
 	text-align: left;
 	padding: 2px;
 
 }
 
+/* Top menu */
 ul.info-tab {
-	display: table;
+	height: 50px;
+	width: auto;
+	background-color: #5E5694;
+	display: flex;
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 	clear: both;
 	font-family: "Geo", sans-serif;
-	font-size: 20px;
-	position: relative;
-	width: 100%;
-	border: 2px solid white;
+	text-align: center;
+	justify-content: center;
+	border: none;
+	box-sizing: content-box;
 }
 ul.info-tab>li {
-	float: left;
-	padding: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
+ul.info-tab > li > span {
+	padding: 10px;
+	font-size: 35px;
+}
 
 ul.info-tab>li:hover {
 	background-color: #6f94c6;
 }
-
-/*!* Font included at game *!*/
-/*.silkscreen-regular {*/
-/*	font-family: "Silkscreen", sans-serif;*/
-/*	font-weight: 400;*/
-/*	font-style: normal;*/
-/*}*/
-
-/*.silkscreen-bold {*/
-/*	font-family: "Silkscreen", sans-serif;*/
-/*	font-weight: 700;*/
-/*	font-style: normal;*/
-/*}*/
-
-/*!* Game Menú *!*/
-/*#game-menu {*/
-/*	display: flex;*/
-/*	flex-direction: column;*/
-/*	align-items: center;*/
-/*	justify-content: center;*/
-/*	height: 100vh;*/
-/*	background-color: #000;*/
-/*	color: #fff;*/
-/*}*/
-
-/*#game-menu h2 {*/
-/*	font-size: 2rem;*/
-/*	margin-bottom: 20px;*/
-/*}*/
-
-/*#game-menu button {*/
-/*	margin: 10px;*/
-/*	padding: 10px 20px;*/
-/*	font-size: 1.2rem;*/
-/*	background-color: #fff;*/
-/*	color: #000;*/
-/*	border: none;*/
-/*	cursor: pointer;*/
-/*	border-radius: 5px;*/
-/*}*/
-
-/*#game-menu button:hover {*/
-/*	background-color: #ccc;*/
-/*}*/
-/*!* Canvas and game container *!*/
-/*#canvas-container {*/
-/*	display: none;*/
-/*}*/
-/*canvas {*/
-/*	border: 15px solid #ffffff;*/
-/*	display: block;*/
-/*	margin: 20px auto;*/
-/*}*/
-
-/*!* Power-Up placeholder visual *!*/
-/*.power-up {*/
-/*	background-color: #007bff;*/
-/*	border: 1px solid #fff;*/
-/*	width: 30px;*/
-/*	height: 30px;*/
-/*	margin: 5px;*/
-/*}*/
-/*!* --- *!*/
-/*.start-div {*/
-/*	height: 80px;*/
-/*	align-items: center;*/
-/*}*/
-
-/*#table {*/
-/*	background-color: black;*/
-/*	margin: 0 auto;*/
-/*	width: 800px;*/
-/*	height: 500px;*/
-/*	border: 15px solid white;*/
-/*	display: flex;*/
-/*	justify-content: space-between;*/
-/*}*/
-
-/*.marcador {*/
-/*	margin: 0 auto;*/
-/*	width: 300px;*/
-/*	display: flex;*/
-/*	justify-content: space-between;*/
-/*}*/
-
-/*.score {*/
-/*	font-size: 110px;*/
-/*	color: white;*/
-/*	font-weight: bold;*/
-/*	text-align: center;*/
-/*	margin-top: 20px;*/
-/*}*/
-
-/*.goal {*/
-/*	width: 20px;*/
-/*}*/
-
-/*.figure {*/
-/*	background-color: white;*/
-/*	height: 100px;*/
-/*	width: 10px;*/
-/*	!* 	margin: 10px; *!*/
-/*	!* 	top: 290px;*/
-/*	position: absolute; *!*/
-/*	margin-top: 150px;*/
-/*}*/
-
-/*#left {*/
-/*	margin-left: 10px;*/
-/*}*/
-
-/*#right {*/
-/*	!* margin-top: 150px; *!*/
-/*	margin-right: 10px;*/
-/*}*/
-
-/*#ball {*/
-/*	width: 30px;*/
-/*	height: 30px;*/
-/*	background-color: red;*/
-/*	border-radius: 50%;*/
-/*	position: absolute; !* Para que podamos moverlo con top y left *!*/
-/*	top: 400px;*/
-/*	left: 50vw;*/
-/*}*/
-
-/*@keyframes moveBox {*/
-/*	0% { left: 0; top: 0;}*/
-/*	50% { left: calc(100% - 100px); top: calc(100% - 100px); } !* Se mueve a la derecha *!*/
-/*	100% { left: 0; top: 0; } !* Vuelve a la posición inicial *!*/
-/*}*/

@@ -9,7 +9,11 @@ function game() {
     class PongGame {
         constructor(mode = "auto-play", player1Name = "player1", player2Name = "player2") {
             // --- Game Mode and status
-            this.mode = mode;
+            if (mode === "remote_challenge") {
+                this.mode = "remote";
+            } else {
+                this.mode = mode;
+            }
             this.running = true;
             this.waiting = false;
             this.listening = false;
@@ -19,7 +23,7 @@ function game() {
             this.ctx = this.canvas.getContext('2d');
             this.canvas.width = 400;
             this.canvas.height = 800;
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             // --- Vars
             this.countdownInterval = null
             this.paddleWidth = 100
@@ -106,6 +110,8 @@ function game() {
             this.initCanvasListeners("auto-play", "overlay");
             this.initCanvasListeners("remote", "cancel-wait");
             if (this.mode === "remote-ai" || this.mode === "remote") {
+                this.listening = true;
+                if (mode === "remote_challenge") return;
                 this.socket.send(JSON.stringify({
                         step: 'join',
                         username: this.playerName,
@@ -113,21 +119,21 @@ function game() {
                         mode: this.mode
                     }
                 ));
-                this.listening = true;
             }
             if (this.mode !== "menu") {
                 this.gameLoop();
             }
         }
 
-        destroy() {
+        destroy(reset=true) {
             this.running = false;
             this.listening = false;
             document.removeEventListener('keydown', this.keydownHandler);
             document.removeEventListener('keyup', this.keyUpHandler);
             this.canvas.removeEventListener("click", this.canvasClickHandler);
             document.removeEventListener("click", this.documentClickHandler);
-            if (this.socket) {
+
+            if (this.socket && !reset) {
                 this.socket.send(JSON.stringify({
                     'step': 'end',
                     'mode': this.mode,
@@ -215,6 +221,7 @@ function game() {
                 this.drawMessage(message);
             }
             this.drawDashedLine();
+
             this.drawRect(this.player.x, this.player.y, this.player.width, this.player.height, this.player.color);
             this.drawRect(this.opponent.x, this.opponent.y, this.opponent.width, this.opponent.height, this.opponent.color);
             this.drawRect(this.ball.x - this.ball.size / 2, this.ball.y - this.ball.size / 2, this.ball.size, this.ball.size, this.ball.color);
@@ -298,82 +305,6 @@ function game() {
             }
         }
 
-// socketListener () {
-//             this.socket.onmessage = (event) => {
-//                 const data = JSON.parse(event.data);
-//                 if (!this.listening) {
-//                     if (data.step !== 'close') return;
-//                 }
-//                 if (data.step === 'challenges-update'){
-//                     alert("new challenge " + data.detail)
-//                 } else if (data.step === 'error') {
-//                     message = "Error at game";
-//                     this.clickMode(message, "auto-play", "remote-match");
-//                 } else if (data.step === 'wait') {
-//                     this.running = false;
-//                     this.waiting = true;
-//                     this.resetBall();
-//                     this.playerName = data.playerName;
-//                     this.waitingLoop('Waiting for a victim!');
-//                 } else if (data.step === 'ready') {
-//                     this.waiting = false;
-//                     this.running = false;
-//                     if (data.playerRole === 'player1') {
-//                         Object.assign(this.player, data.player1);
-//                         this.playerName = data.playerName;
-//                         this.opponentName = data.opponentName;
-//                     } else {
-//                         Object.assign(this.player, data.player2);
-//                         this.playerName = data.opponentName;
-//                         this.opponentName = data.playerName;
-//                     }
-//                     this.startingLoop(data.message);
-//                 } else if (data.step === 'start') {
-//                     console.log(data.id);
-//                     this.id = data.id;
-//                     this.waiting = false;
-//                     this.running = true;
-//                     this.opponentName = data.opponentName;
-//                     this.playerName = data.playerName;
-//                     this.gameLoop();
-//                 } else if (data.step === 'go') {
-//                     console.log(data.id);
-//                     this.waiting = false;
-//                     this.running = true;
-//                     this.id = data.id;
-//                     this.playerName = data.player1Name;
-//                     this.opponentName = data.player2Name;
-//                     if (this.player.role === 'player1') {
-//                         Object.assign(this.opponent, data.player2);
-//                         Object.assign(this.player, data.player1);
-//                     } else {
-//                         Object.assign(this.opponent, data.player1);
-//                         Object.assign(this.player, data.player2);
-//                     }
-//                     Object.assign(this.ball, data.ball);
-//                     this.updateRemoteGame();
-//                     this.gameLoop();
-//                 } else if (data.step === 'endOfGame') {
-//                     this.listening = false;
-//                     this.running = false;
-//                     this.openMenu("remote-match");
-//                     this.startCountdown(10, "rematch-countdown", () => {
-//                         this.clickMode(message, "auto-play", "remote-match");
-//                     });
-//                 } else if (data.step === "end") {
-//                     this.clickMode(message, "auto-play", "remote-match")
-//                 } else if (data.step === 'move') {
-//                     this.opponent.x = data.position;
-//                 } else if (data.step === 'update') {
-//                     Object.assign(this.opponent, data.opponent);
-//                     Object.assign(this.player, data.player);
-//                     Object.assign(this.ball, data.ball);
-//                     this.score1 = data.score1;
-//                     this.score2 = data.score2;
-//                     this.powerUps = data.powerUps;
-//                 }
-//             };
-//         }
         // -- Remote Mode loops
         waitingLoop(msg) {
             if (!this.waiting) return;
@@ -466,11 +397,11 @@ function game() {
             this.clickMode("Clic here to play!", 'auto-play', "cancel-wait");
         }
 
-        clickMode(msg, mode, element = "overlay") {
+        clickMode(msg, mode, element = "overlay", reset=true) {
             clearInterval(this.countdownInterval);
             this.countdownInterval = null
             this.closeMenu(element);
-            this.endGame(msg, mode);
+            this.endGame(msg, mode, reset);
         }
 
         initUIListeners() {
@@ -503,6 +434,7 @@ function game() {
         }
 
         closeMenu(element) {
+            if (!element) return;
             const menu = document.getElementById(element);
             menu.style.display = "none";
         }
@@ -777,10 +709,10 @@ function game() {
             }
         }
 
-        endGame(msg, mode = "auto-play") {
+        endGame(msg, mode = "auto-play", reset=true) {
             message = msg;
             this.running = false;
-            this.destroy();
+            this.destroy(reset);
             startNewGame(mode);
         }
     }
@@ -808,9 +740,10 @@ function game() {
             acceptSpan.title = "Accept";
             acceptSpan.addEventListener("click", (event) => {
               event.stopPropagation();
+              gameInstance.clickMode(null, "remote_challenge", null, false);
               socket_game.send(JSON.stringify({
                 step: "accept_challenge",
-                challenge_id: challenge.id
+                challenge_id: challenge.username
               }));
             });
             iconsDiv.appendChild(acceptSpan);
@@ -836,7 +769,7 @@ function game() {
     }
 
     function append_message(message) {
-        const container = document.getElementById("game-log");
+        const container = document.getElementById("game-log-tab");
         const li = document.createElement("li");
         const textNode = document.createTextNode(message);
         li.appendChild(textNode);
@@ -851,13 +784,17 @@ function game() {
                 gameInstance.game_listener(data);
             } else {
                 if (data.payload_update === "challenges-update") {
-                    renderChallenges("random-challenges-data", data.detail, true, true);
+                    renderChallenges("random-challenges-tab", data.detail, true, true);
                 }
-                if (data.payload_update === "connected-users") {
-                    renderChallenges("connected-users-data", data.detail, false, false);
+                else if (data.payload_update === "connected-users") {
+                    renderChallenges("connected-users-tab", data.detail, false, false);
                 }
-                if (data.payload_update === "log-update") {
+                else if (data.payload_update === "log-update") {
                     append_message(data.detail);
+                }
+                else if (data.payload_update === "challenge-accepted") {
+                    gameInstance.destroy(true);
+                    startNewGame("remote");
                 }
             }
         };
@@ -870,8 +807,7 @@ function game() {
         tabButtons.forEach(button => {
           button.addEventListener('click', () => {
             const targetTabId = button.getAttribute('data-tab');
-
-            document.querySelectorAll('.tab-content').forEach(tabSection => {
+            document.querySelectorAll('.tab-data').forEach(tabSection => {
               tabSection.style.display = 'none';
             });
 

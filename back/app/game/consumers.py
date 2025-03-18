@@ -60,19 +60,20 @@ CLIENT_MUTEX = threading.Lock()
 
 
 
-async def logger_to_client(client, message):
+async def logger_to_client(client, message, update_detail="log-update"):
     """
     Send a message to log section.
 
     :param client: instance of client to send a message.
     :param message: message to send.
+    :param update_detail: update detail to send.
     """
     try:
         await client.send(text_data=json.dumps({
-            "payload_update": "log-update",
+            "payload_update": update_detail,
             "detail": message
         }))
-        logger.info(f"Log message sent. {message}.", extra={"corr": client.cnn_id})
+        logger.info(f"Log message sent. {update_detail} - {message}.", extra={"corr": client.cnn_id})
     except Exception as e:
         logger.warning(f"Error sending log update message.{e} {message}", extra={"corr": client.cnn_id})
 
@@ -137,14 +138,25 @@ class Clients:
                 return
         await self.broadcast_challenges()
 
-    def get_opponent(self, challenger):
+    def get_opponent(self, challenger, opponent_username=None):
         """
         Get a random opponent (first from the list).
 
         :param challenger: Client instance to avoid double challenges.
+        :param opponent_username: opponent ID to get a specific opponent.
         """
         with self.challenges_mutex:
             if len(self.challenges) and challenger not in self.challenges:
+                if opponent_username:
+                    found = None
+                    for i, obj in enumerate(self.challenges):
+                        if obj.username == opponent_username:
+                            found = self.challenges.pop(i)
+                            break
+                    if not found:
+                        logger_to_client(challenger, "Random challenge does not exist.")
+                        logger.warning("Error getting challenge.", extra={"corr": challenger.cnn_id})
+                    return found
                 opponent = self.challenges.pop(0)
             else:
                 return None
@@ -677,12 +689,18 @@ class PongBack(AsyncWebsocketConsumer):
         if data.get("step") == "abort-waiting":
             logger.info(f"User remove random challenge.", extra={"corr": self.cnn_id})
             await ClientsHandler.remove_random_challenge(self)
+        if data.get("step") == "accept_challenge":
+            await self.build_game(data.get("challenge_id"))
+            logger.info(f"User accept random challenge.", extra={"corr": self.cnn_id})
         else:
             if self.module:
                 await self.module.receive(data)
 
-    async def build_game(self, data):
-        opponent = ClientsHandler.get_opponent(self)
+    async def build_game(self, challenger=None):
+        opponent = ClientsHandler.get_opponent(self, challenger)
+        # if challenger and opponent:
+        #     logger_to_client(self, f"You are ready to play with {opponent.username}",
+        #                      "challenge-accepted")
         if opponent:
             logger.info(type(opponent))
             logger.info(opponent)
@@ -695,7 +713,6 @@ class PongBack(AsyncWebsocketConsumer):
                 "player1" if role == "player2" else "player2": opponent
             }
             self.module = opponent.module = GameSession(players)
-            self.free = opponent.free = False
             await self.module.send_start_screen()
         else:
             await self.send(text_data=json.dumps({
