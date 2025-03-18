@@ -80,10 +80,78 @@ async def logger_to_client(client, message, update_detail="log-update"):
 
 class Tournaments:
     def __init__(self, participants):
+        self.clients_mutex = threading.Lock()
         self.participants = participants
         self.matches = []
         self.winners = []
         self.loosers = []
+        self.clients = []
+        self.cardex = {}
+        self.spare = []
+
+    def create_tournament(self):
+        """
+        Create a cardex to save all the matches and avoid repeated matches.
+        """
+        for client in self.clients:
+            self.cardex[client.cnn_id] = []
+
+    def create_round(self):
+        """
+        Create a round of matches.
+        """
+        pairs = self.create_pairs()
+        if self.spare:
+            logger_to_client(self.spare[0], "You are the spare player.")
+        for pair in pairs:
+            pair["player1"].module = pair["player1"].module = game = GameSession(pair)
+            game.send_start_screen()
+
+    def create_pairs(self):
+        """
+        Create a set of matches for a given round.
+        """
+        players = self.clients.copy()
+        self.spare = []
+        # Shuffle players
+        random.shuffle(players)
+        used = []
+        pairs = []
+        spare = []
+        round = []
+        for i, client in enumerate(players):
+            if client in used:
+                continue
+            candidates = []
+            for other in clients[i + 1:]:
+                if (other not in used) and (other not in self.cardex[client.cnn_id]):
+                    candidates.append(other)
+            if candidates:
+                players = {}
+                partner = random.choice(candidates)
+                pairs.append(client, partner)
+                role = f"player{str(random.randint(1, 2))}"
+                players = {
+                    role: client,
+                    "player1" if role == "player2" else "player2": partner
+                }
+                round.append(players)
+                used.add(client)
+                used.add(partner)
+            else:
+                spare.append(client)
+
+        return pairs
+
+    async def join_tournament(self, client):
+        with self.clients_mutex:
+            self.clients.append(client)
+        await logger_to_client(client, "You are in the tournament.")
+
+    async def leave_tournament(self, client):
+        with self.clients_mutex:
+            self.clients.remove(client)
+        await logger_to_client(client, "You are out of the tournament.")
 
 
 class Clients:
