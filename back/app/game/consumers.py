@@ -30,7 +30,8 @@ WAITING_MUTEX = threading.Lock()
 CHALLENGE_MUTEX = threading.Lock()
 CLIENT_MUTEX = threading.Lock()
 
-# ----
+# ---- 
+# IMPORTANTE
 # from channels.db import database_sync_to_async
 # from app.game.models import Match
 #
@@ -689,7 +690,7 @@ class GameSession:
         if self.paddles['player1']['score'] == 5 or self.paddles['player2']['score'] == 5:
             self.winner = 'player1' if self.paddles['player1']['score'] == 5 else 'player2'
 
-    async def end_game_db(self):
+    async def end_game_db(self): # IMPORTANTE
         user1 = self.players["player1"].scope["user"]
         user2 = self.players["player2"].scope["user"]
 
@@ -711,9 +712,9 @@ class PongBack(AsyncWebsocketConsumer):
         self.cnn_id = str(uuid.uuid4())
         try:
             await self.accept()
-            user = self.scope['user']
-            if user.is_authenticated:
-                self.username = user.username
+            user = self.scope['user'] # IMPORTANTE
+            if user.is_authenticated: # redundante, self.scope['user'] solo va si is_authenticated
+                self.username = user.username # self.scope['user']
                 self.logged = True
                 logger.info(f'Logged user connected: conn {self.cnn_id} - user {self.username}',
                             extra={"corr": self.cnn_id})

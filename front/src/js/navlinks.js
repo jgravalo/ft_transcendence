@@ -1,52 +1,5 @@
-//const origin = 'http://127.0.0.1:8000/game/';// /game/json/';
-/*
-console.log("host: <" + window.location.host + ">");
-console.log("hostname: <" + window.location.hostname + ">");
-console.log("origin: <" + window.location.origin + ">");
-console.log("pathname: <" + window.location.pathname + ">");
-console.log("");
-*/
-/* // averiguar para que sirve
-(function() {
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function (...args) {
-        originalPushState.apply(this, args);
-        window.dispatchEvent(new Event('custom-navigation'));
-    };
-
-    history.replaceState = function (...args) {
-        originalReplaceState.apply(this, args);
-        window.dispatchEvent(new Event('custom-navigation'));
-    };
-})();
-
-// Detectar la navegación personalizada
-window.addEventListener('custom-navigation', () => {
-    console.log('La URL cambió en la SPA:', window.location.href);
-});
- */
-
-//Detects the url of the base app (http://localhost:8080 or http://pong42.com )
 var base = window.location.origin;
 console.log("base: ", base);
-
-/* window.addEventListener('popstate', (event) => handlePopstate(event));
-
-
-
-function handlePopstate(event)
-{
-    console.log("Se cambió la URL", event.state);
-    var path = window.location.pathname;
-    console.log(path);
-    if (path.startsWith("/get-translations")) {
-        console.log("Ignoring language fetch in handlePopstate.");
-        return;
-    }
-    handleLink(path);
-} */
 
 handleLinks();
 
@@ -76,24 +29,15 @@ function handleLink(event)
 
 function fetchLink(path)
 {
-    /* let token = getJWTToken();
-    // console.log("JWT before GET:", getJWTToken());
-    //console.log("token =", token);
-    if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
-        console.log("El token ha expirado. Solicita uno nuevo usando el refresh token.");
-        refreshJWT(path);
-        console.log("El token ha renovado");
-        return ;
-    } */
-    //console.log("token before fetch =", getJWTToken());
     if (checkAccess(path) != 0)
         return ;
 	console.log('path for GET =', path);
-    // fetch(base + ":8000" + path, {
     var get = '/api' + path;
         if (path == "")
             get = path;
     console.log('fetch for GET =', base + get);
+	// if (path == '/game/')
+	// 	game();
     fetch(base + get, {
         method: "GET",
         headers: {
@@ -127,7 +71,7 @@ function fetchLink(path)
                 makePost(path);
             else if (path.slice(0, 6) == '/chat/')
                 chat(base + get);
-            else if (path.slice(0, 6) == '/game/')
+			else if (path == '/game/')
                 game();
             handleLinks();
         }

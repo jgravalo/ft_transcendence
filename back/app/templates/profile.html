@@ -62,9 +62,9 @@
 		<div class="match-item">
 			<div>
 				<div class="match-players">{{ match.player1 }} vs {{ match.player2 }}</div>
-				<div class="match-time">{{ match.date }}</div>
+				<div class="match-time">{{ match.created_at }}</div>
 			</div>
-			<div class="match-score">{{ match.score1 }} - {{ match.score2 }}</div>
+			<div class="match-score">{{ match.score_player1 }} - {{ match.score_player2 }}</div>
 		</div>
 		{% endfor %}
 	</div>

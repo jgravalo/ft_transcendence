@@ -5,6 +5,7 @@ function game() {
     let gameInstance = null;
 
     const socket_game = new WebSocket('ws://localhost:8000/ws/game/');
+	console.log('init socket');
 
     class PongGame {
         constructor(mode = "auto-play", player1Name = "player1", player2Name = "player2") {
@@ -20,7 +21,12 @@ function game() {
             this.id = null;
             // --- Canvas
             this.canvas = document.getElementById('pongCanvas');
-            this.ctx = this.canvas.getContext('2d');
+			this.ctx = this.canvas.getContext('2d');
+			if (this.ctx) {
+				console.log("Canvas soportado");
+			} else {
+				console.log("Canvas no soportado en este navegador");
+			}			
             this.canvas.width = 400;
             this.canvas.height = 800;
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -797,7 +803,10 @@ function game() {
     }
     // --- GENERAL MANAGEMENT
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", manageGame);
+
+	function manageGame() {
+		console.log("in manageGame");
         const tabButtons = document.querySelectorAll('.tab-button');
 
         tabButtons.forEach(button => {
@@ -825,7 +834,10 @@ function game() {
         }
         gameInstance = new PongGame('auto-play');
         socket_listener();
-    });
+    }
+	
+	manageGame();
+	// );
 }
 
-game();
+// game();

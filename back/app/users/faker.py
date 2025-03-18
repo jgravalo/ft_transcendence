@@ -24,7 +24,7 @@ def create_fake_matches(n=1):
         score2 = randint(0, 5)
         date = fake.date_time_this_year()
 
-        match = Match.objects.create(player1=player1, player2=player2, score1=score1, score2=score2, date=date)
+        match = Match.objects.create(player1=player1, player2=player2, score_player1=score1, score_player2=score2, created_at=date)
         print(f'Match creado: {match}')
 
 # Generar 10 partidos aleatorios
