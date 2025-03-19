@@ -11,6 +11,7 @@ COPY ./conf/proxy_api.conf templates/includes/proxy_api.conf.template
 COPY ./conf/proxy_websocket.conf templates/includes/proxy_websocket.conf.template
 COPY ./conf/proxy_static_files.conf templates/includes/proxy_static_files.conf.template
 COPY ./conf/ssl_settings.conf templates/includes/ssl_settings.conf.template
+COPY ./conf/metrics.conf templates/includes/metrics.conf.template
 
 # Copy SSL certificates
 COPY ./certs/nginx.crt conf/server.crt

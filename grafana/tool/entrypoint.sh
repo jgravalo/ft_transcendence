@@ -54,7 +54,7 @@ if [ -z "$SECRET_RESPONSE" ]; then
     exit 1
 fi
 
-GF_SECURITY_ADMIN_PASSWORD=$(echo "$SECRET_RESPONSE" | jq -r '.data.data.gf_password')
+GF_SECURITY_ADMIN_PASSWORD=$(echo "$SECRET_RESPONSE" | jq -r '.data.data.gf_security_admin_password')
 if [ -z "$GF_SECURITY_ADMIN_PASSWORD" ] || [ "$DB_PASSWORD" = "null" ]; then
     echo "Error: Failed to retrieve Grafana password from Vault!"
     echo "Vault Response: $SECRET_RESPONSE"

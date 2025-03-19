@@ -54,7 +54,7 @@ if [ -z "$SECRET_RESPONSE" ]; then
     exit 1
 fi
 
-DB_PASSWORD=$(echo "$SECRET_RESPONSE" | jq -r '.data.data.db_password')
+DB_PASSWORD=$(echo "$SECRET_RESPONSE" | jq -r '.data.data.postgres_password')
 if [ -z "$DB_PASSWORD" ] || [ "$DB_PASSWORD" = "null" ]; then
     echo "Error: Failed to retrieve PostgreSQL password from Vault!"
     echo "Vault Response: $SECRET_RESPONSE"
