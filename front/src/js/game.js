@@ -46,14 +46,6 @@ function game()
 			ballSpeedX *= -1;
 		}
 
-		/* // Rebote en paletas
-		if (
-		(ball.y <= player1.y + paddleHeight && ball.x >= player1.x && ball.x <= player1.x + paddleWidth) ||
-		(ball.y >= player2.y - ballSize && ball.x >= player2.x && ball.x <= player2.x + paddleWidth)
-		) {
-			ballSpeedY *= -1;
-		} */
-
 		// Rebote en paletas con mejor detección de colisión
 		function checkCollision(player) {
 			if (
@@ -72,12 +64,14 @@ function game()
 		checkCollision(player2);
 
 		// Punto para un jugador
-		if (gameOver) return;
+		if (gameOver)
+			return;
 		if (ball.y <= 0) {
 			player2.score++;
 			checkWin(player2);
 			resetBall();
-		} else if (ball.y >= canvas.height) {
+		}
+		else if (ball.y >= canvas.height) {
 			player1.score++;
 			checkWin(player1);
 			resetBall();

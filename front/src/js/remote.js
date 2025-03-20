@@ -66,19 +66,21 @@ function gameRemote()
 		checkCollision(player2);
 
 		// Punto para un jugador
-		if (gameOver) return;
+		if (gameOver)
+			return;
 		if (ball.y <= 0) {
-			player2.score++;
+			// player2.score++;
 			checkWin(player2);
 			resetBall();
 		} else if (ball.y >= canvas.height) {
-			player1.score++;
+			// player1.score++;
 			checkWin(player1);
 			resetBall();
 		}
 	}
 
 	function checkWin(player) {
+		player.score++;
 		if (player.score >= maxScore) {
 			gameOver = true;
 			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
@@ -135,41 +137,15 @@ function gameRemote()
 		// if (keys["a"] && player1.x > 0) player1.x -= paddleSpeed;
 		// if (keys["d"] && player1.x < canvas.width - paddleWidth) player1.x += paddleSpeed;
 
-		if (keys["ArrowLeft"] && player2.x > 0)
+		if (keys["ArrowLeft"] && player.x > 0)
 			player.x -= paddleSpeed;
-		if (keys["ArrowRight"] && player2.x < canvas.width - paddleWidth)
+		if (keys["ArrowRight"] && player.x < canvas.width - paddleWidth)
 			player.x += paddleSpeed;
 		moveData = { action: "move", player: role, x: player.x };
 		if (moveData) {
 			socket.send(JSON.stringify(moveData));
 		}
 	}
-	/* 
-	document.addEventListener("keydown", function(event) {
-		let moveData = null;
-	
-		if (event.key === "w" && player1.y > 0) {
-			player1.y -= paddleSpeed;
-			moveData = { action: "move", player: "player1", y: player1.y };
-		}
-		if (event.key === "s" && player1.y < canvas.height - paddleHeight) {
-			player1.y += paddleSpeed;
-			moveData = { action: "move", player: "player1", y: player1.y };
-		}
-		if (event.key === "ArrowUp" && player2.y > 0) {
-			player2.y -= paddleSpeed;
-			moveData = { action: "move", player: "player2", y: player2.y };
-		}
-		if (event.key === "ArrowDown" && player2.y < canvas.height - paddleHeight) {
-			player2.y += paddleSpeed;
-			moveData = { action: "move", player: "player2", y: player2.y };
-		}
-	
-		if (moveData) {
-			socket.send(JSON.stringify(moveData));
-		}
-	});
-	*/
 
 	function gameLoop() {
 		if (!gameStarted) {
