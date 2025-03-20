@@ -1,4 +1,6 @@
-function game()
+
+//remote
+function gameRemote()
 {
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
@@ -46,15 +48,7 @@ function game()
 			ballSpeedX *= -1;
 		}
 
-		/* // Rebote en paletas
-		if (
-		(ball.y <= player1.y + paddleHeight && ball.x >= player1.x && ball.x <= player1.x + paddleWidth) ||
-		(ball.y >= player2.y - ballSize && ball.x >= player2.x && ball.x <= player2.x + paddleWidth)
-		) {
-			ballSpeedY *= -1;
-		} */
-
-		// Rebote en paletas con mejor detección de colisión
+		// Rebote en paletas
 		function checkCollision(player) {
 			if (
 				ball.y + ballSize >= player.y &&
@@ -88,6 +82,7 @@ function game()
 		if (player.score >= maxScore) {
 			gameOver = true;
 			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
+			socket.close();
 		}
 	}
 
@@ -97,19 +92,93 @@ function game()
 		ball.y = canvas.height / 2;
 		ballSpeedY *= -1;
 	}
+	
+	let player = null;
+	let role = null;
+	const socket = new WebSocket("ws://localhost:8000/ws/game/");
+	let gameStarted = false; // !!
 
+	/* socket.onopen = function(event) {
+		const data = JSON.parse(event.data);
+	} */
+
+	socket.onmessage = function(event) {
+		const data = JSON.parse(event.data);
+
+		if (data.action === "set-player") {
+			role = data.role;
+			console.log('role:', role);
+			if (role == "player1")
+				player = player1;
+			else
+				player = player2;
+		}
+		else if (data.action === "start") {
+			gameStarted = true;
+			// startGame();
+			gameLoop();
+		}
+		else if (data.action === "move") {
+			if (data.player === "player1") {
+				player1.x = data.x;
+			} 
+			else {
+				player2.x = data.x;
+			}
+		}
+	};
+	
 	document.addEventListener("keydown", (event) => keys[event.key] = true);
 	document.addEventListener("keyup", (event) => keys[event.key] = false);
 
 	function updatePaddles() {
-		if (keys["a"] && player1.x > 0) player1.x -= paddleSpeed;
-		if (keys["d"] && player1.x < canvas.width - paddleWidth) player1.x += paddleSpeed;
+		// if (keys["a"] && player1.x > 0) player1.x -= paddleSpeed;
+		// if (keys["d"] && player1.x < canvas.width - paddleWidth) player1.x += paddleSpeed;
 
-		if (keys["ArrowLeft"] && player2.x > 0) player2.x -= paddleSpeed;
-		if (keys["ArrowRight"] && player2.x < canvas.width - paddleWidth) player2.x += paddleSpeed;
+		if (keys["ArrowLeft"] && player2.x > 0)
+			player.x -= paddleSpeed;
+		if (keys["ArrowRight"] && player2.x < canvas.width - paddleWidth)
+			player.x += paddleSpeed;
+		moveData = { action: "move", player: role, x: player.x };
+		if (moveData) {
+			socket.send(JSON.stringify(moveData));
+		}
 	}
+	/* 
+	document.addEventListener("keydown", function(event) {
+		let moveData = null;
+	
+		if (event.key === "w" && player1.y > 0) {
+			player1.y -= paddleSpeed;
+			moveData = { action: "move", player: "player1", y: player1.y };
+		}
+		if (event.key === "s" && player1.y < canvas.height - paddleHeight) {
+			player1.y += paddleSpeed;
+			moveData = { action: "move", player: "player1", y: player1.y };
+		}
+		if (event.key === "ArrowUp" && player2.y > 0) {
+			player2.y -= paddleSpeed;
+			moveData = { action: "move", player: "player2", y: player2.y };
+		}
+		if (event.key === "ArrowDown" && player2.y < canvas.height - paddleHeight) {
+			player2.y += paddleSpeed;
+			moveData = { action: "move", player: "player2", y: player2.y };
+		}
+	
+		if (moveData) {
+			socket.send(JSON.stringify(moveData));
+		}
+	});
+	*/
 
 	function gameLoop() {
+		if (!gameStarted) {
+			ctx.fillStyle = "white";
+			ctx.font = "20px Arial";
+			ctx.fillText("Esperando a otro jugador...", canvas.width / 2 - 100, canvas.height / 2);
+			requestAnimationFrame(gameLoop);
+			return;
+		}
 		if (gameOver) return;
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -122,6 +191,4 @@ function game()
 
 		requestAnimationFrame(gameLoop);
 	}
-	gameLoop();
-
 }

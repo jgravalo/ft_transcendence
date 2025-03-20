@@ -90,8 +90,8 @@ function fetchLink(path)
                 makePost(path);
             else if (path.slice(0, 6) == '/chat/')
                 chat(base + get);
-			else if (path == '/game/')
-                game();
+			// else if (path == '/game/')
+            //     game();
             handleLinks();
         }
     })
