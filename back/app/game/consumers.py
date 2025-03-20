@@ -15,7 +15,7 @@ import json
 import sys
 from app.logging_config import get_logger
 
-logger = get_logger("game-back")  # Puedes cambiar el nombre según el módulo
+logger = get_logger("game-back")
 
 waiting_list = []
 client_list = []
@@ -224,10 +224,10 @@ class Clients:
         :param opponent_username: opponent ID to get a specific opponent.
         """
         with self.challenges_mutex:
-            if len(self.challenges) and challenger not in self.challenges:
+            if self.challenges and challenger not in self.challenges:
                 if opponent_username:
                     found = None
-                    for i, obj in enumerate(self.challenges):
+                    for i, obj in enumerate(self.challenges, 0):
                         if obj.username == opponent_username:
                             found = self.challenges.pop(i)
                             break
@@ -269,59 +269,52 @@ class Clients:
 
 ClientsHandler = Clients()
 
-
 class GameSession:
     """
-    Game Session class to control and update the game.
+    Game Session class to control and update the game with a asyncio loop.
     """
     roles = ['player1', 'player2']
     keys_to_remove = ["role", "y", "height"]
-    users = {}
-    match_id = None
-    players = []
-    paddles = {}
-    playing = False
-    ball = {}
-    # ---
-    power_ups = []
-    power_up_size = None
-    power_up_act_dist = None
-    collision_count = 0
-    collision_threshold = 2
-    collision_to_points = 0
-    base_ball = {
-        'speedX': float(4),
-        'speedY': float(4),
-        'baseSpeed': float(4)
-    }
-    winner = None
-    running = True
-    starting = False
-    def __init__(self, players, width=400, height=800):
-        """
-        Init method to GameSession class
 
-        :param players: a list of the players involved.
-        :param width: canvas width. Optional.
-        :param height: canvas height. Optional.
+    # --- Collisions and power ups
+    collision_threshold = 2  # Cada cuántas colisiones se genera un power-up
+    base_ball = {
+        'speedX': 200.0,
+        'speedY': 200.0,
+        'baseSpeed': 200.0
+    }
+    def __init__(self, players, tournament=False, width=400, height=800):
+        """
+        :param players: dict con 'player1' y 'player2' (sus conexiones).
+        :param width: ancho del canvas
+        :param height: alto del canvas
         """
         self.canvas = {'width': width, 'height': height}
-        # Assign randomly roles to players.
-        for key, value in players.items():
-            self.users[key] = value
-        self.players = players
+        self.players = players  # Diccionario con las conexiones o “consumers”
         self.match_id = str(uuid.uuid4())
-        logger.info(f"New game was created {self.match_id}. Player1 {self.players['player1']} | Player2 {self.players['player2']}.", extra={"corr": self.match_id})
+
+        logger.info(f"New game: {self.match_id} | Player1: {self.players['player1']} | Player2: {self.players['player2']}", extra={"corr": self.match_id})
+
+        # -- Ball
         self.ball = {
             'x': width / 2,
             'y': height / 2,
             'size': 15,
-            'speedX': float(4),
-            'speedY': float(4),
-            'baseSpeed': float(4)
+            'speedX': self.base_ball['speedX'],
+            'speedY': self.base_ball['speedY'],
+            'baseSpeed': self.base_ball['baseSpeed'],
         }
+
+        # Power-ups
+        self.power_ups = []
         self.power_up_size = self.ball['size'] * 1.5
         self.power_up_act_dist = self.power_up_size * 3
+
+        # Counters
+        self.collision_count = 0
+        self.collision_to_points = 0
+
+        # Paddles
         self.paddles = {
             "player1": {
                 "role": "player1",
@@ -344,161 +337,58 @@ class GameSession:
                 "speedModifier": 1
             }
         }
-        matches[self.match_id] = self
-        # self.send_start_screen()
 
-
-    async def receive(self, data):
-        """
-        Process received message.
-
-        :param self: connection instance.
-        :param text_data: json object received.
-        """
-        # Join to remote mode
-        if data.get("step") == "update":
-            """
-            Get update game from player, update paddle position and
-            return game data updated
-            """
-            role = data.get("role")
-            self.update_paddle_position(role, data.get('position'))
-            await self.send_update_status()
-
-    async def end_game(self):
-        for role, user in self.players.items():
-            msg = f"You won {self.paddles[role]['points']} points!" if role == self.winner else "You lost!"
-            try:
-                await user.send(text_data=json.dumps({
-                    "step": "endOfGame",
-                    "id": self.match_id,
-                    "winner": self.winner,
-                    "message": msg
-                }))
-                await logger_to_client(user, msg)
-            except Exception as e:
-                logger.warning(f"Error sending end status to {role}.", extra={"corr": self.match_id})
-
-    async def disconnect_game(self):
-        for role, user in self.players.items():
-            try:
-                await user.send(text_data=json.dumps({
-                    "step": "disconnect",
-                    "id": self.match_id
-                }))
-            except Exception as e:
-                logger.warning(f"Error sending disconnect message to {role}.", extra={"corr": self.match_id})
-
-    async def send_update_status(self):
-        """
-        Get update game from player, update paddle position and
-        return game data updated
-        """
-        if not self.running:
-            return
-        self.update_game()
-        if self.winner:
-            self.running = False
-            await self.end_game()
-        for role, user in self.players.items() :
-            opp = 'player1' if role == 'player2' else 'player2'
-            player = {key: value for key, value in self.paddles[role].items() if key not in self.keys_to_remove}
-            await user.send(text_data=json.dumps({
-                "step": "update",
-                "id": self.match_id,
-                "score1": self.paddles['player1']['score'],
-                "score2": self.paddles['player2']['score'],
-                "playerRole": role,
-                "player": player,
-                "opponent": self.paddles[opp],
-                "ball": self.ball,
-                "powerUps": self.power_ups
-            }))
-
-    async def send_start_screen(self):
-        """
-        Send start game, to get user attention before the game is started.
-
-        :param game: game instance.
-        """
-        logger.info('Send start screen messages', extra={"corr": self.match_id})
-        await self.broadcast_log()
-        await self.broadcast_message("Be prepare to fight!")
-        await asyncio.sleep(3)
-        await self.broadcast_message("3 seconds to go!")
-        await asyncio.sleep(2)
-        await self.broadcast_message("Go!", "go")
-        await asyncio.sleep(1)
+        # Control Game
         self.running = True
-        await self.send_update_status()
-        logger.info('Prepare message sent.', extra={"corr": self.match_id})
+        self.starting = False
+        self.winner = None
 
-    async def broadcast_log(self):
+        # Time between updates
+        self.last_update = time.time()
+
+        # Global Matches Registry
+        matches[self.match_id] = self
+
+        # Main loop
+        self._game_loop_task = asyncio.create_task(self.game_loop())
+
+    async def game_loop(self):
         """
-        Broadcast logger message to users involved at game.
+        Main game loop.
+
+        This loop ensures the game runs at a constant frame rate.
         """
-        for role, user in self.players.items() :
-            await logger_to_client(user,
-                                   f"New game {self.players['player1'].username} - {self.players['player2'].username}.")
+        fps = 60
+        interval = 1.0 / fps
+        await self.send_start_screen()
+        self.last_update = time.time()  
+        while self.running:
+            now = time.time()
+            delta = now - self.last_update
+            self.last_update = now
+            self.update_game(delta)
+            if self.winner:
+                self.running = False
+                await self.end_game()
+                break
+            await self.broadcast_state()
+            await asyncio.sleep(interval)
+        logger.info(f"Game loop finished. Match ID: {self.match_id}", extra={"corr": self.match_id})
 
-    async def broadcast_message(self, message, step="ready"):
+    def update_game(self, delta):
         """
-        Broadcast a message to users involved at game.
-
-        :param message: Detailed message to sent to each user.
-        :param step: step sent
+        Update game state.
+        :param delta: delta time between updates.
         """
-        for role, user in self.players.items() :
-            opp = 'player1' if role == 'player2' else 'player2'
-            await user.send(text_data=json.dumps({
-                "step": step,
-                "id": self.match_id,
-                "message": message,
-                "playerRole": role,
-                "playerName": self.players[role].username,
-                "opponentName": self.players[opp].username,
-                "player1Name": self.players['player1'].username,
-                "player2Name": self.players['player2'].username,
-                "player1": self.paddles["player1"],
-                "player2": self.paddles["player2"],
-                "ball": self.ball
-            }))
 
-    async def rematch_reject(self):
-        for role, user in self.players.items() :
-            await user.send(text_data=json.dumps({
-                "step": "end",
-                "id": self.match_id
-            }))
+        self.update_ball_position(delta)
+        self.move_power_up(delta)
+        self.check_power_up_collisions()
 
-    def get_role(self, player):
-        """
-        Return the random role assign to a given player instance.
+        if self.paddles['player1']['score'] == 5 or self.paddles['player2']['score'] == 5:
+            self.winner = 'player1' if self.paddles['player1']['score'] == 5 else 'player2'
 
-        :param player:
-        :return: role assigned. None otherwise.
-        """
-        for key, value in self.users.items():
-            if value == player:
-                return key
-        return None
-
-    def reset_ball(self):
-        """
-        Reset ball position.
-        A new ball will be set at the middle of the field and a random
-        angle is used to start.
-        """
-        self.ball.update(self.base_ball)
-        self.ball["x"] = self.canvas['width'] / 2
-        self.ball["y"] = self.canvas['height'] / 2
-        angle = (random.random() - 0.5) * math.pi / 8
-        self.ball["speedX"] = self.ball["baseSpeed"] * math.sin(angle)
-        self.ball["speedY"] = self.ball["baseSpeed"] * math.cos(angle) * (1 if random.random() > 0.5 else -1)
-        self.collision_count = 0
-
-
-    def update_ball_position(self):
+    def update_ball_position(self, delta):
         """
         Move the ball around the field, and check for collision.
 
@@ -506,8 +396,9 @@ class GameSession:
         A collision against a paddle will return the ball.
         A collision against any end of field, will update the score.
         """
-        self.ball["x"] += self.ball["speedX"]
-        self.ball["y"] += self.ball["speedY"]
+        logger.info(f'Ball position: {self.ball["x"]} - {self.ball["y"]} DELTA {delta}', extra={"corr": self.match_id})
+        self.ball["x"] += self.ball["speedX"] * delta
+        self.ball["y"] += self.ball["speedY"] * delta
 
         # Side walls collisions.
         if self.ball["x"] <= 0 or self.ball["x"] >= self.canvas["width"]:
@@ -529,45 +420,114 @@ class GameSession:
 
         # Player2 point
         if self.ball["y"] >= self.canvas["height"]:
+            logger.info(f' punto 2 {self.ball["y"]} - {self.canvas["height"]}')
             self.paddles['player2']["score"] += 1
             self.paddles['player2']['points'] += int(self.collision_to_points * (100 / self.paddles['player2']['width']))
             self.collision_to_points = 0
             self.reset_ball()
         # Player1 point
         elif self.ball["y"] <= 0:
+            logger.info(f' punto 1 {self.ball["y"]} - {self.canvas["height"]}')
             self.paddles['player1']["score"] += 1
             self.paddles['player1']['points'] += int(self.collision_to_points * (100 / self.paddles['player1']['width']))
-            self.reset_ball()
             self.collision_to_points = 0
+            self.reset_ball()
 
         # Generate power up.
         self.generate_power_up()
-        return self.ball
+
+        # """
+        # Move the ball and check for collisions.
+        #
+        # :param delta: time between updates.
+        # """
+        # # Update ball position
+        # self.ball["x"] += self.ball["speedX"] * delta
+        # self.ball["y"] += self.ball["speedY"] * delta
+        #
+        # # Side walls: ball bounces
+        # if self.ball["x"] <= 0:
+        #     self.ball["x"] = 0
+        #     self.ball["speedX"] *= -1
+        #     self.collision_to_points += 1
+        # elif self.ball["x"] >= self.canvas["width"]:
+        #     self.ball["x"] = self.canvas["width"]
+        #     self.ball["speedX"] *= -1
+        #     self.collision_to_points += 1
+        #
+        # # Player1 paddle: ball bounces
+        # if self.check_collision(self.ball, self.paddles['player1']):
+        #     self.ball["y"] = self.paddles['player1']["y"] - (self.ball["size"] / 2)
+        #     self.ball["speedY"] = -abs(self.ball["baseSpeed"] * self.paddles['player1']["speedModifier"])
+        #     self.collision_count += 1
+        #
+        #     # Side Paddles: modify ball position
+        #     hit_point = self.ball['x'] - (self.paddles['player1']['x'] + self.paddles['player1']['width'] / 2)
+        #     normalized_hp = hit_point / (self.paddles['player1']['width'] / 2)
+        #     self.ball['speedX'] = normalized_hp * 6 * (self.paddles['player1']["speedModifier"] * 50)  # Ajusta factor
+        #
+        # # Player2 paddle: ball bounces
+        # elif self.check_collision(self.ball, self.paddles['player2']):
+        #     self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"] + (self.ball['size'] / 2)
+        #     self.ball["speedY"] = abs(self.ball["baseSpeed"] * self.paddles['player2']["speedModifier"])
+        #     self.collision_count += 1
+        #     self.collision_to_points += 1
+        #
+        #     # Side Paddles: modify ball position
+        #     hit_point = self.ball['x'] - (self.paddles['player2']['x'] + self.paddles['player2']['width'] / 2)
+        #     normalized_hp = hit_point / (self.paddles['player2']['width'] / 2)
+        #     self.ball['speedX'] = normalized_hp * 6 * (self.paddles['player2']["speedModifier"] * 50)
+        #
+        # # Point for player2
+        # if self.ball["y"] >= self.canvas["height"]:
+        #     self.paddles['player2']["score"] += 1
+        #     self.paddles['player2']['points'] += int(self.collision_to_points * (100 / self.paddles['player2']['width']))
+        #     self.collision_to_points = 0
+        #     self.reset_ball()
+        #
+        # # Point for player1
+        # elif self.ball["y"] <= 0:
+        #     self.paddles['player1']["score"] += 1
+        #     self.paddles['player1']['points'] += int(self.collision_to_points * (100 / self.paddles['player1']['width']))
+        #     self.collision_to_points = 0
+        #     self.reset_ball()
+        #
+        # # Generate power-up
+        # self.generate_power_up()
 
     def check_collision(self, ball, paddle):
         """
-        Check if the ball collide with a given paddle.
+        Collision detection between ball and paddle.
 
-        :param ball: ball to check its collision.
-        :param paddle: user paddle.
-
-        :return: True when a collision is detected, False otherwise.
+        :param ball: ball dict
+        :param paddle: paddle dict
         """
         collision = (
-                paddle["x"] < ball["x"] < paddle["x"] + paddle["width"] and
-                ball["y"] + ball["size"] / 2 > paddle["y"] and
-                ball["y"] - ball["size"] / 2 < paddle["y"] + paddle["height"]
+            paddle["x"] < ball["x"] < (paddle["x"] + paddle["width"]) and
+            (ball["y"] + (ball["size"] / 2)) > paddle["y"] and
+            (ball["y"] - (ball["size"] / 2)) < (paddle["y"] + paddle["height"])
         )
-        if collision:
-            hit_point = ball['x'] - (paddle['x'] + paddle['width'] / 2)
-            normalized_hp = hit_point / (paddle['width'] / 2)
-            self.ball['speedX'] = normalized_hp * 6
         return collision
+
+    def reset_ball(self):
+        """
+        Reset ball position and speed.
+        """
+        self.ball.update(self.base_ball)
+        self.ball["x"] = self.canvas['width'] / 2
+        self.ball["y"] = self.canvas['height'] / 2
+
+        angle = (random.random() - 0.5) * (math.pi / 4)
+        # Random direction (left or right)
+        self.ball["speedX"] = self.ball["baseSpeed"] * math.sin(angle)
+        # Random direction (up or down)
+        self.ball["speedY"] = self.ball["baseSpeed"] * math.cos(angle) * (1 if random.random() > 0.5 else -1)
+
+        self.collision_count = 0
 
     def generate_power_up(self):
         """
-        Generate a random power up when collision threshold collision counter is
-        reached, and append it to the power up list.
+        Generates a power-up if collision_count >= collision_threshold and currentl
         """
         if self.collision_count >= self.collision_threshold and len(self.power_ups) == 0:
             from_player = random.random() > 0.5
@@ -588,117 +548,679 @@ class GameSession:
                 "type": power_up_type,
                 "active": False
             })
-            logger.info("POWER UP")
             self.collision_count = 0
 
-    def move_power_up(self):
+    def move_power_up(self, delta):
         """
-        Move the power up after its lunch.
-        """
-        for item in self.power_ups:
-            item['y'] += item['speedY']
-            item['x'] += item['speedX']
+        Move power-ups and check for collisions.
 
+        :param delta: time between updates.
+        """
+        to_remove = []
+        for item in self.power_ups:
+            item['y'] += item['speedY'] * 50 * delta
+            item['x'] += item['speedX'] * 50 * delta
+
+            # Side walls collision
             if item['x'] + self.power_up_size > self.canvas['width'] or item['x'] < 0:
                 item['speedX'] *= -1
+
+            # Power-up out of bounds
             if item['y'] > self.canvas['height'] or item['y'] < 0:
-                self.power_ups.remove(item)
+                to_remove.append(item)
 
-    def apply_power_up(self, role, power_up_type):
-        """
-        Apply the power up to a given user role.
-        A power up should affect paddle properties.
-
-        :param role: paddle role (player1, player2).
-        :param power_up_type: Power up behaviour.
-        """
-        player = self.paddles[role]
-        if power_up_type == ">>":
-            self.paddles[role]["width"] = min(player["width"] + 10, self.canvas["width"] - 45)
-            self.paddles[role]["speedModifier"] = max(player["speedModifier"] - 0.1, 0.8)
-        elif power_up_type == "<<":
-            self.paddles[role]["width"] = max(player["width"] - 10, 50)
-            self.paddles[role]["speedModifier"] = min(player["speedModifier"] + 0.1, 1.2)
-        self.paddles[role]['points'] += 10
+        for item in to_remove:
+            self.power_ups.remove(item)
 
     def check_power_up_collisions(self):
         """
-        Check power up collision.
-        Like a ball, the power up will be moving around the field, until it is catch,
-        or get lost beyond the end of the field.
+        Check for power-up collisions with paddles and ball.
         """
+        to_remove = []
         for item in self.power_ups:
             distance = abs(item["startY"] - item["y"])
             item["active"] = distance >= self.power_up_size
 
             if not item["active"]:
                 continue
-            # Power-up ball collision.
+
+            # Power-up collision with ball
             if (
-                    self.ball["x"] < item["x"] + self.power_up_size and
-                    self.ball["x"] + self.ball["size"] > item["x"] and
-                    self.ball["y"] < item["y"] + self.power_up_size and
-                    self.ball["y"] + self.ball["size"] > item["y"]
+                (self.ball["x"] < item["x"] + self.power_up_size) and
+                (self.ball["x"] + self.ball["size"] > item["x"]) and
+                (self.ball["y"] < item["y"] + self.power_up_size) and
+                (self.ball["y"] + self.ball["size"] > item["y"])
             ):
+                # Power-up collision with ball
                 self.ball["speedY"] *= -1
                 self.ball["speedX"] *= -1
-                self.power_ups.remove(item)
+                to_remove.append(item)
                 continue
+
             # Power-up captured by player1
             if (
-                    item["x"] < self.paddles["player1"]["x"] + self.paddles["player1"]["width"] and
-                    item["x"] + self.power_up_size > self.paddles["player1"]["x"] and
-                    item["y"] < self.paddles["player1"]["y"] + self.paddles["player1"]["height"] and
-                    item["y"] + self.power_up_size > self.paddles["player1"]["y"]
+                item["x"] < (self.paddles["player1"]["x"] + self.paddles["player1"]["width"]) and
+                (item["x"] + self.power_up_size) > self.paddles["player1"]["x"] and
+                item["y"] < (self.paddles["player1"]["y"] + self.paddles["player1"]["height"]) and
+                (item["y"] + self.power_up_size) > self.paddles["player1"]["y"]
             ):
                 self.apply_power_up("player1", item["type"])
-                self.power_ups.remove(item)
+                to_remove.append(item)
                 continue
+
             # Power-up captured by player2
             if (
-                    item["x"] < self.paddles["player2"]["x"] + self.paddles["player2"]["width"] and
-                    item["x"] + self.power_up_size > self.paddles["player2"]["x"] and
-                    item["y"] < self.paddles["player2"]["y"] + self.paddles["player2"]["height"] and
-                    item["y"] + self.power_up_size > self.paddles["player2"]["y"]
+                item["x"] < (self.paddles["player2"]["x"] + self.paddles["player2"]["width"]) and
+                (item["x"] + self.power_up_size) > self.paddles["player2"]["x"] and
+                item["y"] < (self.paddles["player2"]["y"] + self.paddles["player2"]["height"]) and
+                (item["y"] + self.power_up_size) > self.paddles["player2"]["y"]
             ):
                 self.apply_power_up("player2", item["type"])
-                self.power_ups.remove(item)
+                to_remove.append(item)
+
+        for item in to_remove:
+            self.power_ups.remove(item)
+
+    def apply_power_up(self, role, power_up_type):
+        """
+        Applies the power-up to the player.
+
+        :param role: player role
+        :param power_up_type: power-up type
+        """
+        player = self.paddles[role]
+        if power_up_type == ">>":
+            # Increase width and reduce speed
+            player["width"] = min(player["width"] + 10, self.canvas["width"] - 45)
+            player["speedModifier"] = max(player["speedModifier"] - 0.1, 0.8)
+        elif power_up_type == "<<":
+            # Reduce width and increase speed
+            player["width"] = max(player["width"] - 10, 50)
+            player["speedModifier"] = min(player["speedModifier"] + 0.1, 1.2)
+        player['points'] += 10
 
     def update_paddle_position(self, role, position):
         """
-        Update paddle position for a given role player.
-        This method is called when an update message is received.
+        Update the paddle position.
 
         :param role: player role
-        :param position: new x position.
+        :param position: new position
         """
         self.paddles[role]['x'] = position
 
-    def update_game(self):
+    async def receive(self, data):
         """
-        Update all the game (ball, power ups, and paddles).
-        And return them to be sent using player instances.
+        Process received message.
 
-        :return: paddles, power ups, ball.
+        :param data: json object received.
         """
-        if not self.starting:
-            self.reset_ball()
-            self.starting = True
-        self.update_ball_position()
-        self.move_power_up()
-        self.check_power_up_collisions()
-        if self.paddles['player1']['score'] == 5 or self.paddles['player2']['score'] == 5:
-            self.winner = 'player1' if self.paddles['player1']['score'] == 5 else 'player2'
+        if data.get("step") == "update":
+            # Update paddle position
+            role = data.get("role")
+            new_pos = data.get("position")
+            self.update_paddle_position(role, new_pos)
 
-    async def end_game_db(self): # IMPORTANTE
+    async def broadcast_state(self):
+        """
+        Send the game state to both players.
+        """
+
+        if not self.running:
+            return
+
+        for role, user in self.players.items():
+            opp = 'player1' if role == 'player2' else 'player2'
+            player_data = {k: v for k, v in self.paddles[role].items() if k not in self.keys_to_remove}
+            try:
+                await user.send(text_data=json.dumps({
+                    "step": "update",
+                    "id": self.match_id,
+                    "score1": self.paddles['player1']['score'],
+                    "score2": self.paddles['player2']['score'],
+                    "playerRole": role,
+                    "player": player_data,
+                    "opponent": self.paddles[opp],
+                    "ball": self.ball,
+                    "powerUps": self.power_ups
+                }))
+            except Exception as e:
+                logger.warning(f"Error sending update to {role}.\n{str(e)}", extra={"corr": self.match_id})
+
+    async def send_start_screen(self):
+        """
+        Send a start screen to both players.
+        """
+        logger.info(f"Sends start screen messages. Match ID: {self.match_id}", extra={"corr": self.match_id})
+        await self.broadcast_log()
+        await self.broadcast_message("Be prepared to fight!")
+        await asyncio.sleep(3)
+        await self.broadcast_message("3 seconds to go!")
+        await asyncio.sleep(2)
+        await self.broadcast_message("Go!", "go")
+        await asyncio.sleep(1)
+
+
+    async def broadcast_log(self):
+        """
+        Broadcast a log message to both players.
+        """
+        msg = f"New game {self.players['player1'].username} vs {self.players['player2'].username}."
+        for role, user in self.players.items():
+            await logger_to_client(user, msg)
+
+    async def broadcast_message(self, message, step="ready"):
+        """
+        Broadcast a message to both players.
+        This method is used to send start messages only.
+
+        :param message: message to send.
+        :param step: step to send.
+        """
+        for role, user in self.players.items():
+            opp = 'player1' if role == 'player2' else 'player2'
+            try:
+                await user.send(text_data=json.dumps({
+                    "step": step,
+                    "id": self.match_id,
+                    "message": message,
+                    "playerRole": role,
+                    "playerName": self.players[role].username,
+                    "opponentName": self.players[opp].username,
+                    "player1Name": self.players['player1'].username,
+                    "player2Name": self.players['player2'].username,
+                    "player1": self.paddles["player1"],
+                    "player2": self.paddles["player2"],
+                    "ball": self.ball
+                }))
+            except Exception as e:
+                logger.warning(f"Error sending start message to {role}.\n{str(e)}", extra={"corr": self.match_id})
+                # TODO abort game.
+
+    async def end_game(self):
+        """
+        End the game and send the result to both players.
+        """
+        for role, user in self.players.items():
+            if role == self.winner:
+                msg = f"You Won {self.paddles[role]['points']} points."
+            else:
+                msg = "You lost..."
+            try:
+                await user.send(text_data=json.dumps({
+                    "step": "endOfGame",
+                    "id": self.match_id,
+                    "winner": self.winner,
+                    "message": msg
+                }))
+                await logger_to_client(user, msg)
+            except Exception as e:
+                logger.error(f"Error sending end message to {role}.\n{str(e)}", extra={"corr": self.match_id})
+
+    async def disconnect_game(self):
+        """
+        Send a disconnect message to both players.
+        """
+        # TODO send aborting message
+        for role, user in self.players.items():
+            try:
+                await user.send(text_data=json.dumps({
+                    "step": "disconnect",
+                    "id": self.match_id
+                }))
+            except Exception as e:
+                logger.warning(f"Error sending disconnect message to {role}.\n{str(e)}", extra={"corr": self.match_id})
+
+    async def rematch_reject(self):
+        """
+        Rematch is rejected by one of the players.
+        """
+        for role, user in self.players.items():
+            await user.send(text_data=json.dumps({
+                "step": "end",
+                "id": self.match_id
+            }))
+
+    async def end_game_db(self):
+        """
+        (Opcional) Guarda info de la partida en BD.
+        """
         user1 = self.players["player1"].scope["user"]
         user2 = self.players["player2"].scope["user"]
 
         score1 = self.paddles["player1"]["score"]
         score2 = self.paddles["player2"]["score"]
 
-        # Llamar a la función que crea el Match y actualiza estadísticas
         await create_match_and_update_users(user1, user2, score1, score2)
+
+# class GameSession:
+#     """
+#     Game Session class to control and update the game.
+#     """
+#     roles = ['player1', 'player2']
+#     keys_to_remove = ["role", "y", "height"]
+#     users = {}
+#     match_id = None
+#     players = []
+#     paddles = {}
+#     playing = False
+#     ball = {}
+#     # ---
+#     power_ups = []
+#     power_up_size = None
+#     power_up_act_dist = None
+#     collision_count = 0
+#     collision_threshold = 2
+#     collision_to_points = 0
+#     base_ball = {
+#         'speedX': float(4),
+#         'speedY': float(4),
+#         'baseSpeed': float(4)
+#     }
+#     winner = None
+#     running = True
+#     starting = False
+#     def __init__(self, players, width=400, height=800):
+#         """
+#         Init method to GameSession class
+#
+#         :param players: a list of the players involved.
+#         :param width: canvas width. Optional.
+#         :param height: canvas height. Optional.
+#         """
+#         self.canvas = {'width': width, 'height': height}
+#         # Assign randomly roles to players.
+#         for key, value in players.items():
+#             self.users[key] = value
+#         self.players = players
+#         self.match_id = str(uuid.uuid4())
+#         logger.info(f"New game was created {self.match_id}. Player1 {self.players['player1']} | Player2 {self.players['player2']}.", extra={"corr": self.match_id})
+#         self.ball = {
+#             'x': width / 2,
+#             'y': height / 2,
+#             'size': 15,
+#             'speedX': float(4),
+#             'speedY': float(4),
+#             'baseSpeed': float(4)
+#         }
+#         self.power_up_size = self.ball['size'] * 1.5
+#         self.power_up_act_dist = self.power_up_size * 3
+#         self.paddles = {
+#             "player1": {
+#                 "role": "player1",
+#                 "x": width / 2 - 50,
+#                 "y": height - 80,
+#                 "width": 100,
+#                 "height": 15,
+#                 "score": 0,
+#                 "points": 0,
+#                 "speedModifier": 1
+#             },
+#             "player2": {
+#                 "role": "player2",
+#                 "x": width / 2 - 50,
+#                 "y": 60,
+#                 "width": 100,
+#                 "height": 15,
+#                 "score": 0,
+#                 "points": 0,
+#                 "speedModifier": 1
+#             }
+#         }
+#         matches[self.match_id] = self
+#         # self.send_start_screen()
+#
+#
+#     async def receive(self, data):
+#         """
+#         Process received message.
+#
+#         :param self: connection instance.
+#         :param text_data: json object received.
+#         """
+#         # Join to remote mode
+#         if data.get("step") == "update":
+#             """
+#             Get update game from player, update paddle position and
+#             return game data updated
+#             """
+#             role = data.get("role")
+#             self.update_paddle_position(role, data.get('position'))
+#             await self.send_update_status()
+#
+#     async def end_game(self):
+#         for role, user in self.players.items():
+#             msg = f"You won {self.paddles[role]['points']} points!" if role == self.winner else "You lost!"
+#             try:
+#                 await user.send(text_data=json.dumps({
+#                     "step": "endOfGame",
+#                     "id": self.match_id,
+#                     "winner": self.winner,
+#                     "message": msg
+#                 }))
+#                 await logger_to_client(user, msg)
+#             except Exception as e:
+#                 logger.warning(f"Error sending end status to {role}.", extra={"corr": self.match_id})
+#
+#     async def disconnect_game(self):
+#         for role, user in self.players.items():
+#             try:
+#                 await user.send(text_data=json.dumps({
+#                     "step": "disconnect",
+#                     "id": self.match_id
+#                 }))
+#             except Exception as e:
+#                 logger.warning(f"Error sending disconnect message to {role}.", extra={"corr": self.match_id})
+#
+#     async def send_update_status(self):
+#         """
+#         Get update game from player, update paddle position and
+#         return game data updated
+#         """
+#         if not self.running:
+#             return
+#         self.update_game()
+#         if self.winner:
+#             self.running = False
+#             await self.end_game()
+#         for role, user in self.players.items() :
+#             opp = 'player1' if role == 'player2' else 'player2'
+#             player = {key: value for key, value in self.paddles[role].items() if key not in self.keys_to_remove}
+#             await user.send(text_data=json.dumps({
+#                 "step": "update",
+#                 "id": self.match_id,
+#                 "score1": self.paddles['player1']['score'],
+#                 "score2": self.paddles['player2']['score'],
+#                 "playerRole": role,
+#                 "player": player,
+#                 "opponent": self.paddles[opp],
+#                 "ball": self.ball,
+#                 "powerUps": self.power_ups
+#             }))
+#
+#     async def send_start_screen(self):
+#         """
+#         Send start game, to get user attention before the game is started.
+#
+#         :param game: game instance.
+#         """
+#         logger.info('Send start screen messages', extra={"corr": self.match_id})
+#         await self.broadcast_log()
+#         await self.broadcast_message("Be prepare to fight!")
+#         await asyncio.sleep(3)
+#         await self.broadcast_message("3 seconds to go!")
+#         await asyncio.sleep(2)
+#         await self.broadcast_message("Go!", "go")
+#         await asyncio.sleep(1)
+#         self.running = True
+#         await self.send_update_status()
+#         logger.info('Prepare message sent.', extra={"corr": self.match_id})
+#
+#     async def broadcast_log(self):
+#         """
+#         Broadcast logger message to users involved at game.
+#         """
+#         for role, user in self.players.items() :
+#             await logger_to_client(user,
+#                                    f"New game {self.players['player1'].username} - {self.players['player2'].username}.")
+#
+#     async def broadcast_message(self, message, step="ready"):
+#         """
+#         Broadcast a message to users involved at game.
+#
+#         :param message: Detailed message to sent to each user.
+#         :param step: step sent
+#         """
+#         for role, user in self.players.items() :
+#             opp = 'player1' if role == 'player2' else 'player2'
+#             await user.send(text_data=json.dumps({
+#                 "step": step,
+#                 "id": self.match_id,
+#                 "message": message,
+#                 "playerRole": role,
+#                 "playerName": self.players[role].username,
+#                 "opponentName": self.players[opp].username,
+#                 "player1Name": self.players['player1'].username,
+#                 "player2Name": self.players['player2'].username,
+#                 "player1": self.paddles["player1"],
+#                 "player2": self.paddles["player2"],
+#                 "ball": self.ball
+#             }))
+#
+#     async def rematch_reject(self):
+#         for role, user in self.players.items() :
+#             await user.send(text_data=json.dumps({
+#                 "step": "end",
+#                 "id": self.match_id
+#             }))
+#
+#     def get_role(self, player):
+#         """
+#         Return the random role assign to a given player instance.
+#
+#         :param player:
+#         :return: role assigned. None otherwise.
+#         """
+#         for key, value in self.users.items():
+#             if value == player:
+#                 return key
+#         return None
+#
+#     def reset_ball(self):
+#         """
+#         Reset ball position.
+#         A new ball will be set at the middle of the field and a random
+#         angle is used to start.
+#         """
+#         self.ball.update(self.base_ball)
+#         self.ball["x"] = self.canvas['width'] / 2
+#         self.ball["y"] = self.canvas['height'] / 2
+#         angle = (random.random() - 0.5) * math.pi / 8
+#         self.ball["speedX"] = self.ball["baseSpeed"] * math.sin(angle)
+#         self.ball["speedY"] = self.ball["baseSpeed"] * math.cos(angle) * (1 if random.random() > 0.5 else -1)
+#         self.collision_count = 0
+#
+#
+#     def update_ball_position(self):
+#         """
+#         Move the ball around the field, and check for collision.
+#
+#         A collision against a wall will modify its trajectory.
+#         A collision against a paddle will return the ball.
+#         A collision against any end of field, will update the score.
+#         """
+#         self.ball["x"] += self.ball["speedX"]
+#         self.ball["y"] += self.ball["speedY"]
+#
+#         # Side walls collisions.
+#         if self.ball["x"] <= 0 or self.ball["x"] >= self.canvas["width"]:
+#             self.ball["speedX"] *= -1
+#             self.collision_to_points += 1
+#
+#         # Player1 paddle collision.
+#         if self.check_collision(self.ball, self.paddles['player1']):
+#             self.ball["y"] = self.paddles['player1']["y"] - self.ball["size"] / 2
+#             self.ball["speedY"] = -abs(self.ball["baseSpeed"] * self.paddles['player1']["speedModifier"])
+#             self.collision_count += 1
+#
+#         # Player2 paddle collision
+#         elif self.check_collision(self.ball, self.paddles['player2']):
+#             self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"] + self.ball['size'] / 2
+#             self.ball["speedY"] = abs(self.ball["baseSpeed"] * self.paddles['player2']["speedModifier"])
+#             self.collision_count += 1
+#             self.collision_to_points += 1
+#
+#         # Player2 point
+#         if self.ball["y"] >= self.canvas["height"]:
+#             self.paddles['player2']["score"] += 1
+#             self.paddles['player2']['points'] += int(self.collision_to_points * (100 / self.paddles['player2']['width']))
+#             self.collision_to_points = 0
+#             self.reset_ball()
+#         # Player1 point
+#         elif self.ball["y"] <= 0:
+#             self.paddles['player1']["score"] += 1
+#             self.paddles['player1']['points'] += int(self.collision_to_points * (100 / self.paddles['player1']['width']))
+#             self.reset_ball()
+#             self.collision_to_points = 0
+#
+#         # Generate power up.
+#         self.generate_power_up()
+#         return self.ball
+#
+#     def check_collision(self, ball, paddle):
+#         """
+#         Check if the ball collide with a given paddle.
+#
+#         :param ball: ball to check its collision.
+#         :param paddle: user paddle.
+#
+#         :return: True when a collision is detected, False otherwise.
+#         """
+#         collision = (
+#                 paddle["x"] < ball["x"] < paddle["x"] + paddle["width"] and
+#                 ball["y"] + ball["size"] / 2 > paddle["y"] and
+#                 ball["y"] - ball["size"] / 2 < paddle["y"] + paddle["height"]
+#         )
+#         if collision:
+#             hit_point = ball['x'] - (paddle['x'] + paddle['width'] / 2)
+#             normalized_hp = hit_point / (paddle['width'] / 2)
+#             self.ball['speedX'] = normalized_hp * 6
+#         return collision
+#
+#     def generate_power_up(self):
+#         """
+#         Generate a random power up when collision threshold collision counter is
+#         reached, and append it to the power up list.
+#         """
+#         if self.collision_count >= self.collision_threshold and len(self.power_ups) == 0:
+#             from_player = random.random() > 0.5
+#             paddle_key = "player1" if from_player else "player2"
+#             paddle = self.paddles[paddle_key]
+#
+#             direction_y = -3 if from_player else 3
+#             direction_x = (random.random() - 0.5) * 2
+#             types = ['>>', '<<']
+#             power_up_type = random.choice(types)
+#
+#             self.power_ups.append({
+#                 "x": paddle["x"] + paddle["width"] / 2 - self.power_up_size / 2,
+#                 "y": paddle["y"],
+#                 "startY": paddle["y"],
+#                 "speedY": direction_y,
+#                 "speedX": direction_x,
+#                 "type": power_up_type,
+#                 "active": False
+#             })
+#             logger.info("POWER UP")
+#             self.collision_count = 0
+#
+#     def move_power_up(self):
+#         """
+#         Move the power up after its lunch.
+#         """
+#         for item in self.power_ups:
+#             item['y'] += item['speedY']
+#             item['x'] += item['speedX']
+#
+#             if item['x'] + self.power_up_size > self.canvas['width'] or item['x'] < 0:
+#                 item['speedX'] *= -1
+#             if item['y'] > self.canvas['height'] or item['y'] < 0:
+#                 self.power_ups.remove(item)
+#
+#     def apply_power_up(self, role, power_up_type):
+#         """
+#         Apply the power up to a given user role.
+#         A power up should affect paddle properties.
+#
+#         :param role: paddle role (player1, player2).
+#         :param power_up_type: Power up behaviour.
+#         """
+#         player = self.paddles[role]
+#         if power_up_type == ">>":
+#             self.paddles[role]["width"] = min(player["width"] + 10, self.canvas["width"] - 45)
+#             self.paddles[role]["speedModifier"] = max(player["speedModifier"] - 0.1, 0.8)
+#         elif power_up_type == "<<":
+#             self.paddles[role]["width"] = max(player["width"] - 10, 50)
+#             self.paddles[role]["speedModifier"] = min(player["speedModifier"] + 0.1, 1.2)
+#         self.paddles[role]['points'] += 10
+#
+#     def check_power_up_collisions(self):
+#         """
+#         Check power up collision.
+#         Like a ball, the power up will be moving around the field, until it is catch,
+#         or get lost beyond the end of the field.
+#         """
+#         for item in self.power_ups:
+#             distance = abs(item["startY"] - item["y"])
+#             item["active"] = distance >= self.power_up_size
+#
+#             if not item["active"]:
+#                 continue
+#             # Power-up ball collision.
+#             if (
+#                     self.ball["x"] < item["x"] + self.power_up_size and
+#                     self.ball["x"] + self.ball["size"] > item["x"] and
+#                     self.ball["y"] < item["y"] + self.power_up_size and
+#                     self.ball["y"] + self.ball["size"] > item["y"]
+#             ):
+#                 self.ball["speedY"] *= -1
+#                 self.ball["speedX"] *= -1
+#                 self.power_ups.remove(item)
+#                 continue
+#             # Power-up captured by player1
+#             if (
+#                     item["x"] < self.paddles["player1"]["x"] + self.paddles["player1"]["width"] and
+#                     item["x"] + self.power_up_size > self.paddles["player1"]["x"] and
+#                     item["y"] < self.paddles["player1"]["y"] + self.paddles["player1"]["height"] and
+#                     item["y"] + self.power_up_size > self.paddles["player1"]["y"]
+#             ):
+#                 self.apply_power_up("player1", item["type"])
+#                 self.power_ups.remove(item)
+#                 continue
+#             # Power-up captured by player2
+#             if (
+#                     item["x"] < self.paddles["player2"]["x"] + self.paddles["player2"]["width"] and
+#                     item["x"] + self.power_up_size > self.paddles["player2"]["x"] and
+#                     item["y"] < self.paddles["player2"]["y"] + self.paddles["player2"]["height"] and
+#                     item["y"] + self.power_up_size > self.paddles["player2"]["y"]
+#             ):
+#                 self.apply_power_up("player2", item["type"])
+#                 self.power_ups.remove(item)
+#
+#     def update_paddle_position(self, role, position):
+#         """
+#         Update paddle position for a given role player.
+#         This method is called when an update message is received.
+#
+#         :param role: player role
+#         :param position: new x position.
+#         """
+#         self.paddles[role]['x'] = position
+#
+#     def update_game(self):
+#         """
+#         Update all the game (ball, power ups, and paddles).
+#         And return them to be sent using player instances.
+#
+#         :return: paddles, power ups, ball.
+#         """
+#         if not self.starting:
+#             self.reset_ball()
+#             self.starting = True
+#         self.update_ball_position()
+#         self.move_power_up()
+#         self.check_power_up_collisions()
+#         if self.paddles['player1']['score'] == 5 or self.paddles['player2']['score'] == 5:
+#             self.winner = 'player1' if self.paddles['player1']['score'] == 5 else 'player2'
+#
+#     async def end_game_db(self): # IMPORTANTE
+#         user1 = self.players["player1"].scope["user"]
+#         user2 = self.players["player2"].scope["user"]
+#
+#         score1 = self.paddles["player1"]["score"]
+#         score2 = self.paddles["player2"]["score"]
+#
+#         # Llamar a la función que crea el Match y actualiza estadísticas
+#         await create_match_and_update_users(user1, user2, score1, score2)
 
 
 class PongBack(AsyncWebsocketConsumer):
@@ -758,7 +1280,7 @@ class PongBack(AsyncWebsocketConsumer):
                 await self.module.receive(data)
                 # await self.module.game_loop()
             if data.get("mode") == "remote":
-                await self.build_game(data)
+                await self.build_game()
         if data.get("step") == "handshake":
             await self.send(text_data=json.dumps({
                 "step": "handshake"
@@ -776,8 +1298,8 @@ class PongBack(AsyncWebsocketConsumer):
             logger.info(f"User remove random challenge.", extra={"corr": self.cnn_id})
             await ClientsHandler.remove_random_challenge(self)
         if data.get("step") == "accept_challenge":
-            await self.build_game(data.get("challenge_id"))
             logger.info(f"User accept random challenge.", extra={"corr": self.cnn_id})
+            await self.build_game(data.get("challenge_id"))
         else:
             if self.module:
                 await self.module.receive(data)
