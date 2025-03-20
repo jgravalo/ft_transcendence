@@ -390,110 +390,63 @@ class GameSession:
 
     def update_ball_position(self, delta):
         """
-        Move the ball around the field, and check for collision.
+        Move the ball and check for collisions.
 
-        A collision against a wall will modify its trajectory.
-        A collision against a paddle will return the ball.
-        A collision against any end of field, will update the score.
+        :param delta: time between updates.
         """
-        logger.info(f'Ball position: {self.ball["x"]} - {self.ball["y"]} DELTA {delta}', extra={"corr": self.match_id})
+        # Update ball position
         self.ball["x"] += self.ball["speedX"] * delta
         self.ball["y"] += self.ball["speedY"] * delta
 
-        # Side walls collisions.
-        if self.ball["x"] <= 0 or self.ball["x"] >= self.canvas["width"]:
+        # Side walls: ball bounces
+        if self.ball["x"] <= 0:
+            self.ball["x"] = 0
+            self.ball["speedX"] *= -1
+            self.collision_to_points += 1
+        elif self.ball["x"] >= self.canvas["width"]:
+            self.ball["x"] = self.canvas["width"]
             self.ball["speedX"] *= -1
             self.collision_to_points += 1
 
-        # Player1 paddle collision.
+        # Player1 paddle: ball bounces
         if self.check_collision(self.ball, self.paddles['player1']):
-            self.ball["y"] = self.paddles['player1']["y"] - self.ball["size"] / 2
+            self.ball["y"] = self.paddles['player1']["y"] - (self.ball["size"] / 2)
             self.ball["speedY"] = -abs(self.ball["baseSpeed"] * self.paddles['player1']["speedModifier"])
             self.collision_count += 1
 
-        # Player2 paddle collision
+            # Side Paddles: modify ball position
+            hit_point = self.ball['x'] - (self.paddles['player1']['x'] + self.paddles['player1']['width'] / 2)
+            normalized_hp = hit_point / (self.paddles['player1']['width'] / 2)
+            self.ball['speedX'] = normalized_hp * 6 * (self.paddles['player1']["speedModifier"] * 50)
+
+        # Player2 paddle: ball bounces
         elif self.check_collision(self.ball, self.paddles['player2']):
-            self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"] + self.ball['size'] / 2
+            self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"] + (self.ball['size'] / 2)
             self.ball["speedY"] = abs(self.ball["baseSpeed"] * self.paddles['player2']["speedModifier"])
             self.collision_count += 1
             self.collision_to_points += 1
 
-        # Player2 point
+            # Side Paddles: modify ball position
+            hit_point = self.ball['x'] - (self.paddles['player2']['x'] + self.paddles['player2']['width'] / 2)
+            normalized_hp = hit_point / (self.paddles['player2']['width'] / 2)
+            self.ball['speedX'] = normalized_hp * 6 * (self.paddles['player2']["speedModifier"] * 50)
+
+        # Point for player2
         if self.ball["y"] >= self.canvas["height"]:
-            logger.info(f' punto 2 {self.ball["y"]} - {self.canvas["height"]}')
             self.paddles['player2']["score"] += 1
             self.paddles['player2']['points'] += int(self.collision_to_points * (100 / self.paddles['player2']['width']))
             self.collision_to_points = 0
             self.reset_ball()
-        # Player1 point
+
+        # Point for player1
         elif self.ball["y"] <= 0:
-            logger.info(f' punto 1 {self.ball["y"]} - {self.canvas["height"]}')
             self.paddles['player1']["score"] += 1
             self.paddles['player1']['points'] += int(self.collision_to_points * (100 / self.paddles['player1']['width']))
             self.collision_to_points = 0
             self.reset_ball()
 
-        # Generate power up.
+        # Generate power-up
         self.generate_power_up()
-
-        # """
-        # Move the ball and check for collisions.
-        #
-        # :param delta: time between updates.
-        # """
-        # # Update ball position
-        # self.ball["x"] += self.ball["speedX"] * delta
-        # self.ball["y"] += self.ball["speedY"] * delta
-        #
-        # # Side walls: ball bounces
-        # if self.ball["x"] <= 0:
-        #     self.ball["x"] = 0
-        #     self.ball["speedX"] *= -1
-        #     self.collision_to_points += 1
-        # elif self.ball["x"] >= self.canvas["width"]:
-        #     self.ball["x"] = self.canvas["width"]
-        #     self.ball["speedX"] *= -1
-        #     self.collision_to_points += 1
-        #
-        # # Player1 paddle: ball bounces
-        # if self.check_collision(self.ball, self.paddles['player1']):
-        #     self.ball["y"] = self.paddles['player1']["y"] - (self.ball["size"] / 2)
-        #     self.ball["speedY"] = -abs(self.ball["baseSpeed"] * self.paddles['player1']["speedModifier"])
-        #     self.collision_count += 1
-        #
-        #     # Side Paddles: modify ball position
-        #     hit_point = self.ball['x'] - (self.paddles['player1']['x'] + self.paddles['player1']['width'] / 2)
-        #     normalized_hp = hit_point / (self.paddles['player1']['width'] / 2)
-        #     self.ball['speedX'] = normalized_hp * 6 * (self.paddles['player1']["speedModifier"] * 50)  # Ajusta factor
-        #
-        # # Player2 paddle: ball bounces
-        # elif self.check_collision(self.ball, self.paddles['player2']):
-        #     self.ball["y"] = self.paddles['player2']["y"] + self.paddles['player2']["height"] + (self.ball['size'] / 2)
-        #     self.ball["speedY"] = abs(self.ball["baseSpeed"] * self.paddles['player2']["speedModifier"])
-        #     self.collision_count += 1
-        #     self.collision_to_points += 1
-        #
-        #     # Side Paddles: modify ball position
-        #     hit_point = self.ball['x'] - (self.paddles['player2']['x'] + self.paddles['player2']['width'] / 2)
-        #     normalized_hp = hit_point / (self.paddles['player2']['width'] / 2)
-        #     self.ball['speedX'] = normalized_hp * 6 * (self.paddles['player2']["speedModifier"] * 50)
-        #
-        # # Point for player2
-        # if self.ball["y"] >= self.canvas["height"]:
-        #     self.paddles['player2']["score"] += 1
-        #     self.paddles['player2']['points'] += int(self.collision_to_points * (100 / self.paddles['player2']['width']))
-        #     self.collision_to_points = 0
-        #     self.reset_ball()
-        #
-        # # Point for player1
-        # elif self.ball["y"] <= 0:
-        #     self.paddles['player1']["score"] += 1
-        #     self.paddles['player1']['points'] += int(self.collision_to_points * (100 / self.paddles['player1']['width']))
-        #     self.collision_to_points = 0
-        #     self.reset_ball()
-        #
-        # # Generate power-up
-        # self.generate_power_up()
 
     def check_collision(self, ball, paddle):
         """
