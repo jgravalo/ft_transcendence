@@ -798,6 +798,13 @@ function game() {
                 else if (data.payload_update === "log-update") {
                     append_message(data.detail);
                 }
+                else if (data.payload_update === "game-abort") {
+                   append_message(data.detail);
+                   this.clickMode(message, "auto-play", "remote-match");
+                   socket_game.send(JSON.stringify({
+                          step: "game-cancel"
+                   }));
+                }
             }
         };
     }
