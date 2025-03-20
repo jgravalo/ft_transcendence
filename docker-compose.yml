@@ -9,8 +9,8 @@ services:
       - ./waf/.env.${ENVIRONMENT}
     image: waf
     ports:
-      - "${EXTERNAL_PORT}:80"
-      - "${SSL_EXTERNAL_PORT}:443"
+      - "${EXTERNAL_PORT}:8080"
+      - "${SSL_EXTERNAL_PORT}:8443"
     depends_on:
       - front
       - back
