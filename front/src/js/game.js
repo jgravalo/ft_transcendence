@@ -45,6 +45,7 @@ function game()
 		if (ball.x <= 1 || ball.x >= canvas.width - 1) {
 			ballSpeedX *= -1;
 		}
+		
 
 		// Rebote en paletas con mejor detección de colisión
 		function checkCollision(player) {
