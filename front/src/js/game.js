@@ -42,7 +42,7 @@ function game()
 		ball.y += ballSpeedY;
 
 		// Rebote en los lados
-		if (ball.x <= 0 || ball.x >= canvas.width) {
+		if (ball.x <= 1 || ball.x >= canvas.width - 1) {
 			ballSpeedX *= -1;
 		}
 

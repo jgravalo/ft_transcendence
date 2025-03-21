@@ -83,13 +83,14 @@ function gameRemote()
 		player.score++;
 		if (player.score >= maxScore) {
 			gameOver = true;
-			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 			socket.close();
+			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 		}
 	}
 
 	function resetBall() {
-		if (gameOver) return;
+		if (gameOver)
+			return;
 		ball.x = canvas.width / 2;
 		ball.y = canvas.height / 2;
 		ballSpeedY *= -1;
@@ -97,8 +98,8 @@ function gameRemote()
 	
 	let player = null;
 	let role = null;
-	const socket = new WebSocket("ws://localhost:8000/ws/game/");
 	let gameStarted = false; // !!
+	const socket = new WebSocket("ws://localhost:8000/ws/game/");
 
 	/* socket.onopen = function(event) {
 		const data = JSON.parse(event.data);
@@ -121,12 +122,15 @@ function gameRemote()
 			gameLoop();
 		}
 		else if (data.action === "move") {
-			if (data.player === "player1") {
+			if (data.player === "player1")
 				player1.x = data.x;
-			} 
-			else {
+			else
 				player2.x = data.x;
-			}
+		}
+		else if (data.action === "ball") {
+			ball.x = data.ball.x;
+			ball.y = data.ball.y;
+			drawBall();
 		}
 	};
 	
@@ -158,12 +162,13 @@ function gameRemote()
 		if (gameOver) return;
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+		console.log("ball: x:", ball.x, ", y:", ball.y);
 		updatePaddles();
 		drawRect(player1.x, player1.y, paddleWidth, paddleHeight, "white");
 		drawRect(player2.x, player2.y, paddleWidth, paddleHeight, "white");
 		drawBall();
 		drawScore();
-		updateBall();
+		// updateBall();
 
 		requestAnimationFrame(gameLoop);
 	}
