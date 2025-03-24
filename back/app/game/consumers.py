@@ -14,7 +14,14 @@ class PongConsumer(AsyncWebsocketConsumer):
 			# 	username = f"Anonymous{len(self.players) + 1}"
 			self.name = self.scope['user'].username
 			self.role = f"player{len(self.players) + 1}"
-			self.paddle['y'] = 10 if len(self.players) == 0 else self.ball['height'] - 20
+			# self.paddle['y'] = 10 if len(self.players) == 0 else self.ball['height'] - 20
+			self.paddle = {
+				"x": 150,
+				"y": 10 if len(self.players) == 0 else self.ball['height'] - 20,
+				"width": 400,
+				"height": 600,
+				"score": 0
+				}
 			# self.role = "player1" if len(self.players) == 0 else "player2"
 			print('role:', self.role)
 			print('paddle[y]:', self.paddle['y'])
@@ -165,17 +172,29 @@ class PongConsumer(AsyncWebsocketConsumer):
 				self.ball["y"] <= 0 or
 				self.ball["y"] >= self.ball["height"]
 				):
+				if self.ball["y"] <= 0:
+					print('gol player1')
+					self.players[0].paddle["score"] += 1
+				if self.ball["y"] >= self.ball["height"]:
+					print('gol player2')
+					self.players[1].paddle["score"] += 1
 				self.ball["vy"] *= -1  # Invertir dirección en Y
 				self.ball["x"] = self.ball["width"] / 2
 				self.ball["y"] = self.ball["height"] / 2
+				print(f'{self.players[0].paddle["score"]}-{self.players[1].paddle["score"]}')
 
 			# Enviar la nueva posición de la pelota a los clientes
-			await self.channel_layer.group_send(
-				"pong_game",
-				{"type": "ball_update", "ball": self.ball}
+			await self.channel_layer.group_send("pong_game", {
+					"type": "ball_update",
+					"ball": self.ball,
+					"score": {
+						"a": self.players[0].paddle["score"],
+						"b": self.players[1].paddle["score"]
+					}
+				}
 			)
 			await asyncio.sleep(0.03)  # Controla la velocidad de actualización
 
 	async def ball_update(self, event):
 		# Enviar la posición de la pelota a los clientes
-		await self.send(text_data=json.dumps({"action": "ball", "ball": event["ball"]}))
+		await self.send(text_data=json.dumps({"action": "ball", "ball": event["ball"], "score": event["score"]}))

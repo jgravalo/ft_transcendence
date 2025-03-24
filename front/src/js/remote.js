@@ -130,6 +130,8 @@ function gameRemote()
 		else if (data.action === "ball") {
 			ball.x = data.ball.x;
 			ball.y = data.ball.y;
+			player1.score = data.score.a;
+			player2.score = data.score.b;
 			drawBall();
 		}
 	};
