@@ -5,7 +5,6 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 class PongConsumer(AsyncWebsocketConsumer):
 	players = []  # Lista para almacenar jugadores
 	ball = {"x": 300, "y": 200, "vx": 5, "vy": 5, "width": 400, "height": 600, "size": 10}  # Posición y velocidad de la pelota
-	paddle = {"x": 150, "y": 0, "width": 400, "height": 600}  # Posición y velocidad de la pelota
 
 	async def connect(self):
 		if len(self.players) < 2:
@@ -18,8 +17,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 			self.paddle = {
 				"x": 150,
 				"y": 10 if len(self.players) == 0 else self.ball['height'] - 20,
-				"width": 400,
-				"height": 600,
+				"width": 80,
+				"height": 10,
 				"score": 0
 				}
 			# self.role = "player1" if len(self.players) == 0 else "player2"
@@ -165,7 +164,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			# print('paddle[0][y]:', self.players[0].paddle['y'], 'paddle[1][y]:', self.players[1].paddle['y'])
 			# self.check_collision(self.players[0])
 			# self.check_collision(self.players[1])
-			self.check_collision()
+			# self.check_collision()
 			# self.check_paddle_collision()
 
 			if (
@@ -173,16 +172,42 @@ class PongConsumer(AsyncWebsocketConsumer):
 				self.ball["y"] >= self.ball["height"]
 				):
 				if self.ball["y"] <= 0:
-					print('gol player1')
 					self.players[0].paddle["score"] += 1
-				if self.ball["y"] >= self.ball["height"]:
-					print('gol player2')
+				elif self.ball["y"] >= self.ball["height"]:
 					self.players[1].paddle["score"] += 1
 				self.ball["vy"] *= -1  # Invertir dirección en Y
 				self.ball["x"] = self.ball["width"] / 2
 				self.ball["y"] = self.ball["height"] / 2
 				print(f'{self.players[0].paddle["score"]}-{self.players[1].paddle["score"]}')
-
+			
+			# if self.ball["y"] <= self.players[0].paddle["height"] * 2:
+			# 	self.ball["vy"] *= -1  # Invertir dirección en Y
+			# elif self.ball["y"] >= self.ball["height"] - self.players[0].paddle["height"] * 2:
+			# 	self.ball["vy"] *= -1  # Invertir dirección en Y
+			
+			# 🏓 Verificar colisión con la paleta del jugador 1
+			if (
+				self.ball["y"] # - self.ball["size"] / 2
+				<= self.players[0].paddle["y"] + self.players[0].paddle["height"]
+				# <= 10 + 10 = 20
+				and self.ball["x"] >= self.players[0].paddle["x"]
+				and self.ball["x"] <= self.players[0].paddle["x"] + self.players[0].paddle["width"]
+			):
+				print(f'choca en paleta 1: {self.ball["y"]} <= {self.players[0].paddle["y"]} + {self.players[0].paddle["height"]}')
+				self.ball["vy"] *= -1  # Invierte la dirección vertical
+				self.ball["y"] = self.players[0].paddle["y"] + self.players[0].paddle["height"] # Evita quedarse pegada
+			# 🏓 Verificar colisión con la paleta del jugador 2
+			elif (
+				self.ball["y"] # + self.ball["size"] / 2
+				>= self.players[1].paddle["y"]
+				# >= 580 
+				and self.ball["x"] >= self.players[1].paddle["x"]
+				and self.ball["x"] <= self.players[1].paddle["x"] + self.players[1].paddle["width"]
+			):
+				print(f'choca en paleta 2: {self.ball["y"]} + {self.ball["size"]} >= {self.players[0].paddle["y"]}')
+				self.ball["vy"] *= -1
+				self.ball["y"] = self.players[1].paddle["y"] - self.ball["size"]
+			
 			# Enviar la nueva posición de la pelota a los clientes
 			await self.channel_layer.group_send("pong_game", {
 					"type": "ball_update",
