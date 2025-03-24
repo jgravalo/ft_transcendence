@@ -38,7 +38,7 @@ function gameRemote()
 		ctx.fillText(player1.score, 20, 30);
 		ctx.fillText(player2.score, 20, canvas.height - 30);
 	}
-
+/* 
 	function updateBall() {
 		ball.x += ballSpeedX;
 		ball.y += ballSpeedY;
@@ -78,7 +78,7 @@ function gameRemote()
 			resetBall();
 		}
 	}
-
+	
 	function checkWin(player) {
 		player.score++;
 		if (player.score >= maxScore) {
@@ -95,6 +95,7 @@ function gameRemote()
 		ball.y = canvas.height / 2;
 		ballSpeedY *= -1;
 	}
+*/
 	
 	let player = null;
 	let role = null;
@@ -133,6 +134,11 @@ function gameRemote()
 			player1.score = data.score.a;
 			player2.score = data.score.b;
 			drawBall();
+		}
+		else if (data.action === "finish") {
+			socket.close();
+			gameOver = true;
+			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 		}
 	};
 	
