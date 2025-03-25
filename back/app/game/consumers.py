@@ -17,7 +17,7 @@ import json
 import sys
 from app.logging_config import get_logger
 
-logger = get_logger("game-back")
+logger = get_logger("app-logger")
 
 waiting_list = []
 client_list = []
@@ -263,9 +263,13 @@ class Clients:
         with self.clients_mutex:
             msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challenges]
         for client in self.clients:
+            my_challenge = {"id": client.cnn_id, "username": client.username}
+            challenges = msg
+            if my_challenge in challenges:
+                challenges.remove(my_challenge)
             await client.send(text_data=json.dumps({
                 "payload_update": "challenges-update",
-                "detail": msg
+                "detail": challenges
             }))
 
 ClientsHandler = Clients()
@@ -827,6 +831,9 @@ class PongBack(AsyncWebsocketConsumer):
             logger.error(f"Connection {self.cnn_id} wrong request data: {data}.", extra={"corr": self.cnn_id})
             await logger_to_client(self, f"Error. Wrong request.")
             await self.close(code=4001)
+        if data.get("step") == "handshake":
+            logger.info("Handshake received.", extra={"corr": self.cnn_id})
+            logger.info(self.scope["user"])
         if data.get("step") == "end":
             if data.get("mode") == "remote-ai":
                 msg = "Yo beat HAL!" if data.get("score1") > data.get("score1") else "Hal Crushed you!"
@@ -841,6 +848,9 @@ class PongBack(AsyncWebsocketConsumer):
                 }))
                 await ClientsHandler.append_random_challenge(self, "Remote challenge created.")
             else:
+                await self.send(text_data=json.dumps({
+                    "step": "end"
+                }))
                 await logger_to_client(self, "You must be logged to create a challenge.")
         if data.get("step") == "join":
             if data.get("mode") == "remote-ai":
@@ -886,9 +896,6 @@ class PongBack(AsyncWebsocketConsumer):
                 await self.module.broadcast_payload("game-abort", "Game aborted.")
         if data.get("step") == "abort-waiting":
             logger.info(f"User remove random challenge.", extra={"corr": self.cnn_id})
-            await self.send(text_data=json.dumps({
-                "step": "abort-waiting"
-            }))
             await ClientsHandler.remove_random_challenge(self)
         if data.get("step") == "accept_challenge":
             logger.info(f"User accept random challenge.", extra={"corr": self.cnn_id})
@@ -1015,95 +1022,5 @@ class MatchHAL:
                 "position": self.position
             }))
             await asyncio.sleep(interval)
-        # logger.info(f"Game loop finished. Match ID: {self.match_id}", extra={"corr": self.match_id})
-    # async def game_loop(self):
-    #     while self.running:
-    #         await self.ws.send(text_data=json.dumps({
-    #             "step": "move",
-    #             "id": self.match_id,
-    #             "position": self.position
-    #         }))
-    #         await asyncio.sleep(interval)
+        logger.info(f"AI Game loop finished. Match ID: {self.match_id}", extra={"corr": self.match_id})
 
-class MatchControl:
-    ws = None
-    match_id = None
-    cnn_id = None
-    players = {}
-    def __init__(self, ws):
-        self.ws = ws
-        self.cnn_id = self.ws.cnn_id
-
-    async def receive(self, data):
-        """
-        Process received message.
-
-        :param self: connection instance.
-        :param text_data: json object received.
-        """
-        # Join to remote mode
-        if data.get("step") == "join":
-            logger.info("Join remote game request.", extra={"corr": self.cnn_id})
-            logger.info(f"Players waiting to play: {len(waiting_list)}", extra={"corr": self.cnn_id})
-            if waiting_list and self.ws not in waiting_list:
-                async with MUTEX:
-                    logger.info(f"Players Waiting. Create a new game.", extra={"corr": self.cnn_id})
-                    # Get Opponent to the match.
-                    opponent = waiting_list.pop(0)
-                    role = f"player{str(random.randint(1, 2))}"
-                    players = {
-                        role: self.ws,
-                        "player1" if role == "player2" else "player2": opponent.ws
-                    }
-                    self.players = players
-                    await self.playball(players, opponent)
-            else:
-                await self.send(text_data=json.dumps({
-                    "step": "wait",
-                    "playerName": self.username
-                }))
-                waiting_list.append(self)
-
-        elif data.get("step") == "update":
-            """
-            Get update game from player, update paddle position and
-            return game data updated
-            """
-            role = data.get("role")
-            matches[self.match_id]['game'].update_paddle_position(role, data.get('position'))
-            game_info = matches[self.match_id]
-            paddles, power_ups, ball, winner = game_info['game'].update_game()
-            if winner:
-                logger.info("llego un ganador..")
-                await self.end_game_winner(paddles, winner)
-            keys_to_remove = ["role", "y", "height"]
-            for role in PLAYER_ROLES:
-                opp = 'player1' if role == 'player2' else 'player2'
-                player = {key: value for key, value in paddles[role].items() if key not in keys_to_remove}
-                await game_info["players"][role].send(text_data=json.dumps({
-                    "step": "update",
-                    "score1": paddles['player1']['score'],
-                    "score2": paddles['player2']['score'],
-                    "playerRole": role,
-                    "player": player,
-                    "opponent": paddles[opp],
-                    "ball": ball,
-                    "powerUps": power_ups
-                }))
-
-    async def playball(self, players, opponent):
-        self.opponent = opponent
-        self.match_id = str(uuid.uuid4())
-        self.opponent.match_id = self.match_id
-        self.opponent.opponent = self
-        game = GameSession(self.match_id, players)
-        logger.info(f"Match Created.", extra={"corr": self.match_id})
-        logger.info(f"Players {self.username} - {self.opponent.username}", extra={"corr": self.match_id})
-        self.player_role = game.get_role(self)
-        self.opponent.player_role = game.get_role(self.opponent)
-        logger.info(f'Random roles assigned', extra={"corr": self.match_id})
-        matches[self.match_id] = {
-            "players": players,
-            "game": game
-        }
-        await self.send_start_screen(game)
