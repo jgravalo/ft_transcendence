@@ -12,7 +12,11 @@ class PongConsumer(AsyncWebsocketConsumer):
 			# username = self.scope['user'].username
 			# if user.username == AnonymousUser:
 			# 	username = f"Anonymous{len(self.players) + 1}"
-			self.name = self.scope['user'].username
+			print('set user')
+			self.user = self.scope['user']
+			if self.user.username == '':
+				self.user.username = f"Customplayer{len(self.players) + 1}"
+			print(f'user {self.user.username}: {self.user.id}')
 			self.role = f"player{len(self.players) + 1}"
 			self.paddle = {
 				"x": 150,
@@ -21,7 +25,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 				"height": 10,
 				"score": 0
 				}
-			# self.role = "player1" if len(self.players) == 0 else "player2"
 			print('role:', self.role)
 			print('paddle[y]:', self.paddle['y'])
 			self.players.append(self)
@@ -30,15 +33,29 @@ class PongConsumer(AsyncWebsocketConsumer):
 			await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
 
 			if len(self.players) == 2:
-				await self.channel_layer.group_add("pong_game", self.channel_name)
+				print(f'user1 {self.players[0].user.username}: {self.players[0].user.id}')
+				print(f'user2 {self.players[1].user.username}: {self.players[1].user.id}')
+				print('set group')
+				self.room_name = f'chat_{self.players[0].user.id}_{self.players[1].user.id}'
+				self.room_group_name = f'private_{self.room_name}'
+				print(f"🔗 Conectando a la sala {self.room_group_name}")
+				# await self.channel_layer.group_add("pong_game", self.channel_name)
+				await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 				print("🚀 Dos jugadores conectados. Iniciando el juego...")
 				asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
 				
 				# Cuando haya dos jugadores, avísales que pueden empezar
 				for player in self.players:
 					print(f'{player.role} paddle[y]:', player.paddle['y'])
-					await self.channel_layer.group_add("pong_game", player.channel_name)
-					await player.send(text_data=json.dumps({"action": "start", "role": self.role}))
+					# await self.channel_layer.group_add("pong_game", player.channel_name)
+					await self.channel_layer.group_add(self.room_group_name, player.channel_name)
+					await player.send(text_data=json.dumps(
+						{
+						"action": "start",
+						"role": self.role,
+						"player1": self.players[0].user.username,
+						"player2": self.players[1].user.username
+						}))
 		else:
 			await self.close()  # Si hay más de 2 jugadores, cierra la conexión
 
@@ -80,7 +97,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 				print(f'{self.players[0].paddle["score"]}-{self.players[1].paddle["score"]}')
 				if (self.players[0].paddle["score"] >= self.ball["max-score"] or
 					self.players[1].paddle["score"] >= self.ball["max-score"]):
-					await self.channel_layer.group_send("pong_game", {
+					# await self.channel_layer.group_send("pong_game", {
+					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
 					})
 
@@ -106,7 +124,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 				self.ball["y"] = self.players[1].paddle["y"] - self.ball["size"]
 			
 			# Enviar la nueva posición de la pelota a los clientes
-			await self.channel_layer.group_send("pong_game", {
+			await self.channel_layer.group_send(self.room_group_name, {
+			# await self.channel_layer.group_send("pong_game", {
 					"type": "ball_update",
 					"ball": self.ball,
 					"score": {

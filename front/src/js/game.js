@@ -27,8 +27,10 @@ function game()
 	let gameOver = false;
     
 	// Paletas y pelota
-	const player1 = { x: canvas.width / 2 - paddleWidth / 2, y: 10, score: 0 };
-    const player2 = { x: canvas.width / 2 - paddleWidth / 2, y: canvas.height - 20, score: 0 };
+	const player1 = { x: canvas.width / 2 - paddleWidth / 2, y: 10,
+		name: 'player1', score: 0 };
+    const player2 = { x: canvas.width / 2 - paddleWidth / 2, y: canvas.height - 20,
+		name: 'player2', score: 0 };
     const ball = { x: canvas.width / 2, y: canvas.height / 2 };
 
 	const keys = {};
@@ -44,11 +46,17 @@ function game()
 		ctx.arc(ball.x, ball.y, ballSize / 2, 0, Math.PI * 2);
 		ctx.fill();
 	}
+	
+	function drawPlayers() {
+		ctx.font = "20px Arial";
+		ctx.fillText(player1.name, 20, 30);
+		ctx.fillText(player2.name, 20, canvas.height - 30);
+	}
 
 	function drawScore() {
 		ctx.font = "20px Arial";
-		ctx.fillText(player1.score, 20, 30);
-		ctx.fillText(player2.score, 20, canvas.height - 30);
+		ctx.fillText(player1.score, canvas.width - 20, 30);
+		ctx.fillText(player2.score, canvas.width - 20, canvas.height - 30);
 	}
 
 	function updateBall() {
@@ -131,6 +139,7 @@ function game()
 		drawRect(player1.x, player1.y, paddleWidth, paddleHeight, "white");
 		drawRect(player2.x, player2.y, paddleWidth, paddleHeight, "white");
 		drawBall();
+		drawPlayers();
 		drawScore();
 		updateBall();
 
