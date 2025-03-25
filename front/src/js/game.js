@@ -4,7 +4,7 @@ function game() {
     let message = null;
     let gameInstance = null;
 
-    const socket_game = new WebSocket('ws://localhost:8000/ws/game/');
+    const socket_game = new WebSocket('ws://localhost:8080/ws/game/');
 	console.log('init socket');
 
     class PongGame {
@@ -156,7 +156,7 @@ function game() {
             const now = performance.now();
             const deltaTime = now - lastTime;
 
-            if (deltaTime >= (1000 / 100)) {
+            if (deltaTime >= (1000 / 60)) {
                 if (this.mode) {
                     if (this.mode === "auto-play") {
                         this.moveAI(this.player);
@@ -241,9 +241,7 @@ function game() {
             if (!this.listening) {
                 if (data.step !== 'close') return;
             }
-            if (data.step === 'challenges-update') {
-                alert("new challenge " + data.detail)
-            } else if (data.step === 'error') {
+            if (data.step === 'error') {
                 message = "Error at game";
                 this.clickMode(message, "auto-play", "remote-match");
             } else if (data.step === 'wait') {
@@ -308,6 +306,8 @@ function game() {
                 this.score1 = data.score1;
                 this.score2 = data.score2;
                 this.powerUps = data.powerUps;
+            } else if (data.step === 'abort-waiting') {
+                this.clickMode(message, "auto-play", "remote-match");
             }
         }
 
@@ -400,7 +400,6 @@ function game() {
             this.socket.send(JSON.stringify({
                     'step': 'abort-waiting'
                 }))
-            this.clickMode("Clic here to play!", 'auto-play', "cancel-wait");
         }
 
         clickMode(msg, mode, element = "overlay", reset=true) {
@@ -410,11 +409,19 @@ function game() {
             this.endGame(msg, mode, reset);
         }
 
+        create_challenge() {
+            this.closeMenu("overlay");
+            this.socket.send(JSON.stringify({
+                step: 'create_challenge'
+            }));
+        }
+
         initUIListeners() {
             this.uiHandlers = {
                 local: () => this.clickMode(null, "local"),
                 remote: () => this.clickMode(null, "remote"),
                 remoteAI: () => this.clickMode(null, "remote-ai"),
+                remote_challenge: () => this.create_challenge(),
                 rematch_ok: () => this.rematch('join'),
                 rematch_cancel: () => this.rematch('cancel'),
                 waiting_cancel: () => this.abort_waiting()
@@ -422,6 +429,7 @@ function game() {
 
             document.getElementById("local-game").addEventListener("click", this.uiHandlers.local);
             document.getElementById("remote-game").addEventListener("click", this.uiHandlers.remote);
+            document.getElementById("remote-challenge").addEventListener("click", this.uiHandlers.remote_challenge);
             document.getElementById("remote-ia-game").addEventListener("click", this.uiHandlers.remoteAI);
             document.getElementById("accept-rematch").addEventListener("click", this.uiHandlers.rematch_ok);
             document.getElementById("reject-rematch").addEventListener("click", this.uiHandlers.rematch_cancel);
@@ -734,6 +742,10 @@ function game() {
     function renderChallenges(element, data, accept, reject) {
       const container = document.getElementById(element);
       container.innerHTML = "";
+      console.log(data)
+
+      if (!Array.isArray(data)) return;
+
       data.forEach((challenge) => {
         const li = document.createElement("li");
         const textNode = document.createTextNode(challenge.username);
@@ -797,6 +809,17 @@ function game() {
                 }
                 else if (data.payload_update === "log-update") {
                     append_message(data.detail);
+                }
+                else if (data.payload_update === "game-abort") {
+                   append_message(data.detail);
+                   this.clickMode(message, "auto-play", "remote-match");
+                   socket_game.send(JSON.stringify({
+                          step: "game-cancel"
+                   }));
+                }
+                else if (data.payload_update === "abort-waiting") {
+                    startNewGame("auto-play");
+                    // gameInstance.clickMode(message, "auto-play", "cancel-wait");
                 }
             }
         };

@@ -137,7 +137,7 @@ ul.tab-content > div > li:hover {
 #game-info {
     width: 400px;
     height: 800px;
-    border-top: 15px solid #ffffff;
+    border-left: 15px solid #ffffff;
 	border-right: 15px solid #ffffff;
 	border-bottom: 15px solid #ffffff;
 	background-color: black;
@@ -208,7 +208,6 @@ ul#game-log-tab > li {
 ul.info-tab {
 	height: 50px;
 	width: auto;
-	background-color: #5E5694;
 	display: flex;
 	list-style-type: none;
 	margin: 0;
@@ -220,6 +219,7 @@ ul.info-tab {
 	border: none;
 	box-sizing: content-box;
 }
+
 ul.info-tab>li {
 	display: flex;
 	justify-content: center;
@@ -229,8 +229,9 @@ ul.info-tab>li {
 ul.info-tab > li > span {
 	padding: 10px;
 	font-size: 35px;
+	cursor: pointer;
 }
 
 ul.info-tab>li:hover {
-	background-color: #6f94c6;
+	color: #6f94c6;
 }
