@@ -1,5 +1,19 @@
+
+function gameOptions(winner = "")
+{
+	// <h2 id="winnerMessage">${winner}</h2>
+	document.getElementById('content').innerHTML = `
+	<h2 id="winnerMessage"></h2>
+	<button onclick="game()">LOCAL</button>
+	<button onclick="gameRemote()">REMOTE</button>
+	`;
+	document.getElementById('winnerMessage').innerText = winner;
+}
+
 function game()
 {
+	document.getElementById('content').innerHTML =
+		`<canvas id="gameCanvas" width="400" height="600"></canvas>`;
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
 	const winnerMessage = document.getElementById("winnerMessage");
@@ -82,7 +96,7 @@ function game()
 	function checkWin(player) {
 		if (player.score >= maxScore) {
 			gameOver = true;
-			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
+			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 		}
 	}
 
@@ -105,7 +119,12 @@ function game()
 	}
 
 	function gameLoop() {
-		if (gameOver) return;
+		if (gameOver)
+		{
+			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
+			gameOptions(`Player ${player1.score > player2.score ? "1" : "2"} wins!`);
+			return;
+		}
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		updatePaddles();

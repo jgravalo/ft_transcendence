@@ -71,14 +71,15 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 			if (self.ball["y"] <= 0 or self.ball["y"] >= self.ball["height"]):
 				if self.ball["y"] <= 0:
-					self.players[0].paddle["score"] += 1
-				elif self.ball["y"] >= self.ball["height"]:
 					self.players[1].paddle["score"] += 1
+				elif self.ball["y"] >= self.ball["height"]:
+					self.players[0].paddle["score"] += 1
 				self.ball["vy"] *= -1  # Invertir dirección en Y
 				self.ball["x"] = self.ball["width"] / 2
 				self.ball["y"] = self.ball["height"] / 2
 				print(f'{self.players[0].paddle["score"]}-{self.players[1].paddle["score"]}')
-				if self.players[0].paddle["score"] == self.ball["max-score"]:
+				if (self.players[0].paddle["score"] >= self.ball["max-score"] or
+					self.players[1].paddle["score"] >= self.ball["max-score"]):
 					await self.channel_layer.group_send("pong_game", {
 						"type": "finish_game",
 					})

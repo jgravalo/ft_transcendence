@@ -2,6 +2,8 @@
 //remote
 function gameRemote()
 {
+	document.getElementById('content').innerHTML =
+		`<canvas id="gameCanvas" width="400" height="600"></canvas>`;
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
 	const winnerMessage = document.getElementById("winnerMessage");
@@ -38,64 +40,6 @@ function gameRemote()
 		ctx.fillText(player1.score, 20, 30);
 		ctx.fillText(player2.score, 20, canvas.height - 30);
 	}
-/* 
-	function updateBall() {
-		ball.x += ballSpeedX;
-		ball.y += ballSpeedY;
-
-		// Rebote en los lados
-		if (ball.x <= 0 || ball.x >= canvas.width) {
-			ballSpeedX *= -1;
-		}
-
-		// Rebote en paletas
-		function checkCollision(player) {
-			if (
-				ball.y + ballSize >= player.y &&
-				ball.y <= player.y + paddleHeight &&
-				ball.x >= player.x &&
-				ball.x <= player.x + paddleWidth
-			)
-			{
-				let hitPosition = (ball.x - player.x) / paddleWidth - 0.5; // Rango de -0.5 a 0.5
-				ballSpeedX = hitPosition * 6; // Ajusta la dirección X según el punto de impacto
-				ballSpeedY *= -1;
-			}
-		}
-		checkCollision(player1);
-		checkCollision(player2);
-
-		// Punto para un jugador
-		if (gameOver)
-			return;
-		if (ball.y <= 0) {
-			// player2.score++;
-			checkWin(player2);
-			resetBall();
-		} else if (ball.y >= canvas.height) {
-			// player1.score++;
-			checkWin(player1);
-			resetBall();
-		}
-	}
-	
-	function checkWin(player) {
-		player.score++;
-		if (player.score >= maxScore) {
-			gameOver = true;
-			socket.close();
-			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
-		}
-	}
-
-	function resetBall() {
-		if (gameOver)
-			return;
-		ball.x = canvas.width / 2;
-		ball.y = canvas.height / 2;
-		ballSpeedY *= -1;
-	}
-*/
 	
 	let player = null;
 	let role = null;
@@ -138,7 +82,8 @@ function gameRemote()
 		else if (data.action === "finish") {
 			socket.close();
 			gameOver = true;
-			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
+			gameOptions(`Player ${player1.score > player2.score ? "1" : "2"} wins!`);
+			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 		}
 	};
 	
