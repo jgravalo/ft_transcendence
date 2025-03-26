@@ -10,7 +10,7 @@ function game() {
     class PongGame {
         constructor(mode = "auto-play", player1Name = "player1", player2Name = "player2", extra = null) {
             // --- Game Mode and status
-            if (mode === "remote_challenge" || mode === "challenge_created" || mode === "challenge-user") {
+            if (mode === "remote_challenge" || mode === "challenge_created" || mode === "user-challenged") {
                 this.mode = "remote";
             } else {
                 this.mode = mode;
@@ -117,7 +117,7 @@ function game() {
             this.initCanvasListeners("remote", "cancel-wait");
             if (this.mode === "remote-ai" || this.mode === "remote") {
                 this.listening = true;
-                if (mode === "remote_challenge" || mode === "challenge-user") return;
+                if (mode === "remote_challenge" || mode === "user-challenged") return;
                 if (mode === "challenge_created") {
                     this.socket.send(JSON.stringify({
                         step: 'create_challenge'
@@ -741,7 +741,7 @@ function game() {
         }
     }
 
-    function renderChallenges(element, data, accept, reject, challenge) {
+    function renderChallenges(element, data, accept, reject, challenge_user) {
       const container = document.getElementById(element);
       container.innerHTML = "";
       console.log(data)
@@ -782,14 +782,14 @@ function game() {
             });
             iconsDiv.appendChild(rejectSpan);
         }
-        if (challenge) {
+        if (challenge_user) {
             const challengeSpan = document.createElement("span");
             challengeSpan.classList.add("material-symbols-outlined");
             challengeSpan.textContent = "target";
             challengeSpan.title = "Challenge";
             challengeSpan.addEventListener("click", (event) => {
                 // TODO: improve to avoid error
-                gameInstance.clickMode(null, "challenge-user");
+                gameInstance.clickMode(null, "user-challenged", null, false);
                 event.stopPropagation();
                 socket_game.send(JSON.stringify({
                     step: "challenge-user",
@@ -822,8 +822,8 @@ function game() {
                     renderChallenges("random-challenges-tab", data.detail, true, false, false);
                 } else if (data.payload_update === "my-challenges") {
                     renderChallenges("my-challenges-tab", data.detail, true, true, false);
-                    const myChallengeButton = document.getElementById('my-challenges');
-                    myChallengeButton.click();
+                    // const myChallengeButton = document.getElementById('my-challenges');
+                    // myChallengeButton.click();
                 } else if (data.payload_update === "connected-users") {
                     renderChallenges("connected-users-tab", data.detail, false, false, true);
                 } else if (data.payload_update === "log-update") {

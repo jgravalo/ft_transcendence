@@ -816,6 +816,7 @@ class PongBack(AsyncWebsocketConsumer):
     logged = False
     module = None
     modes = ["remote", "remote-ai"]
+    challengers = []
     # free = True
     async def connect(self):
         self.cnn_id = str(uuid.uuid4())
@@ -862,18 +863,20 @@ class PongBack(AsyncWebsocketConsumer):
                 del self.module
             self.module = None
         if data.get("step") == "challenge-user":
-            opponent = Clients.get_client(data.get("challenge_id"))
+            opponent = ClientsHandler.get_client(data.get("challenge_id"))
             if not opponent:
                 await logger_to_client(self, "Opponent was not found. :-(")
                 await self.send(text_data=json.dumps({
                     "step": "end"
                 }))
                 return
-            my_challenge = {"id": self.cnn_id, "username": self.username}
+            my_challenge = [{"id": self.cnn_id, "username": self.username}]
             await opponent.send(text_data=json.dumps({
                 "payload_update": "my-challenges",
                 "detail": my_challenge
             }))
+            await logger_to_client(opponent, f"{self.username} challenges you!.")
+            await logger_to_client(self, f"Your challenge was sent to {opponent.username}.")
 
         if data.get("step") == "create_challenge":
             if self.logged:
@@ -934,6 +937,9 @@ class PongBack(AsyncWebsocketConsumer):
         else:
             if self.module:
                 await self.module.receive(data)
+
+    async def update_challengers(self, challenger):
+        pass
 
     async def build_rematch(self):
         players = self.module.game_players()
