@@ -744,9 +744,11 @@ function game() {
     function renderChallenges(element, data, accept, reject, challenge_user) {
       const container = document.getElementById(element);
       container.innerHTML = "";
-      console.log(data)
 
-      if (!Array.isArray(data)) return;
+        if (!Array.isArray(data)) {
+            console.log("ALO??");
+            return;
+        }
 
       data.forEach((challenge) => {
         const li = document.createElement("li");

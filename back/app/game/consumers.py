@@ -190,9 +190,8 @@ class Clients:
         :param client: Client instance to remove.
         """
         with self.clients_mutex:
-            challenge = {"id": client.cnn_id, "username": client.username}
             for clt in self.clients:
-                clt.update_challengers(challenge, False)
+                clt.update_challengers(client, False)
 
 
     async def append_client(self, client):
@@ -943,7 +942,7 @@ class PongBack(AsyncWebsocketConsumer):
             else:
                 await self.module.broadcast_payload("game-abort", "Game aborted.")
         if data.get("step") == "abort-waiting":
-            logger.info(f"User remove random challenge.", extra={"corr": self.cnn_id})
+            logger.info(f"User remove challenges.", extra={"corr": self.cnn_id})
             await ClientsHandler.remove_random_challenge(self)
             await ClientsHandler.clean_for_waiting(self)
         if data.get("step") == "accept_challenge":
@@ -955,16 +954,16 @@ class PongBack(AsyncWebsocketConsumer):
 
     async def update_challengers(self, challenger, append_challenge=True):
         with self.challenger_mutex:
-            if append_challenge:
+            if append_challenge is True:
                 self.challengers.append(challenger)
                 await logger_to_client(self, f"{challenger.username} challenges you!.")
             else:
                 if challenger in self.challengers:
                     self.challengers.remove(challenger)
-        challengers = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challengers]
+        challenges = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challengers]
         await self.send(text_data=json.dumps({
             "payload_update": "my-challenges",
-            "detail": challengers
+            "detail": challenges
         }))
 
 
