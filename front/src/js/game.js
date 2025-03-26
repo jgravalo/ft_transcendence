@@ -822,8 +822,8 @@ function game() {
                     renderChallenges("random-challenges-tab", data.detail, true, false, false);
                 } else if (data.payload_update === "my-challenges") {
                     renderChallenges("my-challenges-tab", data.detail, true, true, false);
-                    // const myChallengeButton = document.getElementById('my-challenges');
-                    // myChallengeButton.click();
+                    const myChallengeButton = document.getElementById('my-challenges');
+                    myChallengeButton.click();
                 } else if (data.payload_update === "connected-users") {
                     renderChallenges("connected-users-tab", data.detail, false, false, true);
                 } else if (data.payload_update === "log-update") {
