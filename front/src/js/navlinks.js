@@ -55,8 +55,6 @@ function fetchLink(path)
         if (path == "")
             get = path;
     console.log('fetch for GET =', base + get);
-	// if (path == '/game/')
-	// 	game();
     fetch(base + get, {
         method: "GET",
         headers: {
@@ -79,9 +77,6 @@ function fetchLink(path)
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
         if (dest == 'modalContainer')
             makeModal(path);
-        /* {
-            pushState(path);
-        } */
         else
         {
             if (path != '/users/login/close/' && path != '/users/logout/close/')
@@ -94,6 +89,7 @@ function fetchLink(path)
             //     game();
             handleLinks();
         }
+        initGameLandingControls();
     })
     .catch(error => {
         console.error('fallo el 42 auth');
@@ -123,4 +119,56 @@ function setError(error)
         console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
     });
+}
+
+
+//Add keyboard even listener
+let focusedIndex = 0;
+let modes = [];
+
+document.addEventListener("keydown", (e) => {
+	if (!modes.length) return;
+
+	if (e.key === "ArrowRight") {
+		focusedIndex = (focusedIndex + 1) % modes.length;
+		updateSelection();
+	}
+	if (e.key === "ArrowLeft") {
+		focusedIndex = (focusedIndex - 1 + modes.length) % modes.length;
+		updateSelection();
+	}
+	if (e.key === "Enter") {
+		modes[focusedIndex].click();
+	}
+});
+
+function updateSelection() {
+	modes.forEach(btn => btn.classList.remove("selected"));
+	modes[focusedIndex].classList.add("selected");
+}
+function initGameLandingControls() {
+	const localBtn = document.getElementById("play-local");
+	const onlineBtn = document.getElementById("play-online");
+
+	if (!localBtn || !onlineBtn) return;
+
+	modes = [localBtn, onlineBtn];
+	focusedIndex = 0;
+	updateSelection();
+
+	localBtn.addEventListener("click", () => {
+		document.getElementById('content').innerHTML = `
+			<div id="game-wrapper" class="fade-in">
+				<h2 id="winnerMessage"></h2>
+				<button onclick="game()">LOCAL</button>
+				<button onclick="gameRemote()">REMOTE</button>
+				<canvas id="gameCanvas" width="400" height="600"></canvas>
+			</div>
+		`;
+		game();
+	});
+
+	onlineBtn.addEventListener("click", () => {
+		handleLink({ currentTarget: { getAttribute: () => "/game/" }, preventDefault: () => {} });
+	});
 }
