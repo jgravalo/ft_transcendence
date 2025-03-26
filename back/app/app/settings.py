@@ -56,7 +56,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_vault_secret('django', 'django_secret_key')
+SECRET_KEY = get_vault_secret('django', 'secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes')
@@ -160,7 +160,7 @@ DATABASES = {
         'ENGINE': 'django_prometheus.db.backends.postgresql',
         'NAME': os.getenv('DJANGO_DB_NAME', 'postgres'),
         'USER': os.getenv('DJANGO_DB_USER', 'postgres'),
-        'PASSWORD': get_vault_secret('django', 'pg_db_password'),
+        'PASSWORD': get_vault_secret('django', 'db_password'),
         'HOST': os.getenv('DJANGO_DB_HOST', 'db'),
         'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
     }

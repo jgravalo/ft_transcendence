@@ -10,14 +10,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: SSH into server and deploy
+      - name: SSH into EC2 instance and deploy
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: 95.216.55.157
-          username: pong42
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: 52.0.118.59
+          username: ec2-user
+          key: ${{ secrets.AWS_Private }}
           script: |
-            cd /home/pong42/ft_transcendence
+            cd /home/ec2-user/ft_transcendence
             git checkout main
             git reset --hard
             git clean -fd
