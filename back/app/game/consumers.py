@@ -907,6 +907,17 @@ class PongBack(AsyncWebsocketConsumer):
                     "step": "end"
                 }))
                 await logger_to_client(self, "You must be logged to create a challenge.")
+        if data.get("step") == "reject_my_challenge":
+            # -- Reject personal challenge
+            logger.info(f"User reject personal challenge.", extra={"corr": self.cnn_id})
+            opponent = ClientsHandler.get_client(data.get("challenge_id"))
+            if opponent:
+                await ClientsHandler.clean_for_waiting(opponent)
+                opponent.send(text_data=json.dumps({
+                    "step": "end"
+                }))
+                await self.update_challengers(opponent, False)
+                await logger_to_client(opponent, f"{self.username} rejected your challenge.")
         if data.get("step") == "join":
             # -- Join to a game: random remote or remote-ai
             if data.get("mode") == "remote-ai":
