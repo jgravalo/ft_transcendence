@@ -92,6 +92,8 @@ window.addEventListener("popstate", (event) => {
     console.log("POPSTATE");
     if (chatSocket)
         chatSocket.close();
+	if (gameSocket)
+        gameSocket.close();
     path = window.location.pathname;
     console.log("Nueva URL(path):", path);
     console.log("Se cambió la URL(event.state):", event.state);

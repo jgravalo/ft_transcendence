@@ -1,4 +1,4 @@
-
+let gameSocket = null;
 //remote
 function gameRemote()
 {
@@ -53,13 +53,13 @@ function gameRemote()
 	let player = null;
 	let role = null;
 	let gameStarted = false; // !!
-	const socket = new WebSocket('ws://' + base.slice(7, -5) + ':8080/ws/game/');
+	gameSocket = new WebSocket('ws://' + base.slice(7, -5) + ':8080/ws/game/');
 
-	/* socket.onopen = function(event) {
+	/* gameSocket.onopen = function(event) {
 		const data = JSON.parse(event.data);
 	} */
 
-	socket.onmessage = function(event) {
+	gameSocket.onmessage = function(event) {
 		const data = JSON.parse(event.data);
 
 		if (data.action === "set-player") {
@@ -93,9 +93,10 @@ function gameRemote()
 			drawBall();
 		}
 		else if (data.action === "finish") {
-			socket.close();
+			gameSocket.close();
 			gameOver = true;
-			gameOptions(`Player ${player1.score > player2.score ? "1" : "2"} wins!`);
+			let winner = data.winner;
+			gameOptions(`${winner} wins!`);
 			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 		}
 	};
@@ -113,7 +114,7 @@ function gameRemote()
 			player.x += paddleSpeed;
 		moveData = { action: "move", player: role, x: player.x };
 		if (moveData) {
-			socket.send(JSON.stringify(moveData));
+			gameSocket.send(JSON.stringify(moveData));
 		}
 	}
 
