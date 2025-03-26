@@ -181,6 +181,20 @@ class Clients:
                     break
         return found
 
+    async def clean_for_waiting(self, client):
+        """
+        Clean the waiting list.
+        This method iterates over each client waiting list and remove
+        the client instance.
+
+        :param client: Client instance to remove.
+        """
+        with self.clients_mutex:
+            challenge = {"id": client.cnn_id, "username": client.username}
+            for clt in self.clients:
+                clt.update_challengers(challenge, False)
+
+
     async def append_client(self, client):
         """
         Append client instance to control all the environment.
@@ -931,6 +945,7 @@ class PongBack(AsyncWebsocketConsumer):
         if data.get("step") == "abort-waiting":
             logger.info(f"User remove random challenge.", extra={"corr": self.cnn_id})
             await ClientsHandler.remove_random_challenge(self)
+            await ClientsHandler.clean_for_waiting(self)
         if data.get("step") == "accept_challenge":
             logger.info(f"User accept random challenge.", extra={"corr": self.cnn_id})
             await self.build_game(data.get("challenge_id"))
@@ -938,15 +953,20 @@ class PongBack(AsyncWebsocketConsumer):
             if self.module:
                 await self.module.receive(data)
 
-    async def update_challengers(self, challenger):
+    async def update_challengers(self, challenger, append_challenge=True):
         with self.challenger_mutex:
-            self.challengers.append(challenger)
-            challengers = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challengers]
+            if append_challenge:
+                self.challengers.append(challenger)
+                await logger_to_client(self, f"{challenger.username} challenges you!.")
+            else:
+                if challenger in self.challengers:
+                    self.challengers.remove(challenger)
+        challengers = [{"id": clt.cnn_id, "username": clt.username} for clt in self.challengers]
         await self.send(text_data=json.dumps({
             "payload_update": "my-challenges",
             "detail": challengers
         }))
-        await logger_to_client(self, f"{challenger.username} challenges you!.")
+
 
     async def build_rematch(self):
         players = self.module.game_players()
@@ -977,6 +997,7 @@ class PongBack(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         logger.warning(f"Client disconnected {close_code}", extra={"corr": self.cnn_id})
+        ClientsHandler.clean_for_waiting(self)
         ClientsHandler.delete_client(self)
         logger.info(f"Client removed from client list.", extra={"corr": self.cnn_id})
         if self.module:
