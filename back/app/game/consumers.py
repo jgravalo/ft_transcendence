@@ -32,35 +32,32 @@ WAITING_MUTEX = threading.Lock()
 CHALLENGE_MUTEX = threading.Lock()
 CLIENT_MUTEX = threading.Lock()
 
-# ---- 
-# IMPORTANTE
-# from channels.db import database_sync_to_async
-# from app.game.models import Match
-#
-# @database_sync_to_async
-# def create_match_and_update_users(player1, player2, score1, score2):
-#     match = Match.objects.create(
-#         player1=player1,
-#         player2=player2,
-#         score_player1=score1,
-#         score_player2=score2
-#     )
-#     if score1 > score2:
-#         player1.wins += 1
-#         player2.losses += 1
-#     elif score2 > score1:
-#         player2.wins += 1
-#         player1.losses += 1
-#
-#     player1.matches += 1
-#     player2.matches += 1
-#
-#     player1.save()
-#     player2.save()
-#
-#     return match
 # ----
+from channels.db import database_sync_to_async
+from game.models import Match
 
+@database_sync_to_async
+def create_match_and_update_users(player1, player2, score1, score2):
+    match = Match.objects.create(
+        player1=player1,
+        player2=player2,
+        score_player1=score1,
+        score_player2=score2
+    )
+    if score1 > score2:
+        player1.wins += 1
+        player2.losses += 1
+    elif score2 > score1:
+        player2.wins += 1
+        player1.losses += 1
+
+    player1.matches += 1
+    player2.matches += 1
+
+    player1.save()
+    player2.save()
+
+    return match
 
 
 async def logger_to_client(client, message, update_detail="log-update"):
@@ -750,6 +747,11 @@ class GameSession:
                 await logger_to_client(user, msg)
             except Exception as e:
                 logger.error(f"Error sending end message to {role}.\n{str(e)}", extra={"corr": self.match_id})
+        if self.players['player1'].logged and self.players['player2'].logged:
+            create_match_and_update_users(self.players['player1'].username,
+                                          self.players['player2'].username,
+                                          self.paddles['player1']['score'],
+                                          self.paddles['player2']['score'])
 
     async def disconnect_game(self):
         """
