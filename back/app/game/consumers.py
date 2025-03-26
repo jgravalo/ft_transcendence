@@ -867,16 +867,19 @@ class PongBack(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         # Join to remote mode
         if not "step" in data:
+            # -- Error control
             logger.error(f"Connection {self.cnn_id} wrong request data: {data}.", extra={"corr": self.cnn_id})
             await logger_to_client(self, f"Error. Wrong request.")
             await self.close(code=4001)
         if data.get("step") == "end":
+            # -- End Game
             if data.get("mode") == "remote-ai":
                 msg = "Yo beat HAL!" if data.get("score1") > data.get("score1") else "Hal Crushed you!"
                 await logger_to_client(self, msg)
                 del self.module
             self.module = None
         if data.get("step") == "challenge-user":
+            # -- Challenge a user
             opponent = ClientsHandler.get_client(data.get("challenge_id"))
             if not opponent:
                 await logger_to_client(self, "Opponent was not found. :-(")
@@ -892,6 +895,7 @@ class PongBack(AsyncWebsocketConsumer):
             }))
 
         if data.get("step") == "create_challenge":
+            #  -- Create a challenge
             if self.logged:
                 await self.send(text_data=json.dumps({
                     "step": "wait",
@@ -904,12 +908,14 @@ class PongBack(AsyncWebsocketConsumer):
                 }))
                 await logger_to_client(self, "You must be logged to create a challenge.")
         if data.get("step") == "join":
+            # -- Join to a game: random remote or remote-ai
             if data.get("mode") == "remote-ai":
                 self.module = MatchHAL(self)
                 await logger_to_client(self, f"You are ready to play with HAL!")
             if data.get("mode") == "remote":
                 await self.build_game()
         if data.get("step") == "rematch":
+            # -- Rematch request
             logger.info(f"Rematch request from {self.username}", extra={"corr": self.cnn_id})
             if not self.module:
                 logger.error(f"There is no module to cancel.", extra={"corr": self.cnn_id})
@@ -924,11 +930,13 @@ class PongBack(AsyncWebsocketConsumer):
                             await logger_to_client(player, f"{self.username} wants a rematch.")
                     await self.module.broadcast_payload("rematch", "Rematch Accepted.")
         if data.get("step") == "rematch-cancel":
+            # -- Cancel rematch
             if not self.module:
                 logger.error(f"There is no module to cancel.", extra={"corr": self.cnn_id})
             else:
                 await self.module.broadcast_payload("rematch-cancel", "Rematch canceled.")
         if data.get("step") == "game-cancel":
+            # -- Cancel game
             if not self.module:
                 logger.error(f"There is no module to cancel.", extra={"corr": self.cnn_id})
             else:
@@ -937,15 +945,34 @@ class PongBack(AsyncWebsocketConsumer):
                 except Exception as e:
                     logger.warning(f"Error deleting matches {self.module.match_id}.\n{str(e)}",)
         if data.get("game-abort"):
+            # -- Abort game
             if not self.module:
                 logger.error(f"There is no module to cancel.", extra={"corr": self.cnn_id})
             else:
                 await self.module.broadcast_payload("game-abort", "Game aborted.")
         if data.get("step") == "abort-waiting":
+            # -- Abort waiting
             logger.info(f"User remove challenges.", extra={"corr": self.cnn_id})
             await ClientsHandler.remove_random_challenge(self)
             await ClientsHandler.clean_for_waiting(self)
+        if data.get("step") == "accept_my_challenge":
+            # -- Accept personal challenge
+            logger.info(f"User accept personal challenge.", extra={"corr": self.cnn_id})
+            opponent = ClientsHandler.get_client(data.get("challenge_id"))
+            logger.info(f"opponent {opponent}")
+            if not opponent:
+                await logger_to_client(self, f"Challenge is not longer available.")
+                await self.send(text_data=json.dumps({
+                    "step": "end"
+                }))
+            else:
+                await self.send(text_data=json.dumps({
+                    "step": "wait",
+                    "playerName": self.username
+                }))
+                await self.build_game(opponent_instance=opponent)
         if data.get("step") == "accept_challenge":
+            # -- Accept random challenge
             logger.info(f"User accept random challenge.", extra={"corr": self.cnn_id})
             await self.build_game(data.get("challenge_id"))
         else:

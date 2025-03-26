@@ -741,12 +741,11 @@ function game() {
         }
     }
 
-    function renderChallenges(element, data, accept, reject, challenge_user) {
+    function renderChallenges(element, data, accept, reject, challenge_user, step_send="accept_challenge") {
       const container = document.getElementById(element);
       container.innerHTML = "";
 
         if (!Array.isArray(data)) {
-            console.log("ALO??");
             return;
         }
 
@@ -764,8 +763,8 @@ function game() {
               event.stopPropagation();
               gameInstance.clickMode(null, "remote_challenge", null, false);
               socket_game.send(JSON.stringify({
-                step: "accept_challenge",
-                challenge_id: challenge.username
+                step: step_send,
+                challenge_id: challenge.id
               }));
             });
             iconsDiv.appendChild(acceptSpan);
@@ -821,9 +820,9 @@ function game() {
                 gameInstance.game_listener(data);
             } else {
                 if (data.payload_update === "challenges-update") {
-                    renderChallenges("random-challenges-tab", data.detail, true, false, false);
+                    renderChallenges("random-challenges-tab", data.detail, true, false, false, "accept_challenge");
                 } else if (data.payload_update === "my-challenges") {
-                    renderChallenges("my-challenges-tab", data.detail, true, true, false);
+                    renderChallenges("my-challenges-tab", data.detail, true, true, false, "accept_my_challenge");
                     const myChallengeButton = document.getElementById('my-challenges');
                     myChallengeButton.click();
                 } else if (data.payload_update === "connected-users") {
