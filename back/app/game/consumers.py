@@ -8,7 +8,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 	# waiting_players = []  # Lista para almacenar jugadores
 	players = [] # Lista para almacenar jugadores
 	ball = {"x": 300, "y": 200, "vx": 5, "vy": 5, "width": 400, "height": 600,
-		"size": 10, "max-score": 5}  # Posición y velocidad de la pelota
+		"size": 10, "max-score": 2}  # Posición y velocidad de la pelota
 	
 	async def find_available_room(self):
 		""" Busca una sala con espacio disponible (1 jugador) """
@@ -32,9 +32,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 		
 		print('set user')
 		self.user = self.scope['user']
-		if self.user.username == '':
-				self.user.username = f"Customplayer{len(self.players) + 1}"
-		print(f'user {self.user.username}: {self.user.id}')
+		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.players) + 1}"
+		print(f'user {self.name}: {self.user.id}')
 		self.role = f"player{len(self.players) + 1}"
 		self.paddle = {
 			"x": 150,
@@ -60,12 +59,19 @@ class PongConsumer(AsyncWebsocketConsumer):
 			print(f"🔗 Conectando a la sala {self.room_group_name}")
 			await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
-			# print('set game')
-			# self.games[self.room_name] = []
-			# self.games[self.room_name].append(self.players[0])
-			# self.games[self.room_name].append(self.players[1])
-			# print(f'user1: {self.games[self.room_name][0].name}')
-			# print(f'user2: {self.games[self.room_name][1].name}')
+			print('set game')
+			self.games[self.room_name] = []
+			self.games[self.room_name].append(self.players[0])
+			self.games[self.room_name].append(self.players[1])
+			try:
+				print('exp:')
+				print(f'user1: {self.players[0].name}')
+				print(f'user2: {self.players[1].name}')
+				print('me:')
+				print(f'user1: {self.games[self.room_name][0].name}')
+				print(f'user2: {self.games[self.room_name][1].name}')
+			except:
+				print('no print games[]')
 
 			print('set ball')
 			asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
@@ -122,9 +128,13 @@ class PongConsumer(AsyncWebsocketConsumer):
 				print(f'{self.players[0].paddle["score"]}-{self.players[1].paddle["score"]}')
 				if (self.players[0].paddle["score"] >= self.ball["max-score"] or
 					self.players[1].paddle["score"] >= self.ball["max-score"]):
-					# await self.channel_layer.group_send("pong_game", {
+					if self.players[0].paddle["score"] >= self.ball["max-score"]:
+						winner =  self.players[0].name
+					elif self.players[1].paddle["score"] >= self.ball["max-score"]:
+						winner =  self.players[1].name
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
+						"winner": winner
 					})
 
 			# 🏓 Verificar colisión con la paleta del jugador 1
