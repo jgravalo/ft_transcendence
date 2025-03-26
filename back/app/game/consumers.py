@@ -34,10 +34,12 @@ CLIENT_MUTEX = threading.Lock()
 
 # ----
 from channels.db import database_sync_to_async
-from game.models import Match
+
 
 @database_sync_to_async
 def create_match_and_update_users(player1, player2, score1, score2):
+    logger.debug("create_match_and_update_users")
+    from game.models import Match
     match = Match.objects.create(
         player1=player1,
         player2=player2,
@@ -165,6 +167,20 @@ class Clients:
         self.clients_mutex = threading.Lock()
         self.challenges_mutex = threading.Lock()
 
+    def get_client(self, client_id):
+        """
+        Get a client instance by id.
+        :param client_id: Client id.
+        :return: Instance of client, None if not found.
+        """
+        found = None
+        with self.clients_mutex:
+            for client in self.clients:
+                if client.cnn_id == client_id:
+                    found = client
+                    break
+        return found
+
     async def append_client(self, client):
         """
         Append client instance to control all the environment.
@@ -246,11 +262,14 @@ class Clients:
         """
         with self.clients_mutex:
             msg = [{"id": clt.cnn_id, "username": clt.username} for clt in self.clients]
-        msg = msg if len(msg) else "empty"
         for client in self.clients:
+            connected = msg
+            my_cnn = {"id": client.cnn_id, "username": client.username}
+            if my_cnn in connected:
+                connected.remove(my_cnn)
             await client.send(text_data=json.dumps({
                 "payload_update": "connected-users",
-                "detail": msg
+                "detail": connected
             }))
 
     async def broadcast_challenges(self):
@@ -395,6 +414,12 @@ class GameSession:
             await self.broadcast_state()
             await asyncio.sleep(interval)
         logger.info(f"Game loop finished. Match ID: {self.match_id}", extra={"corr": self.match_id})
+        logger.info(f"{self.players['player1'].logged} and {self.players['player2'].logged}")
+        if self.players['player1'].logged and self.players['player2'].logged:
+            create_match_and_update_users(self.players['player1'].username,
+                                          self.players['player2'].username,
+                                          self.paddles['player1']['score'],
+                                          self.paddles['player2']['score'])
 
     def update_game(self, delta):
         """
@@ -747,11 +772,7 @@ class GameSession:
                 await logger_to_client(user, msg)
             except Exception as e:
                 logger.error(f"Error sending end message to {role}.\n{str(e)}", extra={"corr": self.match_id})
-        if self.players['player1'].logged and self.players['player2'].logged:
-            create_match_and_update_users(self.players['player1'].username,
-                                          self.players['player2'].username,
-                                          self.paddles['player1']['score'],
-                                          self.paddles['player2']['score'])
+
 
     async def disconnect_game(self):
         """
@@ -801,6 +822,7 @@ class PongBack(AsyncWebsocketConsumer):
         try:
             await self.accept()
             user = self.scope['user'] # IMPORTANTE
+            logger.info(f"Connected to {self.scope['user']}")
             if user.is_authenticated: # redundante, self.scope['user'] solo va si is_authenticated
                 self.username = user.username # self.scope['user']
                 self.logged = True
@@ -833,15 +855,26 @@ class PongBack(AsyncWebsocketConsumer):
             logger.error(f"Connection {self.cnn_id} wrong request data: {data}.", extra={"corr": self.cnn_id})
             await logger_to_client(self, f"Error. Wrong request.")
             await self.close(code=4001)
-        if data.get("step") == "handshake":
-            logger.info("Handshake received.", extra={"corr": self.cnn_id})
-            logger.info(self.scope["user"])
         if data.get("step") == "end":
             if data.get("mode") == "remote-ai":
                 msg = "Yo beat HAL!" if data.get("score1") > data.get("score1") else "Hal Crushed you!"
                 await logger_to_client(self, msg)
                 del self.module
             self.module = None
+        if data.get("step") == "challenge-user":
+            opponent = Clients.get_client(data.get("challenge_id"))
+            if not opponent:
+                await logger_to_client(self, "Opponent was not found. :-(")
+                await self.send(text_data=json.dumps({
+                    "step": "end"
+                }))
+                return
+            my_challenge = {"id": self.cnn_id, "username": self.username}
+            await opponent.send(text_data=json.dumps({
+                "payload_update": "my-challenges",
+                "detail": my_challenge
+            }))
+
         if data.get("step") == "create_challenge":
             if self.logged:
                 await self.send(text_data=json.dumps({
@@ -860,10 +893,6 @@ class PongBack(AsyncWebsocketConsumer):
                 await logger_to_client(self, f"You are ready to play with HAL!")
             if data.get("mode") == "remote":
                 await self.build_game()
-        if data.get("step") == "handshake":
-            await self.send(text_data=json.dumps({
-                "step": "handshake"
-            }))
         if data.get("step") == "rematch":
             logger.info(f"Rematch request from {self.username}", extra={"corr": self.cnn_id})
             if not self.module:
