@@ -40,7 +40,6 @@ ENV PYTHONUNBUFFERED=1
 
 ENV CREATE_SUPERUSER=true
 ENV DJANGO_SUPERUSER_USERNAME=admin
-ENV DJANGO_SUPERUSER_PASSWORD=admin
 ENV DJANGO_SUPERUSER_EMAIL=admin@example.com
 
 # Establece la variable de entorno para las configuraciones de Django

@@ -3,10 +3,6 @@ ENVIRONMENT ?= development
 ENV_FILE = .env.$(ENVIRONMENT)
 export ENVIRONMENT
 
-# Global environment (default: development).
-ENVIRONMENT ?= development
-ENV_FILE = .env.$(ENVIRONMENT)
-export ENVIRONMENT
 
 all:
 	@echo "Starting containers with environment: $(ENVIRONMENT)"
