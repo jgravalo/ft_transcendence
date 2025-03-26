@@ -12,7 +12,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 	
 	async def find_available_room(self):
 		""" Busca una sala con espacio disponible (1 jugador) """
+		print('in find_available_room')
+		print(f'len games = {len(self.games)}')
 		for room, game_list in self.games.items():
+			print(f'room {room}; len1: {len(game_list)}; len2: {len(self.games[room])}')
 			if len(game_list) == 1:  # Si hay un solo jugador, la sala tiene espacio
 				return room
 		return None  # No hay salas disponibles con espacio
@@ -24,16 +27,21 @@ class PongConsumer(AsyncWebsocketConsumer):
 			# 	username = f"Anonymous{len(self.players) + 1}"
 		available_room = await self.find_available_room()
 
+		print('set game')
 		if available_room:
 			self.room_name = available_room  # Unirse a la sala con espacio
+			print('room available')
 		else:
 			# self.room_name = self.scope["url_route"]["kwargs"]["room_name"]  # Nueva sala
 			self.room_name = f"game_{uuid.uuid4().hex[:8]}"
+			self.games[self.room_name] = []
+			print('new room')
 		
+		print(f'room_name in connect = {self.room_name}')
 		print('set user')
 		self.user = self.scope['user']
 		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.players) + 1}"
-		print(f'user {self.name}: {self.user.id}')
+		# print(f'user {self.name}: {self.user.id}')
 		self.role = f"player{len(self.players) + 1}"
 		self.paddle = {
 			"x": 150,
@@ -44,32 +52,31 @@ class PongConsumer(AsyncWebsocketConsumer):
 			}
 		print('role:', self.role)
 		print('paddle[y]:', self.paddle['y'])
+		print(f'user: {self.name} {self}')
 		self.players.append(self)
+		self.games[self.room_name].append(self)
 		# self.waiting_players.append(self)
 		
 		await self.accept()
 		await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
 		if len(self.players) == 2:
-			print(f'user1 {self.players[0].user.username}: {self.players[0].user.id}')
-			print(f'user2 {self.players[1].user.username}: {self.players[1].user.id}')
+			# print(f'user1 {self.players[0].user.username}: {self.players[0].user.id}')
+			# print(f'user2 {self.players[1].user.username}: {self.players[1].user.id}')
 	
 			print('set group')
-			self.room_name = f'chat_{self.players[0].user.id}_{self.players[1].user.id}'
+			# self.room_name = f'chat_{self.players[0].user.id}_{self.players[1].user.id}'
 			self.room_group_name = f'private_{self.room_name}'
 			print(f"🔗 Conectando a la sala {self.room_group_name}")
 			await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
-			print('set game')
-			self.games[self.room_name] = []
-			self.games[self.room_name].append(self.players[0])
-			self.games[self.room_name].append(self.players[1])
+			
 			try:
 				print('exp:')
-				print(f'user1: {self.players[0].name}')
-				print(f'user2: {self.players[1].name}')
+				print(f'user1: {self.players[0].name} {self.players[0]}')
+				print(f'user2: {self.players[1].name} {self.players[1]}')
 				print('me:')
-				print(f'user1: {self.games[self.room_name][0].name}')
-				print(f'user2: {self.games[self.room_name][1].name}')
+				print(f'user1: {self.games[self.room_name][0].name} {self.games[self.room_name][0]}')
+				print(f'user2: {self.games[self.room_name][1].name} {self.games[self.room_name][1]}')
 			except:
 				print('no print games[]')
 
@@ -77,34 +84,40 @@ class PongConsumer(AsyncWebsocketConsumer):
 			asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
 
 			# Cuando haya dos jugadores, avísales que pueden empezar
-			for player in self.players:
+			for player in self.games[self.room_name]:
 				print(f'{player.role} paddle[y]:', player.paddle['y'])
 				# self.players.remove(player)
 				await self.channel_layer.group_add(self.room_group_name, player.channel_name)
 				await player.send(text_data=json.dumps({
 					"action": "start",
 					"role": self.role,
-					"player1": self.players[0].user.username,
-					"player2": self.players[1].user.username
+					"player1": self.games[self.room_name][0].name,
+					"player2": self.games[self.room_name][1].name
 				}))
 		# else:
 		# 	await self.close()  # Si hay más de 2 jugadores, cierra la conexión
 
 	async def disconnect(self, close_code):
+		print(f'room_name in disconnect = {self.room_name}')
+		if self in self.games[self.room_name]:
+			print(f'{self.role} has been disconnected in games')
+			self.games[self.room_name].remove(self)
 		if self in self.players:
-			print(f'{self.role} has been disconnected')
+			print(f'{self.role} has been disconnected in players')
 			self.players.remove(self)
 
 	async def receive(self, text_data):
+		print(f'room_name in receive = {self.room_name}')
 		data = json.loads(text_data)
 		self.paddle['x'] = data['x']
+		# for player in self.players:
+		for player in self.games[self.room_name]:
+			if player != self:
+				await player.send(text_data=json.dumps(data))
 		# print(f'{self.role} paddle[x]:', self.paddle['x'])
 		# role = data['role']
 		# print('text_data: ', text_data)
 		# Reenvía los datos al otro jugador
-		for player in self.players:
-			if player != self:
-				await player.send(text_data=json.dumps(data))
 
 	async def start_game_loop(self):
 		# Bucle que mueve la pelota y la sincroniza en los clientes
@@ -177,4 +190,4 @@ class PongConsumer(AsyncWebsocketConsumer):
 	
 	async def finish_game(self, event):
 		# Enviar la posición de la pelota a los clientes
-		await self.send(text_data=json.dumps({"action": "finish"}))
+		await self.send(text_data=json.dumps({"action": "finish", "winner": event["winner"]}))

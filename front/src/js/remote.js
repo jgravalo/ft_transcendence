@@ -93,6 +93,7 @@ function gameRemote()
 			drawBall();
 		}
 		else if (data.action === "finish") {
+			console.log(`disconnection ${player.name}`);
 			gameSocket.close();
 			gameOver = true;
 			let winner = data.winner;
