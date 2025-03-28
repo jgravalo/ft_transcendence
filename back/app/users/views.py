@@ -287,6 +287,7 @@ def get_logout(request):
 
 def profile(request):
     try:
+        print(f'request.user = {request.user}')
         user = User.get_user(request)
     except:
        return JsonResponse({'error': 'Forbidden'}, status=403)
@@ -400,6 +401,7 @@ def set_update(request):
 @csrf_exempt
 def friends(request):
     try:
+        print(f'request.user = {request.user}')
         user = User.get_user(request)
     except:
         return JsonResponse({'error': 'Forbidden'}, status=403)

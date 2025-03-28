@@ -8,8 +8,8 @@ from users.models import User
 def chat(request):
     print('entra en chat')
     try:
+        print('request.user =', request.user)
         user = request.user
-        print('request.user =', user)
     except:
         print('request.user failed')
     try:

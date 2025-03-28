@@ -9,6 +9,7 @@ from django.http import JsonResponse
 
 def game(request):
     content = render_to_string('game.html')
+    print(f'request.user = {request.user}')
     data = {
         "id": "52263",
         "player1": "jgravalo",
