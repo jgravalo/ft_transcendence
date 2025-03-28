@@ -30,6 +30,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			print('new room')
 		
 		print(f'room_name in connect = {self.room_name}')
+		self.room_group_name = f'private_{self.room_name}'
 		print('set user')
 		self.user = self.scope['user']
 		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.games[self.room_name]) + 1}"
@@ -51,7 +52,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 		await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
 		if len(self.games[self.room_name]) == 2:
 			print('set group')
-			self.room_group_name = f'private_{self.room_name}'
 			print(f"🔗 Conectando a la sala {self.room_group_name}")
 			await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 			print('set ball')
@@ -74,8 +74,22 @@ class PongConsumer(AsyncWebsocketConsumer):
 	async def disconnect(self, close_code):
 		print(f'room_name in disconnect = {self.room_name}')
 		if self in self.games[self.room_name]:
+			for player in self.games[self.room_name]:
+				if self != player:
+					await player.send(text_data=json.dumps({
+						"action": "finish",
+						"winner": player.name
+					}))
+					""" await self.channel_layer.group_send(self.room_group_name, {
+						"type": "finish_game",
+						"winner": player.name
+					}) """
 			print(f'{self.role} has been disconnected in games')
 			self.games[self.room_name].remove(self)
+			await self.channel_layer.group_discard(
+            	self.room_group_name,
+            	self.channel_name
+        	)
 
 	async def receive(self, text_data):
 		# print(f'room_name in receive = {self.room_name}')

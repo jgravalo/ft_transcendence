@@ -101,6 +101,10 @@ function gameRemote()
 			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 		}
 	};
+
+	gameSocket.onclose = function(event) {
+		console.log(`socket closed`);
+	};
 	
 	document.addEventListener("keydown", (event) => keys[event.key] = true);
 	document.addEventListener("keyup", (event) => keys[event.key] = false);
