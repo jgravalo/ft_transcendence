@@ -10,8 +10,8 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
 class Match(models.Model):
+    room = models.TextField()
     player1 = models.ForeignKey(User, related_name='match_player1', on_delete=models.CASCADE)
     player2 = models.ForeignKey(User, related_name='match_player2', on_delete=models.CASCADE)
     score_player1 = models.IntegerField(default=0)

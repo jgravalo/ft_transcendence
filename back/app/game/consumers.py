@@ -1,6 +1,8 @@
 import json
 import asyncio
 import uuid
+from asgiref.sync import sync_to_async
+from django.apps import apps
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class PongConsumer(AsyncWebsocketConsumer):
@@ -56,7 +58,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 			print('set ball')
 			self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
-				"width": 400, "height": 600, "size": 10, "max-score": 10}
+				"width": 400, "height": 600, "size": 10, "max-score": 3}
 
 			asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
 
@@ -80,10 +82,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 						"action": "finish",
 						"winner": player.name
 					}))
-					""" await self.channel_layer.group_send(self.room_group_name, {
-						"type": "finish_game",
-						"winner": player.name
-					}) """
 			print(f'{self.role} has been disconnected in games')
 			self.games[self.room_name].remove(self)
 			await self.channel_layer.group_discard(
@@ -129,6 +127,15 @@ class PongConsumer(AsyncWebsocketConsumer):
 						winner =  self.games[self.room_name][0].name
 					elif self.games[self.room_name][1].paddle["score"] >= ball["max-score"]:
 						winner =  self.games[self.room_name][1].name
+					if (self.games[self.room_name][0].user.is_authenticated and
+					self.games[self.room_name][1].user.is_authenticated):
+						Match = apps.get_model('game', 'Match')
+						game = await sync_to_async(Match.objects.create)(
+							player1=self.games[self.room_name][0].user,
+							player2=self.games[self.room_name][1].user,
+							score_player1=self.games[self.room_name][0].paddle["score"],
+							score_player2=self.games[self.room_name][1].paddle["score"],
+						)
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
 						"winner": winner
@@ -157,7 +164,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 			
 			# Enviar la nueva posición de la pelota a los clientes
 			await self.channel_layer.group_send(self.room_group_name, {
-			# await self.channel_layer.group_send("pong_game", {
 					"type": "ball_update",
 					"ball": ball,
 					"score": {
