@@ -6,10 +6,6 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 class PongConsumer(AsyncWebsocketConsumer):
 	games = {}  # Lista para almacenar jugadores
 	ball = {}  # Lista para almacenar jugadores
-	# waiting_players = []  # Lista para almacenar jugadores
-	players = [] # Lista para almacenar jugadores
-	# ball = {"x": 300, "y": 200, "vx": 5, "vy": 5, "width": 400, "height": 600,
-		# "size": 10, "max-score": 10}  # Posición y velocidad de la pelota
 	
 	async def find_available_room(self):
 		""" Busca una sala con espacio disponible (1 jugador) """
@@ -22,12 +18,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		return None  # No hay salas disponibles con espacio
 
 	async def connect(self):
-		# if len(self.players) < 2:
-			# username = self.scope['user'].username
-			# if user.username == AnonymousUser:
-			# 	username = f"Anonymous{len(self.players) + 1}"
 		available_room = await self.find_available_room()
-
 		print('set game')
 		if available_room:
 			self.room_name = available_room  # Unirse a la sala con espacio
@@ -54,32 +45,15 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print('role:', self.role)
 		print('paddle[y]:', self.paddle['y'])
 		print(f'user: {self.name} {self}')
-		self.players.append(self)
 		self.games[self.room_name].append(self)
-		# self.waiting_players.append(self)
 		
 		await self.accept()
 		await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
 		if len(self.games[self.room_name]) == 2:
-			# print(f'user1 {self.players[0].user.username}: {self.players[0].user.id}')
-			# print(f'user2 {self.players[1].user.username}: {self.players[1].user.id}')
-	
 			print('set group')
-			# self.room_name = f'chat_{self.players[0].user.id}_{self.players[1].user.id}'
 			self.room_group_name = f'private_{self.room_name}'
 			print(f"🔗 Conectando a la sala {self.room_group_name}")
 			await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-			""" 			
-			try:
-				print('exp:')
-				print(f'user1: {self.players[0].name} {self.players[0]}')
-				print(f'user2: {self.players[1].name} {self.players[1]}')
-				print('me:')
-				print(f'user1: {self.games[self.room_name][0].name} {self.games[self.room_name][0]}')
-				print(f'user2: {self.games[self.room_name][1].name} {self.games[self.room_name][1]}')
-			except:
-				print('no print games[]')
-			"""
 			print('set ball')
 			self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
 				"width": 400, "height": 600, "size": 10, "max-score": 10}
@@ -89,7 +63,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 			# Cuando haya dos jugadores, avísales que pueden empezar
 			for player in self.games[self.room_name]:
 				print(f'{player.role} paddle[y]:', player.paddle['y'])
-				# self.players.remove(player)
 				await self.channel_layer.group_add(self.room_group_name, player.channel_name)
 				await player.send(text_data=json.dumps({
 					"action": "start",
@@ -97,30 +70,20 @@ class PongConsumer(AsyncWebsocketConsumer):
 					"player1": self.games[self.room_name][0].name,
 					"player2": self.games[self.room_name][1].name
 				}))
-		# else:
-		# 	await self.close()  # Si hay más de 2 jugadores, cierra la conexión
 
 	async def disconnect(self, close_code):
 		print(f'room_name in disconnect = {self.room_name}')
 		if self in self.games[self.room_name]:
 			print(f'{self.role} has been disconnected in games')
 			self.games[self.room_name].remove(self)
-		if self in self.players:
-			print(f'{self.role} has been disconnected in players')
-			self.players.remove(self)
 
 	async def receive(self, text_data):
 		# print(f'room_name in receive = {self.room_name}')
 		data = json.loads(text_data)
 		self.paddle['x'] = data['x']
-		# for player in self.players:
 		for player in self.games[self.room_name]:
 			if player != self:
 				await player.send(text_data=json.dumps(data))
-		# print(f'{self.role} paddle[x]:', self.paddle['x'])
-		# role = data['role']
-		# print('text_data: ', text_data)
-		# Reenvía los datos al otro jugador
 
 	async def start_game_loop(self):
 		ball = self.ball[self.room_name]
