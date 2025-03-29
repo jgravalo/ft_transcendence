@@ -15,32 +15,31 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print(f'len games = {len(self.games)}')
 		for room, game_list in self.games.items():
 			print(f'room {room}; len1: {len(game_list)}; len2: {len(self.games[room])}')
-			if len(game_list) == 1:  # Si hay un solo jugador, la sala tiene espacio
+			# Si hay un solo jugador, la sala tiene espacio
+			if len(game_list) == 1: # and room[:4] != 'game_re' # Protegemos de partidas restringidas
 				return room
 		return None  # No hay salas disponibles con espacio
 
 	async def connect(self):
 		# Obtener la sala desde la URL o algún identificador
-		""" 
-		self.room_name = self.scope["url_route"]["kwargs"].get("user2")
-		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
-		if not self.room_name:  # Si no se proporciona una sala, crea una nueva
-			self.room_name = f"game_{uuid.uuid4().hex[:8]}"
-		if self.room_name not in self.games:
-			self.games[self.room_name] = []  # Nueva sala
-		"""
-		"""
-        self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # Para hacer el otro usuario
-		if self.user2:
-		"""
 		available_room = await self.find_available_room()
+		"""
+        # self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # Para hacer el otro usuario
+		self.user2 = self.scope["url_route"]["kwargs"].get("user")
+		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
+		if self.user2:
+			self.room_name = f"game_re{uuid.uuid4().hex[:8]}"
+			self.games[self.room_name] = []  # Nueva sala
+		elif self.room_name: # not in self.games:
+			pass
+		"""
 		print('set game')
 		if available_room:
 			self.room_name = available_room  # Unirse a la sala con espacio
 			print('room available')
 		else:
 			# self.room_name = self.scope["url_route"]["kwargs"]["room_name"]  # Nueva sala
-			self.room_name = f"game_{uuid.uuid4().hex[:8]}"
+			self.room_name = f"game_ra{uuid.uuid4().hex[:8]}"
 			self.games[self.room_name] = []
 			print('new room')
 		
