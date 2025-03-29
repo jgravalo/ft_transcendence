@@ -9,6 +9,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
+from game.models import Match
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -75,7 +77,6 @@ def delete_user(request):
         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response['Pragma'] = 'no-cache'
         response['Expires'] = '0'
-
         return response
 
     except Exception as e:
@@ -292,8 +293,10 @@ def profile(request):
     except:
        return JsonResponse({'error': 'Forbidden'}, status=403)
     # print("url =", user.image.url)
+    matches = Match.objects.filter(Q(player1=user) | Q(player2=user))
     context = {
-        'user': user
+        'user': user,
+        'matches': matches
     }
     content = render_to_string('profile.html', context)
     data = {
