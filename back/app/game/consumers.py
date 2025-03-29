@@ -20,6 +20,19 @@ class PongConsumer(AsyncWebsocketConsumer):
 		return None  # No hay salas disponibles con espacio
 
 	async def connect(self):
+		# Obtener la sala desde la URL o algún identificador
+		""" 
+		self.room_name = self.scope["url_route"]["kwargs"].get("user2")
+		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
+		if not self.room_name:  # Si no se proporciona una sala, crea una nueva
+			self.room_name = f"game_{uuid.uuid4().hex[:8]}"
+		if self.room_name not in self.games:
+			self.games[self.room_name] = []  # Nueva sala
+		"""
+		"""
+        self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # Para hacer el otro usuario
+		if self.user2:
+		"""
 		available_room = await self.find_available_room()
 		print('set game')
 		if available_room:
