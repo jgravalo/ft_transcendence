@@ -4,6 +4,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from django.contrib.sessions.models import Session
+from game.models import Match
+from django.db.models import Q
 
 
 import uuid
@@ -73,6 +75,9 @@ class User(AbstractUser):
 		
 		except Exception:
 			return None
+
+	def get_matches(cls):
+		return Match.objects.filter(Q(player1=user) | Q(player2=user))
 
 	def num_friends(self):
 		return self.friends.count()
