@@ -55,10 +55,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 		if len(self.games[self.room_name]) == 2:
 			print('set group')
 			print(f"🔗 Conectando a la sala {self.room_group_name}")
-			await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+			# await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 			print('set ball')
 			self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
-				"width": 400, "height": 600, "size": 10, "max-score": 3}
+				"width": 400, "height": 600, "size": 10, "max-score": 3, "connect": True}
 
 			asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
 
@@ -75,6 +75,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 	async def disconnect(self, close_code):
 		print(f'room_name in disconnect = {self.room_name}')
+		self.ball[self.room_name]['connect'] = False
 		if self in self.games[self.room_name]:
 			for player in self.games[self.room_name]:
 				if self != player:
@@ -82,12 +83,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 						"action": "finish",
 						"winner": player.name
 					}))
+				await player.close()
+				await self.channel_layer.group_discard(self.room_group_name, player.channel_name)
 			print(f'{self.role} has been disconnected in games')
-			self.games[self.room_name].remove(self)
-			await self.channel_layer.group_discard(
-            	self.room_group_name,
-            	self.channel_name
-        	)
+			# self.games[self.room_name].remove(self)
+			# await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+			self.games[self.room_name].clear()
 
 	async def receive(self, text_data):
 		# print(f'room_name in receive = {self.room_name}')
@@ -140,6 +141,11 @@ class PongConsumer(AsyncWebsocketConsumer):
 						"type": "finish_game",
 						"winner": winner
 					})
+					self.close()
+					break
+			if not self.ball[self.room_name]['connect']:
+				self.close()
+				break
 
 			# 🏓 Verificar colisión con la paleta del jugador 1
 			if (

@@ -12,8 +12,6 @@ function gameRemote()
 	const paddleWidth = 80, paddleHeight = 10;
 	const ballSize = 10;
 	const paddleSpeed = 15;
-	let ballSpeedX = 4, ballSpeedY = 4;
-	const maxScore = 5; // Puntuación máxima para ganar
 	let gameOver = false;
     
 	// Paletas y pelota
@@ -51,13 +49,14 @@ function gameRemote()
 
 	
 	let player = null;
+	let winner = null;
 	let role = null;
 	let gameStarted = false; // !!
 	gameSocket = new WebSocket('ws://' + base.slice(7, -5) + ':8080/ws/game/');
 
-	/* gameSocket.onopen = function(event) {
-		const data = JSON.parse(event.data);
-	} */
+	gameSocket.onopen = function(event) {
+		console.log(`socket opened`);
+	}
 
 	gameSocket.onmessage = function(event) {
 		const data = JSON.parse(event.data);
@@ -69,8 +68,8 @@ function gameRemote()
 				player = player1;
 			else
 			player = player2;
-	}
-	else if (data.action === "start") {
+		}
+		else if (data.action === "start") {
 			console.log('data.player1:', data.player1);
 			console.log('data.player2:', data.player2);
 			player1.name = data.player1;
@@ -92,27 +91,29 @@ function gameRemote()
 			player2.score = data.score.b;
 			drawBall();
 		}
-		else if (data.action === "finish") {
-			console.log(`disconnection ${player.name}`);
-			gameSocket.close();
+		else if (data.action === "finish" || data.action === "disconnect") {
+			// console.log(`disconnection ${player.name}`);
+			// if (data.action === "finish")
+				// gameSocket.close();
+			console.log(`action ${data.action}`);
 			gameOver = true;
-			let winner = data.winner;
-			gameOptions(`${winner} wins!`);
+			winner = data.winner;
 			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 		}
 	};
-
+	
 	gameSocket.onclose = function(event) {
+		gameOver = true;
 		console.log(`socket closed`);
 	};
 	
 	document.addEventListener("keydown", (event) => keys[event.key] = true);
 	document.addEventListener("keyup", (event) => keys[event.key] = false);
-
+	
 	function updatePaddles() {
 		// if (keys["a"] && player1.x > 0) player1.x -= paddleSpeed;
 		// if (keys["d"] && player1.x < canvas.width - paddleWidth) player1.x += paddleSpeed;
-
+		
 		if (keys["ArrowLeft"] && player.x > 0)
 			player.x -= paddleSpeed;
 		if (keys["ArrowRight"] && player.x < canvas.width - paddleWidth)
@@ -122,7 +123,7 @@ function gameRemote()
 			gameSocket.send(JSON.stringify(moveData));
 		}
 	}
-
+	
 	function gameLoop() {
 		if (!gameStarted) {
 			ctx.fillStyle = "white";
@@ -131,7 +132,11 @@ function gameRemote()
 			requestAnimationFrame(gameLoop);
 			return;
 		}
-		if (gameOver) return;
+		if (gameOver)
+		{
+			gameOptions(`${winner} wins!`);
+			return ;
+		}
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		// console.log("ball: x:", ball.x, ", y:", ball.y);
