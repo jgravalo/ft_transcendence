@@ -134,7 +134,9 @@ function gameRemote()
 		}
 		if (gameOver)
 		{
-			gameOptions(`${winner} wins!`);
+			console.log("pathname = ", window.location.pathname);
+			if (window.location.pathname == '/game')
+				gameOptions(`${winner} wins!`);
 			return ;
 		}
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
