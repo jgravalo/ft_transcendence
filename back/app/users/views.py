@@ -290,7 +290,7 @@ def profile(request):
        return JsonResponse({'error': 'Forbidden'}, status=403)
     # print("url =", user.image.url)
     # matches = Match.objects.filter(Q(player1=user) | Q(player2=user))
-    matches = User.get_matches()
+    matches = user.get_matches()
     context = {
         'user': user,
         'matches': matches
