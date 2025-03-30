@@ -859,14 +859,13 @@ class PongBack(AsyncWebsocketConsumer):
                 self.username = f'shy_guy-{random_number}'
                 logger.info(f'Anonymous user connected: conn {self.cnn_id} - user {self.username}',
                             extra={"corr": self.cnn_id})
+            await logger_to_client(self, f"You are connected as {self.username}")
+            await ClientsHandler.append_client(self)
+            await ClientsHandler.broadcast_connected_users()
         except Exception as e:
             logger.error(f'Connection Error {self.cnn_id} - Detail {e}',
                          extra={"corr": self.cnn_id})
             return
-        await logger_to_client(self, f"You are connected as {self.username}")
-        await ClientsHandler.append_client(self)
-        await ClientsHandler.broadcast_connected_users()
-
 
 
     async def receive(self, text_data):
@@ -883,6 +882,13 @@ class PongBack(AsyncWebsocketConsumer):
             logger.error(f"Connection {self.cnn_id} wrong request data: {data}.", extra={"corr": self.cnn_id})
             await logger_to_client(self, f"Error. Wrong request.")
             await self.close(code=4001)
+        if data["step"] == "handshake":
+            # -- Handshake
+            if not self.logged:
+                if self.scope["user"].is_authenticated:
+                    self.username = self.scope["user"].username
+                    self.logged = True
+                    await logger_to_client(self, f"Welcome back {self.username}")
         if data.get("step") == "end":
             # -- End Game
             if data.get("mode") == "remote-ai":

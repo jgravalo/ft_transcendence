@@ -1,15 +1,15 @@
 
-let socket_game = null;
+let socket_game = new WebSocket('ws://localhost:8080/ws/game/');;
 
 function game() {
     // document.getElementById("get-challenges").addEventListener("click", getChallenges);
     let message = null;
     let gameInstance = null;
 
-    if (!socket_game) {
-        socket_game = new WebSocket('ws://localhost:8080/ws/game/');
-        console.log('init socket');
-    }
+    // if (!socket_game) {
+    //     socket_game = new WebSocket('ws://localhost:8080/ws/game/');
+    //     console.log('init socket');
+    // }
     // const socket_game = new WebSocket('ws://localhost:8080/ws/game/');
     const remote_modes = ['remote', 'remote-ai', 'remote_challenge', 'create_challenge', 'challenge-user', 'accept_challenge', 'accept_my_challenge'];
 
@@ -729,6 +729,8 @@ function game() {
         endGame(msg, mode = "auto-play", extra=null) {
             message = msg;
             this.running = false;
+            this.waiting = false;
+            this.listening = false;
             startNewGame(mode, extra);
         }
     }
@@ -837,7 +839,9 @@ function game() {
     }
     // --- GENERAL MANAGEMENT
 
-    document.addEventListener("DOMContentLoaded", manageGame);
+    document.addEventListener("DOMContentLoaded", () => {
+      manageGame();
+    });
 
 	function manageGame() {
 		console.log("in manageGame");
@@ -858,13 +862,11 @@ function game() {
         });
 
         message = "Click here to play!";
-        if (socket_game !== null) {
-            socket_game.onopen = () => {
-                socket_game.send(JSON.stringify({
-                        step: 'handshake'
-                    }
-                ));
-            }
+        if (socket_game) {
+            socket_game.send(JSON.stringify({
+                    step: 'handshake'
+                }
+            ));
         }
         gameInstance = new PongGame('auto-play');
         socket_listener();
