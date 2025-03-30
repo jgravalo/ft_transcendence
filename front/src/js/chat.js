@@ -5,7 +5,19 @@ function chat(url)
     const params = new URLSearchParams(new URL(url).search);
     console.log("hace chatsocket");
     //const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/ws/chat/');
-    chatSocket = new WebSocket('ws://' + base.slice(7, -5) + ':8080/ws/chat/' + params.get("user") + '/');
+
+    const accessToken = sessionStorage.getItem('access');
+    if (!accessToken) {
+        console.error('No se encontró el token de acceso en sessionStorage. No se puede conectar al chat.');
+        // TODO: Redirigir al login o mostrar un mensaje ?
+        return; 
+    }
+
+    const otherUserId = params.get("user"); // Asumo que 'user' es el ID del otro usuario
+    const wsUrl = 'ws://' + base.slice(7, -5) + ':8080/ws/chat/' + otherUserId + '/?token=' + accessToken;
+    
+    chatSocket = new WebSocket(wsUrl);
+    console.log("Intentando conectar a:", wsUrl);
     console.log("hizo chatsocket");
 
     chatSocket.onopen = function () {
