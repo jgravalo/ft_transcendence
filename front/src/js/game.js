@@ -1,12 +1,17 @@
 
+window.socket_game = null;
+
 function game() {
     // document.getElementById("get-challenges").addEventListener("click", getChallenges);
     let message = null;
     let gameInstance = null;
 
-    const socket_game = new WebSocket('ws://localhost:8080/ws/game/');
-	console.log('init socket');
-    const remote_modes = ['remote', 'remote-ai', 'remote_challenge', 'create_challenge', 'challenge-user', 'accept_challenge'];
+    if (!window.socket_game) {
+        window.socket_game = new WebSocket('ws://localhost:8080/ws/game/');
+        console.log('init socket');
+    }
+    // const socket_game = new WebSocket('ws://localhost:8080/ws/game/');
+    const remote_modes = ['remote', 'remote-ai', 'remote_challenge', 'create_challenge', 'challenge-user', 'accept_challenge', 'accept_my_challenge'];
 
     class PongGame {
         constructor(mode = "auto-play", extra = null) {
@@ -52,7 +57,7 @@ function game() {
                 this.opponentName = "Hal42";
             }
             // --- Remote Vars
-            this.socket = socket_game;
+            this.socket = window.socket_game;
             this.player = {
                 playerName: this.playerName,
                 role: 'player1',
@@ -759,7 +764,7 @@ function game() {
             acceptSpan.title = "Accept";
             acceptSpan.addEventListener("click", (event) => {
               event.stopPropagation();
-              gameInstance.clickMode(null, "accept_challenge", undefined, challenge.id);
+              gameInstance.clickMode(null, accept_step, undefined, challenge.id);
             });
             iconsDiv.appendChild(acceptSpan);
         }
@@ -770,7 +775,7 @@ function game() {
             rejectSpan.title = "Reject";
             rejectSpan.addEventListener("click", (event) => {
                 event.stopPropagation();
-                socket_game.send(JSON.stringify({
+                window.socket_game.send(JSON.stringify({
                     step: "reject_challenge",
                     challenge_id: challenge.id
                 }));
@@ -783,6 +788,7 @@ function game() {
             challengeSpan.textContent = "target";
             challengeSpan.title = "Challenge";
             challengeSpan.addEventListener("click", (event) => {
+                // TODO: improve to avoid error
                 event.stopPropagation();
                 console.log(challenge.id);
                 gameInstance.clickMode(null, "challenge-user", undefined, challenge.id);
@@ -804,7 +810,7 @@ function game() {
     }
 
     function socket_listener() {
-        socket_game.onmessage = (event) => {
+        window.socket_game.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (gameInstance && ("step" in data)) {
                 gameInstance.game_listener(data);
@@ -822,7 +828,7 @@ function game() {
                 } else if (data.payload_update === "game-abort") {
                    append_message(data.detail);
                    this.clickMode(message, "auto-play", "remote-match");
-                   socket_game.send(JSON.stringify({
+                   window.socket_game.send(JSON.stringify({
                           step: "game-cancel"
                    }));
                 }
@@ -852,9 +858,9 @@ function game() {
         });
 
         message = "Click here to play!";
-        if (socket_game !== null) {
-            socket_game.onopen = () => {
-                socket_game.send(JSON.stringify({
+        if (window.socket_game !== null) {
+            window.socket_game.onopen = () => {
+                window.socket_game.send(JSON.stringify({
                         step: 'handshake'
                     }
                 ));
