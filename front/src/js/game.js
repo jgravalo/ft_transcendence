@@ -8,7 +8,7 @@ function game() {
 	console.log('init socket');
 
     class PongGame {
-        constructor(mode = "auto-play", player1Name = "player1", player2Name = "player2", extra = null) {
+        constructor(mode = "auto-play", extra = null) {
             // --- Game Mode and status
             if (mode === "remote_challenge" || mode === "challenge_created" || mode === "user-challenged") {
                 this.mode = "remote";
