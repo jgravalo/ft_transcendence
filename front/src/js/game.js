@@ -40,12 +40,12 @@ function game() {
             this.deceleration = 1;
             this.maxSpeed = 20;
             this.collisionCount = 0;
-            this.playerName = player1Name;
-            this.opponentName = player2Name;
             this.score1 = 0;
             this.score2 = 0;
             if (this.mode !== "auto-play") {
                 message = null;
+                this.playerName = "player1";
+                this.opponentName = "player2";
             } else {
                 this.playerName = "Norminette";
                 this.opponentName = "Hal42";
@@ -735,7 +735,7 @@ function game() {
             gameInstance.destroy();
         }
         if (mode === "auto-play") {
-            gameInstance = new PongGame("auto-play", "Hal42", "Norminette");
+            gameInstance = new PongGame("auto-play");
         } else {
             gameInstance = new PongGame(mode);
         }
