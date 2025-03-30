@@ -1,10 +1,5 @@
-import asyncio
 import threading
-import json
-import uuid
 import time
-from cgitb import reset
-from time import sleep
 
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
@@ -13,9 +8,16 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import random
 import math
 import logging
-import json
 import sys
 from app.logging_config import get_logger
+
+import json
+import asyncio
+import uuid
+from asgiref.sync import sync_to_async
+from django.apps import apps
+from channels.generic.websocket import AsyncWebsocketConsumer
+
 
 logger = get_logger("app-logger")
 
@@ -40,12 +42,20 @@ from channels.db import database_sync_to_async
 def create_match_and_update_users(player1, player2, score1, score2):
     logger.debug("create_match_and_update_users")
     from game.models import Match
-    match = Match.objects.create(
-        player1=player1,
-        player2=player2,
-        score_player1=score1,
-        score_player2=score2
-    )
+    Match = apps.get_model('game', 'Match')
+    # game = await sync_to_async(Match.objects.create)(
+    #     player1=player1,
+    #     player2=player2,
+    #     score_player1=score1,
+    #     score_player2=score2
+    # )
+
+    # match = Match.objects.create(
+    #     player1=player1,
+    #     player2=player2,
+    #     score_player1=score1,
+    #     score_player2=score2
+    # )
     if score1 > score2:
         player1.wins += 1
         player2.losses += 1
@@ -855,6 +865,7 @@ class PongBack(AsyncWebsocketConsumer):
             return
         await logger_to_client(self, f"You are connected as {self.username}")
         await ClientsHandler.append_client(self)
+        await ClientsHandler.broadcast_connected_users()
 
 
 
@@ -1037,6 +1048,7 @@ class PongBack(AsyncWebsocketConsumer):
                 await self.build_game(opponent_instance=player)
 
     async def build_game(self, challenger=None, opponent_instance=None):
+        logger.info(f"{challenger} - {opponent_instance}")
         opponent = ClientsHandler.get_opponent(self, challenger) if not opponent_instance else opponent_instance
         if opponent:
             logger.info("Join remote game request.", extra={"corr": self.cnn_id})
@@ -1048,14 +1060,13 @@ class PongBack(AsyncWebsocketConsumer):
                 "player1" if role == "player2" else "player2": opponent
             }
             self.module = opponent.module = GameSession(players)
-            await self.module.send_start_screen()
         else:
             await self.send(text_data=json.dumps({
                 "step": "wait",
                 "playerName": self.username
             }))
             await ClientsHandler.append_random_challenge(self)
-        pass
+
 
     async def disconnect(self, close_code):
         logger.warning(f"Client disconnected {close_code}", extra={"corr": self.cnn_id})

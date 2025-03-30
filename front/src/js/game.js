@@ -1,13 +1,13 @@
 
-window.socket_game = null;
+let socket_game = null;
 
 function game() {
     // document.getElementById("get-challenges").addEventListener("click", getChallenges);
     let message = null;
     let gameInstance = null;
 
-    if (!window.socket_game) {
-        window.socket_game = new WebSocket('ws://localhost:8080/ws/game/');
+    if (!socket_game) {
+        socket_game = new WebSocket('ws://localhost:8080/ws/game/');
         console.log('init socket');
     }
     // const socket_game = new WebSocket('ws://localhost:8080/ws/game/');
@@ -57,7 +57,7 @@ function game() {
                 this.opponentName = "Hal42";
             }
             // --- Remote Vars
-            this.socket = window.socket_game;
+            this.socket = socket_game;
             this.player = {
                 playerName: this.playerName,
                 role: 'player1',
@@ -775,7 +775,7 @@ function game() {
             rejectSpan.title = "Reject";
             rejectSpan.addEventListener("click", (event) => {
                 event.stopPropagation();
-                window.socket_game.send(JSON.stringify({
+                socket_game.send(JSON.stringify({
                     step: "reject_challenge",
                     challenge_id: challenge.id
                 }));
@@ -810,7 +810,7 @@ function game() {
     }
 
     function socket_listener() {
-        window.socket_game.onmessage = (event) => {
+        socket_game.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (gameInstance && ("step" in data)) {
                 gameInstance.game_listener(data);
@@ -828,7 +828,7 @@ function game() {
                 } else if (data.payload_update === "game-abort") {
                    append_message(data.detail);
                    this.clickMode(message, "auto-play", "remote-match");
-                   window.socket_game.send(JSON.stringify({
+                   socket_game.send(JSON.stringify({
                           step: "game-cancel"
                    }));
                 }
@@ -858,9 +858,9 @@ function game() {
         });
 
         message = "Click here to play!";
-        if (window.socket_game !== null) {
-            window.socket_game.onopen = () => {
-                window.socket_game.send(JSON.stringify({
+        if (socket_game !== null) {
+            socket_game.onopen = () => {
+                socket_game.send(JSON.stringify({
                         step: 'handshake'
                     }
                 ));
