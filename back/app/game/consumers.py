@@ -251,12 +251,13 @@ class Clients:
         :param challenger: Client instance to avoid double challenges.
         :param opponent_username: opponent ID to get a specific opponent.
         """
+        logger.info(f"get_opponent {challenger} - {opponent_username}")
         with self.challenges_mutex:
             if self.challenges and challenger not in self.challenges:
                 if opponent_username:
                     found = None
                     for i, obj in enumerate(self.challenges, 0):
-                        if obj.username == opponent_username:
+                        if obj.cnn_id == opponent_username:
                             found = self.challenges.pop(i)
                             break
                     if not found:
@@ -878,35 +879,21 @@ class PongBack(AsyncWebsocketConsumer):
                 await logger_to_client(self, msg)
                 del self.module
             self.module = None
-        if data.get("step") == "challenge-user":
-            # -- Challenge a user
-            opponent = ClientsHandler.get_client(data.get("challenge_id"))
-            if not opponent:
-                await logger_to_client(self, "Opponent was not found. :-(")
-                await self.send(text_data=json.dumps({
-                    "step": "end"
-                }))
-                return
-            await opponent.update_challengers(self)
-            await logger_to_client(self, f"Your challenge was sent to {opponent.username}.")
-            await self.send(text_data=json.dumps({
-                "step": "wait",
-                "playerName": self.username
-            }))
-
-        if data.get("step") == "create_challenge":
-            #  -- Create a challenge
-            if self.logged:
-                await self.send(text_data=json.dumps({
-                    "step": "wait",
-                    "playerName": self.username
-                }))
-                await ClientsHandler.append_random_challenge(self, "Remote challenge created.")
-            else:
-                await self.send(text_data=json.dumps({
-                    "step": "end"
-                }))
-                await logger_to_client(self, "You must be logged to create a challenge.")
+        # if data.get("step") == "challenge-user":
+        #     # -- Challenge a user
+        #     opponent = ClientsHandler.get_client(data.get("challenge_id"))
+        #     if not opponent:
+        #         await logger_to_client(self, "Opponent was not found. :-(")
+        #         await self.send(text_data=json.dumps({
+        #             "step": "end"
+        #         }))
+        #         return
+        #     await opponent.update_challengers(self)
+        #     await logger_to_client(self, f"Your challenge was sent to {opponent.username}.")
+        #     await self.send(text_data=json.dumps({
+        #         "step": "wait",
+        #         "playerName": self.username
+        #     }))
         if data.get("step") == "reject_my_challenge":
             # -- Reject personal challenge
             logger.info(f"User reject personal challenge.", extra={"corr": self.cnn_id})
@@ -925,6 +912,45 @@ class PongBack(AsyncWebsocketConsumer):
                 await logger_to_client(self, f"You are ready to play with HAL!")
             if data.get("mode") == "remote":
                 await self.build_game()
+            if data.get("mode") == "create_challenge":
+                #  -- Create a challenge
+                if self.logged:
+                    await self.send(text_data=json.dumps({
+                        "step": "wait",
+                        "playerName": self.username
+                    }))
+                    await ClientsHandler.append_random_challenge(self, "Remote challenge created.")
+                else:
+                    await self.send(text_data=json.dumps({
+                        "step": "end"
+                    }))
+                    await logger_to_client(self, "You must be logged to create a challenge.")
+            if data.get("mode") == "challenge-user":
+                # -- Challenge a user
+                if "info" not in data:
+                    await logger_to_client(self, "Error challenging an user.")
+                    await self.send(text_data=json.dumps({
+                        "step": "end"
+                    }))
+                    return
+                opponent = ClientsHandler.get_client(data.get("info"))
+                logger.info(data)
+                if not opponent:
+                    await logger_to_client(self, "Opponent was not found. :-(")
+                    await self.send(text_data=json.dumps({
+                        "step": "end"
+                    }))
+                    return
+                await self.send(text_data=json.dumps({
+                    "step": "wait",
+                    "playerName": self.username
+                }))
+                await opponent.update_challengers(self)
+                await logger_to_client(self, f"Your challenge was sent to {opponent.username}.")
+            if data.get("mode") == "accept_challenge":
+                # -- Accept random challenge
+                logger.info(f"User accept random challenge.", extra={"corr": self.cnn_id})
+                await self.build_game(data.get("info"))
         if data.get("step") == "rematch":
             # -- Rematch request
             logger.info(f"Rematch request from {self.username}", extra={"corr": self.cnn_id})
@@ -982,10 +1008,7 @@ class PongBack(AsyncWebsocketConsumer):
                     "playerName": self.username
                 }))
                 await self.build_game(opponent_instance=opponent)
-        if data.get("step") == "accept_challenge":
-            # -- Accept random challenge
-            logger.info(f"User accept random challenge.", extra={"corr": self.cnn_id})
-            await self.build_game(data.get("challenge_id"))
+
         else:
             if self.module:
                 await self.module.receive(data)

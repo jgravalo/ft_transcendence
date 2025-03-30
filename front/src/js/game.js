@@ -6,11 +6,12 @@ function game() {
 
     const socket_game = new WebSocket('ws://localhost:8080/ws/game/');
 	console.log('init socket');
+    const remote_modes = ['remote', 'remote-ai', 'remote_challenge', 'create_challenge', 'challenge-user', 'accept_challenge'];
 
     class PongGame {
         constructor(mode = "auto-play", extra = null) {
             // --- Game Mode and status
-            if (mode === "remote_challenge" || mode === "challenge_created" || mode === "user-challenged") {
+            if (remote_modes.includes(mode)) {
                 this.mode = "remote";
             } else {
                 this.mode = mode;
@@ -118,19 +119,16 @@ function game() {
             if (this.mode === "remote-ai" || this.mode === "remote") {
                 this.listening = true;
                 if (mode === "remote_challenge" || mode === "user-challenged") return;
-                if (mode === "challenge_created") {
-                    this.socket.send(JSON.stringify({
-                        step: 'create_challenge'
-                    }))
-                } else {
-                    this.socket.send(JSON.stringify({
-                            step: 'join',
-                            username: this.playerName,
-                            player: this.player,
-                            mode: this.mode
-                        }
-                    ));
+                let join_msg = {
+                        step: 'join',
+                        username: this.playerName,
+                        player: this.player,
+                        mode: mode
+                    }
+                if (extra) {
+                    join_msg['info'] = extra;
                 }
+                this.socket.send(JSON.stringify(join_msg));
             }
             if (this.mode !== "menu") {
                 this.gameLoop();
@@ -409,11 +407,11 @@ function game() {
             this.clickMode("Click here to play!", "auto-play", "cancel-wait");
         }
 
-        clickMode(msg, mode, element = "overlay", reset=true) {
+        clickMode(msg, mode, element = "overlay", extra=null) {
             clearInterval(this.countdownInterval);
             this.countdownInterval = null
             this.closeMenu(element);
-            this.endGame(msg, mode, reset);
+            this.endGame(msg, mode, extra);
         }
 
         initUIListeners() {
@@ -421,7 +419,7 @@ function game() {
                 local: () => this.clickMode(null, "local"),
                 remote: () => this.clickMode(null, "remote"),
                 remoteAI: () => this.clickMode(null, "remote-ai"),
-                create_challenge: () => this.clickMode(null, "challenge_created"),
+                create_challenge: () => this.clickMode(null, "create_challenge"),
                 rematch_ok: () => this.rematch('join'),
                 rematch_cancel: () => this.rematch('cancel'),
                 waiting_cancel: () => this.abort_waiting()
@@ -723,21 +721,21 @@ function game() {
             }
         }
 
-        endGame(msg, mode = "auto-play", reset=true) {
+        endGame(msg, mode = "auto-play", extra=null) {
             message = msg;
             this.running = false;
-            startNewGame(mode);
+            startNewGame(mode, extra);
         }
     }
 
-    function startNewGame(mode) {
+    function startNewGame(mode, extra=null) {
         if (gameInstance) {
             gameInstance.destroy();
         }
         if (mode === "auto-play") {
             gameInstance = new PongGame("auto-play");
         } else {
-            gameInstance = new PongGame(mode);
+            gameInstance = new PongGame(mode, extra);
         }
     }
 
@@ -761,11 +759,7 @@ function game() {
             acceptSpan.title = "Accept";
             acceptSpan.addEventListener("click", (event) => {
               event.stopPropagation();
-              gameInstance.clickMode(null, "remote_challenge", null, false);
-              socket_game.send(JSON.stringify({
-                step: accept_step,
-                challenge_id: challenge.id
-              }));
+              gameInstance.clickMode(null, "accept_challenge", undefined, challenge.id);
             });
             iconsDiv.appendChild(acceptSpan);
         }
@@ -789,13 +783,9 @@ function game() {
             challengeSpan.textContent = "target";
             challengeSpan.title = "Challenge";
             challengeSpan.addEventListener("click", (event) => {
-                // TODO: improve to avoid error
-                gameInstance.clickMode(null, "user-challenged", null, false);
                 event.stopPropagation();
-                socket_game.send(JSON.stringify({
-                    step: "challenge-user",
-                    challenge_id: challenge.id
-                }));
+                console.log(challenge.id);
+                gameInstance.clickMode(null, "challenge-user", undefined, challenge.id);
             });
             iconsDiv.appendChild(challengeSpan);
         }
