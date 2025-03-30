@@ -9,6 +9,7 @@ function chat(url)
     const accessToken = sessionStorage.getItem('access');
     if (!accessToken) {
         console.error('No se encontró el token de acceso en sessionStorage. No se puede conectar al chat.');
+        window.location.href = '/users/login/';
         // TODO: Redirigir al login o mostrar un mensaje ?
         return; 
     }
