@@ -103,7 +103,9 @@
 				<td>{{ user.email }}</td>
 				<td>{{ user.wins }}-{{ user.losses }}</td>
 				<td id="chat-{{ user.id }}">
-					<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ user.username }}')"></i> -->
+					<i class="fas fa-crossed-swords friend-icon link" href="/game/remote/?user={{ user.id }}" ></i>
+				</td>
+				<td id="chat-{{ user.id }}">
 					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ user.id }}" ></i>
 				</td>
 				<td id="follow-{{ user.id }}">

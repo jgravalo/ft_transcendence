@@ -21,21 +21,26 @@ class PongConsumer(AsyncWebsocketConsumer):
 		return None # No hay salas disponibles con espacio
 
 	async def connect(self):
-		# Obtener la sala desde la URL o algún identificador
 		available_room = await self.find_available_room()
-		"""
-        # self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # Para hacer el otro usuario
+		# Para hacer el otro usuario restringido
+		User = apps.get_model('users', 'User')
 		self.user2 = self.scope["url_route"]["kwargs"].get("user")
-		self.room_name = self.scope["url_route"]["kwargs"].get("room_name")
+		print('set game')
+		try:
+			print(f'user2: {self.user2}')
+			# self.user2 = self.scope['url_route']['kwargs']['other_user_id']
+			self.user2 = await sync_to_async(User.objects.get)(id=self.user2)
+		except:
+			self.user2 = None  # O cualquier valor predeterminado
+		# Obtener la sala desde la URL o algún identificador
+		self.room_name = self.scope["url_route"]["kwargs"].get("room")
 		if self.user2:
 			self.room_name = f"game_re{uuid.uuid4().hex[:8]}"
 			self.games[self.room_name] = []  # Nueva sala
-			self.user2.invite(self.user2, self.room_name)
-		elif self.room_name: # not in self.games:
+			await sync_to_async(self.user2.invite)(self.user2, self.room_name)
+		elif self.room_name: # in self.games:
 			pass
-		"""
-		print('set game')
-		if available_room:
+		elif available_room:
 			self.room_name = available_room  # Unirse a la sala con espacio
 			print('room available')
 		else:
@@ -138,9 +143,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 				if (self.games[self.room_name][0].paddle["score"] >= ball["max-score"] or
 					self.games[self.room_name][1].paddle["score"] >= ball["max-score"]):
 					if self.games[self.room_name][0].paddle["score"] >= ball["max-score"]:
-						winner =  self.games[self.room_name][0].name
+						winner = self.games[self.room_name][0].name
 					elif self.games[self.room_name][1].paddle["score"] >= ball["max-score"]:
-						winner =  self.games[self.room_name][1].name
+						winner = self.games[self.room_name][1].name
 					if (self.games[self.room_name][0].user.is_authenticated and
 					self.games[self.room_name][1].user.is_authenticated):
 						Match = apps.get_model('game', 'Match')

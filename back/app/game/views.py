@@ -26,7 +26,23 @@ def local_game(request):
     return JsonResponse(data)
 
 def remote_game(request):
-    content = render_to_string('remote_game.html')
+    try:
+        # user = User.get_user(request)
+        user = User.get_user(request)
+        # user = User.objects.get(id=id)
+    except:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+	link = ''
+    id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    if id:
+        link = f'/?user={id}'
+    room = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    if room:
+        link = f'/?room={room}'
+    context = {
+        'link': link
+    }
+    content = render_to_string('remote_game.html', context)
     print(f'request.user = {request.user}')
     data = {
         "element": 'content',

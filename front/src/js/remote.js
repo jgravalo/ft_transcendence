@@ -1,11 +1,19 @@
 let gameSocket = null;
 let winner = null;
 //remote
-function gameRemote(/* url */)
+function gameRemote(url)
 {
-	// const params = new URLSearchParams(new URL(url).search);
-	document.getElementById('content').innerHTML =
-		`<canvas id="gameCanvas" width="400" height="600"></canvas>`;
+	const params = new URLSearchParams(new URL(url).search);
+	console.log(`ws://${base.slice(7, -5)}:8080/ws/game/?user=${params.get("user")}/`);
+	console.log(`ws://${base.slice(7)}/ws/game/?user=${params.get("user")}/`);
+	if (params.get("user"))
+		gameSocket = new WebSocket(`ws://${base.slice(7, -5)}:8080/ws/game/?user=${params.get("user")}/`);
+	else if (params.get("room"))
+		gameSocket = new WebSocket(`ws://${base.slice(7, -5)}:8080/ws/game/?room=${params.get("room")}/`);
+	else
+		gameSocket = new WebSocket(`ws://${base.slice(7, -5)}:8080/ws/game/`);
+	/* document.getElementById('content').innerHTML =
+		`<canvas id="gameCanvas" width="400" height="600"></canvas>`; */
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
 	const winnerMessage = document.getElementById("winnerMessage");
@@ -52,7 +60,6 @@ function gameRemote(/* url */)
 	let player = null;
 	let role = null;
 	let gameStarted = false; // !!
-	gameSocket = new WebSocket('ws://' + base.slice(7, -5) + ':8080/ws/game/'/*  + params.get("user") + '/' */);
 
 	gameSocket.onopen = function(event) {
 		console.log(`socket opened`);
