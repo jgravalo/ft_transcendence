@@ -107,3 +107,13 @@ class User(AbstractUser):
 		
 		# Eliminar completamente el usuario y todos sus datos
 		super().delete(*args, **kwargs)
+	
+""" 	def message(self):
+		channel_layer = get_channel_layer()
+		async_to_sync(channel_layer.group_send)(
+			self.username,  # Nombre del grupo
+			{
+				"type": "chat.message",
+				"message": "Hola desde la vista!"
+			}
+		) """

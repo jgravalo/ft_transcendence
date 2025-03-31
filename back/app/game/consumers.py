@@ -18,7 +18,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			# Si hay un solo jugador, la sala tiene espacio
 			if len(game_list) == 1: # and room[:4] != 'game_re' # Protegemos de partidas restringidas
 				return room
-		return None  # No hay salas disponibles con espacio
+		return None # No hay salas disponibles con espacio
 
 	async def connect(self):
 		# Obtener la sala desde la URL o algún identificador
@@ -42,7 +42,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			self.room_name = f"game_ra{uuid.uuid4().hex[:8]}"
 			self.games[self.room_name] = []
 			print('new room')
-		
+
 		print(f'room_name in connect = {self.room_name}')
 		self.room_group_name = f'private_{self.room_name}'
 		print('set user')
@@ -61,7 +61,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print('paddle[y]:', self.paddle['y'])
 		print(f'user: {self.name} {self}')
 		self.games[self.room_name].append(self)
-		
+
 		await self.accept()
 		await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
 		if len(self.games[self.room_name]) == 2:
