@@ -11,11 +11,25 @@ def game(request):
     content = render_to_string('game.html')
     print(f'request.user = {request.user}')
     data = {
-        "id": "52263",
-        "player1": "jgravalo",
-        "player2": "IA",
         "element": 'content',
         "content": content
     }
-    #print(data)
+    return JsonResponse(data)
+
+def local_game(request):
+    content = render_to_string('local_game.html')
+    print(f'request.user = {request.user}')
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
+
+def remote_game(request):
+    content = render_to_string('remote_game.html')
+    print(f'request.user = {request.user}')
+    data = {
+        "element": 'content',
+        "content": content
+    }
     return JsonResponse(data)

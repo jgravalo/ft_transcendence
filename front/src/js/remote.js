@@ -1,4 +1,5 @@
 let gameSocket = null;
+let winner = null;
 //remote
 function gameRemote(/* url */)
 {
@@ -47,10 +48,8 @@ function gameRemote(/* url */)
 		ctx.fillText(player1.score, canvas.width - 20, 30);
 		ctx.fillText(player2.score, canvas.width - 20, canvas.height - 30);
 	}
-
 	
 	let player = null;
-	let winner = null;
 	let role = null;
 	let gameStarted = false; // !!
 	gameSocket = new WebSocket('ws://' + base.slice(7, -5) + ':8080/ws/game/'/*  + params.get("user") + '/' */);
@@ -136,8 +135,9 @@ function gameRemote(/* url */)
 		if (gameOver)
 		{
 			console.log("pathname = ", window.location.pathname);
-			if (window.location.pathname == '/game')
-				gameOptions(`${winner} wins!`);
+			if (window.location.pathname.slice(0, 6) == '/game/')
+				fetchLink('/game/');
+				// gameOptions(`${winner} wins!`);
 			return ;
 		}
 		ctx.clearRect(0, 0, canvas.width, canvas.height);

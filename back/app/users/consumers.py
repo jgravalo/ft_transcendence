@@ -65,5 +65,6 @@ class Connection(WebsocketConsumer):
 		}
 		self.send(text_data=json.dumps({
 			"message": event["message"],
+			"element": 'modalContainer',
 			"content": render_to_string('invite.html', context)
 		}))

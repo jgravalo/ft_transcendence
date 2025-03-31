@@ -130,7 +130,8 @@ function game()
 		if (gameOver)
 		{
 			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
-			gameOptions(`Player ${player1.score > player2.score ? "1" : "2"} wins!`);
+			// gameOptions(`Player ${player1.score > player2.score ? "1" : "2"} wins!`);
+			fetchLink('/game/');
 			return;
 		}
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
