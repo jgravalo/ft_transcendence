@@ -30,6 +30,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		if self.user2:
 			self.room_name = f"game_re{uuid.uuid4().hex[:8]}"
 			self.games[self.room_name] = []  # Nueva sala
+			self.user2.invite(self.user2, self.room_name)
 		elif self.room_name: # not in self.games:
 			pass
 		"""

@@ -138,8 +138,9 @@ function loginSock() // por definir
     };
     // Escuchar mensajes desde el servidor
     connSocket.onmessage = function (event) {
-        //const data = JSON.parse(event.data);
-        //console.log(data.message);
+        var warnPlay = new bootstrap.Modal(document.getElementById('loginModal'));
+		warnPlay.show();
+
     };
     // Manejar desconexión
     connSocket.onclose = function (event) {

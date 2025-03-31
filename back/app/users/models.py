@@ -7,6 +7,8 @@ from django.contrib.sessions.models import Session
 # from game.models import Match
 from django.db.models import Q
 from django.apps import apps
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 import uuid
@@ -108,12 +110,15 @@ class User(AbstractUser):
 		# Eliminar completamente el usuario y todos sus datos
 		super().delete(*args, **kwargs)
 	
-""" 	def message(self):
+	def invite(self, user, link):
 		channel_layer = get_channel_layer()
 		async_to_sync(channel_layer.group_send)(
 			self.username,  # Nombre del grupo
 			{
-				"type": "chat.message",
-				"message": "Hola desde la vista!"
+				# "type": "warn_player",
+				"type": "warn.player",
+				"user": user.username,
+				"link": link,
+				"message": "Hola desde la vista!",
 			}
-		) """
+		)

@@ -73,23 +73,28 @@ function fetchLink(path)
     }) // Convertir la respuesta a JSON
     .then(data => {
         //directions(path,`${data.element}`, `${data.content}`);
-        var dest = `${data.element}`;
+		var dest = `${data.element}`;
+		if (dest != 'modalContainer' &&
+			path != '/users/login/close/' && path != '/users/logout/close/')
+			pushState(path);
         document.getElementById(dest).innerHTML = `${data.content}`;
+		const scripts = document.getElementById(`${data.element}`).getElementsByTagName("script");
+		for (let script of document.getElementById(`${data.element}`).getElementsByTagName("script")) {
+			const newScript = document.createElement("script");
+			newScript.type = "text/javascript";
+			newScript.text = script.innerText;  // Tomamos el código JavaScript del script insertado
+			document.head.appendChild(newScript);  // Insertamos el script de manera segura
+		}
         //updating the newly added content with right language
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
         if (dest == 'modalContainer')
             makeModal(path);
-        /* {
-            pushState(path);
-        } */
         else
         {
-            if (path != '/users/login/close/' && path != '/users/logout/close/')
-                pushState(path);
             if (path == '/users/update/')
                 makePost(path);
-            else if (path.slice(0, 6) == '/chat/')
-                chat(base + get);
+            // else if (path.slice(0, 6) == '/chat/')
+            //     chat(base + get);
 			// else if (path == '/game/')
             //     game();
             handleLinks();

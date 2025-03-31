@@ -17,3 +17,7 @@
 		<button type="submit"><i class="fas fa-paper-plane"></i></button> <!-- onclick="sendMessage()" -->
 	</form>
 <div>
+<script>
+	chat(window.location.origin + '/chat/?user={{ user.id|escapejs }}');
+	console.log('from template: ' + window.location.origin + '/chat/?user={{ user.id|escapejs }}');
+</script>

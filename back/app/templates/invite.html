@@ -1,0 +1,17 @@
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="color: #000;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel" data-i18n="logout.title" >Close Session</h5>
+                <!-- <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <span data-i18n="logout.confirm">You have been invited by {{ user }}. Are you sure?</span>
+            </div>
+            <div style="display: flex; justify-content: right;">
+                <button id="cancel-logout" style="min-width: 50%; background-color: red;"  type="submit" class="btn btn-primary" data-bs-dismiss="modal" data-i18n="logout.cancel">Decline</button>
+                <button id="close-session" style="min-width: 50%; background-color: greenyellow;" type="submit" class="link btn btn-primary" href="/game/remote/?room={{ link }}" data-i18n="logout.exit">Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
