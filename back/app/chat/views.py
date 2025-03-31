@@ -7,17 +7,8 @@ from users.models import User
 
 def chat(request):
     print('entra en chat')
-    try:
-        user = request.user
-        print('request.user =', user)
-    except:
-        print('request.user failed')
-    try:
-        # user = User.get_user(request)
-        id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-        user = User.get_user(request)
-        user = User.objects.get(id=id)
-    except:
+    user = User.get_user(request)
+    if not user:
         return JsonResponse({'error': 'Forbidden'}, status=403)
     context = {
         'user': user
