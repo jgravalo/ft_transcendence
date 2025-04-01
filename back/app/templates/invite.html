@@ -9,9 +9,14 @@
                 <span data-i18n="logout.confirm">You have been invited by {{ user }}. Are you sure?</span>
             </div>
             <div style="display: flex; justify-content: right;">
-                <button id="cancel-logout" style="min-width: 50%; background-color: red;"  type="submit" class="btn btn-primary" data-bs-dismiss="modal" data-i18n="logout.cancel">Decline</button>
-                <button id="close-session" style="min-width: 50%; background-color: green;" type="submit" class="link btn btn-primary"  data-i18n="logout.exit" data-bs-dismiss="modal" href="/game/remote/?room={{ link }}">Accept</button>
+                <button id="decline-match" style="min-width: 50%; background-color: red;"  type="submit" class="btn btn-primary" data-bs-dismiss="modal" data-i18n="logout.cancel">Decline</button>
+                <button id="accept-match" style="min-width: 50%; background-color: green;" type="submit" class="link btn btn-primary"  data-i18n="logout.exit" data-bs-dismiss="modal" href="/game/remote/?room={{ room }}">Accept</button>
             </div>
         </div>
     </div>
 </div>
+<script>
+	document.getElementById('accept-match').addEventListener('click', () => {
+        fetchlink('/game/remote/?room={{ room|escapejs }}');
+    });
+</script>

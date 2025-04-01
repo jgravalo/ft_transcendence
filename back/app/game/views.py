@@ -35,11 +35,13 @@ def remote_game(request):
     #    return JsonResponse({'error': 'Forbidden'}, status=403)
     print('try id')
     id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-    room = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    room = request.GET.get('room', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     link = ''
     if id:
+        print('get id , create match')
         link = f'/?user={id}'
     elif room:
+        print('get room , accept match')
         link = f'/?room={room}'
     context = {
         'link': link

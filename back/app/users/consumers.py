@@ -62,7 +62,7 @@ class Connection(WebsocketConsumer):
 
 	def warn_player(self, event):
 		context = {
-			"link": event["link"],
+			"room": event["room"],
 			"user": event["user"]
 		}
 		self.send(text_data=json.dumps({
