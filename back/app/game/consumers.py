@@ -4,6 +4,7 @@ import uuid
 from asgiref.sync import sync_to_async
 from django.apps import apps
 from channels.generic.websocket import AsyncWebsocketConsumer
+from urllib.parse import parse_qs
 
 class PongConsumer(AsyncWebsocketConsumer):
 	games = {}  # Lista para almacenar jugadores
@@ -22,28 +23,45 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
 		available_room = await self.find_available_room()
-		# Para hacer el otro usuario restringido
 		User = apps.get_model('users', 'User')
-		self.user2 = self.scope["url_route"]["kwargs"].get("user")
+
+		# Para hacer el otro usuario restringido
+		"""
+		query_string = self.scope["query_string"].decode()  # Convertir bytes a string
+		query_params = parse_qs(query_string)  # Parsear la query string en un diccionario
+		
+		# Obtener el usuario desde los parámetros de la consulta
+		self.user2 = query_params.get("user", [None])[0]
+		"""
+
+		self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
+		# self.user2 = self.scope["url_route"]["kwargs"].get("user")
 		print('set game')
 		try:
-			print(f'user2: {self.user2}')
+			print(f'user2 before: {self.user2}')
 			# self.user2 = self.scope['url_route']['kwargs']['other_user_id']
 			self.user2 = await sync_to_async(User.objects.get)(id=self.user2)
+			print(f'user2 before: {self.user2.id}')
 		except:
 			self.user2 = None  # O cualquier valor predeterminado
 		# Obtener la sala desde la URL o algún identificador
 		self.room_name = self.scope["url_route"]["kwargs"].get("room")
+
 		if self.user2:
+			print('CREATE RESTRICTED GAME')
 			self.room_name = f"game_re{uuid.uuid4().hex[:8]}"
 			self.games[self.room_name] = []  # Nueva sala
+			print(f'invite {self.user2.username}')
 			await sync_to_async(self.user2.invite)(self.user2, self.room_name)
 		elif self.room_name: # in self.games:
+			print('ADD TO RESTRICTED GAME')
 			pass
 		elif available_room:
+			print('ADD TO RANDOM GAME')
 			self.room_name = available_room  # Unirse a la sala con espacio
 			print('room available')
 		else:
+			print('CREATE RANDOM GAME')
 			# self.room_name = self.scope["url_route"]["kwargs"]["room_name"]  # Nueva sala
 			self.room_name = f"game_ra{uuid.uuid4().hex[:8]}"
 			self.games[self.room_name] = []
@@ -56,13 +74,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.games[self.room_name]) + 1}"
 		# print(f'user {self.name}: {self.user.id}')
 		self.role = f"player{len(self.games[self.room_name]) + 1}"
-		self.paddle = {
-			"x": 150,
-			"y": 10 if len(self.games[self.room_name]) == 0 else 580,
-			"width": 80,
-			"height": 10,
-			"score": 0
-			}
+		self.paddle = {"width": 80, "height": 10, "score": 0,
+			"x": 150, "y": 10 if len(self.games[self.room_name]) == 0 else 580}
 		print('role:', self.role)
 		print('paddle[y]:', self.paddle['y'])
 		print(f'user: {self.name} {self}')

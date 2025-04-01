@@ -27,11 +27,13 @@ class Connection(WebsocketConsumer):
 		print(f'room_group_name for user = {self.room_group_name}')
 		# self.channel_layer.group_add(self.room_group_name, self.channel_name)
 		async_to_sync(self.channel_layer.group_add)(self.room_group_name, self.channel_name)
+		"""
 		self.send(text_data=json.dumps({
 			"message": "Conexión WebSocket exitosa from Django",
 			"status": user.is_online if user.is_authenticated else False,
 			"content": render_to_string("close_login.html")
 		}))
+		"""
 
 	def disconnect(self, close_code):
 		print('desconexion desde el front')

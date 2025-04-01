@@ -127,9 +127,9 @@ function loginSock() // por definir
 { 
     // CREATE SOCKET
     const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/';
-    //const route = 'ws://back:8000/ws/connect/';
     console.log('ruta: ', route);
     connSocket = new WebSocket(route);
+	
     // Escuchar eventos de conexión
     connSocket.onopen = function (event) {
         console.log("WebSocket conectado");
@@ -138,9 +138,12 @@ function loginSock() // por definir
     };
     // Escuchar mensajes desde el servidor
     connSocket.onmessage = function (event) {
-		if (data.element) {
+        const data = JSON.parse(event.data);
+		console.log(`element: ${data.element}`);
+		console.log(`content: ${data.content}`);
+		// if (data.element) {
 			document.getElementById(data.element).innerHTML = data.content;
-		}
+		// }
         var warnPlay = new bootstrap.Modal(document.getElementById('loginModal'));
 		warnPlay.show();
     };

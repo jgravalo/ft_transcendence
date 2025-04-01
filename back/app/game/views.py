@@ -26,18 +26,20 @@ def local_game(request):
     return JsonResponse(data)
 
 def remote_game(request):
-    try:
+    #try:
+    # print('try user')
+    # user = User.get_user(request)
         # user = User.get_user(request)
-        user = User.get_user(request)
         # user = User.objects.get(id=id)
-    except:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
-	link = ''
+    #except:
+    #    return JsonResponse({'error': 'Forbidden'}, status=403)
+    print('try id')
     id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    room = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    link = ''
     if id:
         link = f'/?user={id}'
-    room = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-    if room:
+    elif room:
         link = f'/?room={room}'
     context = {
         'link': link
