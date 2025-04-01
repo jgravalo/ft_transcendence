@@ -17,7 +17,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 		for room, game_list in self.games.items():
 			print(f'room {room}; len1: {len(game_list)}; len2: {len(self.games[room])}')
 			# Si hay un solo jugador, la sala tiene espacio
-			if len(game_list) == 1: # and room[:4] != 'game_re' # Protegemos de partidas restringidas
+			print(f'room[:7] = {room[:7]}')
+			if len(game_list) == 1 and room[:7] != 'game_re': # Protegemos de partidas restringidas
 				return room
 		return None # No hay salas disponibles con espacio
 

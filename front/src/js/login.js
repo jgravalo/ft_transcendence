@@ -141,11 +141,11 @@ function loginSock() // por definir
         const data = JSON.parse(event.data);
 		console.log(`element: ${data.element}`);
 		console.log(`content: ${data.content}`);
-		// if (data.element) {
+		if (data.element) {
 			document.getElementById(data.element).innerHTML = data.content;
-		// }
-        var warnPlay = new bootstrap.Modal(document.getElementById('loginModal'));
-		warnPlay.show();
+			var warnPlay = new bootstrap.Modal(document.getElementById('loginModal'));
+			warnPlay.show();
+		}
     };
     // Manejar desconexión
     connSocket.onclose = function (event) {

@@ -17,6 +17,7 @@
 </div>
 <script>
 	document.getElementById('accept-match').addEventListener('click', () => {
-        fetchlink('/game/remote/?room={{ room|escapejs }}');
+        console.log('I accept the match');
+		fetchlink('/game/remote/?room={{ room|escapejs }}');
     });
 </script>
