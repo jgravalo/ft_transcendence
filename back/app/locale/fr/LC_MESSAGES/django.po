@@ -23,11 +23,11 @@ msgstr "Accueil"
 
 #: language/translations.py:5
 msgid "Login"
-msgstr "Se connecter"
+msgstr "Connection"
 
 #: language/translations.py:6
 msgid "Register"
-msgstr "S'inscrire"
+msgstr "Inscription"
 
 #: language/translations.py:7
 msgid "Welcome"
@@ -43,7 +43,7 @@ msgstr "© 2025 projet ft_transcendence par 42"
 
 #: language/translations.py:10
 msgid "Team"
-msgstr "Membres de l'équipe : Jésus, Manuel, David, Victor et Louis"
+msgstr "Créateurs: Jésus, Manuel, David, Victor et Louis"
 
 #: language/translations.py:11
 msgid "Logout"
@@ -511,3 +511,18 @@ msgstr "1. Responsable du traitement des données"
 msgid "The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
 msgstr "Le responsable du traitement des données est Pong42, avec l'adresse Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
 
+#: language/translations.py:173
+msgid "Local"
+msgstr "🎮 Local"
+
+#: language/translations.py:174
+msgid "Local_description"
+msgstr "Jouer sur le même clavier"
+
+#: language/translations.py:175
+msgid "Online"
+msgstr "🧑‍🤝‍🧑 En ligne"
+
+#: language/translations.py:176
+msgid "Online_description"
+msgstr "Jouer contre un autre joueur"

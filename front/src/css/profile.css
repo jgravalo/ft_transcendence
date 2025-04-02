@@ -122,8 +122,10 @@
 .stats {
 	width: 100%;
 	display: flex;
-	gap: 20px;
+	justify-content: space-between;
+	flex-wrap: wrap;
 	margin: 10px 0;
+	gap: 10px;
 }
 
 .stat-card {
@@ -135,6 +137,8 @@
 	flex-direction: column;
 	align-items: center;
 	width: 250px;
+	max-width: 100%;
+	flex: 1 1 0;
 }
 
 .stat-icon {

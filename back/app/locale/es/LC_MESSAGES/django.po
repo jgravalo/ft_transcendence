@@ -23,11 +23,11 @@ msgstr "Inicio"
 
 #: language/translations.py:5
 msgid "Login"
-msgstr "Iniciar sesión"
+msgstr "Iniciar"
 
 #: language/translations.py:6
 msgid "Register"
-msgstr "Registrarse"
+msgstr "Registrar"
 
 #: language/translations.py:7
 msgid "Welcome"
@@ -515,3 +515,18 @@ msgstr "1. Responsable del tratamiento de datos"
 msgid "The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
 msgstr "El responsable del tratamiento de datos es Pong42, con dirección Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
 
+#: language/translations.py:173
+msgid "Local"
+msgstr "🎮 Local"
+
+#: language/translations.py:174
+msgid "Local_description"
+msgstr "Jugar en el mismo teclado"
+
+#: language/translations.py:175
+msgid "Online"
+msgstr "🧑‍🤝‍🧑 En línea"
+
+#: language/translations.py:176
+msgid "Online_description"
+msgstr "Jugar contra otro jugador"

@@ -169,5 +169,9 @@ TRANSLATION_KEYS = {
     "privacy.changes.title": _("11. Changes to the Privacy Policy"),
     "privacy.changes.intro": _("We may update this Privacy Policy at any time. We will notify you of significant changes through the application or the email associated with your account. The date of the last update will be indicated at the top of this page."),
     "privacy.contact.title": _("12. Contact"),
-    "privacy.contact.intro": _("For any privacy and data handling inquiries, you can contact the system administrator at contact@pong42.com")
+    "privacy.contact.intro": _("For any privacy and data handling inquiries, you can contact the system administrator at contact@pong42.com"),
+    "home.local.title": _("Local"),
+    "home.local.description": _("Local_description"),
+    "home.online.title": _("Online"),
+    "home.online.description": _("Online_description"),
 }
