@@ -219,6 +219,7 @@
 
 .tab.active {
 	border-bottom: 2px solid white;
+	border-radius: 0px;
 }
 
 .match-history {
@@ -397,5 +398,8 @@
 
 	.stat-card {
 		width: 100%;
+	}
+	.tab {
+		font-size: large;
 	}
 }
