@@ -172,3 +172,17 @@ function initGameLandingControls() {
 		handleLink({ currentTarget: { getAttribute: () => "/game/" }, preventDefault: () => {} });
 	});
 }
+
+function showTab(tabId, button) {
+	// Hide all tab contents
+	document.querySelectorAll('.tab-content').forEach(div => {
+		div.classList.add('hidden');
+	});
+
+	// Show selected tab
+	document.getElementById(tabId).classList.remove('hidden');
+
+	// Only activate active on the right tab button
+	document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+	if (button) button.classList.add('active');
+}
