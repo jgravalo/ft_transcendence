@@ -220,6 +220,7 @@
 .tab.active {
 	border-bottom: 2px solid white;
 	border-radius: 0px;
+	color: white;
 }
 
 .match-history {
@@ -340,6 +341,7 @@
 	.tabs {
 		justify-content: center;
 	}
+
 	
 	.tab {
 		padding: 8px 15px;
