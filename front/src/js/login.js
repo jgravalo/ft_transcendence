@@ -123,6 +123,8 @@ function getInfo()
     return new FormData(form);
 }
 
+let link = null;
+
 function loginSock() // por definir
 { 
     // CREATE SOCKET
@@ -145,6 +147,11 @@ function loginSock() // por definir
 			document.getElementById(data.element).innerHTML = data.content;
 			var warnPlay = new bootstrap.Modal(document.getElementById('loginModal'));
 			warnPlay.show();
+			execScript(data.element);
+			document.getElementById('accept-match').addEventListener('click', () => {
+				console.log('I accept the match');
+				fetchLink(link);
+			});
 		}
     };
     // Manejar desconexión

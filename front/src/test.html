@@ -75,9 +75,21 @@
 		<!-- Main content -->
 		<div id="all">
 			<div id="content">
-				<h2 id="winnerMessage"></h2>
+				<td id="game-{{ user.id }}">
+					<i class="fas fa-chess-board friend-icon link" href="/game/remote/?user={{ user.id }}" ></i>
+				</td>
+				<td id="chat-{{ user.id }}">
+					<i class="fas fa-comment friend-icon link" href="/chat/?user={{ user.id }}" ></i>
+				</td>
+				<td id="follow-{{ user.id }}">
+					<i class="fas fa-plus friend-icon" onclick="addFriend('{{ user.id }}')"></i>
+				</td>
+				<td id="block-{{ user.id }}">
+					<i class="fas fa-ban friend-icon" onclick="blockUser('{{ user.id }}')" style="color: brown;"></i>
+				</td>
+				<!-- <h2 id="winnerMessage"></h2>
 				<button onclick="game()">READY</button>
-				<canvas id="gameCanvas" width="400" height="600"></canvas>
+				<canvas id="gameCanvas" width="400" height="600"></canvas> -->
 				 <!--
 				<div class="profile-container">
 					<div class="profile">

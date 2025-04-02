@@ -16,8 +16,11 @@
     </div>
 </div>
 <script>
-	document.getElementById('accept-match').addEventListener('click', () => {
-        console.log('I accept the match');
-		fetchlink('/game/remote/?room={{ room|escapejs }}');
-    });
+	console.log('Will u accept the match?');
+	link = '/game/remote/?room={{ room|escapejs }}';
+	// document.getElementById('accept-match').addEventListener('click', () => {
+	// 	fetchlink('/game/remote/?room={{ room|escapejs }}');
+    // });
+	// 	document.getElementById('accept-match').click();
+    //     console.log('I accept the match');
 </script>

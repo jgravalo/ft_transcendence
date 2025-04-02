@@ -47,6 +47,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			self.user2 = None  # O cualquier valor predeterminado
 		# Obtener la sala desde la URL o algún identificador
 		self.room_name = self.scope["url_route"]["kwargs"].get("room")
+		print("self.room_name =", self.room_name)
 
 		if self.user2:
 			print('CREATE RESTRICTED GAME')
