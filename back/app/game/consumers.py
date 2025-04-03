@@ -162,6 +162,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 						winner = self.games[self.room_name][0].name
 					elif self.games[self.room_name][1].paddle["score"] >= ball["max-score"]:
 						winner = self.games[self.room_name][1].name
+					
+					# guarda en db
 					if (self.games[self.room_name][0].user.is_authenticated and
 					self.games[self.room_name][1].user.is_authenticated):
 						Match = apps.get_model('game', 'Match')
@@ -171,6 +173,11 @@ class PongConsumer(AsyncWebsocketConsumer):
 							score_player1=self.games[self.room_name][0].paddle["score"],
 							score_player2=self.games[self.room_name][1].paddle["score"],
 						)
+""" 
+						if self.is_tournament:
+							Round = apps.get_model('game', 'Round')
+							round = matches
+ """
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
 						"winner": winner
