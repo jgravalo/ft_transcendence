@@ -36,6 +36,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 		"""
 
 		self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
+		self.room_name = parse_qs(self.scope["query_string"].decode()).get("room", [None])[0]
+		# self.room_name = self.scope["url_route"]["kwargs"].get("room")
 		# self.user2 = self.scope["url_route"]["kwargs"].get("user")
 		print('set game')
 		try:
@@ -46,7 +48,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 		except:
 			self.user2 = None  # O cualquier valor predeterminado
 		# Obtener la sala desde la URL o algún identificador
-		self.room_name = self.scope["url_route"]["kwargs"].get("room")
 		print("self.room_name =", self.room_name)
 
 		if self.user2:
