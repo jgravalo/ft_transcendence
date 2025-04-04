@@ -1,6 +1,6 @@
 function addFriend(user)
 {
-	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-check friend-icon" onclick="deleteFriend(\'' + user + '\')"></i>';
+	document.getElementById(user).innerHTML = '<i class="fas fa-check"> Added</i>';
 	fetchFriend(user, 'add');
 }
 

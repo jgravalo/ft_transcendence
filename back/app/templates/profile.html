@@ -43,23 +43,18 @@
 		</div>
 	</div>
 
+		<!-- Tabs -->
 	<div class="tabs">
-		<button class="tab active"  onclick="showTab('match-history', this)">Match History</button>
-		<button class="tab" onclick="showTab('friends', this)">Friends</button>
-		<button class="tab">Achievements</button>
+		<button class="tab active" onclick="showTab('match-history', this)">Match History</button>
+		<button class="tab" onclick="showTab('friends-list', this)">Friends</button>
+		<button class="tab" onclick="showTab('blocked-list', this)">Blocked</button>
+		<button class="tab" onclick="showTab('users-list', this)">Other Users</button>
 	</div>
 
 	<!-- Match History -->
 	<div id="match-history" class="tab-content">
-		<div class="match-item">
-			<div>
-				<div class="match-players">XXX vs XXX</div>
-				<div class="match-time">XXX hours ago</div>
-			</div>
-			<div class="match-score">XXX - XXX</div>
-		</div>
 		{% for match in matches %}
-		<div class="match-item">
+		<div class="tab-item">
 			<div>
 				<div class="match-players">{{ match.player1 }} vs {{ match.player2 }}</div>
 				<div class="match-time">{{ match.created_at }}</div>
@@ -69,129 +64,84 @@
 		{% endfor %}
 	</div>
 
-	<!-- Friends -->
-	<div id="friends" class="tab-content hidden">
-		<h1 style="color: white;" data-i18n="friends.list.title">Lista de Usuarios</h1>
-			<form class="search-bar" action="/search" method="get">
-				<input type="text" name="search" placeholder="Search..." data-i18n="friends.search.placeholder" />
-				<button type="submit"><i class="fas fa-search"></i></button>
-			</form>
-		<h5 style="color: white;" data-i18n="friends.title">Friends</h1>
-		<table class="user">
-			<thead>
-				<tr>
-					<th data-i18n="friends.table.index">#</th>
-					<th data-i18n="friends.table.username">Username</th>
-					<th data-i18n="friends.table.email">Email</th>
-					<th data-i18n="friends.table.record">Record</th>
-					<th data-i18n="friends.table.action">State</th>
-					<th data-i18n="friends.table.action">-</th>
-					<th data-i18n="friends.table.action">-</th>
-					<th data-i18n="friends.table.action">-</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for friend in friends %}
-				<tr>
-					<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
-						<img src="{{ friend.image.url }}">
-					</div></td>
-					<td>{{ friend.username }}</td>
-					<td>{{ friend.email }}</td>
-					<td>{{ friend.wins }}-{{ friend.losses }}</td>
-					<td>{% if friend.is_online %}Active{% else %}Unavailable{% endif %}</td>
-					<td id="chat-{{ friend.id }}">
-						<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i> -->
-						<i class="fas fa-comment friend-icon link" href="/chat/?user={{ friend.id }}" ></i>
-					</td>
-					<td id="follow-{{ friend.id }}">
-						<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.id }}')"></i>
-					</td>
-					<td id="block-{{ friend.id }}">
-						<i class="fas fa-ban friend-icon" onclick="blockUser('{{ friend.id }}')" style="color: brown;"></i>
-					</td>
-				</tr>
-				{% empty %}
-				<tr>
-					<td colspan="4" data-i18n="friends.friends.empty">You don't have friends</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+	<!-- Friends List -->
+	<div id="friends-list" class="tab-content hidden">
+		{% for friend in friends %}
+		<div class="tab-item">
+			<div class="match-players">
+				<img src="{{ friend.image.url }}" class="user-avatar" />
+				<span>{{ friend.username }}</span>
+			</div>
+			<div class="match-score">
+				<span>{{ friend.wins }} - {{ friend.losses }}</span>
+				{% if friend.is_online %}
+					<span class="online-status">🟢</span>
+				{% else %}
+					<span class="online-status">🔴</span>
+				{% endif %}
+				<i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i>
+				<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.id }}')"></i>
+				<i class="fas fa-ban friend-icon" onclick="blockUser('{{ friend.id }}')" style="color: brown;"></i>
+			</div>
+		</div>
+		{% empty %}
+		<p style="color: white;" data-i18n="friends.friends.empty">You don't have friends</p>
+		{% endfor %}
+	</div>
 
-		<h5 style="color: white;" data-i18n="friends.blocked.title">blocked users</h1>
-		<table class="user">
-			<thead>
-				<tr>
-					<th data-i18n="friends.table.index">#</th>
-					<th data-i18n="friends.table.username">Username</th>
-					<th data-i18n="friends.table.email">Email</th>
-					<th data-i18n="friends.table.record">Record</th>
-					<th data-i18n="friends.table.action">-</th>
-					<th data-i18n="friends.table.action">-</th>
-					<th data-i18n="friends.table.action">-</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for blocked in blockeds %}
-				<tr>
-					<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
-						<img src="{{ blocked.image.url }}">
-					</div></td>
-					<td>{{ blocked.username }}</td>
-					<td>{{ blocked.email }}</td>
-					<td>{{ blocked.wins }}-{{ blocked.losses }}</td>
-					<td id="follow-{{ blocked.id }}"> </td>
-					<td id="block-{{ blocked.id }}">
-						<i class="fas fa-lock-open friend-icon" onclick="unlockUser('{{ blocked.id }}')"></i>
-					</td>
-				</tr>
-				{% empty %}
-				<tr>
-					<td colspan="4" data-i18n="friends.blocked.empty">There are not blocked users.</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+	<!-- Blocked Users -->
+	<div id="blocked-list" class="tab-content hidden">
+		{% for blocked in blockeds %}
+		<div class="tab-item">
+			<div class="match-players">
+				<img src="{{ blocked.image.url }}" class="user-avatar" />
+				<span>{{ blocked.username }}</span>
+			</div>
+			<div class="match-score">
+				<span>{{ blocked.wins }} - {{ blocked.losses }}</span>
+				<span class="online-status">🚫</span>
+				<i class="fas fa-lock-open friend-icon" onclick="unlockUser('{{ blocked.id }}')"></i>
+			</div>
+		</div>
+		{% empty %}
+		<p style="color: white;" data-i18n="friends.blocked.empty">There are no blocked users.</p>
+		{% endfor %}
+	</div>
 
-		<h5 style="color: white;" data-i18n="friends.other.title">Other users</h1>
-		<table class="user">
-			<thead>
-				<tr>
-					<th data-i18n="friends.table.index">#</th>
-					<th data-i18n="friends.table.username">Username</th>
-					<th data-i18n="friends.table.email">Email</th>
-					<th data-i18n="friends.table.record">Record</th>
-					<th data-i18n="friends.table.action">-</th>
-					<th data-i18n="friends.table.action">-</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for user in users %}
-				<tr>
-					<td style="height: 50px; display: flex; justify-content: center; "><div class="user-photo">
-						<img src="{{ user.image.url }}">
-					</div></td>
-					<td>{{ user.username }}</td>
-					<td>{{ user.email }}</td>
-					<td>{{ user.wins }}-{{ user.losses }}</td>
-					<td id="chat-{{ user.id }}">
-						<!-- <i class="fas fa-comment friend-icon" onclick="chat('{{ user.username }}')"></i> -->
-						<i class="fas fa-comment friend-icon link" href="/chat/?user={{ user.id }}" ></i>
-					</td>
-					<td id="follow-{{ user.id }}">
-						<i class="fas fa-plus friend-icon" onclick="addFriend('{{ user.id }}')"></i>
-					</td>
-					<td id="block-{{ user.id }}">
-						<i class="fas fa-ban friend-icon" onclick="blockUser('{{ user.id }}')" style="color: brown;"></i>
-					</td>
-				</tr>
-				{% empty %}
-				<tr>
-					<td colspan="4" data-i18n="friends.other.empty">There are not users.</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+	<!-- Other Users -->
+	<div id="users-list" class="tab-content hidden">
+		<!-- Header Row -->
+		<div class="tab-header">
+			<div style="flex: 1.5;">User</div>
+			<div style="flex: 2;">Email</div>
+			<div style="flex: 1;">Record</div>
+			<div style="flex: 2;">Actions</div>
+		</div>		
+
+		{% for user in users %}
+		<div class="tab-item">
+			<!-- User -->
+			<div class="tab-players">
+				<img src="{{ user.image.url }}" class="user-avatar" />
+				<span>{{ user.username }}</span>
+			</div>
+
+			<!-- Email -->
+			<div class="tab-email">{{ user.email }}</div>
+
+			<!-- Record -->
+			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
+
+			<!-- Actions -->
+			<div class="tab-actions">
+				<button onclick="chat('{{ user.username }}')">💬 Chat</button>
+				<button id="friend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')">➕ Add Friend</button>
+				<button class="block-btn" onclick="blockUser('{{ user.id }}')">🚫 Block</button>
+			</div>
+		</div>
+		{% empty %}
+		<p style="color: white;" data-i18n="friends.other.empty">There are no other users.</p>
+		{% endfor %}
 	</div>
 </div>
+
