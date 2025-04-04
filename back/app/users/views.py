@@ -286,20 +286,28 @@ def get_logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    try:
-        user = User.get_user(request)
-    except:
-       return JsonResponse({'error': 'Forbidden'}, status=403)
-    # print("url =", user.image.url)
-    context = {
-        'user': user
-    }
-    content = render_to_string('profile.html', context)
-    data = {
-        "element": 'content',
-        "content": content
-    }
-    return JsonResponse(data)
+	try:
+		user = User.get_user(request)
+	except:
+		return JsonResponse({'error': 'Forbidden'}, status=403)
+
+	blocked = user.blocked.all()
+	blocked_by = user.blocked_by.all()
+	friends = user.friends.all()
+	non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked) - set(blocked_by)
+
+	context = {
+		'user': user,
+		'friends': friends,
+		'blockeds': blocked,
+		'users': non_friends,
+	}
+	content = render_to_string('profile.html', context)
+	data = {
+		"element": 'content',
+		"content": content
+	}
+	return JsonResponse(data)
 
 def foreign_profile(request):
     try:

@@ -64,43 +64,61 @@
 		{% endfor %}
 	</div>
 
-	<!-- Friends List -->
-	<div id="friends-list" class="tab-content hidden">
-		{% for friend in friends %}
-		<div class="tab-item">
-			<div class="match-players">
-				<img src="{{ friend.image.url }}" class="user-avatar" />
-				<span>{{ friend.username }}</span>
-			</div>
-			<div class="match-score">
-				<span>{{ friend.wins }} - {{ friend.losses }}</span>
-				{% if friend.is_online %}
-					<span class="online-status">🟢</span>
-				{% else %}
-					<span class="online-status">🔴</span>
-				{% endif %}
-				<i class="fas fa-comment friend-icon" onclick="chat('{{ friend.username }}')"></i>
-				<i class="fas fa-check friend-icon" onclick="deleteFriend('{{ friend.id }}')"></i>
-				<i class="fas fa-ban friend-icon" onclick="blockUser('{{ friend.id }}')" style="color: brown;"></i>
-			</div>
-		</div>
-		{% empty %}
-		<p style="color: white;" data-i18n="friends.friends.empty">You don't have friends</p>
-		{% endfor %}
+<!-- Friends List -->
+<div id="friends-list" class="tab-content hidden">
+	<!-- Header Row -->
+	<div class="tab-header">
+		<div style="flex: 1.5;">User</div>
+		<div style="flex: 2;">Email</div>
+		<div style="flex: 1;">Record</div>
+		<div style="flex: 2;">Actions</div>
 	</div>
+
+	{% for friend in friends %}
+	<div class="tab-item">
+		<div class="tab-players">
+			<img src="{{ friend.image.url }}" class="user-avatar" />
+			<span>{{ friend.username }}</span>
+			{% if friend.is_online %}
+				<span class="online-status">🟢</span>
+			{% else %}
+				<span class="online-status">🔴</span>
+			{% endif %}
+		</div>
+		<div class="tab-email">{{ friend.email }}</div>
+		<div class="tab-score">{{ friend.wins }} - {{ friend.losses }}</div>
+		<div class="tab-actions">
+			<button onclick="chat('{{ friend.username }}')">💬 Chat</button>
+			<button id="deletefriend-btn-{{ friend.id }}" onclick="deleteFriend('{{ friend.id }}')">💔 Unfriend</button>
+		</div>
+	</div>
+	{% empty %}
+	<p style="color: white;" data-i18n="friends.friends.empty">You don't have friends</p>
+	{% endfor %}
+</div>
 
 	<!-- Blocked Users -->
 	<div id="blocked-list" class="tab-content hidden">
+		<!-- Header Row -->
+		<div class="tab-header">
+			<div style="flex: 1.5;">User</div>
+			<div style="flex: 2;">Email</div>
+			<div style="flex: 1;">Record</div>
+			<div style="flex: 2;">Actions</div>
+		</div>
+
 		{% for blocked in blockeds %}
 		<div class="tab-item">
-			<div class="match-players">
+			<div class="tab-players">
 				<img src="{{ blocked.image.url }}" class="user-avatar" />
 				<span>{{ blocked.username }}</span>
-			</div>
-			<div class="match-score">
-				<span>{{ blocked.wins }} - {{ blocked.losses }}</span>
 				<span class="online-status">🚫</span>
-				<i class="fas fa-lock-open friend-icon" onclick="unlockUser('{{ blocked.id }}')"></i>
+			</div>
+			<div class="tab-email">{{ blocked.email }}</div>
+			<div class="tab-score">{{ blocked.wins }} - {{ blocked.losses }}</div>
+			<div class="tab-actions">
+				<button id="unblockfriend-btn-{{ blocked.id }}" onclick="unlockUser('{{ blocked.id }}')">🔓 Unblock</button>
+				<!-- Potential: add 'Add friend' or 'Chat' if you want to do more here -->
 			</div>
 		</div>
 		{% empty %}
@@ -120,23 +138,16 @@
 
 		{% for user in users %}
 		<div class="tab-item">
-			<!-- User -->
 			<div class="tab-players">
 				<img src="{{ user.image.url }}" class="user-avatar" />
 				<span>{{ user.username }}</span>
 			</div>
-
-			<!-- Email -->
 			<div class="tab-email">{{ user.email }}</div>
-
-			<!-- Record -->
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
-
-			<!-- Actions -->
 			<div class="tab-actions">
-				<button onclick="chat('{{ user.username }}')">💬 Chat</button>
-				<button id="friend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')">➕ Add Friend</button>
-				<button class="block-btn" onclick="blockUser('{{ user.id }}')">🚫 Block</button>
+				<button id="chatfriend-btn-{{ user.id }}" onclick="chat('{{ user.username }}')">💬 Chat</button>
+				<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')">❤️ Add Friend</button>
+				<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')">🚫 Block</button>
 			</div>
 		</div>
 		{% empty %}
