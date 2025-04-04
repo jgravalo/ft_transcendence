@@ -19,6 +19,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			# Si hay un solo jugador, la sala tiene espacio
 			print(f'room[:7] = {room[:7]}')
 			if len(game_list) == 1 and room[:7] != 'game_re': # Protegemos de partidas restringidas
+			# if len(game_list) == 1 and room[:7] == 'game_ra': # Protegemos de partidas restringidas
 				return room
 		return None # No hay salas disponibles con espacio
 
@@ -176,8 +177,13 @@ class PongConsumer(AsyncWebsocketConsumer):
 """ 
 						if self.is_tournament:
 							Round = apps.get_model('game', 'Round')
-							round = matches
- """
+							round = Round.objects.get(tournament__name=self.tour_name)
+							round.matches.add(game)
+							if round.number != 2:
+								round.tournament.winner = winner
+							else:
+								next_round.add_player(winner)
+"""
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
 						"winner": winner

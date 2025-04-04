@@ -19,12 +19,12 @@ class Match(models.Model):
 
 	def __str__(self):
 		return f"{self.player1} vs {self.player2} - {self.score_player1}:{self.score_player2}"
-""" 
+
 class Tournament(models.Model):
-	name = models.CharField(default='tournament')
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
+	name = models.CharField(default=f'tournament_{self.id}')
 	size = models.IntegerField(default=0)
 	number = models.IntegerField(default=0)
-	rounds = models.ManyToManyField(Round, symmetrical=False, related_name='rounds_of', blank=True)
 	players = models.ManyToManyField(User, symmetrical=False, related_name='tournaments', blank=True)
 
 	def add_player(self, user):
@@ -35,6 +35,7 @@ class Tournament(models.Model):
 
 	def play(self):
 		start = Round.objects.create(
+			tournament=self,
 			name=self.name,
 			number=self.number,
 			size=self.size,
@@ -43,7 +44,7 @@ class Tournament(models.Model):
 		start.play()
 
 class Round(models.Model):
-	name = models.CharField(default=0)
+	tournament = models.ForeignKey(Tournament, related_name='round_of', on_delete=models.CASCADE)
 	size = models.IntegerField(default=0)
 	number = models.IntegerField(default=0)
 	players = models.ManyToManyField(User, symmetrical=False, related_name='tournaments', blank=True)
@@ -58,14 +59,22 @@ class Round(models.Model):
 	def play(self):
 		players = list(self.players.all()) # Obtener todos los usuarios
 		pairs = list(combinations(players, 2)) # Generar parejas únicas sin repetición
-		next_round = self.objects.create(number=self.number / 2)
+		if self.number > 2:
+			next_round = self.objects.create(
+				tournament=self.tournament,
+				number=self.number / 2
+				)
 
 		# Mostrar las parejas
 		for pair in pairs:
 			print(pair[0].username, "-", pair[1].username)
-			room_name = f"game_re{uuid.uuid4().hex[:8]}" # f"game_to{uuid.uuid4().hex[:8]}"
-			pair[0].invite(pair[0], room_name)
-			pair[1].invite(pair[1], room_name)
-"""
-		
-		
+			# room_name = f"game_to{uuid.uuid4().hex[:8]}"
+			# pair[0].invite(pair[0], room_name)
+			# pair[1].invite(pair[1], room_name)
+			
+			# for debug
+			winner = random.choice(pair)
+			if self.number == 2:
+				self.tournament.winner = winner
+			else:
+				next_round.add_player(winner)
