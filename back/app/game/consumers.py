@@ -38,8 +38,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 		self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
 		self.room_name = parse_qs(self.scope["query_string"].decode()).get("room", [None])[0]
-		# self.room_name = self.scope["url_route"]["kwargs"].get("room")
-		# self.user2 = self.scope["url_route"]["kwargs"].get("user")
 		print('set game')
 		try:
 			print(f'user2 before: {self.user2}')
@@ -51,6 +49,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		# Obtener la sala desde la URL o algún identificador
 		print("self.room_name =", self.room_name)
 
+		self.is_tournament = False
 		if self.user2:
 			print('CREATE RESTRICTED GAME')
 			self.room_name = f"game_re{uuid.uuid4().hex[:8]}"
@@ -59,6 +58,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 			await sync_to_async(self.user2.invite)(self.user2, self.room_name)
 		elif self.room_name: # in self.games:
 			print('ADD TO RESTRICTED GAME')
+			if room[:7] == 'game_to':
+				self.is_tournament = True
 			pass
 		elif available_room:
 			print('ADD TO RANDOM GAME')
@@ -174,16 +175,17 @@ class PongConsumer(AsyncWebsocketConsumer):
 							score_player1=self.games[self.room_name][0].paddle["score"],
 							score_player2=self.games[self.room_name][1].paddle["score"],
 						)
-""" 
+
 						if self.is_tournament:
 							Round = apps.get_model('game', 'Round')
 							round = Round.objects.get(tournament__name=self.tour_name)
 							round.matches.add(game)
 							if round.number != 2:
 								round.tournament.winner = winner
+								round.tournament.save()
 							else:
 								next_round.add_player(winner)
-"""
+
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
 						"winner": winner

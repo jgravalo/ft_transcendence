@@ -22,10 +22,16 @@ class Match(models.Model):
 
 class Tournament(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
-	name = models.CharField(default=f'tournament_{self.id}')
+	name = models.CharField(max_length=255, blank=True)
 	size = models.IntegerField(default=0)
 	number = models.IntegerField(default=0)
 	players = models.ManyToManyField(User, symmetrical=False, related_name='tournaments', blank=True)
+	winner = models.ForeignKey(User, related_name='trophies', on_delete=models.CASCADE)
+
+	def save(self, *args, **kwargs):
+		if not self.name:
+			self.name = f'tournament_{self.id}'
+		super().save(*args, **kwargs)
 
 	def add_player(self, user):
 		self.players.add(user)
@@ -47,7 +53,7 @@ class Round(models.Model):
 	tournament = models.ForeignKey(Tournament, related_name='round_of', on_delete=models.CASCADE)
 	size = models.IntegerField(default=0)
 	number = models.IntegerField(default=0)
-	players = models.ManyToManyField(User, symmetrical=False, related_name='tournaments', blank=True)
+	players = models.ManyToManyField(User, symmetrical=False, related_name='rounds', blank=True)
 	matches = models.ManyToManyField(Match, symmetrical=False, related_name='matches_did', blank=True)	
 
 	def add_player(self, user):
