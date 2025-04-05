@@ -530,3 +530,106 @@ msgstr "🧑‍🤝‍🧑 En línea"
 #: language/translations.py:176
 msgid "Online_description"
 msgstr "Jugar contra otro jugador"
+
+# Profile page translations
+msgid "profile.play"
+msgstr "Jugar 1v1"
+
+msgid "profile.wins"
+msgstr "Victorias Totales"
+
+msgid "profile.losses"
+msgstr "Derrotas Totales"
+
+msgid "profile.matches"
+msgstr "Partidos Jugados"
+
+msgid "profile.tournaments"
+msgstr "Victorias en Torneos"
+
+msgid "profile.tabs.matches"
+msgstr "Historial de Partidos"
+
+msgid "profile.tabs.friends"
+msgstr "Amigos"
+
+msgid "profile.tabs.blocked"
+msgstr "Bloqueados"
+
+msgid "profile.tabs.users"
+msgstr "Otros Usuarios"
+
+msgid "profile.matches.players"
+msgstr "Jugadores"
+
+msgid "profile.matches.date"
+msgstr "Fecha"
+
+msgid "profile.matches.score"
+msgstr "Puntuación"
+
+msgid "profile.matches.empty"
+msgstr "No hay partidos jugados aún"
+
+msgid "profile.friends.user"
+msgstr "Usuario"
+
+msgid "profile.friends.email"
+msgstr "Correo Electrónico"
+
+msgid "profile.friends.record"
+msgstr "Registro"
+
+msgid "profile.friends.actions"
+msgstr "Acciones"
+
+msgid "profile.friends.chat"
+msgstr "💬 Chatear"
+
+msgid "profile.friends.unfriend"
+msgstr "💔 Eliminar Amigo"
+
+msgid "profile.friends.empty"
+msgstr "No tienes amigos"
+
+msgid "profile.blocked.user"
+msgstr "Usuario"
+
+msgid "profile.blocked.email"
+msgstr "Correo Electrónico"
+
+msgid "profile.blocked.record"
+msgstr "Registro"
+
+msgid "profile.blocked.actions"
+msgstr "Acciones"
+
+msgid "profile.blocked.unblock"
+msgstr "🔓 Desbloquear"
+
+msgid "profile.blocked.empty"
+msgstr "No hay usuarios bloqueados"
+
+msgid "profile.users.user"
+msgstr "Usuario"
+
+msgid "profile.users.email"
+msgstr "Correo Electrónico"
+
+msgid "profile.users.record"
+msgstr "Registro"
+
+msgid "profile.users.actions"
+msgstr "Acciones"
+
+msgid "profile.users.chat"
+msgstr "💬 Chatear"
+
+msgid "profile.users.add"
+msgstr "❤️ Agregar Amigo"
+
+msgid "profile.users.block"
+msgstr "🚫 Bloquear"
+
+msgid "profile.users.empty"
+msgstr "No hay otros usuarios"

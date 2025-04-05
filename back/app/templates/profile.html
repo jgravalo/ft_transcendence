@@ -25,7 +25,7 @@
 
 		<!-- loses -->
 		<div class="stat-card">
-			<div class="stat-icon trophy">XXX</div>
+			<div class="stat-icon trophy">💀</div>
 			<div class="stat-value">{{ user.losses }}</div>
 			<div class="stat-label" data-i18n="profile.dash.losses">Total Losses</div>
 		</div>
@@ -45,19 +45,19 @@
 
 		<!-- Tabs -->
 	<div class="tabs">
-		<button class="tab active" onclick="showTab('match-history', this)">Match History</button>
-		<button class="tab" onclick="showTab('friends-list', this)">Friends</button>
-		<button class="tab" onclick="showTab('blocked-list', this)">Blocked</button>
-		<button class="tab" onclick="showTab('users-list', this)">Other Users</button>
+		<button class="tab active" onclick="showTab('match-history', this)" data-i18n="profile.tabs.matches">Match History</button>
+		<button class="tab" onclick="showTab('friends-list', this)" data-i18n="profile.tabs.friends">Friends</button>
+		<button class="tab" onclick="showTab('blocked-list', this)" data-i18n="profile.tabs.blocked">Blocked</button>
+		<button class="tab" onclick="showTab('users-list', this)" data-i18n="profile.tabs.users">Other Users</button>
 	</div>
 
 	<!-- Match History -->
 	<div id="match-history" class="tab-content">
 		<!-- Header Row -->
 		<div class="tab-header">
-			<div style="flex: 1;">Players</div>
-			<div style="flex: 1;">Date</div>
-			<div style="flex: 1;">Score</div>
+			<div style="flex: 1;" data-i18n="profile.matches.players">Players</div>
+			<div style="flex: 1;" data-i18n="profile.matches.date">Date</div>
+			<div style="flex: 1;" data-i18n="profile.matches.score">Score</div>
 		</div>
 
 		{% if matches %}
@@ -79,10 +79,10 @@
 <div id="friends-list" class="tab-content hidden">
 	<!-- Header Row -->
 	<div class="tab-header">
-		<div style="flex: 1.5;">User</div>
-		<div style="flex: 2;">Email</div>
-		<div style="flex: 1;">Record</div>
-		<div style="flex: 2;">Actions</div>
+		<div style="flex: 1.5;" data-i18n="profile.friends.user">User</div>
+		<div style="flex: 2;" data-i18n="profile.friends.email">Email</div>
+		<div style="flex: 1;" data-i18n="profile.friends.record">Record</div>
+		<div style="flex: 2;" data-i18n="profile.friends.actions">Actions</div>
 	</div>
 
 	{% for friend in friends %}
@@ -104,7 +104,7 @@
 		</div>
 	</div>
 	{% empty %}
-	<p style="color: white;" data-i18n="friends.friends.empty">You don't have friends</p>
+	<p style="color: white;" data-i18n="profile.friends.empty">You don't have friends</p>
 	{% endfor %}
 </div>
 
@@ -112,10 +112,10 @@
 	<div id="blocked-list" class="tab-content hidden">
 		<!-- Header Row -->
 		<div class="tab-header">
-			<div style="flex: 1.5;">User</div>
-			<div style="flex: 2;">Email</div>
-			<div style="flex: 1;">Record</div>
-			<div style="flex: 2;">Actions</div>
+			<div style="flex: 1.5;" data-i18n="profile.blocked.user">User</div>
+			<div style="flex: 2;" data-i18n="profile.blocked.email">Email</div>
+			<div style="flex: 1;" data-i18n="profile.blocked.record">Record</div>
+			<div style="flex: 2;" data-i18n="profile.blocked.actions">Actions</div>
 		</div>
 
 		{% for blocked in blockeds %}
@@ -128,12 +128,11 @@
 			<div class="tab-email">{{ blocked.email }}</div>
 			<div class="tab-score">{{ blocked.wins }} - {{ blocked.losses }}</div>
 			<div class="tab-actions">
-				<button id="unblockfriend-btn-{{ blocked.id }}" onclick="unlockUser('{{ blocked.id }}')">🔓 Unblock</button>
-				<!-- Potential: add 'Add friend' or 'Chat' if you want to do more here -->
+				<button id="unblockfriend-btn-{{ blocked.id }}" onclick="unlockUser('{{ blocked.id }}')" data-i18n="profile.blocked.unblock">🔓 Unblock</button>
 			</div>
 		</div>
 		{% empty %}
-		<p style="color: white;" data-i18n="friends.blocked.empty">There are no blocked users.</p>
+		<p style="color: white;" data-i18n="profile.blocked.empty">There are no blocked users.</p>
 		{% endfor %}
 	</div>
 
@@ -141,10 +140,10 @@
 	<div id="users-list" class="tab-content hidden">
 		<!-- Header Row -->
 		<div class="tab-header">
-			<div style="flex: 1.5;">User</div>
-			<div style="flex: 2;">Email</div>
-			<div style="flex: 1;">Record</div>
-			<div style="flex: 2;">Actions</div>
+			<div style="flex: 1.5;" data-i18n="profile.users.user">User</div>
+			<div style="flex: 2;" data-i18n="profile.users.email">Email</div>
+			<div style="flex: 1;" data-i18n="profile.users.record">Record</div>
+			<div style="flex: 2;" data-i18n="profile.users.actions">Actions</div>
 		</div>		
 		
 		{% for user in users %}
@@ -162,7 +161,7 @@
 			</div>
 		</div>
 		{% empty %}
-		<p style="color: white;" data-i18n="friends.other.empty">There are no other users.</p>
+		<p style="color: white;" data-i18n="profile.users.empty">There are no other users.</p>
 		{% endfor %}
 	</div>
 </div>
