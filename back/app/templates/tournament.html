@@ -6,25 +6,21 @@
 		<!-- Formulario de Login -->
 		<form id="loginForm" enctype="multipart/form-data">
 			<div class="mb-3">
-				<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.username">Nombre de usuario</label>
-				<input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+				<label style="color: white;" for="tournament-name" class="form-label" data-i18n="edit.profile.username">Nombre del torneo</label>
+				<input type="text" class="form-control" id="tournament-name" name="tournament-name" value="" required>
 				<span id="errorName" class="error"></span><br>
 			</div>
 			<div class="mb-3">
-				<label style="color: white;" for="email" class="form-label" data-i18n="edit.profile.email">Correo Electrónico</label>
-				<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-				<span id="errorEmail" class="error"></span><br>
+				<label style="color: white;" for="number-players" class="form-label" data-i18n="edit.profile.username">Numero de jugadores</label>
+				<select id="number-players" name="number-players">
+					<!-- <option value="" disabled selected>Numero de jugadores</option> -->
+					<option value="4">4</option>
+					<option value="8">8</option>
+					<option value="16">16</option>
+					<option value="32">32</option>
+				</select>
 			</div>
-			<div class="mb-3">
-				<input type="hidden" name="two_fa_enabled" value=False>
-				<label class="switch">
-					<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value=True
-						{% if user.two_fa_enabled %}checked{% endif %}>
-					<span class="slider"></span>
-				</label>
-				<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.twofa">Enable Two-Factor Authentication</label>
-			</div>
-			<button type="submit" data-i18n="edit.profile.submit">Actualizar</button>
+			<button type="submit" data-i18n="edit.profile.submit">Crear</button>
 		</form>
 	</div>
 </div>

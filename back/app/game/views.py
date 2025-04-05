@@ -53,3 +53,29 @@ def remote_game(request):
         "content": content
     }
     return JsonResponse(data)
+
+def tournament(request):
+    content = render_to_string('tournament.html')
+    print(f'request.user = {request.user}')
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
+
+def set_tournament(request):
+    if request.method == "POST":
+        try:
+            tournament_name = request.POST.get('tournament-name')
+            number_players = request.POST.get('number-players')
+            response = JsonResponse({
+                "error": "Success",
+                "element": 'bar',
+                "content": render_to_string('close_login.html'),
+                "next_path": '/users/profile/'
+            })
+        except Exception as e:
+            print(f"Error en login: {str(e)}")
+            return JsonResponse({'error': 'Error interno del servidor'}, status=500)
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)
