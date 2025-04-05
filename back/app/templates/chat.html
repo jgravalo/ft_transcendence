@@ -1,6 +1,10 @@
 <div class="chat-profile link" href="/users/profile/foreign/?user={{ other_user.username }}">
 	<div class="chat-photo">
-		<img src="{{ other_user.image.url }}">
+		{% if other_user.image_42_url %}
+			<img src="{{ other_user.image_42_url }}">
+		{% else %}
+			<img src="{{ other_user.image.url }}">
+		{% endif %}
 	</div>
 	<div class="chat-info">
 		<h1 id="username">{{ other_user.username }}</h1>
