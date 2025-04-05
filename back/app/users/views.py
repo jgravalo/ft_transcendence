@@ -583,6 +583,12 @@ def fortytwo_callback(request):
                         email=user_data['email'],
                         password='42auth'
                     )
+                
+                # Guardar la URL de la imagen de 42 si existe
+                if 'image' in user_data and user_data['image'] and 'link' in user_data['image']:
+                    user.image_42_url = user_data['image']['link']
+                    user.save()
+                
                 login(request, user)
 
                 # Generar tokens usando SimpleJWT

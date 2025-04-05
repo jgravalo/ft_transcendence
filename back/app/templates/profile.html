@@ -1,7 +1,11 @@
 <div class="profile-container">
 	<div class="profile">
 		<div class="profile-photo">
-			<img src="{{ user.image.url }}">
+			{% if user.image_42_url %}
+				<img src="{{ user.image_42_url }}">
+			{% else %}
+				<img src="{{ user.image.url }}">
+			{% endif %}
 		</div>
 		<div class="info">
 			<div class="username-container">
@@ -88,7 +92,11 @@
 	{% for friend in friends %}
 	<div class="tab-item">
 		<div class="tab-players">
-			<img src="{{ friend.image.url }}" class="user-avatar" />
+			{% if friend.image_42_url %}
+				<img src="{{ friend.image_42_url }}" class="user-avatar" />
+			{% else %}
+				<img src="{{ friend.image.url }}" class="user-avatar" />
+			{% endif %}
 			<span>{{ friend.username }}</span>
 			{% if friend.is_online %}
 				<span class="online-status">🟢</span>
@@ -121,7 +129,11 @@
 		{% for blocked in blockeds %}
 		<div class="tab-item">
 			<div class="tab-players">
-				<img src="{{ blocked.image.url }}" class="user-avatar" />
+				{% if blocked.image_42_url %}
+					<img src="{{ blocked.image_42_url }}" class="user-avatar" />
+				{% else %}
+					<img src="{{ blocked.image.url }}" class="user-avatar" />
+				{% endif %}
 				<span>{{ blocked.username }}</span>
 				<span class="online-status">🚫</span>
 			</div>
@@ -149,7 +161,11 @@
 		{% for user in users %}
 		<div class="tab-item">
 			<div class="tab-players">
-				<img src="{{ user.image.url }}" class="user-avatar" />
+				{% if user.image_42_url %}
+					<img src="{{ user.image_42_url }}" class="user-avatar" />
+				{% else %}
+					<img src="{{ user.image.url }}" class="user-avatar" />
+				{% endif %}
 				<span>{{ user.username }}</span>
 			</div>
 			<div class="tab-email">{{ user.email }}</div>
