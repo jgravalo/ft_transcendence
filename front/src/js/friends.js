@@ -1,45 +1,61 @@
-function addFriend(user)
-{
-	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-check friend-icon" onclick="deleteFriend(\'' + user + '\')"></i>';
-	fetchFriend(user, 'add');
+function addFriend(userId) {
+	const btnAdd = document.getElementById("addfriend-btn-" + userId);
+	const btnBlock = document.getElementById("blockfriend-btn-" + userId);
+	if (!btnAdd || !btnBlock) return;
+
+	btnAdd.innerHTML = '<i class="fas fa-check"></i> Added';
+	btnAdd.disabled = true;
+	btnBlock.disabled = true;
+
+	fetchFriend(userId, 'add');
 }
 
-function deleteFriend(user)
+function deleteFriend(userId)
 {
-	alert("Do you want to unfollow " + user + "?");
-	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + user + '\')"></i>';
-	fetchFriend(user, 'delete');
+	const btn = document.getElementById("deletefriend-btn-" + userId);
+	if (!btn) return;
+	
+	btn.innerHTML = '<i class="fas fa-check"></i> Unfriended';
+	btn.disabled = true;
+	
+	fetchFriend(userId, 'delete');
 }
 
-function blockUser(user)
-{
-	alert("Do you want to block " + user + "?");
-	document.getElementById("chat-" + user).innerHTML = ' ';
-	document.getElementById("follow-" + user).innerHTML = ' ';
-	document.getElementById("block-" + user).innerHTML = '<i class="fas fa-lock-open friend-icon" onclick="unlockUser(\'' + user + '\')"></i>';
-	fetchFriend(user, 'block');
+function blockUser(userId) {
+	const btnAdd = document.getElementById("addfriend-btn-" + userId);
+	const btnBlock = document.getElementById("blockfriend-btn-" + userId);
+	const btnChat = document.getElementById("chatfriend-btn-" + userId);
+	if (!btnAdd || !btnBlock || !btnChat) return;
+
+	btnAdd.disabled = true;
+	btnChat.disabled = true;
+	btnBlock.disabled = true;
+	btnBlock.innerHTML = '🚫 Blocked';
+	
+	fetchFriend(userId, 'block');
 }
 
-function unlockUser(user)
+function unlockUser(userId)
 {
-	document.getElementById("chat-" + user).innerHTML = '<i class="fas fa-comment friend-icon link" href="/chat/?user=' + user + '" ></i>';
-	document.getElementById("follow-" + user).innerHTML = '<i class="fas fa-plus friend-icon" onclick="addFriend(\'' + user + '\')"></i>';
-	document.getElementById("block-" + user).innerHTML = '<i class="fas fa-ban friend-icon" onclick="blockUser(\'' + user + '\')" style="color: brown;"></i>';
-	fetchFriend(user, 'unlock');
+	const btnUnblock = document.getElementById("unblockfriend-btn-" + userId);
+	if (!btnUnblock) return;
+	
+	btnUnblock.innerHTML = '✅ Unblocked';
+	btnUnblock.disabled = true;
+
+	fetchFriend(userId, 'unlock');
 }
 
 function fetchFriend(user, rule)
 {
-	//if (checkAccess('/users/friends/' + rule + '/?' + rule + '=' + user) != 0)
 	if (checkAccess('/users/friends/edit/'+ '/?' + rule + '=' + user) != 0)
         return ;
-	//fetch(base + '/api' + '/users/friends/' + rule + '/?' + rule + '=' + user, {
 	fetch(base + '/api' + '/users/friends/edit/', {
 		method: "POST",
 		headers: {
 			'Authorization': `Bearer ${getJWTToken()}`,
 			"Content-Type": "application/json",
-			'X-CSRFToken': getCSRFToken(), // Incluir el token CSRF
+			'X-CSRFToken': getCSRFToken(),
 		},
 		body: JSON.stringify({
 			'user': user,
@@ -47,9 +63,6 @@ function fetchFriend(user, rule)
 		}),
 	})
 	.then(response => response.json())
-    .then(data => {
-		fetchLink('/users/friends/');
-	})
 	.catch(error => {
 		console.log("fetch login catch");
 		console.error('Error:', error);

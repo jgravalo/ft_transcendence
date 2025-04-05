@@ -1,10 +1,15 @@
 <div id="game-landing">
-	<div id="game-board-landing"></div>
 	<div class="landing-content">
-		<div class="title-container">
-			<h1 id="header" data-i18n="home.welcome">Welcome to the cosmic</h1>
-			<a id="pongname">Pong42</a>
+		<h1 class="game-title">🏓 Pong<span>42</span></h1>
+		<div class="mode-columns">
+			<div class="mode-option selected" id="play-local" tabindex="0" role="button">
+				<h2 class="mode-title" data-i18n="home.local.title">🎮 Local</h2>
+				<p class="mode-sub" data-i18n="home.local.description">Play on the same keyboard</p>
+			</div>
+			<div class="mode-option" id="play-online" tabindex="0" role="button">
+				<h2 class="mode-title" data-i18n="home.online.title">🌐 Online</h2>
+				<p class="mode-sub" data-i18n="home.online.description">Play against another player</p>
+			</div>
 		</div>
-		<button id="gameButton" class="link" href="/game" data-i18n="home.start">Start the game</button>
 	</div>
 </div>

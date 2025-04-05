@@ -1,4 +1,6 @@
-function game()
+
+//remote
+function gameRemote()
 {
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
@@ -36,18 +38,17 @@ function game()
 		ctx.fillText(player1.score, 20, 30);
 		ctx.fillText(player2.score, 20, canvas.height - 30);
 	}
-
+/* 
 	function updateBall() {
 		ball.x += ballSpeedX;
 		ball.y += ballSpeedY;
 
 		// Rebote en los lados
-		if (ball.x <= 1 || ball.x >= canvas.width - 1) {
+		if (ball.x <= 0 || ball.x >= canvas.width) {
 			ballSpeedX *= -1;
 		}
-		
 
-		// Rebote en paletas con mejor detección de colisión
+		// Rebote en paletas
 		function checkCollision(player) {
 			if (
 				ball.y + ballSize >= player.y &&
@@ -68,55 +69,115 @@ function game()
 		if (gameOver)
 			return;
 		if (ball.y <= 0) {
-			player2.score++;
+			// player2.score++;
 			checkWin(player2);
 			resetBall();
-		}
-		else if (ball.y >= canvas.height) {
-			player1.score++;
+		} else if (ball.y >= canvas.height) {
+			// player1.score++;
 			checkWin(player1);
 			resetBall();
 		}
 	}
-
+	
 	function checkWin(player) {
+		player.score++;
 		if (player.score >= maxScore) {
 			gameOver = true;
+			socket.close();
 			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
 		}
 	}
 
 	function resetBall() {
-		if (gameOver) return;
+		if (gameOver)
+			return;
 		ball.x = canvas.width / 2;
 		ball.y = canvas.height / 2;
 		ballSpeedY *= -1;
 	}
+*/
+	
+	let player = null;
+	let role = null;
+	let gameStarted = false; // !!
+	const socket = new WebSocket("ws://localhost:8000/ws/game/");
 
+	/* socket.onopen = function(event) {
+		const data = JSON.parse(event.data);
+	} */
+
+	socket.onmessage = function(event) {
+		const data = JSON.parse(event.data);
+
+		if (data.action === "set-player") {
+			role = data.role;
+			console.log('role:', role);
+			if (role == "player1")
+				player = player1;
+			else
+				player = player2;
+		}
+		else if (data.action === "start") {
+			gameStarted = true;
+			// startGame();
+			gameLoop();
+		}
+		else if (data.action === "move") {
+			if (data.player === "player1")
+				player1.x = data.x;
+			else
+				player2.x = data.x;
+		}
+		else if (data.action === "ball") {
+			ball.x = data.ball.x;
+			ball.y = data.ball.y;
+			player1.score = data.score.a;
+			player2.score = data.score.b;
+			drawBall();
+		}
+		else if (data.action === "finish") {
+			socket.close();
+			gameOver = true;
+			winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
+		}
+	};
+	
 	document.addEventListener("keydown", (event) => keys[event.key] = true);
 	document.addEventListener("keyup", (event) => keys[event.key] = false);
 
 	function updatePaddles() {
-		if (keys["a"] && player1.x > 0) player1.x -= paddleSpeed;
-		if (keys["d"] && player1.x < canvas.width - paddleWidth) player1.x += paddleSpeed;
+		// if (keys["a"] && player1.x > 0) player1.x -= paddleSpeed;
+		// if (keys["d"] && player1.x < canvas.width - paddleWidth) player1.x += paddleSpeed;
 
-		if (keys["ArrowLeft"] && player2.x > 0) player2.x -= paddleSpeed;
-		if (keys["ArrowRight"] && player2.x < canvas.width - paddleWidth) player2.x += paddleSpeed;
+		if (keys["ArrowLeft"] && player.x > 0)
+			player.x -= paddleSpeed;
+		if (keys["ArrowRight"] && player.x < canvas.width - paddleWidth)
+			player.x += paddleSpeed;
+		moveData = { action: "move", player: role, x: player.x };
+		if (moveData) {
+			socket.send(JSON.stringify(moveData));
+		}
 	}
 
 	function gameLoop() {
+		if (!gameStarted) {
+			ctx.fillStyle = "white";
+			ctx.font = "20px Arial";
+			ctx.fillText("Esperando a otro jugador...", canvas.width / 2 - 100, canvas.height / 2);
+			requestAnimationFrame(gameLoop);
+			return;
+		}
 		if (gameOver) return;
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+		console.log("ball: x:", ball.x, ", y:", ball.y);
 		updatePaddles();
 		drawRect(player1.x, player1.y, paddleWidth, paddleHeight, "white");
 		drawRect(player2.x, player2.y, paddleWidth, paddleHeight, "white");
 		drawBall();
 		drawScore();
-		updateBall();
+		// updateBall();
 
 		requestAnimationFrame(gameLoop);
 	}
-	gameLoop();
-
 }
