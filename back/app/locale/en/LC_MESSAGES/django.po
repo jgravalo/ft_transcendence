@@ -289,5 +289,105 @@ msgstr "🧑‍🤝‍🧑 Online"
 msgid "Online_description"
 msgstr "Play against another player"
 
+# Profile page translations
+msgid "profile.play"
+msgstr "Play 1v1"
 
+msgid "profile.wins"
+msgstr "Total Wins"
 
+msgid "profile.losses"
+msgstr "Total Losses"
+
+msgid "profile.matches"
+msgstr "Games Played"
+
+msgid "profile.tournaments"
+msgstr "Tournament Wins"
+
+msgid "profile.tabs.matches"
+msgstr "Match History"
+
+msgid "profile.tabs.friends"
+msgstr "Friends"
+
+msgid "profile.tabs.blocked"
+msgstr "Blocked"
+
+msgid "profile.tabs.users"
+msgstr "Other Users"
+
+msgid "profile.matches.players"
+msgstr "Players"
+
+msgid "profile.matches.date"
+msgstr "Date"
+
+msgid "profile.matches.score"
+msgstr "Score"
+
+msgid "profile.matches.empty"
+msgstr "No matches played yet"
+
+msgid "profile.friends.user"
+msgstr "User"
+
+msgid "profile.friends.email"
+msgstr "Email"
+
+msgid "profile.friends.record"
+msgstr "Record"
+
+msgid "profile.friends.actions"
+msgstr "Actions"
+
+msgid "profile.friends.chat"
+msgstr "💬 Chat"
+
+msgid "profile.friends.unfriend"
+msgstr "💔 Unfriend"
+
+msgid "profile.friends.empty"
+msgstr "You don't have friends"
+
+msgid "profile.blocked.user"
+msgstr "User"
+
+msgid "profile.blocked.email"
+msgstr "Email"
+
+msgid "profile.blocked.record"
+msgstr "Record"
+
+msgid "profile.blocked.actions"
+msgstr "Actions"
+
+msgid "profile.blocked.unblock"
+msgstr "🔓 Unblock"
+
+msgid "profile.blocked.empty"
+msgstr "There are no blocked users"
+
+msgid "profile.users.user"
+msgstr "User"
+
+msgid "profile.users.email"
+msgstr "Email"
+
+msgid "profile.users.record"
+msgstr "Record"
+
+msgid "profile.users.actions"
+msgstr "Actions"
+
+msgid "profile.users.chat"
+msgstr "💬 Chat"
+
+msgid "profile.users.add"
+msgstr "❤️ Add Friend"
+
+msgid "profile.users.block"
+msgstr "🚫 Block"
+
+msgid "profile.users.empty"
+msgstr "There are no other users"

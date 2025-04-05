@@ -526,3 +526,106 @@ msgstr "🧑‍🤝‍🧑 En ligne"
 #: language/translations.py:176
 msgid "Online_description"
 msgstr "Jouer contre un autre joueur"
+
+# Profile page translations
+msgid "profile.play"
+msgstr "Jouer en 1v1"
+
+msgid "profile.wins"
+msgstr "Victoires Totales"
+
+msgid "profile.losses"
+msgstr "Défaites Totales"
+
+msgid "profile.matches"
+msgstr "Matchs Joués"
+
+msgid "profile.tournaments"
+msgstr "Victoires en Tournoi"
+
+msgid "profile.tabs.matches"
+msgstr "Historique des Matchs"
+
+msgid "profile.tabs.friends"
+msgstr "Amis"
+
+msgid "profile.tabs.blocked"
+msgstr "Bloqués"
+
+msgid "profile.tabs.users"
+msgstr "Autres Utilisateurs"
+
+msgid "profile.matches.players"
+msgstr "Joueurs"
+
+msgid "profile.matches.date"
+msgstr "Date"
+
+msgid "profile.matches.score"
+msgstr "Score"
+
+msgid "profile.matches.empty"
+msgstr "Aucun match joué pour le moment"
+
+msgid "profile.friends.user"
+msgstr "Utilisateur"
+
+msgid "profile.friends.email"
+msgstr "Adresse e-mail"
+
+msgid "profile.friends.record"
+msgstr "Enregistrement"
+
+msgid "profile.friends.actions"
+msgstr "Actions"
+
+msgid "profile.friends.chat"
+msgstr "💬 Discuter"
+
+msgid "profile.friends.unfriend"
+msgstr "💔 Retirer Ami"
+
+msgid "profile.friends.empty"
+msgstr "Vous n'avez pas d'amis"
+
+msgid "profile.blocked.user"
+msgstr "Utilisateur"
+
+msgid "profile.blocked.email"
+msgstr "Adresse e-mail"
+
+msgid "profile.blocked.record"
+msgstr "Enregistrement"
+
+msgid "profile.blocked.actions"
+msgstr "Actions"
+
+msgid "profile.blocked.unblock"
+msgstr "🔓 Débloquer"
+
+msgid "profile.blocked.empty"
+msgstr "Il n'y a pas d'utilisateurs bloqués"
+
+msgid "profile.users.user"
+msgstr "Utilisateur"
+
+msgid "profile.users.email"
+msgstr "Adresse e-mail"
+
+msgid "profile.users.record"
+msgstr "Enregistrement"
+
+msgid "profile.users.actions"
+msgstr "Actions"
+
+msgid "profile.users.chat"
+msgstr "💬 Discuter"
+
+msgid "profile.users.add"
+msgstr "❤️ Ajouter Ami"
+
+msgid "profile.users.block"
+msgstr "🚫 Bloquer"
+
+msgid "profile.users.empty"
+msgstr "Il n'y a pas d'autres utilisateurs"
