@@ -156,7 +156,7 @@
 			<div class="tab-email">{{ user.email }}</div>
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
 			<div class="tab-actions">
-				<button id="chatfriend-btn-{{ user.id }}" onclick="chat('{{ user.username }}')">💬 Chat</button>
+				<button id="chatfriend-btn-{{ user.id }}" onclick="window.location.href='/chat/?user={{ user.id }}'">💬 Chat</button>
 				<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')">❤️ Add Friend</button>
 				<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')">🚫 Block</button>
 			</div>
