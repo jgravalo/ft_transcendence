@@ -87,29 +87,29 @@ msgstr "No tienes amigos"
 
 #: language/translations.py:21
 msgid "Other Users"
-msgstr "Otros Usuarios"
+msgstr "Otros"
 
 #: language/translations.py:22
 msgid "Blocked Users"
 msgstr "Usuarios bloqueados"
 
-#: language/translations.py:22
+#: language/translations.py:23
 msgid "#"
 msgstr "#"
 
-#: language/translations.py:23
+#: language/translations.py:24
 msgid "There are no users"
 msgstr "No hay usuarios"
 
-#: language/translations.py:23
+#: language/translations.py:25
 msgid "There are no blocked users"
 msgstr "No hay usuarios bloqueados"
 
-#: language/translations.py:24
+#: language/translations.py:26
 msgid "Start 1vs1"
-msgstr "Jugar 1vs1"
+msgstr "🎮 Jugar 1vs1"
 
-#: language/translations.py:25
+#: language/translations.py:27
 msgid "Start online"
 msgstr "Jugar en linéa"
 
@@ -153,365 +153,455 @@ msgstr "Va a cerrar su sesión. ¿Está seguro?"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: language/translations.py:39
+#: language/translations.py:38
 msgid "Wins"
 msgstr "Victorias"
 
-#: language/translations.py:40
+#: language/translations.py:39
 msgid "Losses"
 msgstr "Derrotas"
 
-#: language/translations.py:41
+#: language/translations.py:40
 msgid "Matches"
 msgstr "Partidos"
 
-#: language/translations.py:44
+#: language/translations.py:41
 msgid "Tournament"
-msgstr "Torneo"
+msgstr "🏆 Torneo"
 
-#: language/translations.py:45
+#: language/translations.py:41
+msgid "Tournament_description"
+msgstr "Participa en un Torneo"
+
+#: language/translations.py:41
+msgid "Tournament Wins"
+msgstr "Torneos Ganados"
+
+#: language/translations.py:42
 msgid "Stats"
 msgstr "Estadísticas"
 
-#: language/translations.py:47
+#: language/translations.py:43
 msgid "Edit"
 msgstr "Editar perfil"
 
-#: language/translations.py:53
+#: language/translations.py:44
 msgid "User already exists"
 msgstr "El usuario ya existe"
 
-#: language/translations.py:54
+#: language/translations.py:45
 msgid "The password must be at least 6 characters long"
 msgstr "La contraseña debe tener al menos 6 caracteres"
 
-#: language/translations.py:55
+#: language/translations.py:46
 msgid "Empty field"
 msgstr "Campo vacío"
 
-#: language/translations.py:56
+#: language/translations.py:47
 msgid "Username cannot start by 'AI'"
 msgstr "El nombre de usuario no puede comenzar con 'AI'"
 
-#: language/translations.py:57
+#: language/translations.py:48
 msgid "Username cannot include '@'"
 msgstr "El nombre de usuario no puede incluir '@'"
 
-#: language/translations.py:59
+#: language/translations.py:49
 msgid "The email must include '@'"
 msgstr "El correo electrónico debe incluir '@'"
 
-#: language/translations.py:62
+#: language/translations.py:50
 msgid "SMS"
 msgstr "SMS"
 
-#: language/translations.py:63
+#: language/translations.py:51
 msgid "Google"
 msgstr "Google"
 
-#: language/translations.py:64
+#: language/translations.py:52
 msgid "Edit your profile information"
 msgstr "Edita la información de tu perfil"
 
-#: language/translations.py:67
+#: language/translations.py:53
 msgid "Current Password"
 msgstr "Contraseña actual"
 
-#: language/translations.py:68
+#: language/translations.py:54
 msgid "New Password"
 msgstr "Nueva contraseña"
 
-#: language/translations.py:69
+#: language/translations.py:55
 msgid "Enable Two-Factor Authentication"
 msgstr "Activar la autenticación en dos pasos (2FA)"
 
-#: language/translations.py:72
+#: language/translations.py:56
 msgid "Introduce your OTP code"
 msgstr "Introduce tu código OTP"
 
-#: language/translations.py:73
+#: language/translations.py:57
 msgid "Verify"
 msgstr "Verificar"
 
-#: language/translations.py:74
+#: language/translations.py:58
 msgid "Login with 42"
 msgstr "Iniciar sesión con 42"
 
-#: language/translations.py:75
+#: language/translations.py:59
 msgid "Privacy Policy"
 msgstr "Política de Privacidad"
 
-#: language/translations.py:76
+#: language/translations.py:60
 msgid "Update"
 msgstr "Actualizar"
 
-#: language/translations.py:77
+#: language/translations.py:61
 msgid "I confirm that I have read and accept the Privacy Policy and authorize the use of my personal data as indicated in it."
 msgstr "Confirmo que he leído y acepto la Política de Privacidad y autorizo el uso de mis datos personales según lo indicado en ella."
 
-#: language/translations.py:78
+#: language/translations.py:62
 msgid "Last update: 06/03/2025"
 msgstr "Última actualización: 06/03/2025"
 
-#: language/translations.py:79
+#: language/translations.py:63
 msgid "Legal basis We process your personal data on the basis of your consent, which you give when you register and accept this Privacy Policy. You can withdraw your consent at any time by requesting the deletion of your account."
 msgstr "Base legal Procesamos tus datos personales sobre la base de tu consentimiento, que otorgas al registrarte y al aceptar esta Política de Privacidad. Puedes retirar tu consentimiento en cualquier momento solicitando la eliminación de tu cuenta."
 
-#: language/translations.py:80
+#: language/translations.py:64
 msgid "2. What data we store"
 msgstr "2. Qué datos guardamos"
 
-#: language/translations.py:81
+#: language/translations.py:65
 msgid "We collect and store the following information:"
 msgstr "Recopilamos y almacenamos la siguiente información:"
 
-#: language/translations.py:82
+#: language/translations.py:66
 msgid "Account data"
 msgstr "Datos de la cuenta"
 
+#: language/translations.py:67
 msgid "Security Data"
 msgstr "Datos de seguridad"
 
+#: language/translations.py:68
 msgid "Two-factor authentication (2FA) status"
 msgstr "Estado de autenticación de dos factores (2FA)"
 
+#: language/translations.py:69
 msgid "JWT session tokens"
 msgstr "Tokens de sesión JWT"
 
+#: language/translations.py:70
 msgid "Game Data"
 msgstr "Datos del juego"
 
+#: language/translations.py:71
 msgid "Match history"
 msgstr "Historial de partidas"
 
+#: language/translations.py:72
 msgid "Statistics (wins, losses, matches played)"
 msgstr "Estadísticas (victorias, derrotas, partidas jugadas)"
 
+#: language/translations.py:73
 msgid "Social Data"
 msgstr "Datos sociales"
 
+#: language/translations.py:74
 msgid "Friends list"
 msgstr "Lista de amigos"
 
+#: language/translations.py:75
 msgid "Blocked users list"
 msgstr "Lista de usuarios bloqueados"
 
+#: language/translations.py:76
 msgid "3. Why we store this data"
 msgstr "3. Por qué guardamos estos datos"
 
+#: language/translations.py:77
 msgid "Data is stored for:"
 msgstr "Los datos se almacenan para:"
 
+#: language/translations.py:78
 msgid "Account Management"
 msgstr "Gestión de cuenta"
 
+#: language/translations.py:79
 msgid "Provide and maintain your user account"
 msgstr "Proporcionar y mantener tu cuenta de usuario"
 
+#: language/translations.py:80
 msgid "Ensure your account security"
 msgstr "Garantizar la seguridad de tu cuenta"
 
+#: language/translations.py:81
 msgid "Game Experience"
 msgstr "Experiencia de juego"
 
+#: language/translations.py:82
 msgid "Manage your game progress and statistics"
 msgstr "Gestionar tu progreso en el juego y estadísticas"
 
+#: language/translations.py:83
 msgid "Improve user experience"
 msgstr "Mejorar la experiencia de usuario"
 
+#: language/translations.py:84
 msgid "4. Legal bases for processing"
 msgstr "4. Bases legales del tratamiento"
 
+#: language/translations.py:85
 msgid "We process your personal data based on the following legal bases:"
 msgstr "Procesamos tus datos personales en base a las siguientes bases legales:"
 
+#: language/translations.py:86
 msgid "User Consent"
 msgstr "Consentimiento del usuario"
 
+#: language/translations.py:87
 msgid "When registering and accepting this privacy policy"
 msgstr "Al registrarte y aceptar esta política de privacidad"
 
+#: language/translations.py:88
 msgid "When providing additional profile information"
 msgstr "Al proporcionar información adicional en tu perfil"
 
+#: language/translations.py:89
 msgid "When participating in social features"
 msgstr "Al participar en funcionalidades sociales"
 
+#: language/translations.py:90
 msgid "Contract Execution"
 msgstr "Ejecución del contrato"
 
+#: language/translations.py:91
 msgid "To provide the game service"
 msgstr "Para proporcionar el servicio de juego"
 
+#: language/translations.py:92
 msgid "To manage your account and access"
 msgstr "Para gestionar tu cuenta y acceso"
 
+#: language/translations.py:93
 msgid "To maintain your statistics and progress"
 msgstr "Para mantener tus estadísticas y progreso"
 
+#: language/translations.py:94
 msgid "Legitimate Interest"
 msgstr "Interés legítimo"
 
+#: language/translations.py:95
 msgid "To improve our services"
 msgstr "Para mejorar nuestros servicios"
 
+#: language/translations.py:96
 msgid "To ensure platform security"
 msgstr "Para garantizar la seguridad de la plataforma"
 
+#: language/translations.py:97
 msgid "To prevent fraud and abuse"
 msgstr "Para prevenir fraudes y abusos"
 
+#: language/translations.py:98
 msgid "5. How we protect your data"
 msgstr "5. Cómo protegemos tus datos"
 
+#: language/translations.py:99
 msgid "We implement the following security measures:"
 msgstr "Implementamos las siguientes medidas de seguridad:"
 
+#: language/translations.py:100
 msgid "Access Security"
 msgstr "Seguridad de acceso"
 
+#: language/translations.py:101
 msgid "Password encryption using secure algorithms"
 msgstr "Encriptación de contraseñas usando algoritmos seguros"
 
+#: language/translations.py:102
 msgid "Optional two-factor authentication (2FA)"
 msgstr "Autenticación de dos factores (2FA) opcional"
 
+#: language/translations.py:103
 msgid "JWT tokens for secure sessions"
 msgstr "Tokens JWT para sesiones seguras"
 
+#: language/translations.py:104
 msgid "Data Protection"
 msgstr "Protección de datos"
 
+#: language/translations.py:105
 msgid "Secure storage in PostgreSQL databases"
 msgstr "Almacenamiento seguro en bases de datos PostgreSQL"
 
+#: language/translations.py:106
 msgid "Encryption of sensitive data in transit (HTTPS)"
 msgstr "Encriptación de datos sensibles en tránsito (HTTPS)"
 
+#: language/translations.py:107
 msgid "6. Data Transfer"
 msgstr "6. Transferencia de datos"
 
+#: language/translations.py:108
 msgid "Data is hosted on servers within the European Union, the application host is Obambu SARL, located in Paris, France."
 msgstr "Los datos se alojan en servidores dentro de la Unión Europea, el host de la aplicación es Obambu SARL, ubicado en París, Francia."
 
+#: language/translations.py:109
 msgid "If you use 42 login, the personal data we collect may be transferred to 42, which is the application's authentication provider."
 msgstr "Si utilizas el inicio de sesión con 42, los datos personales que recopilamos pueden ser transferidos a 42, que es el proveedor de autenticación de la aplicación."
 
+#: language/translations.py:110
 msgid "7. Cookies and similar technologies"
 msgstr "7. Cookies y tecnologías similares"
 
+#: language/translations.py:111
 msgid "We use cookies and similar technologies for:"
 msgstr "Utilizamos cookies y tecnologías similares para:"
 
+#: language/translations.py:112
 msgid "Essential Functionality"
 msgstr "Funcionalidad esencial"
 
+#: language/translations.py:113
 msgid "Session management and authentication"
 msgstr "Gestión de sesión y autenticación"
 
+#: language/translations.py:114
 msgid "User preferences storage"
 msgstr "Almacenamiento de preferencias de usuario"
 
+#: language/translations.py:115
 msgid "Application state maintenance"
 msgstr "Mantenimiento del estado de la aplicación"
 
+#: language/translations.py:116
 msgid "Local Storage"
 msgstr "Almacenamiento local"
 
+#: language/translations.py:117
 msgid "LocalStorage for game data and preferences"
 msgstr "LocalStorage para datos de juego y preferencias"
 
+#: language/translations.py:118
 msgid "SessionStorage for temporary session information"
 msgstr "SessionStorage para información temporal de sesión"
 
+#: language/translations.py:119
 msgid "Cookies for authentication tokens"
 msgstr "Cookies para tokens de autenticación"
 
+#: language/translations.py:120
 msgid "Security"
 msgstr "Seguridad"
 
+#: language/translations.py:121
 msgid "Protection against CSRF attacks"
 msgstr "Protección contra ataques CSRF"
 
+#: language/translations.py:122
 msgid "Session validation"
 msgstr "Validación de sesiones"
 
+#: language/translations.py:123
 msgid "Security monitoring"
 msgstr "Monitoreo de seguridad"
 
+#: language/translations.py:124
 msgid "You can configure your browser to reject some cookies, although this may affect the platform's functionality. For more information about managing cookies in your browser, consult its official documentation."
 msgstr "Puedes configurar tu navegador para rechazar algunas cookies, aunque esto puede afectar al funcionamiento de la plataforma. Para más información sobre cómo gestionar las cookies en tu navegador, consulta la documentación oficial del mismo."
 
+#: language/translations.py:125
 msgid "8. Your rights over your data"
 msgstr "8. Tus derechos sobre tus datos"
 
+#: language/translations.py:126
 msgid "If you believe that the processing of your personal data does not comply with current regulations, you have the right to file a complaint with the Spanish Data Protection Agency (or the competent authority in your country of residence)."
 msgstr "Si consideras que el tratamiento de tus datos personales no se ajusta a la normativa vigente, tienes derecho a presentar una reclamación ante la Agencia Española de Protección de Datos (o la autoridad competente de tu país de residencia)."
 
+#: language/translations.py:127
 msgid "As a user, you have the following rights:"
 msgstr "Como usuario, tienes los siguientes derechos:"
 
+#: language/translations.py:128
 msgid "Data Control"
 msgstr "Control de datos"
 
+#: language/translations.py:129
 msgid "Access your personal data"
 msgstr "Acceder a tus datos personales"
 
+#: language/translations.py:130
 msgid "Modify your profile information"
 msgstr "Modificar tu información de perfil"
 
+#: language/translations.py:131
 msgid "Request account deletion"
 msgstr "Solicitar la eliminación de tu cuenta"
 
+#: language/translations.py:132
 msgid "Export your data"
 msgstr "Exportar tus datos"
 
+#: language/translations.py:133
 msgid "Right to temporary suspension of data processing: You can request that we stop processing your data in certain cases."
 msgstr "Derecho a la suspensión temporal del tratamiento de tus datos: Puedes solicitar que dejemos de tratar tus datos en ciertos casos."
 
+#: language/translations.py:134
 msgid "9. Data Retention"
 msgstr "9. Retención de datos"
 
+#: language/translations.py:135
 msgid "We retain your personal data while your account is active. If you decide to delete your account, all your personal data will be immediately and permanently deleted. We will only retain anonymized game statistics that do not personally identify you."
 msgstr "Conservamos tus datos personales mientras tu cuenta esté activa. Si decides eliminar tu cuenta, todos tus datos personales serán eliminados de forma inmediata y permanente. Únicamente conservaremos estadísticas de juego anonimizadas, que no permiten identificarte personalmente."
 
+#: language/translations.py:136
 msgid "Deletion Process"
 msgstr "Proceso de eliminación"
 
+#: language/translations.py:137
 msgid "All your personal data will be deleted"
 msgstr "Se eliminarán todos tus datos personales"
 
+#: language/translations.py:138
 msgid "Only anonymous game statistics will be kept"
 msgstr "Se mantendrán solo las estadísticas de juego anónimas"
 
+#: language/translations.py:139
 msgid "Your message history and social relationships will be deleted"
 msgstr "Se eliminará tu historial de mensajes y relaciones sociales"
 
+#: language/translations.py:140
 msgid "10. Minors"
 msgstr "10. Menores de edad"
 
+#: language/translations.py:141
 msgid "The service can be used by minors under 18 years of age. If you are under 18, you must obtain consent from your parents or guardians to use the service."
 msgstr "El servicio puede ser utilizado por menores de 18 años. Si eres menor de 18 años, debes obtener el consentimiento de tus padres o tutores para utilizar el servicio."
 
+#: language/translations.py:142
 msgid "If you become aware that a user under 18 is using the service, you must notify the service administration."
 msgstr "Si tienes conocimiento de que un usuario menor de 18 años está utilizando el servicio, debes notificarlo a la administración del servicio."
 
+#: language/translations.py:143
 msgid "11. Changes to the Privacy Policy"
 msgstr "11. Cambios a la Política de Privacidad"
 
+#: language/translations.py:144
 msgid "We may update this Privacy Policy at any time. We will notify you of significant changes through the application or the email associated with your account. The date of the last update will be indicated at the top of this page."
 msgstr "Podemos actualizar esta Política de Privacidad en cualquier momento. Te notificaremos de los cambios importantes a través de la aplicación o el correo electrónico asociado a tu cuenta. La fecha de la última actualización se indicará en la parte superior de esta página."
 
+#: language/translations.py:145
 msgid "12. Contact"
 msgstr "12. Contacto"
 
+#: language/translations.py:146
 msgid "For any privacy and data handling inquiries, you can contact the system administrator at contact@pong42.com"
 msgstr "Para cualquier consulta relacionada con la privacidad y el manejo de tus datos, puedes contactar al administrador del sistema al correo contacto@pong42.com"
 
+#: language/translations.py:147
 msgid "1. Data Controller"
 msgstr "1. Responsable del tratamiento de datos"
 
+#: language/translations.py:148
 msgid "The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
 msgstr "El responsable del tratamiento de datos es Pong42, con dirección Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
 
@@ -531,105 +621,43 @@ msgstr "🧑‍🤝‍🧑 En línea"
 msgid "Online_description"
 msgstr "Jugar contra otro jugador"
 
-# Profile page translations
-msgid "profile.play"
-msgstr "Jugar 1v1"
-
-msgid "profile.wins"
-msgstr "Victorias Totales"
-
-msgid "profile.losses"
-msgstr "Derrotas Totales"
-
-msgid "profile.matches"
-msgstr "Partidos Jugados"
-
-msgid "profile.tournaments"
-msgstr "Victorias en Torneos"
-
-msgid "profile.tabs.matches"
+#: language/translations.py:178
+msgid "Match History"
 msgstr "Historial de Partidos"
 
-msgid "profile.tabs.friends"
-msgstr "Amigos"
-
-msgid "profile.tabs.blocked"
+#: language/translations.py:179
+msgid "Blocked"
 msgstr "Bloqueados"
 
-msgid "profile.tabs.users"
-msgstr "Otros Usuarios"
-
-msgid "profile.matches.players"
-msgstr "Jugadores"
-
-msgid "profile.matches.date"
-msgstr "Fecha"
-
-msgid "profile.matches.score"
-msgstr "Puntuación"
-
-msgid "profile.matches.empty"
+#: language/translations.py:180
+msgid "No matches played yet"
 msgstr "No hay partidos jugados aún"
 
-msgid "profile.friends.user"
-msgstr "Usuario"
-
-msgid "profile.friends.email"
-msgstr "Correo Electrónico"
-
-msgid "profile.friends.record"
-msgstr "Registro"
-
-msgid "profile.friends.actions"
+#: language/translations.py:182
+msgid "Actions"
 msgstr "Acciones"
 
-msgid "profile.friends.chat"
+#: language/translations.py:183
+msgid "Date"
+msgstr "Fecha"
+
+#: language/translations.py:184
+msgid "💬 Chat"
 msgstr "💬 Chatear"
 
-msgid "profile.friends.unfriend"
+#: language/translations.py:185
+msgid "💔 Unfriend"
 msgstr "💔 Eliminar Amigo"
 
-msgid "profile.friends.empty"
-msgstr "No tienes amigos"
-
-msgid "profile.blocked.user"
-msgstr "Usuario"
-
-msgid "profile.blocked.email"
-msgstr "Correo Electrónico"
-
-msgid "profile.blocked.record"
-msgstr "Registro"
-
-msgid "profile.blocked.actions"
-msgstr "Acciones"
-
-msgid "profile.blocked.unblock"
+#: language/translations.py:186
+msgid "🔓 Unblock"
 msgstr "🔓 Desbloquear"
 
-msgid "profile.blocked.empty"
-msgstr "No hay usuarios bloqueados"
-
-msgid "profile.users.user"
-msgstr "Usuario"
-
-msgid "profile.users.email"
-msgstr "Correo Electrónico"
-
-msgid "profile.users.record"
-msgstr "Registro"
-
-msgid "profile.users.actions"
-msgstr "Acciones"
-
-msgid "profile.users.chat"
-msgstr "💬 Chatear"
-
-msgid "profile.users.add"
+#: language/translations.py:187
+msgid "❤️ Add Friend"
 msgstr "❤️ Agregar Amigo"
 
-msgid "profile.users.block"
+#: language/translations.py:188
+msgid "🚫 Block"
 msgstr "🚫 Bloquear"
 
-msgid "profile.users.empty"
-msgstr "No hay otros usuarios"

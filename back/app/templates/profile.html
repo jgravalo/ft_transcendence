@@ -11,7 +11,7 @@
 				</div>
 			</div>
 			<div class="actions">
-				<button class="link challenge-btn" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
+				<button class="challenge-btn" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
 			</div>
 		</div>
 	</div>
@@ -38,7 +38,7 @@
 		
 		<div class="stat-card">
 			<div class="stat-icon tournament">👑</div>
-			<div class="stat-value">XXX</div>
+			<div class="stat-value">0</div>
 			<div class="stat-label" data-i18n="profile.dash.tournament">Tournament Wins</div>
 		</div>
 	</div>
@@ -55,16 +55,20 @@
 	<div id="match-history" class="tab-content">
 		<!-- Header Row -->
 		<div class="tab-header">
-			<div style="flex: 1;" data-i18n="profile.matches.players">Players</div>
-			<div style="flex: 1;" data-i18n="profile.matches.date">Date</div>
-			<div style="flex: 1;" data-i18n="profile.matches.score">Score</div>
+			<div style="flex: 1;" data-i18n="table.username">Players</div>
+			<div style="flex: 1;" data-i18n="table.date">Date</div>
+			<div style="flex: 1;" data-i18n="table.record">Match History (W/L)
+			</div>
 		</div>
 
 		{% if matches %}
 			{% for match in matches %}
 			<div class="match-item">
 				<div class="tab-players">
-					<span>{{ match.player1 }} vs {{ match.player2 }}</span>
+					<span>
+						<span class="link user-link" href="/users/profile/foreign/?user={{ match.player1 }}">{{ match.player1 }}</span> vs 
+						<span class="link user-link" href="/users/profile/foreign/?user={{ match.player2 }}">{{ match.player2 }}</span>
+					</span>
 				</div>
 				<div class="tab-email">{{ match.created_at }}</div>
 				<div class="tab-score">{{ match.score_player1 }} - {{ match.score_player2 }}</div>
@@ -79,17 +83,17 @@
 <div id="friends-list" class="tab-content hidden">
 	<!-- Header Row -->
 	<div class="tab-header">
-		<div style="flex: 1.5;" data-i18n="profile.friends.user">User</div>
-		<div style="flex: 2;" data-i18n="profile.friends.email">Email</div>
-		<div style="flex: 1;" data-i18n="profile.friends.record">Record</div>
-		<div style="flex: 2;" data-i18n="profile.friends.actions">Actions</div>
+		<div style="flex: 1.5;" data-i18n="table.username">User</div>
+		<div style="flex: 2;" data-i18n="table.email">Email</div>
+		<div style="flex: 1;" data-i18n="table.record">Record</div>
+		<div style="flex: 2;" data-i18n="table.actions">Actions</div>
 	</div>
 
 	{% for friend in friends %}
 	<div class="tab-item">
 		<div class="tab-players">
 			<img src="{{ friend.image.url }}" class="user-avatar" />
-			<span>{{ friend.username }}</span>
+			<span class="link user-link" href="/users/profile/foreign/?user={{ friend.username }}">{{ friend.username }}</span>
 			{% if friend.is_online %}
 				<span class="online-status">🟢</span>
 			{% else %}
@@ -112,23 +116,23 @@
 	<div id="blocked-list" class="tab-content hidden">
 		<!-- Header Row -->
 		<div class="tab-header">
-			<div style="flex: 1.5;" data-i18n="profile.blocked.user">User</div>
-			<div style="flex: 2;" data-i18n="profile.blocked.email">Email</div>
-			<div style="flex: 1;" data-i18n="profile.blocked.record">Record</div>
-			<div style="flex: 2;" data-i18n="profile.blocked.actions">Actions</div>
+			<div style="flex: 1.5;" data-i18n="table.username">User</div>
+			<div style="flex: 2;" data-i18n="table.email">Email</div>
+			<div style="flex: 1;" data-i18n="table.record">Record</div>
+			<div style="flex: 2;" data-i18n="table.actions">Actions</div>
 		</div>
 
 		{% for blocked in blockeds %}
 		<div class="tab-item">
 			<div class="tab-players">
 				<img src="{{ blocked.image.url }}" class="user-avatar" />
-				<span>{{ blocked.username }}</span>
+				<span class="link user-link" href="/users/profile/foreign/?user={{ blocked.username }}">{{ blocked.username }}</span>
 				<span class="online-status">🚫</span>
 			</div>
 			<div class="tab-email">{{ blocked.email }}</div>
 			<div class="tab-score">{{ blocked.wins }} - {{ blocked.losses }}</div>
 			<div class="tab-actions">
-				<button id="unblockfriend-btn-{{ blocked.id }}" onclick="unlockUser('{{ blocked.id }}')" data-i18n="profile.blocked.unblock">🔓 Unblock</button>
+				<button id="unblockfriend-btn-{{ blocked.id }}" onclick="unlockUser('{{ blocked.id }}')" data-i18n="action.unblock">🔓 Unblock</button>
 			</div>
 		</div>
 		{% empty %}
@@ -140,17 +144,17 @@
 	<div id="users-list" class="tab-content hidden">
 		<!-- Header Row -->
 		<div class="tab-header">
-			<div style="flex: 1.5;" data-i18n="profile.users.user">User</div>
-			<div style="flex: 2;" data-i18n="profile.users.email">Email</div>
-			<div style="flex: 1;" data-i18n="profile.users.record">Record</div>
-			<div style="flex: 2;" data-i18n="profile.users.actions">Actions</div>
+			<div style="flex: 1.5;" data-i18n="table.username">User</div>
+			<div style="flex: 2;" data-i18n="table.email">Email</div>
+			<div style="flex: 1;" data-i18n="table.record">Record</div>
+			<div style="flex: 2;" data-i18n="table.actions">Actions</div>
 		</div>		
 		
 		{% for user in users %}
 		<div class="tab-item">
 			<div class="tab-players">
 				<img src="{{ user.image.url }}" class="user-avatar" />
-				<span>{{ user.username }}</span>
+				<span class="link user-link" href="/users/profile/foreign/?user={{ user.username }}">{{ user.username }}</span>
 			</div>
 			<div class="tab-email">{{ user.email }}</div>
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>

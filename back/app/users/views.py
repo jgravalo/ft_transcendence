@@ -314,13 +314,34 @@ def profile(request):
 
 def foreign_profile(request):
     try:
-        username = request.GET.get('user', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-        user = User.objects.get(username=username)
+        username = request.GET.get('user', '')
+        user = None
+        
+        # Try to get user by ID first (for action buttons that pass IDs)
+        if username.isdigit():
+            try:
+                user = User.objects.get(id=username)
+            except User.DoesNotExist:
+                pass
+        
+        # If not found by ID, try by username
+        if not user:
+            user = User.objects.get(username=username)
+            
+        # Check if the user is viewing their own profile
+        current_user = User.get_user(request)
+        is_own_profile = (current_user.id == user.id)
+        is_friend = user in current_user.friends.all()
+        is_blocked = user in current_user.blocked.all()
+            
     except:
-       return JsonResponse({'error': 'Forbidden'}, status=403)
-    # print("url =", user.image.url)
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
     context = {
-        'user': user
+        'user': user,
+        'is_own_profile': is_own_profile,
+        'is_friend': is_friend,
+        'is_blocked': is_blocked
     }
     content = render_to_string('foreign.html', context)
     data = {

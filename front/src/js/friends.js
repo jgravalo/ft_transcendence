@@ -1,11 +1,9 @@
 function addFriend(userId) {
 	const btnAdd = document.getElementById("addfriend-btn-" + userId);
-	const btnBlock = document.getElementById("blockfriend-btn-" + userId);
-	if (!btnAdd || !btnBlock) return;
+	if (!btnAdd) return;
 
 	btnAdd.innerHTML = '<i class="fas fa-check"></i> Added';
 	btnAdd.disabled = true;
-	btnBlock.disabled = true;
 
 	fetchFriend(userId, 'add');
 }
