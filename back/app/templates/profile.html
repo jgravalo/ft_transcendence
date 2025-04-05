@@ -99,8 +99,8 @@
 		<div class="tab-email">{{ friend.email }}</div>
 		<div class="tab-score">{{ friend.wins }} - {{ friend.losses }}</div>
 		<div class="tab-actions">
-			<button onclick="chat('{{ friend.username }}')" data-i18n="profile.friends.chat">💬 Chat</button>
-			<button id="deletefriend-btn-{{ friend.id }}" onclick="deleteFriend('{{ friend.id }}')" data-i18n="profile.friends.unfriend">💔 Unfriend</button>
+			<button id="chatfriend-btn-{{ friend.id }}" class="link" href="/chat/?user={{ friend.id }}"  data-i18n="profile.friends.chat">💬 Chat</button>
+			<button id="deletefriend-btn-{{ friend.id }}" onclick="deleteFriend('{{ friend.id }}')">💔 Unfriend</button>
 		</div>
 	</div>
 	{% empty %}
@@ -155,7 +155,7 @@
 			<div class="tab-email">{{ user.email }}</div>
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
 			<div class="tab-actions">
-				<button id="chatfriend-btn-{{ user.id }}" onclick="window.location.href='/chat/?user={{ user.id }}'">💬 Chat</button>
+				<button id="chatfriend-btn-{{ user.id }}" class="link" href="/chat/?user={{ user.id }}" data-i18n="profile.users.chat">💬 Chat</button>
 				<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')">❤️ Add Friend</button>
 				<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')">🚫 Block</button>
 			</div>

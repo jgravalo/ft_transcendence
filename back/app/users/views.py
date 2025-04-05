@@ -287,30 +287,29 @@ def get_logout(request):
     return JsonResponse(data)
 
 def profile(request):
-	try:
-		user = User.get_user(request)
-	except:
-		return JsonResponse({'error': 'Forbidden'}, status=403)
+    user = User.get_user(request)
+    if not user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
 
-	blocked = user.blocked.all()
-	blocked_by = user.blocked_by.all()
-	friends = user.friends.all()
-	non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked) - set(blocked_by)
-	matches = Match.objects.filter(player1=user) | Match.objects.filter(player2=user)
+    blocked = user.blocked.all()
+    blocked_by = user.blocked_by.all()
+    friends = user.friends.all()
+    non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked) - set(blocked_by)
+    matches = Match.objects.filter(player1=user) | Match.objects.filter(player2=user)
 
-	context = {
-		'user': user,
-		'friends': friends,
-		'blockeds': blocked,
-		'users': non_friends,
-		'matches': matches.order_by('-created_at'),
-	}
-	content = render_to_string('profile.html', context)
-	data = {
-		"element": 'content',
-		"content": content
-	}
-	return JsonResponse(data)
+    context = {
+        'user': user,
+        'friends': friends,
+        'blockeds': blocked,
+        'users': non_friends,
+        'matches': matches.order_by('-created_at'),
+    }
+    content = render_to_string('profile.html', context)
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data)
 
 def foreign_profile(request):
     try:
@@ -330,9 +329,8 @@ def foreign_profile(request):
     return JsonResponse(data)
 
 def update(request):
-    try:
-        user = User.get_user(request)
-    except:
+    user = User.get_user(request)
+    if not user:
         return JsonResponse({'error': 'Forbidden'}, status=403)
     context = {
         'user': user
@@ -350,23 +348,15 @@ from django.core.files.storage import default_storage
 def set_update(request):
     if request.method == "POST":
         try:
-            try:
-                user = User.get_user(request)
-            except:
+            user = User.get_user(request)
+            if not user:
                 return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
-                #image = data.get('image')
-                # Acceder al archivo 'image' desde request.FILES
-                # file = request.FILES['image']
-                # user.image.save(file.name, file)
-                file = request.FILES.get('image')  # Asegúrate de obtener la imagen correctamente
+
+                file = request.FILES.get('image')
                 if file:
-                    #file_path = default_storage.save('profile_images/' + file.name, file)
-                    user.image = file#_path  # Asigna el archivo al campo image
-                    user.save()  # Guarda el usuario con la imagen
-                # print('funciono request.FILES')
-                # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
-                # print('funciono image.save')
+                    user.image = file
+                    user.save()
             except:
                 print("fallo al subir image")
             username = request.POST.get('username')
@@ -410,9 +400,8 @@ def set_update(request):
 
 @csrf_exempt
 def friends(request):
-    try:
-        user = User.get_user(request)
-    except:
+    user = User.get_user(request)
+    if not user:
         return JsonResponse({'error': 'Forbidden'}, status=403)
     blocked = user.blocked.all()
     blocked_by = user.blocked_by.all()
@@ -432,29 +421,23 @@ def friends(request):
 
 @csrf_exempt
 def edit_friend(request):
-    try:
-        print('user1')
-        user1 = User.get_user(request)
-        print('data')
-        data = json.loads(request.body)
-        print('username')
-        user_id = data.get("user", "")
-        rule = data.get("rule", "")
-        print('user2')
-        user2 = User.objects.get(id=user_id)
-        print('user2')
-        if rule == 'add':
-            user1.friends.add(user2)
-        elif rule == 'delete':
-            user1.friends.remove(user2)
-        elif rule == 'block':
-            user1.blocked.add(user2)
-        elif rule == 'unlock':
-            user1.blocked.remove(user2)
-        data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-        return JsonResponse(data)
-    except:
+    user1 = User.get_user(request)
+    if not user1:
         return JsonResponse({'error': 'Forbidden'}, status=403)
+    data = json.loads(request.body)
+    user_id = data.get("user", "")
+    rule = data.get("rule", "")
+    user2 = User.objects.get(id=user_id)
+    if rule == 'add':
+        user1.friends.add(user2)
+    elif rule == 'delete':
+        user1.friends.remove(user2)
+    elif rule == 'block':
+        user1.blocked.add(user2)
+    elif rule == 'unlock':
+        user1.blocked.remove(user2)
+    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
+    return JsonResponse(data)
 
 @csrf_exempt
 def add_friend(request):
@@ -653,9 +636,8 @@ def privacy_policy(request):
 @csrf_exempt
 def download_user_data(request):
     if request.method == "GET":
-        try:
-            user = User.get_user(request)
-        except:
+        user = User.get_user(request)
+        if not user:
             return JsonResponse({'error': 'Forbidden'}, status=403)
         
         zip_buffer = BytesIO()
@@ -706,11 +688,11 @@ def anonymize_user(request):
     if request.method != "POST":
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
+    user = User.get_user(request)
+    if not user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    
     try:
-        user = User.get_user(request)
-        if not user:
-            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
-        
         # Generar identificador anónimo único
         salt = secrets.token_hex(8)
         hash_base = hashlib.sha256((str(user.id) + salt).encode()).hexdigest()

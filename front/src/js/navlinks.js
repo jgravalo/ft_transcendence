@@ -89,7 +89,7 @@ function fetchLink(path)
             //     game();
             handleLinks();
         }
-        initGameLandingControls();
+        // initGameLandingControls(); // Comentado por Victor
     })
     .catch(error => {
         console.error('fallo el 42 auth');
