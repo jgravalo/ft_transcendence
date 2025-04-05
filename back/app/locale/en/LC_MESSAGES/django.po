@@ -87,7 +87,7 @@ msgstr "You don't have friends"
 
 #: language/translations.py:21
 msgid "Other Users"
-msgstr "Other Users"
+msgstr "Other"
 
 #: language/translations.py:22
 msgid "#"
@@ -97,13 +97,9 @@ msgstr "#"
 msgid "There are no users"
 msgstr "There are no users"
 
-#: language/translations.py:23
-msgid "There are no blocked users"
-msgstr "There are no blocked users"
-
 #: language/translations.py:24
 msgid "Start 1vs1"
-msgstr "Start 1vs1"
+msgstr "🎮 Play 1vs1"
 
 #: language/translations.py:25
 msgid "Start online"
@@ -163,7 +159,15 @@ msgstr "Matches"
 
 #: language/translations.py:44
 msgid "Tournament"
-msgstr "Tournament"
+msgstr "🏆 Tournament"
+
+#: language/translations.py:44
+msgid "Tournament_description"
+msgstr "Play in a Tournament"
+
+#: language/translations.py:44
+msgid "Tournament Wins"
+msgstr "Tournament Wins"
 
 #: language/translations.py:45
 msgid "Stats"
@@ -289,105 +293,46 @@ msgstr "🧑‍🤝‍🧑 Online"
 msgid "Online_description"
 msgstr "Play against another player"
 
-# Profile page translations
-msgid "profile.play"
-msgstr "Play 1v1"
-
-msgid "profile.wins"
-msgstr "Total Wins"
-
-msgid "profile.losses"
-msgstr "Total Losses"
-
-msgid "profile.matches"
-msgstr "Games Played"
-
-msgid "profile.tournaments"
-msgstr "Tournament Wins"
-
-msgid "profile.tabs.matches"
+#: language/translations.py:178
+msgid "Match History"
 msgstr "Match History"
 
-msgid "profile.tabs.friends"
-msgstr "Friends"
-
-msgid "profile.tabs.blocked"
+#: language/translations.py:179
+msgid "Blocked"
 msgstr "Blocked"
 
-msgid "profile.tabs.users"
-msgstr "Other Users"
-
-msgid "profile.matches.players"
-msgstr "Players"
-
-msgid "profile.matches.date"
-msgstr "Date"
-
-msgid "profile.matches.score"
-msgstr "Score"
-
-msgid "profile.matches.empty"
+#: language/translations.py:180
+msgid "No matches played yet"
 msgstr "No matches played yet"
 
-msgid "profile.friends.user"
-msgstr "User"
-
-msgid "profile.friends.email"
-msgstr "Email"
-
-msgid "profile.friends.record"
-msgstr "Record"
-
-msgid "profile.friends.actions"
-msgstr "Actions"
-
-msgid "profile.friends.chat"
-msgstr "💬 Chat"
-
-msgid "profile.friends.unfriend"
-msgstr "💔 Unfriend"
-
-msgid "profile.friends.empty"
-msgstr "You don't have friends"
-
-msgid "profile.blocked.user"
-msgstr "User"
-
-msgid "profile.blocked.email"
-msgstr "Email"
-
-msgid "profile.blocked.record"
-msgstr "Record"
-
-msgid "profile.blocked.actions"
-msgstr "Actions"
-
-msgid "profile.blocked.unblock"
-msgstr "🔓 Unblock"
-
-msgid "profile.blocked.empty"
+#: language/translations.py:181
+msgid "There are no blocked users"
 msgstr "There are no blocked users"
 
-msgid "profile.users.user"
-msgstr "User"
-
-msgid "profile.users.email"
-msgstr "Email"
-
-msgid "profile.users.record"
-msgstr "Record"
-
-msgid "profile.users.actions"
+#: language/translations.py:182
+msgid "Actions"
 msgstr "Actions"
 
-msgid "profile.users.chat"
+#: language/translations.py:183
+msgid "Date"
+msgstr "Date"
+
+#: language/translations.py:184
+msgid "💬 Chat"
 msgstr "💬 Chat"
 
-msgid "profile.users.add"
+#: language/translations.py:185
+msgid "💔 Unfriend"
+msgstr "💔 Unfriend"
+
+#: language/translations.py:186
+msgid "🔓 Unblock"
+msgstr "🔓 Unblock"
+
+#: language/translations.py:187
+msgid "❤️ Add Friend"
 msgstr "❤️ Add Friend"
 
-msgid "profile.users.block"
+#: language/translations.py:188
+msgid "🚫 Block"
 msgstr "🚫 Block"
-
-msgid "profile.users.empty"
-msgstr "There are no other users"

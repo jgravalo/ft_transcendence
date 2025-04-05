@@ -1,23 +1,56 @@
-<div class="profile">
-	<div class="profile-photo">
-		<img src="{{ user.image.url }}"> <!-- src="img/España.webp"> -->
-	</div>
-	<div class="info">
-		<h1 id="username">{{ user.username }}</h1>
-		<div class="stats">
-			<h2><a data-i18n="profile.dash.wins">wins</a>: {{ user.wins }}<!--span id="wins">0</span--></h2>
-			<h2><a data-i18n="profile.dash.losses">losses</a>: {{ user.losses }}<!--span id="losses">0</span--></h2>
-			<h2><a data-i18n="profile.dash.matches">matches</a>: {{ user.matches }}<!--span id="matches">0</span--></h2>
+<div class="profile-container">
+	<div class="profile">
+		<div class="profile-photo">
+			<img src="{{ user.image.url }}">
+		</div>
+		<div class="info">
+			<div class="username-container">
+				<h1 class="username">{{ user.username }}</h1>
+			</div>
+			<div class="tab-actions">
+				{% if not is_own_profile %}
+					<button class="challenge-btn" href="/game" data-i18n="profile.dash.1v1">🎮 Play 1v1</button>
+					
+					{% if is_friend %}
+						<button id="deletefriend-btn-{{ user.id }}" onclick="deleteFriend('{{ user.id }}')" data-i18n="action.unfriend">💔 Unfriend</button>
+						<button id="chatfriend-btn-{{ user.id }}" onclick="window.location.href='/chat/?user={{ user.id }}'" data-i18n="action.chat">💬 Chat</button>
+					{% elif is_blocked %}
+						<button id="unblockfriend-btn-{{ user.id }}" onclick="unlockUser('{{ user.id }}')" data-i18n="action.unblock">🔓 Unblock</button>
+					{% else %}
+						<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')" data-i18n="action.add">❤️ Add Friend</button>
+						<button id="chatfriend-btn-{{ user.id }}" onclick="window.location.href='/chat/?user={{ user.id }}'" data-i18n="action.chat">💬 Chat</button>
+						<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')" data-i18n="action.block">🚫 Block</button>
+					{% endif %}
+				{% else %}
+					<button href="/users/update" data-i18n="profile.dash.edit">Edit profile</button>
+				{% endif %}
+			</div>
 		</div>
 	</div>
-</div>
-<div class="fila">
-	<button class="item link" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
-	<button class="item link" href="/game" data-i18n="profile.dash.online">Play online</button>
-	<button class="item link" href="/game" data-i18n="profile.dash.tournament">Tournament</button>
-</div>
-<div class="fila">
-	<button class="item link" href="/game" data-i18n="profile.dash.stats">Stats</button>
-	<button class="item link" href="/users/friends" data-i18n="profile.dash.friends">Friends</button>
-	<button class="item link" href="/users/update" data-i18n="profile.dash.edit">Edit profile</button>
+
+	<div class="stats">
+		<div class="stat-card">
+			<div class="stat-icon trophy">🏆</div>
+			<div class="stat-value">{{ user.wins }}</div>
+			<div class="stat-label" data-i18n="profile.dash.wins">Total Wins</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon trophy">💀</div>
+			<div class="stat-value">{{ user.losses }}</div>
+			<div class="stat-label" data-i18n="profile.dash.losses">Total Losses</div>
+		</div>
+		
+		<div class="stat-card">
+			<div class="stat-icon clock">🕒</div>
+			<div class="stat-value">{{ user.matches }}</div>
+			<div class="stat-label" data-i18n="profile.dash.matches">Games Played</div>
+		</div>
+		
+		<div class="stat-card">
+			<div class="stat-icon tournament">👑</div>
+			<div class="stat-value">0</div>
+			<div class="stat-label" data-i18n="profile.dash.tournament">Tournament Wins</div>
+		</div>
+	</div>
 </div>

@@ -87,7 +87,7 @@ msgstr "Vous n'avez pas d'amis"
 
 #: language/translations.py:21
 msgid "Other Users"
-msgstr "Autres Utilisateurs"
+msgstr "Autres"
 
 #: language/translations.py:22
 msgid "#"
@@ -97,15 +97,15 @@ msgstr "#"
 msgid "There are no users"
 msgstr "Il n'y a pas d'utilisateurs"
 
-#: language/translations.py:23
+#: language/translations.py:24
 msgid "There are no blocked users"
 msgstr "Il n'y a pas d'utilisateurs bloqués"
 
-#: language/translations.py:24
-msgid "Start 1vs1"
-msgstr "Jouer en 1vs1"
-
 #: language/translations.py:25
+msgid "Start 1vs1"
+msgstr "🎮 Jouer en 1vs1"
+
+#: language/translations.py:26
 msgid "Start online"
 msgstr "Jouer en ligne"
 
@@ -163,7 +163,15 @@ msgstr "Matchs"
 
 #: language/translations.py:44
 msgid "Tournament"
-msgstr "Tournoi"
+msgstr "🏆 Tournoi"
+
+#: language/translations.py:44
+msgid "Tournament_description"
+msgstr "Participer à un Tournoi"
+
+#: language/translations.py:44
+msgid "Tournament Wins"
+msgstr "Tournois Gagnés"
 
 #: language/translations.py:45
 msgid "Stats"
@@ -527,105 +535,43 @@ msgstr "🧑‍🤝‍🧑 En ligne"
 msgid "Online_description"
 msgstr "Jouer contre un autre joueur"
 
-# Profile page translations
-msgid "profile.play"
-msgstr "Jouer en 1v1"
+#: language/translations.py:178
+msgid "Match History"
+msgstr "Historique des matchs"
 
-msgid "profile.wins"
-msgstr "Victoires Totales"
-
-msgid "profile.losses"
-msgstr "Défaites Totales"
-
-msgid "profile.matches"
-msgstr "Matchs Joués"
-
-msgid "profile.tournaments"
-msgstr "Victoires en Tournoi"
-
-msgid "profile.tabs.matches"
-msgstr "Historique des Matchs"
-
-msgid "profile.tabs.friends"
-msgstr "Amis"
-
-msgid "profile.tabs.blocked"
+#: language/translations.py:179
+msgid "Blocked"
 msgstr "Bloqués"
 
-msgid "profile.tabs.users"
-msgstr "Autres Utilisateurs"
+#: language/translations.py:180
+msgid "No matches played yet"
+msgstr "Aucun match joué pour l'instant"
 
-msgid "profile.matches.players"
-msgstr "Joueurs"
+#: language/translations.py:182
+msgid "Actions"
+msgstr "Actions"
 
-msgid "profile.matches.date"
+#: language/translations.py:183
+msgid "Date"
 msgstr "Date"
 
-msgid "profile.matches.score"
-msgstr "Score"
+#: language/translations.py:184
+msgid "💬 Chat"
+msgstr "💬 Chat"
 
-msgid "profile.matches.empty"
-msgstr "Aucun match joué pour le moment"
+#: language/translations.py:185
+msgid "💔 Unfriend"
+msgstr "💔 Retirer de mes amis"
 
-msgid "profile.friends.user"
-msgstr "Utilisateur"
-
-msgid "profile.friends.email"
-msgstr "Adresse e-mail"
-
-msgid "profile.friends.record"
-msgstr "Enregistrement"
-
-msgid "profile.friends.actions"
-msgstr "Actions"
-
-msgid "profile.friends.chat"
-msgstr "💬 Discuter"
-
-msgid "profile.friends.unfriend"
-msgstr "💔 Retirer Ami"
-
-msgid "profile.friends.empty"
-msgstr "Vous n'avez pas d'amis"
-
-msgid "profile.blocked.user"
-msgstr "Utilisateur"
-
-msgid "profile.blocked.email"
-msgstr "Adresse e-mail"
-
-msgid "profile.blocked.record"
-msgstr "Enregistrement"
-
-msgid "profile.blocked.actions"
-msgstr "Actions"
-
-msgid "profile.blocked.unblock"
+#: language/translations.py:186
+msgid "🔓 Unblock"
 msgstr "🔓 Débloquer"
 
-msgid "profile.blocked.empty"
-msgstr "Il n'y a pas d'utilisateurs bloqués"
+#: language/translations.py:187
+msgid "❤️ Add Friend"
+msgstr "❤️ Ajouter en ami"
 
-msgid "profile.users.user"
-msgstr "Utilisateur"
-
-msgid "profile.users.email"
-msgstr "Adresse e-mail"
-
-msgid "profile.users.record"
-msgstr "Enregistrement"
-
-msgid "profile.users.actions"
-msgstr "Actions"
-
-msgid "profile.users.chat"
-msgstr "💬 Discuter"
-
-msgid "profile.users.add"
-msgstr "❤️ Ajouter Ami"
-
-msgid "profile.users.block"
+#: language/translations.py:188
+msgid "🚫 Block"
 msgstr "🚫 Bloquer"
 
-msgid "profile.users.empty"
-msgstr "Il n'y a pas d'autres utilisateurs"
