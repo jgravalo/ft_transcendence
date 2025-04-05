@@ -74,6 +74,7 @@ function makeSubmit(path)
 {
     const info = getInfo();
     const post = path + "set/";
+	console.log(`post: ${post}`);
     
     fetch(base + '/api' + post, {
         method: "POST",
@@ -97,7 +98,7 @@ function makeSubmit(path)
 				loginSock();
             }
             
-            if (path !== '/users/update/') {
+            if (path !== '/users/update/' && path !== '/game/tournament/') {
                 document.getElementById('close').click();
             }
             

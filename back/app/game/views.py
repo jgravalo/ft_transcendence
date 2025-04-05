@@ -1,11 +1,7 @@
 from django.template.loader import render_to_string
-
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-
-#from .models import Match
-#from .serializers import MatchSerializer
-
-# Create your views here.
+from .models import Tournament
 
 def game(request):
     content = render_to_string('game.html')
@@ -63,11 +59,19 @@ def tournament(request):
     }
     return JsonResponse(data)
 
+@csrf_exempt
 def set_tournament(request):
     if request.method == "POST":
         try:
             tournament_name = request.POST.get('tournament-name')
             number_players = request.POST.get('number-players')
+            print(f'tournament_name: {tournament_name}')
+            print(f'number_players: {number_players}')
+            tournament = Tournament.objects.create(
+                name=tournament_name,
+                number=number_players
+            )
+            print('TORNEO CREADO')
             response = JsonResponse({
                 "error": "Success",
                 "element": 'bar',
