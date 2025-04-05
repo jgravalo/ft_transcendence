@@ -1,6 +1,46 @@
 var base = window.location.origin;
 console.log("base: ", base);
 
+// Función para actualizar la barra de navegación según el estado de login
+function updateNavigationBarState() {
+    const accessToken = getStorage('access');
+    
+    const navBarEndpoint = accessToken ? '/users/login/close/' : '/users/logout/close/';
+    const elementIdToUpdate = 'bar';
+
+    if (document.getElementById(elementIdToUpdate)) {
+         fetch(base + '/api' + navBarEndpoint, {
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(), 
+            },
+         })
+         .then(response => {
+             if (!response.ok) {
+                 if (accessToken) {
+                    return fetch(base + '/api/users/logout/close/', { /* ... headers sin auth ... */ });
+                 }
+                 throw new Error('Failed to fetch navbar state');
+             }
+             return response.json();
+         })
+         .then(data => {
+             if (data.content && document.getElementById(elementIdToUpdate)) {
+                 document.getElementById(elementIdToUpdate).innerHTML = data.content;
+                 handleLinks(); 
+                 changeLanguage(localStorage.getItem("selectedLanguage") || "en");
+             }
+         })
+         .catch(error => {
+             console.error('Error updating navigation bar:', error);
+         });
+    }
+}
+
+updateNavigationBarState(); 
+
 handleLinks();
 
 function handleLinks()

@@ -23,6 +23,9 @@ from .serializers import UserSerializer
 import os
 import hashlib
 import secrets
+from django.contrib.auth.decorators import login_required # O usa la autenticación de DRF si es una APIView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 # def iniciar_sesion(request):
 #     usuario = authenticate(username="juan", password="secreto123")
@@ -94,7 +97,10 @@ def get_login(request):
     }
     return JsonResponse(data)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def close_login(request):
+    # Si llega aquí, el usuario está autenticado vía JWT
     content = render_to_string('close_login.html')
     data = {
         "element": 'bar',
