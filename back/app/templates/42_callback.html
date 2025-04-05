@@ -49,6 +49,9 @@
                 })
                 .then(data => {
                     if (data.error === "Success") {
+                        console.log('Callback 42 Data:', data); 
+                        console.log('Access Token:', data.access);
+                        console.log('Refresh Token:', data.refresh);
                         sessionStorage.setItem('access', data.access);
                         sessionStorage.setItem('refresh', data.refresh);
                         // localStorage.setItem('access', data.access);

@@ -50,10 +50,13 @@ function fetchLink(path)
 {
     if (checkAccess(path) != 0)
         return ;
-	console.log('path for GET =', path);
-    var get = '/api' + path;
-        if (path == "")
-            get = path;
+    console.log('path for GET =', path);
+    let apiPath = path;
+    if (apiPath === '/' || apiPath === '//') {
+       apiPath = '/'; 
+    }
+    let get = (path === "") ? path : '/api' + apiPath; 
+    
     console.log('fetch for GET =', base + get);
     fetch(base + get, {
         method: "GET",

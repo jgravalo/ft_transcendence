@@ -69,6 +69,8 @@ function isTokenExpired(token) {
 function checkAccess(path) {
 	let token = getStorage('access');
 	let refresh = getStorage('refresh');
+	console.log('checkAccess - Access Token from storage:', token);
+	console.log('checkAccess - Refresh Token from storage:', refresh);
     // console.log("JWT before GET:", getJWTToken());
     //console.log("token =", token);
 	if (token && token !== undefined && token !== "undefined" && isTokenExpired(token)) {
