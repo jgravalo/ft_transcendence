@@ -74,18 +74,26 @@ function makeSubmit(path)
 {
     const info = getInfo();
     const post = path + "set/";
-    
+    const headers = {
+        'X-CSRFToken': getCSRFToken(),
+    };
+    const token = getJWTToken();
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     fetch(base + '/api' + post, {
         method: "POST",
-        headers: {
-            'X-CSRFToken': getCSRFToken(),
-        },
+        headers: headers,
         body: info,
         credentials: 'include'
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
+            console.error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+            return response.json().then(errData => {
+                throw new Error(errData.error || 'Error en la respuesta del servidor');
+            });
         }
         return response.json();
     })
@@ -97,22 +105,44 @@ function makeSubmit(path)
             }
             
             if (path !== '/users/update/') {
-                document.getElementById('close').click();
+                const modalElement = document.getElementById('loginModal');
+                if (modalElement) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                }
+            } else {
+                console.log("Perfil actualizado con éxito");
+                alert("Perfil actualizado con éxito");
             }
             
-            if (data.element) {
-                document.getElementById(data.element).innerHTML = data.content;
+            if (data.element && data.content) {
+                const targetElement = document.getElementById(data.element);
+                if (targetElement) {
+                    targetElement.innerHTML = data.content;
+                }
             }
             
-            fetchLink(data.next_path);
-            handleLinks();
+            if (data.next_path && path !== '/users/update/') {
+                fetchLink(data.next_path);
+                handleLinks();
+            } else if (path === '/users/update/') {
+                handleLinks();
+            }
         } else {
-            document.getElementById(data.type).textContent = data.error;
-            document.getElementById('loginForm').reset();
+            const errorElement = document.getElementById(data.type);
+            if (errorElement) {
+                errorElement.textContent = data.error;
+            } else {
+                console.error("Error devuelto por el servidor:", data.error);
+                alert("Error: " + data.error);
+            }
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Error en fetch:', error);
+        alert('Ocurrió un error al procesar tu solicitud: ' + error.message);
     });
 }
 
@@ -178,3 +208,4 @@ function loginSock() // por definir
         console.error("WebSocket error:", error);
     };
 }
+

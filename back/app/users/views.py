@@ -395,7 +395,7 @@ def set_update(request):
                 return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
             if email != user.email and User.objects.filter(email=email).exists():
                 return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
-            # if old_password != '' and old_password != user.password: # unhashed
+            #if old_password != '' and old_password == user.password: # unhashed
             if old_password != '' and user.check_password(old_password): # hashed
                 return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
             if old_password == '' and new_password != '':
