@@ -206,22 +206,6 @@ function initGameLandingControls() {
 	modes = [localBtn, onlineBtn, tournamentBtn];
 	focusedIndex = 0;
 	updateSelection();
-
-	localBtn.addEventListener("click", () => {
-		document.getElementById('content').innerHTML = `
-			<div id="game-wrapper" class="fade-in">
-				<h2 id="winnerMessage"></h2>
-				<button onclick="game()">LOCAL</button>
-				<button onclick="gameRemote()">REMOTE</button>
-				<canvas id="gameCanvas" width="400" height="600"></canvas>
-			</div>
-		`;
-		game();
-	});
-
-	onlineBtn.addEventListener("click", () => {
-		handleLink({ currentTarget: { getAttribute: () => "/game/" }, preventDefault: () => {} });
-	});
 }
 
 function showTab(tabId, button) {

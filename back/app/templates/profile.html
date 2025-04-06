@@ -54,6 +54,7 @@
 		<button class="tab" onclick="showTab('friends-list', this)" data-i18n="profile.tabs.friends">Friends</button>
 		<button class="tab" onclick="showTab('blocked-list', this)" data-i18n="profile.tabs.blocked">Blocked</button>
 		<button class="tab" onclick="showTab('users-list', this)" data-i18n="profile.tabs.users">Other Users</button>
+		<button class="tab" onclick="showTab('tournaments-list', this)" data-i18n="profile.tabs.tournaments">Tournaments</button>
 	</div>
 
 	<!-- Match History -->
@@ -181,6 +182,30 @@
 				<button id="chatfriend-btn-{{ user.id }}" class="link" href="/chat/?user={{ user.id }}" data-i18n="profile.users.chat">💬 Chat</button>
 				<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')">❤️ Add Friend</button>
 				<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')">🚫 Block</button>
+			</div>
+		</div>
+		{% empty %}
+		<p style="color: white;" data-i18n="profile.users.empty">There are no other users.</p>
+		{% endfor %}
+	</div>
+
+	<!-- Tournaments -->
+	<div id="tournaments-list" class="tab-content hidden">
+		<!-- Header Row -->
+		<div class="tab-header">
+			<div style="flex: 1.5;" data-i18n="table.username">Tournament</div>
+			<div style="flex: 1;" data-i18n="table.record">Users</div>
+			<div style="flex: 2;" data-i18n="table.actions">Actions</div>
+		</div>
+		
+		{% for tournament in tournaments %}
+		<div class="tab-item">
+			<div class="tab-players">
+				<span>{{ tournament.name }}</span>
+			</div>
+			<div class="tab-score">{{ tournament.size }}/{{ tournament.number }}</div>
+			<div class="tab-actions">
+				<button id="tournament-btn-{{ tournament.id }}" class="link" href="/game/tournament/join/?tournament={{ tournament.id }}" data-i18n="profile.users.game">⚔️ join</button>
 			</div>
 		</div>
 		{% empty %}

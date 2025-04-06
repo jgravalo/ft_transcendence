@@ -28,15 +28,15 @@ class Tournament(models.Model):
 	players = models.ManyToManyField(User, symmetrical=False, related_name='tournaments', blank=True)
 	winner = models.ForeignKey(User, null=True, related_name='trophies', on_delete=models.CASCADE)
 
-	# def save(self, *args, **kwargs):
-	# 	if not self.name:
-	# 		self.name = f'tournament_{self.id}'
-	# 	super().save(*args, **kwargs)
+	@property
+	def is_full(self):
+		return self.size == self.number
 
 	def add_player(self, user):
 		self.players.add(user)
 		self.size = self.players.count()
 		if self.size == self.number:
+			# self.is_full = True
 			self.play()
 
 	def play(self):

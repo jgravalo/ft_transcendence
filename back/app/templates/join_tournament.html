@@ -1,0 +1,22 @@
+<div id="tournaments-list" class="tab-content hidden">
+	<!-- Header Row -->
+	<div class="tab-header">
+		<div style="flex: 1.5;" data-i18n="table.username">User</div>
+		<div style="flex: 1;" data-i18n="table.record">Record</div>
+		<div style="flex: 2;" data-i18n="table.actions">Actions</div>
+	</div>
+	
+	{% for tournament in tournaments %}
+	<div class="tab-item">
+		<div class="tab-players">
+			<span>{{ tournament.name }}</span>
+		</div>
+		<div class="tab-score">{{ tournament.size }}/{{ tournament.number }}</div>
+		<div class="tab-actions">
+			<button id="gamefriend-btn-{{ user.id }}" class="link" href="/game/remote/?user={{ user.id }}" data-i18n="profile.users.chat">⚔️ Game</button>
+		</div>
+	</div>
+	{% empty %}
+	<p style="color: white;" data-i18n="profile.users.empty">There are no other users.</p>
+	{% endfor %}
+</div>

@@ -2,6 +2,7 @@ from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import Tournament
+from users.models import User
 
 def game(request):
     content = render_to_string('game.html')
@@ -61,6 +62,7 @@ def tournament(request):
 
 @csrf_exempt
 def set_tournament(request):
+    print(f'set_tournament method: {request.method}')
     if request.method == "POST":
         try:
             tournament_name = request.POST.get('tournament-name')
@@ -78,8 +80,42 @@ def set_tournament(request):
                 "content": render_to_string('close_login.html'),
                 "next_path": '/users/profile/'
             })
+            return response
         except Exception as e:
             print(f"Error en login: {str(e)}")
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
 
     return JsonResponse({"error": "Método no permitido"}, status=405)
+
+def join_tournament(request):
+    print('entra en join_tournament')
+    logged_in_user = User.get_user(request)
+    if not logged_in_user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+
+    tournament_id = request.GET.get('tournament')
+    if not tournament_id:
+        return JsonResponse({'error': 'Tournament ID not provided in query parameters'}, status=400)
+    print(f'tournament_id: {tournament_id}')
+    try:
+        tournament = Tournament.objects.get(id=tournament_id)
+        # tournament = get_object_or_404(Tournament, pk=tournament_id)
+    except ValueError:
+        return JsonResponse({'error': 'Invalid Tournament ID format'}, status=400)
+    except Tournament.DoesNotExist:
+        return JsonResponse({'error': 'Tournament not found'}, status=404)
+    print(f'tournament.id: {tournament.id}')
+
+    tournament.add_player(logged_in_user)
+
+    return JsonResponse({"error": "Success"})
+""" 
+    context = {
+        'user': other_user
+    }
+    content = render_to_string('chat.html', context)
+    data = {
+        "element": 'content',
+        "content": content
+    }
+    return JsonResponse(data) """

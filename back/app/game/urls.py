@@ -7,4 +7,5 @@ urlpatterns = [
     path('remote/', views.remote_game, name='remote_game'),
     path('tournament/', views.tournament, name='tournament'),
     path('tournament/set/', views.set_tournament, name='set_tournament'),
+    path('tournament/join/', views.join_tournament, name='join_tournament'),
 ]

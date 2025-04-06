@@ -10,6 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
 from game.models import Match
+from game.models import Tournament
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -301,6 +302,7 @@ def profile(request):
     friends = user.friends.all()
     non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked) - set(blocked_by)
     matches = Match.objects.filter(player1=user) | Match.objects.filter(player2=user)
+    tournaments = Tournament.objects.all()
 
     context = {
         'user': user,
@@ -308,6 +310,7 @@ def profile(request):
         'blockeds': blocked,
         'users': non_friends,
         'matches': matches.order_by('-created_at'),
+		'tournaments': tournaments,
     }
     content = render_to_string('profile.html', context)
     data = {

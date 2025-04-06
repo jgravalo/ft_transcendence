@@ -178,9 +178,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 						if self.is_tournament:
 							Round = apps.get_model('game', 'Round')
-							round = Round.objects.get(tournament__name=self.tour_name)
+							round = Round.objects.get(tournament__name=self.tour_name) # aqui saldran varios casos, hay que filtrr mas (por players)
 							round.matches.add(game)
-							if round.number != 2:
+							if round.number == 2:
 								round.tournament.winner = winner
 								round.tournament.save()
 							else:
