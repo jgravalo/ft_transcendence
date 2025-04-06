@@ -97,6 +97,13 @@ function makeSubmit(path)
 {
     const info = getInfo();
     const post = path + "set/";
+    const headers = {
+        'X-CSRFToken': getCSRFToken(),
+    };
+    const token = getJWTToken();
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
     
     fetch(base + '/api' + post, {
         method: "POST",
