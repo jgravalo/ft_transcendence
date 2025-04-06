@@ -129,7 +129,7 @@
 			<div style="flex: 1.5;" data-i18n="table.username">User</div>
 			<div style="flex: 2;" data-i18n="table.email">Email</div>
 			<div style="flex: 1;" data-i18n="table.record">Record</div>
-			<div style="flex: 2;" data-i18n="table.actions">Actions</div>
+			<div style="flex: 3;" data-i18n="table.actions">Actions</div>
 		</div>
 
 		{% for blocked in blockeds %}
@@ -177,7 +177,7 @@
 			<div class="tab-email">{{ user.email }}</div>
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
 			<div class="tab-actions">
-				<button id="gamefriend-btn-{{ user.id }}" class="link" href="/game/remote/?user={{ user.id }}" data-i18n="action.game">⚔️ Game</button>
+				<button id="gamefriend-btn-{{ user.id }}" class="play-btn" href="/game/remote/?user={{ user.id }}" data-i18n="action.game">⚔️ Game</button>
 				<button id="chatfriend-btn-{{ user.id }}" class="link" href="/chat/?user={{ user.id }}" data-i18n="action.chat">💬 Chat</button>
 				<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')" data-i18n="action.add">❤️ Add Friend</button>
 				<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')" data-i18n="action.block">🚫 Block</button>
