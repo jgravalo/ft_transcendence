@@ -590,3 +590,7 @@ msgstr "Supprimer le compte"
 #: language/translations.py:191
 msgid "Anonymize account"
 msgstr "Anonymiser le compte"
+
+#: language/translations.py:192
+msgid "Back to home"
+msgstr "Retour à la maison"

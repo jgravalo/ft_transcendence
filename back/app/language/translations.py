@@ -185,4 +185,5 @@ TRANSLATION_KEYS = {
     "action.block": _("🚫 Block"),
     # Error
     "error.404.message": _("Oops! Page not found"),
+    "error.404.home": _("Back to home"),
 }

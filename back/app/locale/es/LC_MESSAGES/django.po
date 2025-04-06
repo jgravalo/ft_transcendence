@@ -676,3 +676,7 @@ msgstr "Eliminar cuenta"
 #: language/translations.py:191
 msgid "Anonymize account"
 msgstr "Anonimizar cuenta"
+
+#: language/translations.py:192
+msgid "Back to home"
+msgstr "Volver al inicio"
