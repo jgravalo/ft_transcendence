@@ -1,4 +1,8 @@
 <h2 id="winnerMessage"></h2>
-<button onclick="game()">LOCAL</button>
-<button onclick="gameRemote()">REMOTE</button>
-<canvas id="gameCanvas" width="400" height="600"></canvas>
+<button class="link" href="/game/local">LOCAL</button>
+<button class="link" href="/game/remote">REMOTE</button>
+<script>
+	if (winner)
+		document.getElementById('winnerMessage').innerText = `${winner} wins!`;
+	// handleLinks();
+</script>

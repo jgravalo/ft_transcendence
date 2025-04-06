@@ -79,7 +79,6 @@ def delete_user(request):
         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response['Pragma'] = 'no-cache'
         response['Expires'] = '0'
-
         return response
 
     except Exception as e:

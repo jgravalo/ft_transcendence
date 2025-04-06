@@ -18,7 +18,7 @@ def create_fake_matches(n=1):
         if users:
             player1 = random.choice(users)
             player2 = random.choice(users)
-        while player1 == player2:  # Evitar que sean el mismo equipo
+        while player1 == player2:  # Evitar que sean el mismo
             player2 = random.choice(users)
         score1 = randint(0, 5)
         score2 = randint(0, 5)

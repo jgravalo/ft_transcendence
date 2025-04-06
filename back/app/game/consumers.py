@@ -1,116 +1,229 @@
 import json
 import asyncio
+import uuid
+from asgiref.sync import sync_to_async
+from django.apps import apps
 from channels.generic.websocket import AsyncWebsocketConsumer
+from urllib.parse import parse_qs
 
 class PongConsumer(AsyncWebsocketConsumer):
-	players = []  # Lista para almacenar jugadores
-	ball = {"x": 300, "y": 200, "vx": 5, "vy": 5, "width": 400, "height": 600,
-		"size": 10, "max-score": 5}  # Posición y velocidad de la pelota
+	games = {}  # Lista para almacenar jugadores
+	ball = {}  # Lista para almacenar jugadores
+	
+	async def find_available_room(self):
+		""" Busca una sala con espacio disponible (1 jugador) """
+		print('in find_available_room')
+		print(f'len games = {len(self.games)}')
+		for room, game_list in self.games.items():
+			print(f'room {room}; len1: {len(game_list)}; len2: {len(self.games[room])}')
+			# Si hay un solo jugador, la sala tiene espacio
+			print(f'room[:7] = {room[:7]}')
+			if len(game_list) == 1 and room[:7] != 'game_re': # Protegemos de partidas restringidas
+			# if len(game_list) == 1 and room[:7] == 'game_ra': # Protegemos de partidas restringidas
+				return room
+		return None # No hay salas disponibles con espacio
 
 	async def connect(self):
-		if len(self.players) < 2:
-			# username = self.scope['user'].username
-			# if user.username == AnonymousUser:
-			# 	username = f"Anonymous{len(self.players) + 1}"
-			self.name = self.scope['user'].username
-			self.role = f"player{len(self.players) + 1}"
-			self.paddle = {
-				"x": 150,
-				"y": 10 if len(self.players) == 0 else self.ball['height'] - 20,
-				"width": 80,
-				"height": 10,
-				"score": 0
-				}
-			# self.role = "player1" if len(self.players) == 0 else "player2"
-			print('role:', self.role)
-			print('paddle[y]:', self.paddle['y'])
-			self.players.append(self)
-			
-			await self.accept()
-			await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
+		available_room = await self.find_available_room()
+		User = apps.get_model('users', 'User')
 
-			if len(self.players) == 2:
-				await self.channel_layer.group_add("pong_game", self.channel_name)
-				print("🚀 Dos jugadores conectados. Iniciando el juego...")
-				asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
-				
-				# Cuando haya dos jugadores, avísales que pueden empezar
-				for player in self.players:
-					print(f'{player.role} paddle[y]:', player.paddle['y'])
-					await self.channel_layer.group_add("pong_game", player.channel_name)
-					await player.send(text_data=json.dumps({"action": "start", "role": self.role}))
+		# Para hacer el otro usuario restringido
+		"""
+		query_string = self.scope["query_string"].decode()  # Convertir bytes a string
+		query_params = parse_qs(query_string)  # Parsear la query string en un diccionario
+		
+		# Obtener el usuario desde los parámetros de la consulta
+		self.user2 = query_params.get("user", [None])[0]
+		"""
+
+		self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
+		self.room_name = parse_qs(self.scope["query_string"].decode()).get("room", [None])[0]
+		print('set game')
+		try:
+			print(f'user2 before: {self.user2}')
+			# self.user2 = self.scope['url_route']['kwargs']['other_user_id']
+			self.user2 = await sync_to_async(User.objects.get)(id=self.user2)
+			print(f'user2 before: {self.user2.id}')
+		except:
+			self.user2 = None  # O cualquier valor predeterminado
+		# Obtener la sala desde la URL o algún identificador
+		print("self.room_name =", self.room_name)
+
+		self.is_tournament = False
+		if self.user2:
+			print('CREATE RESTRICTED GAME')
+			self.room_name = f"game_re{uuid.uuid4().hex[:8]}"
+			self.games[self.room_name] = []  # Nueva sala
+			print(f'invite {self.user2.username}')
+			await sync_to_async(self.user2.invite)(self.user2, self.room_name)
+		elif self.room_name: # in self.games:
+			print('ADD TO RESTRICTED GAME')
+			if self.room_name[:7] == 'game_to':
+				self.is_tournament = True
+			pass
+		elif available_room:
+			print('ADD TO RANDOM GAME')
+			self.room_name = available_room  # Unirse a la sala con espacio
+			print('room available')
 		else:
-			await self.close()  # Si hay más de 2 jugadores, cierra la conexión
+			print('CREATE RANDOM GAME')
+			# self.room_name = self.scope["url_route"]["kwargs"]["room_name"]  # Nueva sala
+			self.room_name = f"game_ra{uuid.uuid4().hex[:8]}"
+			self.games[self.room_name] = []
+			print('new room')
+
+		print(f'room_name in connect = {self.room_name}')
+		self.room_group_name = f'private_{self.room_name}'
+		print('set user')
+		self.user = self.scope['user']
+		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.games[self.room_name]) + 1}"
+		# print(f'user {self.name}: {self.user.id}')
+		self.role = f"player{len(self.games[self.room_name]) + 1}"
+		self.paddle = {"width": 80, "height": 10, "score": 0,
+			"x": 150, "y": 10 if len(self.games[self.room_name]) == 0 else 580}
+		print('role:', self.role)
+		print('paddle[y]:', self.paddle['y'])
+		print(f'user: {self.name} {self}')
+		self.games[self.room_name].append(self)
+
+		await self.accept()
+		await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
+		if len(self.games[self.room_name]) == 2:
+			print('set group')
+			print(f"🔗 Conectando a la sala {self.room_group_name}")
+			# await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+			print('set ball')
+			self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
+				"width": 400, "height": 600, "size": 10, "max-score": 3, "connect": True}
+
+			asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
+
+			# Cuando haya dos jugadores, avísales que pueden empezar
+			for player in self.games[self.room_name]:
+				print(f'{player.role} paddle[y]:', player.paddle['y'])
+				await self.channel_layer.group_add(self.room_group_name, player.channel_name)
+				await player.send(text_data=json.dumps({
+					"action": "start",
+					"role": self.role,
+					"player1": self.games[self.room_name][0].name,
+					"player2": self.games[self.room_name][1].name
+				}))
 
 	async def disconnect(self, close_code):
-		if self in self.players:
-			print(f'{self.role} has been disconnected')
-			self.players.remove(self)
+		print(f'room_name in disconnect = {self.room_name}')
+		self.ball[self.room_name]['connect'] = False
+		if self in self.games[self.room_name]:
+			for player in self.games[self.room_name]:
+				if self != player:
+					await player.send(text_data=json.dumps({
+						"action": "finish",
+						"winner": player.name
+					}))
+				await player.close()
+				await self.channel_layer.group_discard(self.room_group_name, player.channel_name)
+			print(f'{self.role} has been disconnected in games')
+			# self.games[self.room_name].remove(self)
+			# await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+			self.games[self.room_name].clear()
 
 	async def receive(self, text_data):
+		# print(f'room_name in receive = {self.room_name}')
 		data = json.loads(text_data)
 		self.paddle['x'] = data['x']
-		# print(f'{self.role} paddle[x]:', self.paddle['x'])
-		# role = data['role']
-		# print('text_data: ', text_data)
-		# Reenvía los datos al otro jugador
-		for player in self.players:
+		for player in self.games[self.room_name]:
 			if player != self:
 				await player.send(text_data=json.dumps(data))
 
 	async def start_game_loop(self):
+		ball = self.ball[self.room_name]
+		print(f'room_name in ball = {self.room_name}')
 		# Bucle que mueve la pelota y la sincroniza en los clientes
-		while len(self.players) == 2:
-			self.ball["x"] += self.ball["vx"]
-			self.ball["y"] += self.ball["vy"]
+		while len(self.games[self.room_name]) == 2:
+			ball["x"] += ball["vx"]
+			ball["y"] += ball["vy"]
 			# print('ball: x:', self.ball["x"], ', y:', self.ball["y"])
 
 			# Rebote en las paredes superior e inferior
-			if self.ball["x"] <= 0 or self.ball["x"] >= self.ball["width"]:
-				self.ball["vx"] *= -1  # Invertir dirección en Y
+			if ball["x"] <= 0 or ball["x"] >= ball["width"]:
+				ball["vx"] *= -1  # Invertir dirección en Y
 
-			if (self.ball["y"] <= 0 or self.ball["y"] >= self.ball["height"]):
-				if self.ball["y"] <= 0:
-					self.players[0].paddle["score"] += 1
-				elif self.ball["y"] >= self.ball["height"]:
-					self.players[1].paddle["score"] += 1
-				self.ball["vy"] *= -1  # Invertir dirección en Y
-				self.ball["x"] = self.ball["width"] / 2
-				self.ball["y"] = self.ball["height"] / 2
-				print(f'{self.players[0].paddle["score"]}-{self.players[1].paddle["score"]}')
-				if self.players[0].paddle["score"] == self.ball["max-score"]:
-					await self.channel_layer.group_send("pong_game", {
+			if (ball["y"] <= 0 or ball["y"] >= ball["height"]):
+				if ball["y"] <= 0:
+					self.games[self.room_name][1].paddle["score"] += 1
+				elif ball["y"] >= ball["height"]:
+					self.games[self.room_name][0].paddle["score"] += 1
+
+				ball["vy"] *= -1  # Invertir dirección en Y
+				ball["x"] = ball["width"] / 2
+				ball["y"] = ball["height"] / 2
+				print(f'{self.games[self.room_name][0].paddle["score"]}-{self.games[self.room_name][1].paddle["score"]}')
+
+				if (self.games[self.room_name][0].paddle["score"] >= ball["max-score"] or
+					self.games[self.room_name][1].paddle["score"] >= ball["max-score"]):
+					if self.games[self.room_name][0].paddle["score"] >= ball["max-score"]:
+						winner = self.games[self.room_name][0].name
+					elif self.games[self.room_name][1].paddle["score"] >= ball["max-score"]:
+						winner = self.games[self.room_name][1].name
+					
+					# guarda en db
+					if (self.games[self.room_name][0].user.is_authenticated and
+					self.games[self.room_name][1].user.is_authenticated):
+						Match = apps.get_model('game', 'Match')
+						game = await sync_to_async(Match.objects.create)(
+							player1=self.games[self.room_name][0].user,
+							player2=self.games[self.room_name][1].user,
+							score_player1=self.games[self.room_name][0].paddle["score"],
+							score_player2=self.games[self.room_name][1].paddle["score"],
+						)
+
+						if self.is_tournament:
+							Round = apps.get_model('game', 'Round')
+							round = Round.objects.get(tournament__name=self.tour_name)
+							round.matches.add(game)
+							if round.number != 2:
+								round.tournament.winner = winner
+								round.tournament.save()
+							else:
+								next_round.add_player(winner)
+
+					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
+						"winner": winner
 					})
+					self.close()
+					break
+			if not self.ball[self.room_name]['connect']:
+				self.close()
+				break
 
 			# 🏓 Verificar colisión con la paleta del jugador 1
 			if (
-				self.ball["y"] # - self.ball["size"] / 2
-				<= self.players[0].paddle["y"] + self.players[0].paddle["height"]
-				and self.ball["x"] >= self.players[0].paddle["x"]
-				and self.ball["x"] <= self.players[0].paddle["x"] + self.players[0].paddle["width"]
+				ball["y"] # - self.ball["size"] / 2
+				<= self.games[self.room_name][0].paddle["y"] + self.games[self.room_name][0].paddle["height"]
+				and ball["x"] >= self.games[self.room_name][0].paddle["x"]
+				and ball["x"] <= self.games[self.room_name][0].paddle["x"] + self.games[self.room_name][0].paddle["width"]
 			):
-				print(f'choca en paleta 1: {self.ball["y"]} <= {self.players[0].paddle["y"]} + {self.players[0].paddle["height"]}')
-				self.ball["vy"] *= -1  # Invierte la dirección vertical
-				self.ball["y"] = self.players[0].paddle["y"] + self.players[0].paddle["height"] # Evita quedarse pegada
+				print(f'choca en paleta 1: {ball["y"]} <= {self.games[self.room_name][0].paddle["y"]} + {self.games[self.room_name][0].paddle["height"]}')
+				ball["vy"] *= -1  # Invierte la dirección vertical
+				ball["y"] = self.games[self.room_name][0].paddle["y"] + self.games[self.room_name][0].paddle["height"] # Evita quedarse pegada
 			# 🏓 Verificar colisión con la paleta del jugador 2
 			elif (
-				self.ball["y"] # + self.ball["size"] / 2
-				>= self.players[1].paddle["y"]
-				and self.ball["x"] >= self.players[1].paddle["x"]
-				and self.ball["x"] <= self.players[1].paddle["x"] + self.players[1].paddle["width"]
+				ball["y"] # + self.ball["size"] / 2
+				>= self.games[self.room_name][1].paddle["y"]
+				and ball["x"] >= self.games[self.room_name][1].paddle["x"]
+				and ball["x"] <= self.games[self.room_name][1].paddle["x"] + self.games[self.room_name][1].paddle["width"]
 			):
-				print(f'choca en paleta 2: {self.ball["y"]} >= {self.players[0].paddle["y"]}')
-				self.ball["vy"] *= -1
-				self.ball["y"] = self.players[1].paddle["y"] - self.ball["size"]
+				print(f'choca en paleta 2: {ball["y"]} >= {self.games[self.room_name][0].paddle["y"]}')
+				ball["vy"] *= -1
+				ball["y"] = self.games[self.room_name][1].paddle["y"] - ball["size"]
 			
 			# Enviar la nueva posición de la pelota a los clientes
-			await self.channel_layer.group_send("pong_game", {
+			await self.channel_layer.group_send(self.room_group_name, {
 					"type": "ball_update",
-					"ball": self.ball,
+					"ball": ball,
 					"score": {
-						"a": self.players[0].paddle["score"],
-						"b": self.players[1].paddle["score"]
+						"a": self.games[self.room_name][0].paddle["score"],
+						"b": self.games[self.room_name][1].paddle["score"]
 					}
 				}
 			)
@@ -122,4 +235,4 @@ class PongConsumer(AsyncWebsocketConsumer):
 	
 	async def finish_game(self, event):
 		# Enviar la posición de la pelota a los clientes
-		await self.send(text_data=json.dumps({"action": "finish"}))
+		await self.send(text_data=json.dumps({"action": "finish", "winner": event["winner"]}))

@@ -12,36 +12,36 @@
 						<img id="preview" src="{{ user.image.url }}"> <!-- alt="Vista previa"> -->
 					</div>
 				</label>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.username">Nombre de usuario</label>
-					<input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
-					<span id="errorName" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="email" class="form-label" data-i18n="edit.profile.email">Correo Electrónico</label>
-					<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-					<span id="errorEmail" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="old-password" class="form-label" data-i18n="edit.profile.password.current">Contraseña Actual</label>
-					<input type="old-password" class="form-control" id="old-password" name="old-password">
-					<span id="errorOldPassword" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="new-password" class="form-label" data-i18n="edit.profile.password.new">Nueva Contraseña</label>
-					<input type="new-password" class="form-control" id="new-password" name="new-password">
-					<span id="errorPassword" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<input type="hidden" name="two_fa_enabled" value=False>
-					<label class="switch">
-						<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value=True
-							{% if user.two_fa_enabled %}checked{% endif %}>
-						<span class="slider"></span>
-					</label>
-					<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.twofa">Enable Two-Factor Authentication</label>
-				</div>
+			</div>
+			<div class="mb-3">
+				<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.username">Nombre de usuario</label>
+				<input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+				<span id="errorName" class="error"></span><br>
+			</div>
+			<div class="mb-3">
+				<label style="color: white;" for="email" class="form-label" data-i18n="edit.profile.email">Correo Electrónico</label>
+				<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+				<span id="errorEmail" class="error"></span><br>
+			</div>
+			<div class="mb-3">
+				<label style="color: white;" for="old-password" class="form-label" data-i18n="edit.profile.password.current">Contraseña Actual</label>
+				<input type="old-password" class="form-control" id="old-password" name="old-password">
+				<span id="errorOldPassword" class="error"></span><br>
+			</div>
+			<div class="mb-3">
+				<label style="color: white;" for="new-password" class="form-label" data-i18n="edit.profile.password.new">Nueva Contraseña</label>
+				<input type="new-password" class="form-control" id="new-password" name="new-password">
+				<span id="errorPassword" class="error"></span><br>
+			</div>
+			<div class="mb-3">
+				<input type="hidden" name="two_fa_enabled" value=False>
+				<label class="switch">
+					<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value=True
+					{% if user.two_fa_enabled %}checked{% endif %}>
+					<span class="slider"></span>
+				</label>
+				<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.twofa">Enable Two-Factor Authentication</label>
+			</div>
 			<button type="submit" data-i18n="edit.profile.submit">Actualizar</button>
 		</form>
 	</div>
@@ -57,14 +57,13 @@
 	<div class="modal-body">
 		<!-- <h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5> -->
 		<!-- <p data-i18n="privacy.data.controller.description">The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona.</p> -->
-		 <!-- Botton para anonimizar datos y eliminar cuenta -->
-		 <button type="button" class="btn btn-danger delete-user-btn">
-			<i class="fas fa-trash"></i>
-			<span data-i18n="privacy.data.delete.account">Delete account</span>
-		</button>
-		<button type="button" class="btn btn-danger anonymize-user-btn">
-			<i class="fas fa-user-times"></i>
-			<span data-i18n="privacy.data.anonymize.account">Anonymize account</span>
-		</button>
-	</div>
+		<!-- Botton para anonimizar datos y eliminar cuenta -->
+	<button type="button" class="btn btn-danger delete-user-btn">
+		<i class="fas fa-trash"></i>
+		<span data-i18n="privacy.data.delete.account">Delete account</span>
+	</button>
+	<button type="button" class="btn btn-danger anonymize-user-btn">
+		<i class="fas fa-user-times"></i>
+		<span data-i18n="privacy.data.anonymize.account">Anonymize account</span>
+	</button>
 </div>

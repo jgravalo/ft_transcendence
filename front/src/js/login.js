@@ -94,6 +94,7 @@ function makeSubmit(path)
 {
     const info = getInfo();
     const post = path + "set/";
+	console.log(`post: ${post}`);
     
     fetch(base + '/api' + post, {
         method: "POST",
@@ -114,9 +115,10 @@ function makeSubmit(path)
             if (path === '/users/login/' || path === '/users/register/') {
                 saveStorage('access', data.access);
                 saveStorage('refresh', data.refresh);
+				loginSock();
             }
             
-            if (path !== '/users/update/') {
+            if (path !== '/users/update/' && path !== '/game/tournament/') {
                 document.getElementById('close').click();
             }
             
@@ -142,55 +144,41 @@ function getInfo()
     return new FormData(form);
 }
 
+let link = null;
+
 function loginSock() // por definir
 { 
     // CREATE SOCKET
-    const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/';
-    //const route = 'ws://back:8000/ws/connect/';
+    const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/?token=' + sessionStorage.getItem('access');
     console.log('ruta: ', route);
     connSocket = new WebSocket(route);
+	
     // Escuchar eventos de conexión
     connSocket.onopen = function (event) {
         console.log("WebSocket conectado");
-        //fetchLink('/users/login/close/');
-        //const data = JSON.parse(event.data);
-        //document.getElementById('bar').innerHTML = data.content;
         fetchLink('/users/login/close/');
-        /* fetch(window.location.origin + '/api/users/login/close/', {
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('access')}`,
-                'Content-Type': 'application/json',
-                // 'X-CSRFToken': getCSRFToken()
-            }
-        })
-        // .then(response => response.json())
-        .then(response => response.json())
-        .then(data => {
-            if (data.content) {
-                document.getElementById('bar').innerHTML = data.content;
-            }
-        }); */
-        /* document.getElementById('page_links').innerHTML = `
-            <div class="bar-links"><a id="Home" class="link" href="/" data-i18n="button.home">Home</a></div>`;
-        document.getElementById('log_links').innerHTML = `
-            <div class="bar-links"><a class="link" href="/users/login" data-i18n="button.login">Log in</a></div>
-		    <div class="bar-links"><a class="link" href="/users/register" data-i18n="button.register">Sign up</a></div>`; */
         connSocket.send(JSON.stringify({ message: "Hola desde el frontend" }));
     };
     // Escuchar mensajes desde el servidor
     connSocket.onmessage = function (event) {
-        //const data = JSON.parse(event.data);
-        //console.log(data.message);
+        const data = JSON.parse(event.data);
+		console.log(`element: ${data.element}`);
+		console.log(`content: ${data.content}`);
+		if (data.element) {
+			document.getElementById(data.element).innerHTML = data.content;
+			var warnPlay = new bootstrap.Modal(document.getElementById('loginModal'));
+			warnPlay.show();
+			execScript(data.element);
+			document.getElementById('accept-match').addEventListener('click', () => {
+				console.log('I accept the match');
+				fetchLink(link);
+			});
+		}
     };
     // Manejar desconexión
     connSocket.onclose = function (event) {
         //const data = JSON.parse(event.data);
         fetchLink('/users/logout/close/');
-        /* document.getElementById('page_links').innerHTML = `
-            <div class="bar-links"><a id="Home" class="link" href="/users/profile" data-i18n="button.home">Home</a></div>`;
-        document.getElementById('log_links').innerHTML = `
-            <div class="bar-links"><a class="link" href="/users/logout" data-i18n="button.logout">Log out</a></div>`; */
-        // document.getElementById('bar').innerHTML = data.content;
         console.log("WebSocket desconectado");
     };
     // Manejar errores
