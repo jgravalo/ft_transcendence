@@ -192,10 +192,11 @@ function updateSelection() {
 function initGameLandingControls() {
 	const localBtn = document.getElementById("play-local");
 	const onlineBtn = document.getElementById("play-online");
+	const tournamentBtn = document.getElementById("play-tournament");
 
-	if (!localBtn || !onlineBtn) return;
+	if (!localBtn || !onlineBtn || !tournamentBtn) return;
 
-	modes = [localBtn, onlineBtn];
+	modes = [localBtn, onlineBtn, tournamentBtn];
 	focusedIndex = 0;
 	updateSelection();
 

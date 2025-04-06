@@ -174,22 +174,31 @@
 	display: flex;
 	gap: 10px;
 	margin-left: auto;
+	flex-wrap: wrap;
+}
+
+.actions .block-btn {
+	background: linear-gradient(to right, #d32f2f, #b71c1c);
 }
 
 .challenge-btn {
-	/* background-color: #00bcd4; */
 	background: linear-gradient(to right, #b22633, #001695);
 	color: white;
 	border: none;
-	border-radius: 5px;
+	border-radius: 8px;
 	padding: 10px 20px;
 	font-weight: bold;
 	cursor: pointer;
 	transition: all 0.3s ease;
+	font-size: x-large;
 }
 
 .challenge-btn:hover {
-	background-color: #00a0b5;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+	filter: brightness(1.1);
+	border: none;
+	border-radius: 8px;
 }
 
 .message-input {
@@ -286,22 +295,38 @@
 }
 
 .tab-actions button {
-	background-color: rgba(50, 50, 50, 0.5);
-	border: 1px solid rgba(100, 100, 100, 0.2);
+	background: linear-gradient(to right, #1e3c7250, #2a529850);
 	color: white;
-	border-radius: 5px;
-	padding: 5px 8px;
-	font-size: 0.8rem;
+	border: none;
+	border-radius: 6px;
+	padding: 8px 12px;
+	font-size: 0.85rem;
 	cursor: pointer;
-	transition: background 0.2s;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	gap: 4px;
 }
 
 .tab-actions button:hover {
-	background: rgba(100, 100, 100, 0.5);
+	transform: translateY(-2px);
+	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+	filter: brightness(1.1);
+}
+
+.tab-actions button:disabled {
+	background: #575757;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
 }
 
 .tab-actions .block-btn {
-	background: #ff05003b;
+	background: linear-gradient(to right, #d32f2f50, #b71c1c50);
+}
+
+.profile-container .tab-actions {
+	justify-content: unset;
 }
 
 .user-avatar {
@@ -364,6 +389,7 @@
 	
 	.tab {
 		padding: 5px 10px;
+		font-size: small;
 	}
 
 	.tab-item {

@@ -312,9 +312,15 @@ body {
 }
 
 .link {
-  /* color: white; */
 	color: var(--color);
+  cursor: pointer;
+}
 
+.link.user-link:hover {
+  text-decoration: underline;
+  color: #c7c7c7;
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 #header {
@@ -649,7 +655,7 @@ html {
 }
 
 .mode-title {
-	font-size: 3rem;
+	font-size: 2rem;
 	font-weight: 900;
 	letter-spacing: 2px;
 	color: #fff;
