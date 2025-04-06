@@ -181,7 +181,7 @@ function loginSock() // por definir
     // CREATE SOCKET
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     // Get the hostname from the current location
-    const hostname = window.location.hostname;
+    let hostname = window.location.hostname;
     let route;
 
     if (hostname === 'localhost' || hostname === '127.0.0.1') {

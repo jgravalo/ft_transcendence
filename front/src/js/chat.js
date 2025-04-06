@@ -17,7 +17,7 @@ function chat(url)
 	const params = new URLSearchParams(new URL(url).search);
     const otherUserId = params.get("user"); // Asumo que 'user' es el ID del otro usuario
    
-    const hostname = window.location.hostname;
+    let hostname = window.location.hostname;
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
         hostname += ':8080';

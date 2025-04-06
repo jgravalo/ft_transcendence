@@ -5,7 +5,7 @@ function gameRemote(url)
 {
 	const params = new URLSearchParams(new URL(url).search);
 
-	const hostname = window.location.hostname;
+	let hostname = window.location.hostname;
 	const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
 	if (hostname === 'localhost' || hostname === '127.0.0.1') {
