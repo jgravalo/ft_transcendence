@@ -16,8 +16,8 @@ function chat(url)
     console.log(`url de donde extraer id: <${url}>`);
 	const params = new URLSearchParams(new URL(url).search);
     const otherUserId = params.get("user"); // Asumo que 'user' es el ID del otro usuario
-    console.log(`id a enviar a chat: <${otherUserId}>`);
-    const wsUrl = 'ws://' + base.slice(7, -5) + ':8080/ws/chat/?user=' + otherUserId + '&token=' + accessToken;
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = protocol + base.slice(7, -5) + ':8080/ws/chat/' + otherUserId + '/?token=' + accessToken;
     
     chatSocket = new WebSocket(wsUrl);
     console.log("Intentando conectar a:", wsUrl);
