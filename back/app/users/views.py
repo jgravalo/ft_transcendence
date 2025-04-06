@@ -294,29 +294,35 @@ def get_logout(request):
     return JsonResponse(data)
 
 def profile(request):
-    user = User.get_user(request)
-    if not user:
-        return JsonResponse({'error': 'Forbidden'}, status=403)
+    try:
+        print(f"Request headers: {request.headers}")
+        user = User.get_user(request)
+        if not user:
+            print("User not authenticated")
+            return JsonResponse({'error': 'Authentication failed. Please log in again.'}, status=401)
 
-    blocked = user.blocked.all()
-    blocked_by = user.blocked_by.all()
-    friends = user.friends.all()
-    non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked) - set(blocked_by)
-    matches = Match.objects.filter(player1=user) | Match.objects.filter(player2=user)
+        blocked = user.blocked.all()
+        blocked_by = user.blocked_by.all()
+        friends = user.friends.all()
+        non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked) - set(blocked_by)
+        matches = Match.objects.filter(player1=user) | Match.objects.filter(player2=user)
 
-    context = {
-        'user': user,
-        'friends': friends,
-        'blockeds': blocked,
-        'users': non_friends,
-        'matches': matches.order_by('-created_at'),
-    }
-    content = render_to_string('profile.html', context)
-    data = {
-        "element": 'content',
-        "content": content
-    }
-    return JsonResponse(data)
+        context = {
+            'user': user,
+            'friends': friends,
+            'blockeds': blocked,
+            'users': non_friends,
+            'matches': matches.order_by('-created_at'),
+        }
+        content = render_to_string('profile.html', context)
+        data = {
+            "element": 'content',
+            "content": content
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        print(f"Error in profile view: {str(e)}")
+        return JsonResponse({'error': 'Internal server error. Please try again later.'}, status=500)
 
 def foreign_profile(request):
     try:
