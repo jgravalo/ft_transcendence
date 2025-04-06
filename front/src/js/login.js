@@ -182,8 +182,13 @@ function loginSock() // por definir
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     // Get the hostname from the current location
     const hostname = window.location.hostname;
-    const route = protocol + '//' + hostname + ':8080/ws/connect/?token=' + sessionStorage.getItem('access');
-    //const route = 'ws://back:8000/ws/connect/';
+    let route;
+
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        hostname += ':8080';
+    }
+    route = `${protocol}//${hostname}/ws/connect/?token=${sessionStorage.getItem('access')}`;
+    
     console.log('ruta: ', route);
     connSocket = new WebSocket(route);
 	

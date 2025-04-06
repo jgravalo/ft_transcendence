@@ -4,8 +4,14 @@ let winner = null;
 function gameRemote(url)
 {
 	const params = new URLSearchParams(new URL(url).search);
+
+	const hostname = window.location.hostname;
 	const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-	let route = protocol + window.location.hostname + '/ws/game/';
+
+	if (hostname === 'localhost' || hostname === '127.0.0.1') {
+		hostname += ':8080';
+	}
+	let route = `${protocol}//${hostname}/ws/game/`;
 	console.log(`${route}?user=${params.get("user")}`);
 	if (params.get("user"))
 		route += `?user=${params.get("user")}&token=${sessionStorage.getItem('access')}`
