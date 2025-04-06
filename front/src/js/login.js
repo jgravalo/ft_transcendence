@@ -111,7 +111,7 @@ function makeSubmit(path)
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     fetch(base + '/api' + post, {
         method: "POST",
         headers: headers,
@@ -132,11 +132,19 @@ function makeSubmit(path)
             if (path === '/users/login/' || path === '/users/register/') {
                 saveStorage('access', data.access);
                 saveStorage('refresh', data.refresh);
-				loginSock();
             }
             
-            if (path !== '/users/update/') {
-                document.getElementById('close').click();
+            if (path !== '/users/update/' && path !== '/game/tournament/') {
+                const modalElement = document.getElementById('loginModal');
+                if (modalElement) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                }
+            } else {
+                console.log("Perfil actualizado con éxito");
+                alert("Perfil actualizado con éxito");
             }
             
             if (data.element && data.content) {
