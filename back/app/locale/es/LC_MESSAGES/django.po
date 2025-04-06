@@ -680,3 +680,7 @@ msgstr "Anonimizar cuenta"
 #: language/translations.py:192
 msgid "Back to home"
 msgstr "Volver al inicio"
+
+#: language/translations.py:193
+msgid "⚔️ Game"
+msgstr "⚔️ Jugar"

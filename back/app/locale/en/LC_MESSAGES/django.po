@@ -356,3 +356,7 @@ msgstr "Anonymize account"
 #: language/translations.py:192
 msgid "Back to home"
 msgstr "Back to home"
+
+#: language/translations.py:193
+msgid "⚔️ Game"
+msgstr "⚔️ Game"

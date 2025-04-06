@@ -183,6 +183,7 @@ TRANSLATION_KEYS = {
     "action.unblock": _("🔓 Unblock"),
     "action.add": _("❤️ Add Friend"),
     "action.block": _("🚫 Block"),
+    "action.block": _("⚔️ Game"),
     # Error
     "error.404.message": _("Oops! Page not found"),
     "error.404.home": _("Back to home"),
