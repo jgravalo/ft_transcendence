@@ -7,13 +7,13 @@
 			<!-- Formulario de Login -->
 			<form id="loginForm" enctype="multipart/form-data">
 				<div class="file-upload">
-					<input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
-					<label for="fileInput">
+					<!-- <input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
+					 <label for="fileInput"> -->
 						<div class="circle">
 							<img id="preview" src="{{ user.image.url }}"> <!-- alt="Vista previa"> -->
 						</div>
-					</label>
-					</div>
+					<!-- </label> 
+					</div> -->
 					<div class="mb-3">
 						<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.username">Nombre de usuario</label>
 						<input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
