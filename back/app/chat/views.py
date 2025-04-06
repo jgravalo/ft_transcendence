@@ -14,16 +14,17 @@ def chat(request):
     other_user_id = request.GET.get('user')
     if not other_user_id:
         return JsonResponse({'error': 'User ID not provided in query parameters'}, status=400)
-
+    print(f'other_user_id: {other_user_id}')
     try:
         other_user = get_object_or_404(User, pk=other_user_id)
     except ValueError:
         return JsonResponse({'error': 'Invalid User ID format'}, status=400)
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
+    print(f'other_user.id: {other_user.id}')
 
     context = {
-        'other_user': other_user
+        'user': other_user
     }
     content = render_to_string('chat.html', context)
     data = {

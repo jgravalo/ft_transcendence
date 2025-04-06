@@ -619,7 +619,7 @@ html {
 .mode-option {
 	border-radius: 10px;
 	background: linear-gradient(to right, #b22633, #001695);
-	padding: 20px 25px;
+	padding: 20px 5px;
 	box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
 	cursor: pointer;

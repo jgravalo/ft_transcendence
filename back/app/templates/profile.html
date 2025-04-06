@@ -15,7 +15,8 @@
 				</div>
 			</div>
 			<div class="actions">
-				<button class="challenge-btn" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
+				<button class="link challenge-btn" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
+				<button class="link challenge-btn" href="/game/tournament" data-i18n="profile.dash.tournament">Tournament</button>
 			</div>
 		</div>
 	</div>
@@ -111,7 +112,8 @@
 		<div class="tab-email">{{ friend.email }}</div>
 		<div class="tab-score">{{ friend.wins }} - {{ friend.losses }}</div>
 		<div class="tab-actions">
-			<button id="chatfriend-btn-{{ friend.id }}" class="link" href="/chat/?user={{ friend.id }}"  data-i18n="action.chat">💬 Chat</button>
+				<button id="gamefriend-btn-{{ friend.id }}" class="link" href="/game/remote/?user={{ friend.id }}" data-i18n="action.game">⚔️ Game</button>
+				<button id="chatfriend-btn-{{ friend.id }}" class="link" href="/chat/?user={{ friend.id }}"  data-i18n="action.chat">💬 Chat</button>
 			<button id="deletefriend-btn-{{ friend.id }}" onclick="deleteFriend('{{ friend.id }}')" data-i18n="action.unfriend">💔 Unfriend</button>
 		</div>
 	</div>
@@ -160,7 +162,7 @@
 			<div style="flex: 2;" data-i18n="table.email">Email</div>
 			<div style="flex: 1;" data-i18n="table.record">Record</div>
 			<div style="flex: 2;" data-i18n="table.actions">Actions</div>
-		</div>		
+		</div>
 		
 		{% for user in users %}
 		<div class="tab-item">
@@ -175,6 +177,7 @@
 			<div class="tab-email">{{ user.email }}</div>
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
 			<div class="tab-actions">
+				<button id="gamefriend-btn-{{ user.id }}" class="link" href="/game/remote/?user={{ user.id }}" data-i18n="action.game">⚔️ Game</button>
 				<button id="chatfriend-btn-{{ user.id }}" class="link" href="/chat/?user={{ user.id }}" data-i18n="action.chat">💬 Chat</button>
 				<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')" data-i18n="action.add">❤️ Add Friend</button>
 				<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')" data-i18n="action.block">🚫 Block</button>

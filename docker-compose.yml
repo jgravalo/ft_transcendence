@@ -20,6 +20,8 @@ services:
       - monitoring_net
     volumes:
       - nginx_logs:/var/log/nginx
+      - ${SSL_CERT}:/etc/nginx/conf/server.crt:ro
+      - ${SSL_CERT_KEY}:/etc/nginx/conf/server.key:ro
     cap_add:
       - NET_BIND_SERVICE
 

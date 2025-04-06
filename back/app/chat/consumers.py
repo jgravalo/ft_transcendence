@@ -3,6 +3,7 @@ import json
 #from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 from django.apps import apps
+from urllib.parse import parse_qs
 
 class PrivateChatConsumer(AsyncWebsocketConsumer):
     """
@@ -17,7 +18,10 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         print('conecta socket')
         print('user =', self.scope['user'])
         self.user1 = self.scope['user'].id  # Usuario actual
-        self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # ID del otro usuario
+        # self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # ID del otro usuario
+        # User = apps.get_model('users', 'User')
+        self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
+        # self.user2 = await sync_to_async(User.objects.get)(id=self.user2)
 
         print('user1:', self.user1)
         print('user2:', self.user2)

@@ -1,0 +1,26 @@
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" style="color: #000;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel" data-i18n="logout.title" >Close Session</h5>
+                <!-- <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            </div>
+            <div class="modal-body">
+                <span data-i18n="logout.confirm">You have been invited by {{ user }}. Are you sure?</span>
+            </div>
+            <div style="display: flex; justify-content: right;">
+                <button id="decline-match" style="min-width: 50%; background-color: red;"  type="submit" class="btn btn-primary" data-bs-dismiss="modal" data-i18n="logout.cancel">Decline</button>
+                <button id="accept-match" style="min-width: 50%; background-color: green;" type="submit" class="link btn btn-primary"  data-i18n="logout.exit" data-bs-dismiss="modal" href="/game/remote/?room={{ room }}">Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+	console.log('Will u accept the match?');
+	link = '/game/remote/?room={{ room|escapejs }}';
+	// document.getElementById('accept-match').addEventListener('click', () => {
+	// 	fetchlink('/game/remote/?room={{ room|escapejs }}');
+    // });
+	// 	document.getElementById('accept-match').click();
+    //     console.log('I accept the match');
+</script>
