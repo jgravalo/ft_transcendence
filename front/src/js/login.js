@@ -7,6 +7,26 @@ function make2FA()
     handleLinks();
 }
 
+function logout()
+{   
+    fetch(base + '/api/users/logout/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.element) {
+                document.getElementById(data.element).innerHTML = data.content;
+            }
+            makeModal('/users/logout/');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
 function makeLogout()
 {
     /* document.getElementById('close-session').addEventListener('click', () => {
