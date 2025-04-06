@@ -164,7 +164,8 @@ def set_login(request):
                 "error": "Success",
                 "element": 'bar',
                 "content": render_to_string('close_login.html'),
-                "next_path": '/users/profile/'
+                "next_path": '/users/profile/',
+                "clear_elements": ['errorOldPassword', 'errorPassword', 'old-password', 'new-password']
             })
 
             # Establecer cookies
@@ -216,6 +217,8 @@ def parse_data(username, email, password):
         return {'type': 'errorEmail', 'error': _("Empty fields")}#, status=400)
     if not '@' in email:
         return {'type': 'errorEmail', 'error': _("The email must include \'@\'")}#, status=400)
+    if len(password) < 6:
+        return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}#, status=400)
     return None
 
 @csrf_exempt
@@ -379,7 +382,6 @@ def set_update(request):
             if not user:
                 return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
-
                 file = request.FILES.get('image')
                 if file:
                     user.image = file
@@ -390,40 +392,58 @@ def set_update(request):
             email = request.POST.get('email')
             old_password = request.POST.get('old-password')
             new_password = request.POST.get('new-password')
-            two_fa_enabled = request.POST.get('two_fa_enabled')
+            two_fa_enabled = request.POST.get('two_fa_enabled') == 'True'
+
+            # Validacion de Datos
             if username != user.username and User.objects.filter(username=username).exists():
                 return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
             if email != user.email and User.objects.filter(email=email).exists():
                 return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
-            #if old_password != '' and old_password == user.password: # unhashed
-            if old_password != '' and user.check_password(old_password): # hashed
-                return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
-            if old_password == '' and new_password != '':
-                return JsonResponse({'type': 'errorOldPassword', 'error': 'You need to enter your current password'})
-            if old_password != '' and len(password) < 6:
-                return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}
-            error = parse_data(username, email, new_password)
-            if error != None:
-                return JsonResponse(error)
-            if user.username != username:
-                user.username=username
-            if user.email != email:
-                user.email=email
-            if old_password != '' or new_password != '':
-                # user.password=new_password # unhashed
-                user.set_password(new_password) # hashed
-            user.two_fa_enabled=two_fa_enabled
+            
+            error_format = parse_data(username, email, "dummy_password")
+            if error_format and error_format.get('type') in ['errorName', 'errorEmail']:
+                 return JsonResponse(error_format)
+
+            password_updated = False
+            # Logica de Actualización de Contraseña
+            if new_password:
+                if not old_password:
+                    return JsonResponse({'type': 'errorOldPassword', 'error': _('You need to enter your current password to set a new one')})
+                
+                if not user.check_password(old_password):
+                    return JsonResponse({'type': 'errorOldPassword', 'error': _('Current password is not correct')})
+                
+                if len(new_password) < 6:
+                    return JsonResponse({'type': 'errorPassword', 'error': _("The new password must be at least 6 characters long")})
+                
+                password_updated = True
+                
+            elif old_password and not new_password:
+                 return JsonResponse({'type': 'errorPassword', 'error': _("You need to enter a new password")})
+
+            # Aplicar Cambios
+            user.username = username
+            user.email = email
+            if password_updated:
+                user.set_password(new_password)
+            
+            user.two_fa_enabled = two_fa_enabled
+
             user.save()
-            content = render_to_string('close_login.html') # online_bar
+            
+            content = render_to_string('close_login.html')
             data = {
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
-                "next_path": '/users/profile/'
+                "clear_elements": ['errorOldPassword', 'errorPassword', 'old-password', 'new-password']
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+        except Exception as e:
+            print(f"Error en set_update: {str(e)}")
+            return JsonResponse({'error': 'Ocurrió un error interno al actualizar el perfil.'}, status=500)
 
 @csrf_exempt
 def friends(request):
