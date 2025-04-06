@@ -63,6 +63,13 @@ function makeModal(path) //modalHTML)
     var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
     myModal.show();
 
+    // Disable Enter key when modal is open
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && document.getElementById('loginModal').classList.contains('show')) {
+            event.preventDefault();
+        }
+    });
+
     //document.getElementById('close').addEventListener('click', deleteUser(path));
 
     // Manejador del evento de envío del formulario
@@ -173,7 +180,9 @@ function loginSock() // por definir
 { 
     // CREATE SOCKET
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const route = protocol + base.slice(7, -5) + ':8080/ws/connect/?token=' + sessionStorage.getItem('access');
+    // Get the hostname from the current location
+    const hostname = window.location.hostname;
+    const route = protocol + '//' + hostname + ':8080/ws/connect/?token=' + sessionStorage.getItem('access');
     //const route = 'ws://back:8000/ws/connect/';
     console.log('ruta: ', route);
     connSocket = new WebSocket(route);
