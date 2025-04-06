@@ -58,7 +58,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			await sync_to_async(self.user2.invite)(self.user2, self.room_name)
 		elif self.room_name: # in self.games:
 			print('ADD TO RESTRICTED GAME')
-			if room[:7] == 'game_to':
+			if self.room_name[:7] == 'game_to':
 				self.is_tournament = True
 			pass
 		elif available_room:
