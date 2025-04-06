@@ -147,6 +147,9 @@ TRANSLATION_KEYS = {
     "privacy.changes.intro": _("We may update this Privacy Policy at any time. We will notify you of significant changes through the application or the email associated with your account. The date of the last update will be indicated at the top of this page."),
     "privacy.contact.title": _("12. Contact"),
     "privacy.contact.intro": _("For any privacy and data handling inquiries, you can contact the system administrator at contact@pong42.com"),
+    "privacy.data.download.account": _("Download account data"),
+    "privacy.data.delete.account": _("Delete account"),
+    "privacy.data.anonymize.account": _("Anonymize account"),
     "home.local.title": _("Local"),
     "home.local.description": _("Local_description"),
     "home.online.title": _("Online"),
@@ -180,4 +183,6 @@ TRANSLATION_KEYS = {
     "action.unblock": _("🔓 Unblock"),
     "action.add": _("❤️ Add Friend"),
     "action.block": _("🚫 Block"),
+    # Error
+    "error.404.message": _("Oops! Page not found"),
 }

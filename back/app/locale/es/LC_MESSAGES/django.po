@@ -661,3 +661,18 @@ msgstr "❤️ Agregar Amigo"
 msgid "🚫 Block"
 msgstr "🚫 Bloquear"
 
+#: language/translations.py:189
+msgid "Oops! Page not found"
+msgstr "¡Uy! Página no encontrada"
+
+#: language/translations.py:190
+msgid "Download account data"
+msgstr "Descargar datos de la cuenta"
+
+#: language/translations.py:191
+msgid "Delete account"
+msgstr "Eliminar cuenta"
+
+#: language/translations.py:191
+msgid "Anonymize account"
+msgstr "Anonimizar cuenta"
