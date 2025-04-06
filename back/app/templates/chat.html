@@ -1,11 +1,15 @@
-<div class="chat-profile link" href="/users/profile/foreign/?user={{ user.username }}">
+<div class="chat-profile link" href="/users/profile/foreign/?user={{ other_user.username }}">
 	<div class="chat-photo">
-		<img src="{{ user.image.url }}">
+		{% if other_user.image_42_url %}
+			<img src="{{ other_user.image_42_url }}">
+		{% else %}
+			<img src="{{ other_user.image.url }}">
+		{% endif %}
 	</div>
 	<div class="chat-info">
-		<h1 id="username">{{ user.username }}</h1>
+		<h1 id="username">{{ other_user.username }}</h1>
 		<div>
-			<h2>wins: {{ user.wins }}</h2>
+			<h2>wins: {{ other_user.wins }}</h2>
 		</div>
 	</div>
 </div>
@@ -18,6 +22,6 @@
 	</form>
 <div>
 <script>
-	chat(window.location.origin + '/chat/?user={{ user.id|escapejs }}');
-	console.log('from template: ' + window.location.origin + '/chat/?user={{ user.id|escapejs }}');
+	console.log('from template: ' + window.location.origin + '/chat/?user={{ user.id }}');
+	chat(window.location.origin + '/chat/?user={{ user.id }}'); // user.id|escapejs
 </script>

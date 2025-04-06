@@ -87,7 +87,7 @@ msgstr "You don't have friends"
 
 #: language/translations.py:21
 msgid "Other Users"
-msgstr "Other Users"
+msgstr "Other"
 
 #: language/translations.py:22
 msgid "#"
@@ -97,13 +97,9 @@ msgstr "#"
 msgid "There are no users"
 msgstr "There are no users"
 
-#: language/translations.py:23
-msgid "There are no blocked users"
-msgstr "There are no blocked users"
-
 #: language/translations.py:24
 msgid "Start 1vs1"
-msgstr "Start 1vs1"
+msgstr "🎮 Play 1vs1"
 
 #: language/translations.py:25
 msgid "Start online"
@@ -163,7 +159,15 @@ msgstr "Matches"
 
 #: language/translations.py:44
 msgid "Tournament"
-msgstr "Tournament"
+msgstr "🏆 Tournament"
+
+#: language/translations.py:44
+msgid "Tournament_description"
+msgstr "Play in a Tournament"
+
+#: language/translations.py:44
+msgid "Tournament Wins"
+msgstr "Tournament Wins"
 
 #: language/translations.py:45
 msgid "Stats"
@@ -273,3 +277,62 @@ msgstr "1. Data Controller"
 msgid "The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
 msgstr "The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona."
 
+#: language/translations.py:173
+msgid "Local"
+msgstr "🎮 Local"
+
+#: language/translations.py:174
+msgid "Local_description"
+msgstr "Play on the same keyboard"
+
+#: language/translations.py:175
+msgid "Online"
+msgstr "🧑‍🤝‍🧑 Online"
+
+#: language/translations.py:176
+msgid "Online_description"
+msgstr "Play against another player"
+
+#: language/translations.py:178
+msgid "Match History"
+msgstr "Match History"
+
+#: language/translations.py:179
+msgid "Blocked"
+msgstr "Blocked"
+
+#: language/translations.py:180
+msgid "No matches played yet"
+msgstr "No matches played yet"
+
+#: language/translations.py:181
+msgid "There are no blocked users"
+msgstr "There are no blocked users"
+
+#: language/translations.py:182
+msgid "Actions"
+msgstr "Actions"
+
+#: language/translations.py:183
+msgid "Date"
+msgstr "Date"
+
+#: language/translations.py:184
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: language/translations.py:185
+msgid "💔 Unfriend"
+msgstr "💔 Unfriend"
+
+#: language/translations.py:186
+msgid "🔓 Unblock"
+msgstr "🔓 Unblock"
+
+#: language/translations.py:187
+msgid "❤️ Add Friend"
+msgstr "❤️ Add Friend"
+
+#: language/translations.py:188
+msgid "🚫 Block"
+msgstr "🚫 Block"

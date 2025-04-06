@@ -24,6 +24,7 @@ class User(AbstractUser):
 	is_online = models.BooleanField(default=True)
 #	user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
 	image = models.ImageField(upload_to='', default='default.jpg') # Carpeta dentro de MEDIA_ROOT
+	image_42_url = models.URLField(max_length=255, blank=True, null=True)  # Campo para almacenar la URL de la imagen de 42
 	wins = models.IntegerField(default=0)
 	losses = models.IntegerField(default=0)
 	matches = models.IntegerField(default=0)

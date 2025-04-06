@@ -129,7 +129,7 @@ let link = null;
 function loginSock() // por definir
 { 
     // CREATE SOCKET
-    const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/';
+    const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/?token=' + sessionStorage.getItem('access');
     console.log('ruta: ', route);
     connSocket = new WebSocket(route);
 	

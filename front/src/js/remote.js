@@ -4,13 +4,18 @@ let winner = null;
 function gameRemote(url)
 {
 	const params = new URLSearchParams(new URL(url).search);
-	console.log(`ws://${base.slice(7)}/ws/game/?user=${params.get("user")}`);
+	let route = `ws://${base.slice(7)}/ws/game/`;
+	console.log(`${route}?user=${params.get("user")}`);
 	if (params.get("user"))
-		gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/?user=${params.get("user")}`);
+		route += `?user=${params.get("user")}&token=${sessionStorage.getItem('access')}`
+		// gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/?user=${params.get("user")}`);
 	else if (params.get("room"))
-		gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/?room=${params.get("room")}`);
+		route += `?room=${params.get("room")}&token=${sessionStorage.getItem('access')}`
+	// gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/`);
 	else
-		gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/`);
+		route += `?token=${sessionStorage.getItem('access')}`;
+	// gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/`);
+	gameSocket = new WebSocket(route);
 	/* document.getElementById('content').innerHTML =
 		`<canvas id="gameCanvas" width="400" height="600"></canvas>`; */
 	const canvas = document.getElementById("gameCanvas");
