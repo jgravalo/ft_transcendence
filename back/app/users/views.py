@@ -165,7 +165,6 @@ def set_login(request):
                 "element": 'bar',
                 "content": render_to_string('close_login.html'),
                 "next_path": '/users/profile/',
-                "clear_elements": ['errorOldPassword', 'errorPassword', 'old-password', 'new-password']
             })
 
             # Establecer cookies
@@ -436,7 +435,6 @@ def set_update(request):
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
-                "clear_elements": ['errorOldPassword', 'errorPassword', 'old-password', 'new-password']
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
@@ -758,6 +756,7 @@ def anonymize_user(request):
         user.first_name = ""
         user.last_name = ""
         user.set_password(secrets.token_urlsafe(32))
+        user.image_42_url = ""
         
         # Eliminar imagen personal pero mantener una por defecto
         if user.image and user.image.name != 'default.jpg':

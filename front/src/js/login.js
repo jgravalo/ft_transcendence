@@ -62,12 +62,15 @@ function makePost(path)
     //console.log("token =", token);
     const form =  document.getElementById('loginForm');
 	console.log('entra en submit');
-    form.addEventListener('submit', function(event) {
-        console.log('hace event default');
-        event.preventDefault();
-        console.log('hizo event default');
-        makeSubmit(path);
-    })
+    if (form)
+    {
+        form.addEventListener('submit', function(event) {
+            console.log('hace event default');
+            event.preventDefault();
+            console.log('hizo event default');
+            makeSubmit(path);
+        })
+    }
 }
 
 function makeSubmit(path)

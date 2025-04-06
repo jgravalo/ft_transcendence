@@ -1,51 +1,53 @@
-<div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
-	<div class="modal-header d-flex justify-content-between">
-		<h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5>
-	</div>
-	<div class="modal-body">
-		<!-- Formulario de Login -->
-		<form id="loginForm" enctype="multipart/form-data">
-			<div class="file-upload">
-				<input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
-				<label for="fileInput">
-					<div class="circle">
-						<img id="preview" src="{{ user.image.url }}"> <!-- alt="Vista previa"> -->
-					</div>
-				</label>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.username">Nombre de usuario</label>
-					<input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
-					<span id="errorName" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="email" class="form-label" data-i18n="edit.profile.email">Correo Electrónico</label>
-					<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-					<span id="errorEmail" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="old-password" class="form-label" data-i18n="edit.profile.password.current">Contraseña Actual</label>
-					<input type="old-password" class="form-control" id="old-password" name="old-password">
-					<span id="errorOldPassword" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="new-password" class="form-label" data-i18n="edit.profile.password.new">Nueva Contraseña</label>
-					<input type="new-password" class="form-control" id="new-password" name="new-password">
-					<span id="errorPassword" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<input type="hidden" name="two_fa_enabled" value=False>
-					<label class="switch">
-						<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value=True
-							{% if user.two_fa_enabled %}checked{% endif %}>
-						<span class="slider"></span>
+{% if user.image_42_url == "" %}
+	<div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
+		<div class="modal-header d-flex justify-content-between">
+			<h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5>
+		</div>
+		<div class="modal-body">
+			<!-- Formulario de Login -->
+			<form id="loginForm" enctype="multipart/form-data">
+				<div class="file-upload">
+					<input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
+					<label for="fileInput">
+						<div class="circle">
+							<img id="preview" src="{{ user.image.url }}"> <!-- alt="Vista previa"> -->
+						</div>
 					</label>
-					<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.twofa">Enable Two-Factor Authentication</label>
-				</div>
-			<button type="submit" data-i18n="edit.profile.submit">Actualizar</button>
-		</form>
+					</div>
+					<div class="mb-3">
+						<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.username">Nombre de usuario</label>
+						<input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+						<span id="errorName" class="error"></span><br>
+					</div>
+					<div class="mb-3">
+						<label style="color: white;" for="email" class="form-label" data-i18n="edit.profile.email">Correo Electrónico</label>
+						<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+						<span id="errorEmail" class="error"></span><br>
+					</div>
+					<div class="mb-3">
+						<label style="color: white;" for="old-password" class="form-label" data-i18n="edit.profile.password.current">Contraseña Actual</label>
+						<input type="old-password" class="form-control" id="old-password" name="old-password">
+						<span id="errorOldPassword" class="error"></span><br>
+					</div>
+					<div class="mb-3">
+						<label style="color: white;" for="new-password" class="form-label" data-i18n="edit.profile.password.new">Nueva Contraseña</label>
+						<input type="new-password" class="form-control" id="new-password" name="new-password">
+						<span id="errorPassword" class="error"></span><br>
+					</div>
+					<div class="mb-3">
+						<input type="hidden" name="two_fa_enabled" value=False>
+						<label class="switch">
+							<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value=True
+								{% if user.two_fa_enabled %}checked{% endif %}>
+							<span class="slider"></span>
+						</label>
+						<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.twofa">Enable Two-Factor Authentication</label>
+					</div>
+				<button type="submitUpdate" data-i18n="edit.profile.submit">Actualizar</button>
+			</form>
+		</div>
 	</div>
-</div>
+{% endif %}
 <div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
 	<div class="modal-body">
 		<!-- boton para descargar todos los datos de la cuenta -->
