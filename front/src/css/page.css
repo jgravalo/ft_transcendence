@@ -329,13 +329,13 @@ body {
 }
 
 #content a {
-	background: linear-gradient(to right, #b22633, #001695);
+	background: linear-gradient(to right, #ffffff, #9a9a9a);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
   padding: 4px 10px;
-  font-size: 38px;
+  font-size: 18px;
   font-weight: 800;
 }
 

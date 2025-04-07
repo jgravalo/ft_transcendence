@@ -226,6 +226,12 @@ button:hover {
 	border-bottom: 2px solid transparent;
 }
 
+.tab:hover {
+	border-bottom: 2px solid white;
+	border-radius: 0px;
+	color: white;
+}
+
 .tab.active {
 	border-bottom: 2px solid white;
 	border-radius: 0px;
@@ -300,7 +306,7 @@ button:hover {
 	border: none;
 	border-radius: 6px;
 	padding: 8px 12px;
-	font-size: 0.75rem;
+	font-size: 0.80rem;
 	cursor: pointer;
 	transition: all 0.2s ease;
 	display: flex;
@@ -329,7 +335,7 @@ button:hover {
 	background: linear-gradient(to right, #d48f2e50, #cd790450);
 
 }
-.profile-container .tab-actions {
+.profile-container.tab-actions {
 	justify-content: unset;
 }
 

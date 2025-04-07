@@ -172,7 +172,7 @@
 				{% else %}
 					<img src="{{ user.image.url }}" class="user-avatar" />
 				{% endif %}
-				<a href="/users/profile/foreign/?user={{ user.id }}">{{ user.username }}</a>
+				<span href="/users/profile/foreign/?user={{ user.id }}">{{ user.username }}</span>
 			</div>
 			<div class="tab-email">{{ user.email }}</div>
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
