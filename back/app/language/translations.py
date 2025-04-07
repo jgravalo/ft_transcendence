@@ -170,7 +170,6 @@ TRANSLATION_KEYS = {
     "profile.tabs.users": _("Other Users"),
     "profile.matches.empty": _("No matches played yet"),
     "profile.friends.empty": _("You don't have friends"),
-    "home.tournament.title": _("Tournament"),
     "profile.blocked.empty": _("There are no blocked users"),
     "profile.users.empty": _("There are no users"),
     # Common table headers (used across multiple sections)

@@ -42,16 +42,6 @@ canvas {
 	'opsz' 24
 }
 
-
-#game-container {
-    width: 400px;
-    height: 800px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-	/*border: 15px solid #ffffff;*/
-}
-
 .game-console {
 	display: block;
 	width: 400px;

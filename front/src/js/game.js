@@ -1,7 +1,6 @@
 
 function gameOptions(winner = "")
 {
-	// <h2 id="winnerMessage">${winner}</h2>
 	document.getElementById('content').innerHTML = `
 	<h2 id="winnerMessage"></h2>
 	<button onclick="game()">LOCAL</button>
@@ -17,6 +16,7 @@ function game()
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
 	const winnerMessage = document.getElementById("winnerMessage");
+	ctx.fill
 
     // Configuración
 	const paddleWidth = 80, paddleHeight = 10;
@@ -48,6 +48,7 @@ function game()
 	}
 	
 	function drawPlayers() {
+		ctx.textAlign = "left";  
 		ctx.font = "20px Arial";
 		ctx.fillText(player1.name, 20, 30);
 		ctx.fillText(player2.name, 20, canvas.height - 30);
@@ -117,20 +118,37 @@ function game()
 
 	document.addEventListener("keydown", (event) => keys[event.key] = true);
 	document.addEventListener("keyup", (event) => keys[event.key] = false);
-
+	
 	function updatePaddles() {
 		if (keys["a"] && player1.x > 0) player1.x -= paddleSpeed;
 		if (keys["d"] && player1.x < canvas.width - paddleWidth) player1.x += paddleSpeed;
-
+		
 		if (keys["ArrowLeft"] && player2.x > 0) player2.x -= paddleSpeed;
 		if (keys["ArrowRight"] && player2.x < canvas.width - paddleWidth) player2.x += paddleSpeed;
 	}
+	
+	let countdown = ["Ready", "3", "2", "1", "Go!"];
+	let countIndex = 0;
+
+	function showCountdown() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.font = "40px Arial";
+		ctx.fillStyle = "white";
+		ctx.textAlign = "center";
+		ctx.fillText(countdown[countIndex], canvas.width / 2, canvas.height / 2);
+		countIndex++;
+
+		if (countIndex < countdown.length) {
+			setTimeout(showCountdown, 800);
+		} else {
+			gameLoop(); // Start game
+		}
+	}
+	showCountdown(); // Start countdown
 
 	function gameLoop() {
 		if (gameOver)
 		{
-			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
-			// gameOptions(`Player ${player1.score > player2.score ? "1" : "2"} wins!`);
 			fetchLink('/game/');
 			return;
 		}
@@ -146,6 +164,4 @@ function game()
 
 		requestAnimationFrame(gameLoop);
 	}
-	gameLoop();
-
 }

@@ -129,7 +129,6 @@ function fetchLink(path)
                 makePost(path);
             handleLinks();
         }
-        initGameLandingControls(); // Comentado por Victor
     })
     .catch(error => {
         console.error('fallo el 42 auth');
@@ -170,58 +169,6 @@ function execScript(element)
 		newScript.text = script.innerText;  // Tomamos el código JavaScript del script insertado
 		document.head.appendChild(newScript);  // Insertamos el script de manera segura
 	}
-}
-
-//Add keyboard even listener
-let focusedIndex = 0;
-let modes = [];
-
-document.addEventListener("keydown", (e) => {
-	if (!modes.length) return;
-
-	if (e.key === "ArrowRight") {
-		focusedIndex = (focusedIndex + 1) % modes.length;
-		updateSelection();
-	}
-	if (e.key === "ArrowLeft") {
-		focusedIndex = (focusedIndex - 1 + modes.length) % modes.length;
-		updateSelection();
-	}
-	if (e.key === "Enter") {
-		modes[focusedIndex].click();
-	}
-});
-
-function updateSelection() {
-	modes.forEach(btn => btn.classList.remove("selected"));
-	modes[focusedIndex].classList.add("selected");
-}
-function initGameLandingControls() {
-	const localBtn = document.getElementById("play-local");
-	const onlineBtn = document.getElementById("play-online");
-	const tournamentBtn = document.getElementById("play-tournament");
-
-	if (!localBtn || !onlineBtn || !tournamentBtn) return;
-
-	modes = [localBtn, onlineBtn, tournamentBtn];
-	focusedIndex = 0;
-	updateSelection();
-
-	localBtn.addEventListener("click", () => {
-		document.getElementById('content').innerHTML = `
-			<div id="game-wrapper" class="fade-in">
-				<h2 id="winnerMessage"></h2>
-				<button onclick="game()">LOCAL</button>
-				<button onclick="gameRemote()">REMOTE</button>
-				<canvas id="gameCanvas" width="400" height="600"></canvas>
-			</div>
-		`;
-		game();
-	});
-
-	onlineBtn.addEventListener("click", () => {
-		handleLink({ currentTarget: { getAttribute: () => "/game/" }, preventDefault: () => {} });
-	});
 }
 
 function showTab(tabId, button) {
