@@ -231,6 +231,7 @@ ul.info-tab {
 	border: none;
 	box-sizing: content-box;
 }
+
 ul.info-tab>li {
 	display: flex;
 	justify-content: center;
