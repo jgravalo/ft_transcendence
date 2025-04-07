@@ -17,16 +17,21 @@
 				<button href="/users/profile/" data-i18n="edit.back">Back to Profile</button>
 			</div>
 		</div>
-		<div class="modal-body">
-			<!-- Formulario de Login -->
-			<form id="loginForm" enctype="multipart/form-data">
-				<div class="file-upload">
-					<input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
-					<label for="fileInput">
-						<div class="circle">
-							<img id="preview" src="{{ user.image.url }}"> <!-- alt="Vista previa"> -->
-						</div>
-					</label>
+	</div>
+
+	<!-- Combined card with profile edit and account management -->
+	<div class="stat-card card-section">
+		<div class="two-column-layout">
+			<!-- Left column: Profile Edit -->
+			<div class="column-left">
+				<h2 class="card-title" data-i18n="edit.profile.title">Edit your profile information</h2>
+				
+				{% if user.image_42_url == "" %}
+				<form id="loginForm" enctype="multipart/form-data">
+					<div class="file-upload">
+						<input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
+						<label for="fileInput">
+						</label>
 					</div>
 					
 					<div class="form-group">

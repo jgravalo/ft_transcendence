@@ -102,7 +102,7 @@
 			{% else %}
 				<img src="{{ friend.image.url }}" class="user-avatar" />
 			{% endif %}
-			<span>{{ friend.username }}</span>
+			<span class="link user-link" href="/users/profile/foreign/?user={{ friend.id }}">{{ friend.username }}</span>
 			{% if friend.is_online %}
 				<span class="online-status">🟢</span>
 			{% else %}
@@ -140,7 +140,7 @@
 				{% else %}
 					<img src="{{ blocked.image.url }}" class="user-avatar" />
 				{% endif %}
-				<span>{{ blocked.username }}</span>
+				<span class="link user-link" href="/users/profile/foreign/?user={{ blocked.id }}">{{ blocked.username }}</span>
 				<span class="online-status">🚫</span>
 			</div>
 			<div class="tab-email">{{ blocked.email }}</div>
@@ -172,7 +172,7 @@
 				{% else %}
 					<img src="{{ user.image.url }}" class="user-avatar" />
 				{% endif %}
-				<span href="/users/profile/foreign/?user={{ user.id }}">{{ user.username }}</span>
+				<span class="link user-link" href="/users/profile/foreign/?user={{ user.id }}">{{ user.username }}</span>
 			</div>
 			<div class="tab-email">{{ user.email }}</div>
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>

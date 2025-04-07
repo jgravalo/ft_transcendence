@@ -306,7 +306,7 @@ button:hover {
 	border: none;
 	border-radius: 6px;
 	padding: 8px 12px;
-	font-size: 0.80rem;
+	font-size: 0.75rem;
 	cursor: pointer;
 	transition: all 0.2s ease;
 	display: flex;
