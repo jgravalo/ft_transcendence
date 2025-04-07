@@ -54,6 +54,7 @@ services:
       - pongnet
       - monitoring_net
     volumes:
+      # - ./back/app:/app # test
       - media:/app/img
     restart: unless-stopped
     healthcheck:

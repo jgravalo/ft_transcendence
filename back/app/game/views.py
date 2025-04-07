@@ -94,6 +94,7 @@ def join_tournament(request):
         return JsonResponse({'error': 'Forbidden'}, status=403)
 
     tournament_id = request.GET.get('tournament')
+    print(f'tournament_id: {tournament_id}')
     if not tournament_id:
         return JsonResponse({'error': 'Tournament ID not provided in query parameters'}, status=400)
     print(f'tournament_id: {tournament_id}')
@@ -105,8 +106,15 @@ def join_tournament(request):
     except Tournament.DoesNotExist:
         return JsonResponse({'error': 'Tournament not found'}, status=404)
     print(f'tournament.id: {tournament.id}')
+    print(f'tournament.name: {tournament.name}')
 
+    for player in list(tournament.players.all()):
+        print(f'player {player.username}')
+    print(f'size {tournament.size}')
     tournament.add_player(logged_in_user)
+    for player in list(tournament.players.all()):
+        print(f'player {player.username}')
+    print(f'size {tournament.size}')
 
     return JsonResponse({"error": "Success"})
 """ 

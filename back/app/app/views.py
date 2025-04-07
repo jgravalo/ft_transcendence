@@ -36,8 +36,8 @@ def get_home(request):
 def get_error(request):
     error_code = request.GET.get('error', '404')
     if error_code == 'undefined':
+        print(f'no hay este codigo: {error_code}')
         error_code = '404'
-        print('no hay este codigo')
     content = render_to_string(f'{error_code}.html')
     data = {
         #"element": 'content',

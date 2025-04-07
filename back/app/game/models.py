@@ -35,6 +35,7 @@ class Tournament(models.Model):
 	def add_player(self, user):
 		self.players.add(user)
 		self.size = self.players.count()
+		self.save()
 		if self.size == self.number:
 			# self.is_full = True
 			self.play()
@@ -42,7 +43,6 @@ class Tournament(models.Model):
 	def play(self):
 		start = Round.objects.create(
 			tournament=self,
-			name=self.name,
 			number=self.number,
 			size=self.size,
 			)

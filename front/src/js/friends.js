@@ -61,6 +61,9 @@ function fetchFriend(user, rule)
 		}),
 	})
 	.then(response => response.json())
+	.then(data => {
+		fetchLink('/users/profile');
+	})
 	.catch(error => {
 		console.log("fetch login catch");
 		console.error('Error:', error);

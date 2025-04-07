@@ -21,6 +21,7 @@ WORKDIR /app
 
 # Copiar el archivo de requisitos (requirements.txt) al contenedor
 COPY requirements.txt /app/
+# COPY init.sh /app/
 
 # Actualizar pip e instalar las dependencias de Python
 RUN pip install --upgrade pip \

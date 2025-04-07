@@ -9,33 +9,33 @@ function updateNavigationBarState() {
     const elementIdToUpdate = 'bar';
 
     if (document.getElementById(elementIdToUpdate)) {
-         fetch(base + '/api' + navBarEndpoint, {
+        fetch(base + '/api' + navBarEndpoint, {
             method: "GET",
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCSRFToken(), 
             },
-         })
-         .then(response => {
-             if (!response.ok) {
-                 if (accessToken) {
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (accessToken) {
                     return fetch(base + '/api/users/logout/close/', { /* ... headers sin auth ... */ });
-                 }
-                 throw new Error('Failed to fetch navbar state');
-             }
-             return response.json();
-         })
-         .then(data => {
-             if (data.content && document.getElementById(elementIdToUpdate)) {
-                 document.getElementById(elementIdToUpdate).innerHTML = data.content;
-                 handleLinks(); 
-                 changeLanguage(localStorage.getItem("selectedLanguage") || "en");
-             }
-         })
-         .catch(error => {
-             console.error('Error updating navigation bar:', error);
-         });
+                }
+                throw new Error('Failed to fetch navbar state');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.content && document.getElementById(elementIdToUpdate)) {
+                document.getElementById(elementIdToUpdate).innerHTML = data.content;
+                handleLinks(); 
+                changeLanguage(localStorage.getItem("selectedLanguage") || "en");
+            }
+        })
+        .catch(error => {
+            console.error('Error updating navigation bar:', error);
+        });
     }
 }
 
@@ -115,10 +115,18 @@ function fetchLink(path)
     .then(data => {
 		var dest = `${data.element}`;
 		if (dest != 'modalContainer' &&
-			path != '/users/login/close/' && path != '/users/logout/close/')
+			path.slice(0, 22) != '/game/tournament/join/' &&
+			path != '/users/login/close/' && path != '/users/logout/close/'
+		)
 			pushState(path);
-        document.getElementById(dest).innerHTML = `${data.content}`;
-		execScript(dest);
+		// if (path == '/users/profile/')
+		// 	console.log('PROFILE 2');
+		if (path.slice(0, 22) == '/game/tournament/join/')
+			fetchLink('/users/profile/');
+		if (data.content) {
+        	document.getElementById(dest).innerHTML = `${data.content}`;
+			execScript(dest);
+		}
         //updating the newly added content with right language
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
         if (dest == 'modalContainer')
