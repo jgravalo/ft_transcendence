@@ -1,7 +1,11 @@
 <div class="profile-container">
 	<div class="profile">
 		<div class="profile-photo">
-			<img src="{{ user.image.url }}">
+			{% if user.image_42_url %}
+				<img src="{{ user.image_42_url }}">
+			{% else %}
+				<img src="{{ user.image.url }}">
+			{% endif %}
 		</div>
 		<div class="info">
 			<div class="username-container">
@@ -11,7 +15,8 @@
 				</div>
 			</div>
 			<div class="actions">
-				<button class="link challenge-btn" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
+				<button style="background: linear-gradient(to right, #d48f2e50, #cd790450);" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
+				<button href="/game/tournament" data-i18n="profile.dash.title">Tournament</button>
 			</div>
 		</div>
 	</div>
@@ -25,7 +30,7 @@
 
 		<!-- loses -->
 		<div class="stat-card">
-			<div class="stat-icon trophy">XXX</div>
+			<div class="stat-icon trophy">💀</div>
 			<div class="stat-value">{{ user.losses }}</div>
 			<div class="stat-label" data-i18n="profile.dash.losses">Total Losses</div>
 		</div>
@@ -38,34 +43,148 @@
 		
 		<div class="stat-card">
 			<div class="stat-icon tournament">👑</div>
-			<div class="stat-value">XXX</div>
+			<div class="stat-value">0</div>
 			<div class="stat-label" data-i18n="profile.dash.tournament">Tournament Wins</div>
 		</div>
 	</div>
 
+		<!-- Tabs -->
 	<div class="tabs">
-		<button class="tab active">Match History</button>
-		<!-- <button class="tab" onclick="window.location.href='/users/friends'">Friends</button> -->
-		<button class="tab link" href="/users/friends">Friends</button>
-		<button class="tab">Achievements</button>
+		<button class="tab active" onclick="showTab('match-history', this)" data-i18n="profile.tabs.matches">Match History</button>
+		<button class="tab" onclick="showTab('friends-list', this)" data-i18n="profile.tabs.friends">Friends</button>
+		<button class="tab" onclick="showTab('blocked-list', this)" data-i18n="profile.tabs.blocked">Blocked</button>
+		<button class="tab" onclick="showTab('users-list', this)" data-i18n="profile.tabs.users">Other Users</button>
 	</div>
 
-	<div class="match-history">
-		<div class="match-item">
-			<div>
-				<div class="match-players">XXX vs XXX</div>
-				<div class="match-time">XXX hours ago</div>
+	<!-- Match History -->
+	<div id="match-history" class="tab-content">
+		<!-- Header Row -->
+		<div class="tab-header">
+			<div style="flex: 1;" data-i18n="table.username">Players</div>
+			<div style="flex: 1;" data-i18n="table.date">Date</div>
+			<div style="flex: 1;" data-i18n="table.record">Match History (W/L)
 			</div>
-			<div class="match-score">XXX - XXX</div>
 		</div>
-		{% for match in matches %}
-		<div class="match-item">
-			<div>
-				<div class="match-players">{{ match.player1 }} vs {{ match.player2 }}</div>
-				<div class="match-time">{{ match.created_at }}</div>
+
+		{% if matches %}
+			{% for match in matches %}
+			<div class="match-item">
+				<div class="tab-players">
+					<span>
+						<span class="link user-link" href="/users/profile/foreign/?user={{ match.player1 }}">{{ match.player1 }}</span> vs 
+						<span class="link user-link" href="/users/profile/foreign/?user={{ match.player2 }}">{{ match.player2 }}</span>
+					</span>
+				</div>
+				<div class="tab-email">{{ match.created_at }}</div>
+				<div class="tab-score">{{ match.score_player1 }} - {{ match.score_player2 }}</div>
 			</div>
-			<div class="match-score">{{ match.score_player1 }} - {{ match.score_player2 }}</div>
+			{% endfor %}
+		{% else %}
+			<p style="color: white; text-align: center; padding: 20px;" data-i18n="profile.matches.empty">No matches played yet.</p>
+		{% endif %}
+	</div>
+
+<!-- Friends List -->
+<div id="friends-list" class="tab-content hidden">
+	<!-- Header Row -->
+	<div class="tab-header">
+		<div style="flex: 1.5;" data-i18n="table.username">User</div>
+		<div style="flex: 2;" data-i18n="table.email">Email</div>
+		<div style="flex: 1;" data-i18n="table.record">Record</div>
+		<div style="flex: 3;" data-i18n="table.actions">Actions</div>
+	</div>
+
+	{% for friend in friends %}
+	<div class="tab-item">
+		<div class="tab-players">
+			{% if friend.image_42_url %}
+				<img src="{{ friend.image_42_url }}" class="user-avatar" />
+			{% else %}
+				<img src="{{ friend.image.url }}" class="user-avatar" />
+			{% endif %}
+			<span class="link user-link" href="/users/profile/foreign/?user={{ friend.id }}">{{ friend.username }}</span>
+			{% if friend.is_online %}
+				<span class="online-status">🟢</span>
+			{% else %}
+				<span class="online-status">🔴</span>
+			{% endif %}
 		</div>
+		<div class="tab-email">{{ friend.email }}</div>
+		<div class="tab-score">{{ friend.wins }} - {{ friend.losses }}</div>
+		<div class="tab-actions">
+				<button id="gamefriend-btn-{{ friend.id }}" class="link" href="/game/remote/?user={{ friend.id }}" data-i18n="action.game">⚔️ Game</button>
+				<button id="chatfriend-btn-{{ friend.id }}" class="link" href="/chat/?user={{ friend.id }}"  data-i18n="action.chat">💬 Chat</button>
+			<button id="deletefriend-btn-{{ friend.id }}" onclick="deleteFriend('{{ friend.id }}')" data-i18n="action.unfriend">💔 Unfriend</button>
+		</div>
+	</div>
+	{% empty %}
+	<p style="color: white;" data-i18n="profile.friends.empty">You don't have friends</p>
+	{% endfor %}
+</div>
+
+	<!-- Blocked Users -->
+	<div id="blocked-list" class="tab-content hidden">
+		<!-- Header Row -->
+		<div class="tab-header">
+			<div style="flex: 1.5;" data-i18n="table.username">User</div>
+			<div style="flex: 2;" data-i18n="table.email">Email</div>
+			<div style="flex: 1;" data-i18n="table.record">Record</div>
+			<div style="flex: 3;" data-i18n="table.actions">Actions</div>
+		</div>
+
+		{% for blocked in blockeds %}
+		<div class="tab-item">
+			<div class="tab-players">
+				{% if blocked.image_42_url %}
+					<img src="{{ blocked.image_42_url }}" class="user-avatar" />
+				{% else %}
+					<img src="{{ blocked.image.url }}" class="user-avatar" />
+				{% endif %}
+				<span class="link user-link" href="/users/profile/foreign/?user={{ blocked.id }}">{{ blocked.username }}</span>
+				<span class="online-status">🚫</span>
+			</div>
+			<div class="tab-email">{{ blocked.email }}</div>
+			<div class="tab-score">{{ blocked.wins }} - {{ blocked.losses }}</div>
+			<div class="tab-actions">
+				<button id="unblockfriend-btn-{{ blocked.id }}" onclick="unlockUser('{{ blocked.id }}')" data-i18n="action.unblock">🔓 Unblock</button>
+			</div>
+		</div>
+		{% empty %}
+		<p style="color: white;" data-i18n="profile.blocked.empty">There are no blocked users.</p>
+		{% endfor %}
+	</div>
+
+	<!-- Other Users -->
+	<div id="users-list" class="tab-content hidden">
+		<!-- Header Row -->
+		<div class="tab-header">
+			<div style="flex: 1.5;" data-i18n="table.username">User</div>
+			<div style="flex: 2;" data-i18n="table.email">Email</div>
+			<div style="flex: 1;" data-i18n="table.record">Record</div>
+			<div style="flex: 3;" data-i18n="table.actions">Actions</div>
+		</div>
+		
+		{% for user in users %}
+		<div class="tab-item">
+			<div class="tab-players">
+				{% if user.image_42_url %}
+					<img src="{{ user.image_42_url }}" class="user-avatar" />
+				{% else %}
+					<img src="{{ user.image.url }}" class="user-avatar" />
+				{% endif %}
+				<span class="link user-link" href="/users/profile/foreign/?user={{ user.id }}">{{ user.username }}</span>
+			</div>
+			<div class="tab-email">{{ user.email }}</div>
+			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
+			<div class="tab-actions">
+				<button id="gamefriend-btn-{{ user.id }}" class="play-btn" href="/game/remote/?user={{ user.id }}" data-i18n="action.game">⚔️ Game</button>
+				<button id="chatfriend-btn-{{ user.id }}" class="link" href="/chat/?user={{ user.id }}" data-i18n="action.chat">💬 Chat</button>
+				<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')" data-i18n="action.add">❤️ Add Friend</button>
+				<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')" data-i18n="action.block">🚫 Block</button>
+			</div>
+		</div>
+		{% empty %}
+		<p style="color: white;" data-i18n="profile.users.empty">There are no other users.</p>
 		{% endfor %}
 	</div>
 </div>

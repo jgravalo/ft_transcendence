@@ -19,6 +19,10 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+		<style>
+			body { text-align: center; background: black; color: white; }
+			canvas { border: 2px solid white; display: block; margin: auto; }
+		</style>
 	</head>
 	<body>
 		<!-- Background design -->
@@ -71,97 +75,32 @@
 		<!-- Main content -->
 		<div id="all">
 			<div id="content">
-				 <!--
-				<div class="profile-container">
-					<div class="profile">
-						<div class="profile-photo">
-							<img src="{{ user.image.url }}">
-						</div>
-						<div class="info">
-							<div class="username-container">
-								<h1 class="username">{{ user.username }}</h1>
-								<div class="settings-icon">
-									<i class="fas fa-cog link" href="/users/update"></i>
-								</div>
-							</div>
-							<div class="actions">
-								<button class="link challenge-btn" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
-							</div>
-						</div>
-					</div>
-				
-					<div class="stats">
-						<div class="stat-card">
-							<div class="stat-icon trophy">🏆</div>
-							<div class="stat-value">{{ user.wins }}</div>
-							<div class="stat-label" data-i18n="profile.dash.wins">Total Wins</div>
-						</div>
-				
-						<div class="stat-card">
-							<div class="stat-icon trophy">XXX</div>
-							<div class="stat-value">{{ user.losses }}</div>
-							<div class="stat-label" data-i18n="profile.dash.losses">Total Losses</div>
-						</div>
-						
-						<div class="stat-card">
-							<div class="stat-icon clock">🕒</div>
-							<div class="stat-value">{{ user.matches }}</div>
-							<div class="stat-label" data-i18n="profile.dash.matches">Games Played</div>
-						</div>
-						
-						<div class="stat-card">
-							<div class="stat-icon tournament">👑</div>
-							<div class="stat-value">XXX</div>
-							<div class="stat-label" data-i18n="profile.dash.tournament">Tournament Wins</div>
-						</div>
-					</div>
-				
-					<div class="tabs">
-						<button class="tab active">Match History</button>
-						<button class="tab link" href="/users/friends">Friends</button>
-						<button class="tab">Achievements</button>
-					</div>
-				
-					<div class="match-history">
-						<div class="match-item">
-							<div>
-								<div class="match-players">XXX vs XXX</div>
-								<div class="match-time">XXX hours ago</div>
-							</div>
-							<div class="match-score">XXX - XXX</div>
-						</div>
-						{% for match in matches %}
-						<div class="match-item">
-							<div>
-								<div class="match-players">{{ match.player1 }} vs {{ match.player2 }}</div>
-								<div class="match-time">{{ match.date }} hours ago</div>
-							</div>
-							<div class="match-score">{{ match.score1 }} - {{ match.score2 }}</div>
-						</div>
-						{% endfor %}
-					</div>
-				</div> -->
-				<div class="profile-container">
 				<!--  -->
-				<div class="chat-profile link" href="/users/profile/foreign/?user={{ user.username }}">
-					<div class="chat-photo">
-						<img src="img/España.webp">
+				<div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
+					<div class="modal-header d-flex justify-content-between">
+						<h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5>
 					</div>
-					<div class="chat-info">
-						<h1 id="username">{{ user.username }}</h1>
-						<div>
-							<h2>wins: {{ user.wins }}</h2>
-						</div>
+					<div class="modal-body">
+						<!-- Formulario de Login -->
+						<form id="loginForm" enctype="multipart/form-data">
+							<div class="mb-3">
+								<label style="color: white;" for="tournament-name" class="form-label" data-i18n="edit.profile.username">Nombre del torneo</label>
+								<input type="text" class="form-control" id="tournament-name" name="tournament-name" value="" required>
+								<span id="errorName" class="error"></span><br>
+							</div>
+							<div class="mb-3">
+								<label style="color: white;" for="players" class="form-label" data-i18n="edit.profile.username">Numero de jugadores</label>
+								<select id="players" name="players">
+									<!-- <option value="" disabled selected>Numero de jugadores</option> -->
+									<option value="4">4</option>
+									<option value="8">8</option>
+									<option value="16">16</option>
+									<option value="32">32</option>
+								</select>
+							</div>
+							<button type="submit" data-i18n="edit.profile.submit">Crear</button>
+						</form>
 					</div>
-				</div>
-				<!-- <textarea id="chat-log" cols="100" rows="20" readonly></textarea><br> -->
-				<div class="chat-container">
-					<div class="chat-log" id="chat-box"></div>
-				</div>
-				<form id="message-bar" class="message-bar"> <!-- action="/search" method="get"-->
-					<input id="message-input" type="text" size="80" type="text" name="message" placeholder="Write..." />
-					<button type="submit"><i class="fas fa-paper-plane"></i></button> <!-- onclick="sendMessage()" -->
-				</form>
 				</div>
 				<!--  -->
 			</div>
@@ -185,16 +124,14 @@
 
 		<!-- Scripts -->
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-		<script src="/js/navlinks.js"></script>
-		<script src="/js/login.js"></script>
-		<script src="/js/game.js"></script>
-		<script src="/js/websocket.js"></script>
-		<script src="/js/friends.js"></script>
-		<script src="/js/jwt.js" type="module"></script>
-		<script src="/js/lang.js"></script>
-		<script src="/js/tokens.js"></script>
-		<script src="/js/status.js"></script>
-		<script src="/js/chat.js"></script>
+		<script src="js/navlinks.js"></script>
+		<script src="js/login.js"></script>
+		<script src="js/game.js"></script>
+		<script src="js/friends.js"></script>
+		<script src="js/lang.js"></script>
+		<script src="js/tokens.js"></script>
+		<script src="js/status.js"></script>
+		<script src="js/chat.js"></script>
 		<script>
 			// Cargar la barra de usuario autenticado, 42 auth
 		window.onload = function() {

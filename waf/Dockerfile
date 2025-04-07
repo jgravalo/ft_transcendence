@@ -13,9 +13,5 @@ COPY ./conf/proxy_static_files.conf templates/includes/proxy_static_files.conf.t
 COPY ./conf/ssl_settings.conf templates/includes/ssl_settings.conf.template
 COPY ./conf/metrics.conf templates/includes/metrics.conf.template
 
-# Copy SSL certificates
-COPY ./certs/nginx.crt conf/server.crt
-COPY ./certs/nginx.key conf/server.key
-
 # Default command to start Nginx
 CMD ["nginx", "-g", "daemon off;"]

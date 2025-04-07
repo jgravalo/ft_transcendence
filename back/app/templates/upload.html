@@ -1,70 +1,123 @@
-<div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
-	<div class="modal-header d-flex justify-content-between">
-		<h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5>
+<div class="profile-container">
+	<!-- Profile section with photo and basic info -->
+	<div class="profile">
+		<div class="profile-photo">
+			{% if user.image_42_url %}
+				<img src="{{ user.image_42_url }}" id="preview">
+			{% else %}
+				<img src="{{ user.image.url }}" id="preview">
+			{% endif %}
+		</div>
+		<div class="info">
+			<div class="username-container">
+				<h1 class="username">{{ user.username }}</h1>
+			</div>
+			<div class="actions">
+				<button data-i18n="edit.profile.avatar" style="background-color: linear-gradient(to right, #5500b050, #c43dc950);">🛠️ Update Avatar Picture</span>
+				<button href="/users/profile/" data-i18n="edit.back">Back to Profile</button>
+			</div>
+		</div>
 	</div>
-	<div class="modal-body">
-		<!-- Formulario de Login -->
-		<form id="loginForm" enctype="multipart/form-data">
-			<div class="file-upload">
-				<input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
-				<label for="fileInput">
-					<div class="circle">
-						<img id="preview" src="{{ user.image.url }}"> <!-- alt="Vista previa"> -->
+
+	<!-- Combined card with profile edit and account management -->
+	<div class="stat-card card-section">
+		<div class="two-column-layout">
+			<!-- Left column: Profile Edit -->
+			<div class="column-left">
+				<h2 class="card-title" data-i18n="edit.profile.title">Edit your profile information</h2>
+				
+				{% if user.image_42_url == "" %}
+				<form id="loginForm" enctype="multipart/form-data">
+					<div class="file-upload">
+						<input type="file" id="fileInput" name="image" value="{{ user.image.url }}" accept="image/*">
+						<label for="fileInput">
+						</label>
 					</div>
-				</label>
+					
+					<div class="form-group">
+						<label for="username" data-i18n="edit.profile.username">Username</label>
+						<input type="text" class="form-input" id="username" name="username" value="{{ user.username }}" required>
+						<span id="errorName" class="error"></span>
+					</div>
+					
+					<div class="form-group">
+						<label for="email" data-i18n="edit.profile.email">Email</label>
+						<input type="email" class="form-input" id="email" name="email" value="{{ user.email }}" required>
+						<span id="errorEmail" class="error"></span>
+					</div>
+					
+					<div class="form-group">
+						<label for="old-password" data-i18n="edit.profile.password.current">Current Password</label>
+						<input type="password" class="form-input" id="old-password" name="old-password">
+						<span id="errorOldPassword" class="error"></span>
+					</div>
+					
+					<div class="form-group">
+						<label for="new-password" data-i18n="edit.profile.password.new">New Password</label>
+						<input type="password" class="form-input" id="new-password" name="new-password">
+						<span id="errorPassword" class="error"></span>
+					</div>
+					
+					<div class="switch-container">
+						<input type="hidden" name="two_fa_enabled" value=False>
+						<label class="switch">
+							<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value=True
+								{% if user.two_fa_enabled %}checked{% endif %}>
+							<span class="slider"></span>
+						</label>
+						<label class="switch-label" for="two_fa_enabled" data-i18n="edit.profile.twofa">Enable Two-Factor Authentication</label>
+					</div>
+					
+					<button type="submit" class="full-width-btn" data-i18n="edit.profile.submit">Update Profile</button>
+				</form>
+				{% endif %}
+			</div>
+			
+			<!-- Separator -->
+			<div class="column-separator"></div>
+			
+			<!-- Right column: Account Management -->
+			<div class="column-right">
+				<h2 class="card-title" data-i18n="privacy.data.management">Account Data Management</h2>
+				
+				<div class="data-management-container">
+					<!-- Data Download Section -->
+					<div class="data-section">
+						<div class="data-header">
+							<div class="data-title" data-i18n="privacy.data.download.title">📥 Download Data</div>
+							<div class="data-description" data-i18n="privacy.data.download.description">Get a copy of all your account data</div>
+						</div>
+						<button type="button" class="full-width-btn download-user-data-btn">
+							<i class="fas fa-download"></i>
+							<span data-i18n="privacy.data.download.account">Download account data</span>
+						</button>
+					</div>
+					
+					<!-- Anonymize Account Section -->
+					<div class="data-section">
+						<div class="data-header">
+							<div class="data-title" data-i18n="privacy.data.anonymize.title">🔒 Anonymize Account</div>
+							<div class="data-description" data-i18n="privacy.data.anonymize.description">Hide your personal information but keep your game statistics</div>
+						</div>
+							<button type="button" class="full-width-btn anonymize-user-btn btn-anonymize">
+							<i class="fas fa-user-times"></i>
+							<span data-i18n="privacy.data.anonymize.account">Anonymize account</span>
+						</button>
+					</div>
+					
+					<!-- Delete Account Section -->
+					<div class="data-section">
+						<div class="data-header">
+							<div class="data-title" data-i18n="privacy.data.delete.title">💀 Delete Account</div>
+							<div class="data-description" data-i18n="privacy.data.delete.description">Permanently remove your account and all associated data</div>
+						</div>
+						<button type="button" class=" full-width-btn delete-user-btn btn-delete">
+							<i class="fas fa-trash"></i>
+							<span data-i18n="privacy.data.delete.account">Delete account</span>
+						</button>
+					</div>
 				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.username">Nombre de usuario</label>
-					<input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
-					<span id="errorName" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="email" class="form-label" data-i18n="edit.profile.email">Correo Electrónico</label>
-					<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-					<span id="errorEmail" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="old-password" class="form-label" data-i18n="edit.profile.password.current">Contraseña Actual</label>
-					<input type="old-password" class="form-control" id="old-password" name="old-password">
-					<span id="errorOldPassword" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<label style="color: white;" for="new-password" class="form-label" data-i18n="edit.profile.password.new">Nueva Contraseña</label>
-					<input type="new-password" class="form-control" id="new-password" name="new-password">
-					<span id="errorPassword" class="error"></span><br>
-				</div>
-				<div class="mb-3">
-					<input type="hidden" name="two_fa_enabled" value=False>
-					<label class="switch">
-						<input type="checkbox" id="two_fa_enabled" name="two_fa_enabled" value=True
-							{% if user.two_fa_enabled %}checked{% endif %}>
-						<span class="slider"></span>
-					</label>
-					<label style="color: white;" for="username" class="form-label" data-i18n="edit.profile.twofa">Enable Two-Factor Authentication</label>
-				</div>
-			<button type="submit" data-i18n="edit.profile.submit">Actualizar</button>
-		</form>
-	</div>
-</div>
-<div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
-	<div class="modal-body">
-		<!-- boton para descargar todos los datos de la cuenta -->
-		<button type="button" class="btn text-white download-user-data-btn">
-			<i class="fas fa-download"></i>
-			<span data-i18n="privacy.data.download.account">Download account data</span>
-		</button>
-	</div>
-	<div class="modal-body">
-		<!-- <h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5> -->
-		<!-- <p data-i18n="privacy.data.controller.description">The data controller is Pong42, with address Carrer d'Albert Einstein, 11, Nou Barris, 08042 Barcelona.</p> -->
-		 <!-- Botton para anonimizar datos y eliminar cuenta -->
-		 <button type="button" class="btn btn-danger delete-user-btn">
-			<i class="fas fa-trash"></i>
-			<span data-i18n="privacy.data.delete.account">Delete account</span>
-		</button>
-		<button type="button" class="btn btn-danger anonymize-user-btn">
-			<i class="fas fa-user-times"></i>
-			<span data-i18n="privacy.data.anonymize.account">Anonymize account</span>
-		</button>
+			</div>
+		</div>
 	</div>
 </div>

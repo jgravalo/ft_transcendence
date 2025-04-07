@@ -1,0 +1,127 @@
+/* Upload page styles - extends profile.css styles */
+
+/* Form specific styling */
+.file-upload {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.circle {
+    cursor: pointer;
+}
+
+.circle span {
+    color: white;
+    display: block;
+    margin-top: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    color: white;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.error {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+}
+
+.switch-container {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.switch-label {
+    color: white;
+    margin-left: 10px;
+}
+
+/* Card and section styling */
+.card-section {
+    width: 100%;
+    padding: 25px;
+    margin-top: 20px;
+}
+
+.card-title {
+    color: white;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: x-large
+}
+
+.data-management-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.data-section {
+    padding-bottom: 20px;
+}
+
+.data-section:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.data-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.data-icon {
+    font-size: 2rem;
+    margin-right: 15px;
+}
+
+.data-title {
+    font-size: 1.3rem;
+    color: white;
+    font-weight: bold;
+}
+
+.data-description {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.full-width-btn {
+    width: 100%;
+}
+
+.btn-anonymize {
+    background: linear-gradient(to right, #ff9800, #f57c00);
+}
+
+.btn-delete {
+    background: linear-gradient(to right, #d32f2f, #b71c1c);
+}
+
+/* Responsive styles - will inherit from profile.css */
+@media (max-width: 768px) {
+    .data-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .data-icon {
+        margin-bottom: 10px;
+    }
+} 

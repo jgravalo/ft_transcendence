@@ -3,6 +3,7 @@ import json
 #from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 from django.apps import apps
+from urllib.parse import parse_qs
 
 class PrivateChatConsumer(AsyncWebsocketConsumer):
     """
@@ -17,7 +18,10 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         print('conecta socket')
         print('user =', self.scope['user'])
         self.user1 = self.scope['user'].id  # Usuario actual
-        self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # ID del otro usuario
+        # self.user2 = self.scope['url_route']['kwargs']['other_user_id']  # ID del otro usuario
+        # User = apps.get_model('users', 'User')
+        self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
+        # self.user2 = await sync_to_async(User.objects.get)(id=self.user2)
 
         print('user1:', self.user1)
         print('user2:', self.user2)
@@ -76,15 +80,6 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             print("❌ Error al obtener mensajes:", e)
 
-    # @database_sync_to_async
-    # def get_or_create_group(self):
-    #     group, created = Group.objects.get_or_create(room=self.room_group_name)
-    #     return group
-
-    # @database_sync_to_async
-    # def get_messages(self, group):
-    #     return list(group.history.all())
-
     async def disconnect(self, close_code):
         """
         Se ejecuta cuando un usuario se desconecta.
@@ -133,18 +128,6 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             }
         )
         print(f"📤 Mensaje enviado al grupo {self.room_group_name}")
-    
-    # @database_sync_to_async
-    # def get_group(self):
-    #     return Group.objects.get(room=self.room_group_name)
-
-    # @database_sync_to_async
-    # def create_message(self, message):
-    #     return Message.objects.create(user=self.scope['user'], content=message)
-
-    # @database_sync_to_async
-    # def add_message_to_group(self, group, chat):
-    #     group.history.add(chat)
 
     async def chat_message(self, event):
         """

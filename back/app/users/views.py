@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 import json
 from .models import User
+from game.models import Match
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -22,6 +23,9 @@ from .serializers import UserSerializer
 import os
 import hashlib
 import secrets
+from django.contrib.auth.decorators import login_required # O usa la autenticación de DRF si es una APIView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 # def iniciar_sesion(request):
 #     usuario = authenticate(username="juan", password="secreto123")
@@ -75,7 +79,6 @@ def delete_user(request):
         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response['Pragma'] = 'no-cache'
         response['Expires'] = '0'
-
         return response
 
     except Exception as e:
@@ -93,7 +96,10 @@ def get_login(request):
     }
     return JsonResponse(data)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def close_login(request):
+    # Si llega aquí, el usuario está autenticado vía JWT
     content = render_to_string('close_login.html')
     data = {
         "element": 'bar',
@@ -157,7 +163,7 @@ def set_login(request):
                 "error": "Success",
                 "element": 'bar',
                 "content": render_to_string('close_login.html'),
-                "next_path": '/users/profile/'
+                "next_path": '/users/profile/',
             })
 
             # Establecer cookies
@@ -209,6 +215,8 @@ def parse_data(username, email, password):
         return {'type': 'errorEmail', 'error': _("Empty fields")}#, status=400)
     if not '@' in email:
         return {'type': 'errorEmail', 'error': _("The email must include \'@\'")}#, status=400)
+    if len(password) < 6:
+        return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}#, status=400)
     return None
 
 @csrf_exempt
@@ -287,29 +295,65 @@ def get_logout(request):
 
 def profile(request):
     try:
+        print(f"Request headers: {request.headers}")
         user = User.get_user(request)
-    except:
-       return JsonResponse({'error': 'Forbidden'}, status=403)
-    # print("url =", user.image.url)
-    context = {
-        'user': user
-    }
-    content = render_to_string('profile.html', context)
-    data = {
-        "element": 'content',
-        "content": content
-    }
-    return JsonResponse(data)
+        if not user:
+            print("User not authenticated")
+            return JsonResponse({'error': 'Authentication failed. Please log in again.'}, status=401)
+
+        blocked = user.blocked.all()
+        blocked_by = user.blocked_by.all()
+        friends = user.friends.all()
+        non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked) - set(blocked_by)
+        matches = Match.objects.filter(player1=user) | Match.objects.filter(player2=user)
+
+        context = {
+            'user': user,
+            'friends': friends,
+            'blockeds': blocked,
+            'users': non_friends,
+            'matches': matches.order_by('-created_at'),
+        }
+        content = render_to_string('profile.html', context)
+        data = {
+            "element": 'content',
+            "content": content
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        print(f"Error in profile view: {str(e)}")
+        return JsonResponse({'error': 'Internal server error. Please try again later.'}, status=500)
 
 def foreign_profile(request):
     try:
-        username = request.GET.get('user', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-        user = User.objects.get(username=username)
+        username = request.GET.get('user', '')
+        user = None
+        
+        # Try to get user by ID first (for action buttons that pass IDs)
+        if username.isdigit():
+            try:
+                user = User.objects.get(id=username)
+            except User.DoesNotExist:
+                pass
+        
+        # If not found by ID, try by username
+        if not user:
+            user = User.objects.get(username=username)
+            
+        # Check if the user is viewing their own profile
+        current_user = User.get_user(request)
+        is_own_profile = (current_user.id == user.id)
+        is_friend = user in current_user.friends.all()
+        is_blocked = user in current_user.blocked.all()
+            
     except:
-       return JsonResponse({'error': 'Forbidden'}, status=403)
-    # print("url =", user.image.url)
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
     context = {
-        'user': user
+        'user': user,
+        'is_own_profile': is_own_profile,
+        'is_friend': is_friend,
+        'is_blocked': is_blocked
     }
     content = render_to_string('foreign.html', context)
     data = {
@@ -319,9 +363,8 @@ def foreign_profile(request):
     return JsonResponse(data)
 
 def update(request):
-    try:
-        user = User.get_user(request)
-    except:
+    user = User.get_user(request)
+    if not user:
         return JsonResponse({'error': 'Forbidden'}, status=403)
     context = {
         'user': user
@@ -339,69 +382,76 @@ from django.core.files.storage import default_storage
 def set_update(request):
     if request.method == "POST":
         try:
-            try:
-                user = User.get_user(request)
-            except:
+            user = User.get_user(request)
+            if not user:
                 return JsonResponse({'error': 'Forbidden'}, status=403)
             try:
-                #image = data.get('image')
-                # Acceder al archivo 'image' desde request.FILES
-                # file = request.FILES['image']
-                # user.image.save(file.name, file)
-                file = request.FILES.get('image')  # Asegúrate de obtener la imagen correctamente
+                file = request.FILES.get('image')
                 if file:
-                    #file_path = default_storage.save('profile_images/' + file.name, file)
-                    user.image = file#_path  # Asigna el archivo al campo image
-                    user.save()  # Guarda el usuario con la imagen
-                # print('funciono request.FILES')
-                # Guardar el archivo en el almacenamiento de Django (por defecto en el sistema de archivos)
-                # print('funciono image.save')
+                    user.image = file
+                    user.save()
             except:
                 print("fallo al subir image")
             username = request.POST.get('username')
             email = request.POST.get('email')
             old_password = request.POST.get('old-password')
             new_password = request.POST.get('new-password')
-            two_fa_enabled = request.POST.get('two_fa_enabled')
+            two_fa_enabled = request.POST.get('two_fa_enabled') == 'True'
+
+            # Validacion de Datos
             if username != user.username and User.objects.filter(username=username).exists():
                 return JsonResponse({'type': 'errorName', 'error': _("User already exists") })
             if email != user.email and User.objects.filter(email=email).exists():
                 return JsonResponse({'type': 'errorEmail', 'error': _("User already exists") })
-            # if old_password != '' and old_password != user.password: # unhashed
-            if old_password != '' and user.check_password(old_password): # hashed
-                return JsonResponse({'type': 'errorOldPassword', 'error': 'Password is not correct'})
-            if old_password == '' and new_password != '':
-                return JsonResponse({'type': 'errorOldPassword', 'error': 'You need to enter your current password'})
-            if old_password != '' and len(password) < 6:
-                return {'type': 'errorPassword', 'error': _("The password must be at least 6 characters long")}
-            error = parse_data(username, email, new_password)
-            if error != None:
-                return JsonResponse(error)
-            if user.username != username:
-                user.username=username
-            if user.email != email:
-                user.email=email
-            if old_password != '' or new_password != '':
-                # user.password=new_password # unhashed
-                user.set_password(new_password) # hashed
-            user.two_fa_enabled=two_fa_enabled
+            
+            error_format = parse_data(username, email, "dummy_password")
+            if error_format and error_format.get('type') in ['errorName', 'errorEmail']:
+                 return JsonResponse(error_format)
+
+            password_updated = False
+            # Logica de Actualización de Contraseña
+            if new_password:
+                if not old_password:
+                    return JsonResponse({'type': 'errorOldPassword', 'error': _('You need to enter your current password to set a new one')})
+                
+                if not user.check_password(old_password):
+                    return JsonResponse({'type': 'errorOldPassword', 'error': _('Current password is not correct')})
+                
+                if len(new_password) < 6:
+                    return JsonResponse({'type': 'errorPassword', 'error': _("The new password must be at least 6 characters long")})
+                
+                password_updated = True
+                
+            elif old_password and not new_password:
+                 return JsonResponse({'type': 'errorPassword', 'error': _("You need to enter a new password")})
+
+            # Aplicar Cambios
+            user.username = username
+            user.email = email
+            if password_updated:
+                user.set_password(new_password)
+            
+            user.two_fa_enabled = two_fa_enabled
+
             user.save()
-            content = render_to_string('close_login.html') # online_bar
+            
+            content = render_to_string('close_login.html')
             data = {
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
-                "next_path": '/users/profile/'
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+        except Exception as e:
+            print(f"Error en set_update: {str(e)}")
+            return JsonResponse({'error': 'Ocurrió un error interno al actualizar el perfil.'}, status=500)
 
 @csrf_exempt
 def friends(request):
-    try:
-        user = User.get_user(request)
-    except:
+    user = User.get_user(request)
+    if not user:
         return JsonResponse({'error': 'Forbidden'}, status=403)
     blocked = user.blocked.all()
     blocked_by = user.blocked_by.all()
@@ -421,29 +471,23 @@ def friends(request):
 
 @csrf_exempt
 def edit_friend(request):
-    try:
-        print('user1')
-        user1 = User.get_user(request)
-        print('data')
-        data = json.loads(request.body)
-        print('username')
-        user_id = data.get("user", "")
-        rule = data.get("rule", "")
-        print('user2')
-        user2 = User.objects.get(id=user_id)
-        print('user2')
-        if rule == 'add':
-            user1.friends.add(user2)
-        elif rule == 'delete':
-            user1.friends.remove(user2)
-        elif rule == 'block':
-            user1.blocked.add(user2)
-        elif rule == 'unlock':
-            user1.blocked.remove(user2)
-        data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
-        return JsonResponse(data)
-    except:
+    user1 = User.get_user(request)
+    if not user1:
         return JsonResponse({'error': 'Forbidden'}, status=403)
+    data = json.loads(request.body)
+    user_id = data.get("user", "")
+    rule = data.get("rule", "")
+    user2 = User.objects.get(id=user_id)
+    if rule == 'add':
+        user1.friends.add(user2)
+    elif rule == 'delete':
+        user1.friends.remove(user2)
+    elif rule == 'block':
+        user1.blocked.add(user2)
+    elif rule == 'unlock':
+        user1.blocked.remove(user2)
+    data = {'mensaje': 'Hola, esta es una respuesta JSON.'}
+    return JsonResponse(data)
 
 @csrf_exempt
 def add_friend(request):
@@ -589,6 +633,12 @@ def fortytwo_callback(request):
                         email=user_data['email'],
                         password='42auth'
                     )
+                
+                # Guardar la URL de la imagen de 42 si existe
+                if 'image' in user_data and user_data['image'] and 'link' in user_data['image']:
+                    user.image_42_url = user_data['image']['link']
+                    user.save()
+                
                 login(request, user)
 
                 # Generar tokens usando SimpleJWT
@@ -642,9 +692,8 @@ def privacy_policy(request):
 @csrf_exempt
 def download_user_data(request):
     if request.method == "GET":
-        try:
-            user = User.get_user(request)
-        except:
+        user = User.get_user(request)
+        if not user:
             return JsonResponse({'error': 'Forbidden'}, status=403)
         
         zip_buffer = BytesIO()
@@ -695,11 +744,11 @@ def anonymize_user(request):
     if request.method != "POST":
         return JsonResponse({"error": "Método no permitido"}, status=405)
     
+    user = User.get_user(request)
+    if not user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    
     try:
-        user = User.get_user(request)
-        if not user:
-            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
-        
         # Generar identificador anónimo único
         salt = secrets.token_hex(8)
         hash_base = hashlib.sha256((str(user.id) + salt).encode()).hexdigest()
@@ -712,6 +761,7 @@ def anonymize_user(request):
         user.first_name = ""
         user.last_name = ""
         user.set_password(secrets.token_urlsafe(32))
+        user.image_42_url = ""
         
         # Eliminar imagen personal pero mantener una por defecto
         if user.image and user.image.name != 'default.jpg':

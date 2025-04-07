@@ -1,3 +1,15 @@
+body {
+	text-align: center;
+	background: black;
+	color: white;
+}
+
+canvas {
+	border: 2px solid white;
+	display: block;
+	margin: auto;
+}
+
 .silkscreen-regular {
 	font-family: "Silkscreen", sans-serif;
 	font-weight: 400;

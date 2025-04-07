@@ -4,6 +4,11 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from django.contrib.sessions.models import Session
+# from game.models import Match
+from django.db.models import Q
+from django.apps import apps
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 import uuid
@@ -19,6 +24,7 @@ class User(AbstractUser):
 	is_online = models.BooleanField(default=True)
 #	user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
 	image = models.ImageField(upload_to='', default='default.jpg') # Carpeta dentro de MEDIA_ROOT
+	image_42_url = models.URLField(max_length=255, blank=True, null=True, default="")  # Campo para almacenar la URL de la imagen de 42
 	wins = models.IntegerField(default=0)
 	losses = models.IntegerField(default=0)
 	matches = models.IntegerField(default=0)
@@ -51,28 +57,30 @@ class User(AbstractUser):
 			auth_header = request.headers.get('Authorization')
 			if not auth_header:
 				return None
-			
+
 			token = auth_header.split(" ")[1]
 			# print("token =", token)
 			# token = auth_header.split(" ")[0]
 			if not token:
 				return None
-			
-
 			try:
 				token_obj = AccessToken(token)
 				user_id = token_obj['user_id']
 			except TokenError:
 				return None
-			
+
 			try:
 				user = cls.objects.get(id=user_id)
 				return user
 			except cls.DoesNotExist:
 				return None
-		
+
 		except Exception:
 			return None
+
+	def get_matches(self):
+		Match = apps.get_model('game', 'Match')  # 🔥 Se obtiene dinámicamente
+		return Match.objects.filter(Q(player1=self) | Q(player2=self))
 
 	def num_friends(self):
 		return self.friends.count()
@@ -102,3 +110,16 @@ class User(AbstractUser):
 		
 		# Eliminar completamente el usuario y todos sus datos
 		super().delete(*args, **kwargs)
+	
+	def invite(self, user, room):
+		channel_layer = get_channel_layer()
+		async_to_sync(channel_layer.group_send)(
+			self.username,  # Nombre del grupo
+			{
+				# "type": "warn_player",
+				"type": "warn.player",
+				"user": user.username,
+				"room": room,
+				"message": "Hola desde la vista!",
+			}
+		)

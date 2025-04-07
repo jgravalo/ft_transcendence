@@ -1,0 +1,26 @@
+<div class="modal-content" style="background-color: rgba(0, 0, 0, 0.5); padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin: 20px 0px;">
+	<div class="modal-header d-flex justify-content-between">
+		<h5 style="color: white;" class="modal-title text-center" id="loginModalLabel" data-i18n="edit.profile.title">Edit your profile information</h5>
+	</div>
+	<div class="modal-body">
+		<!-- Formulario de Login -->
+		<form id="loginForm" enctype="multipart/form-data">
+			<div class="mb-3">
+				<label style="color: white;" for="tournament-name" class="form-label" data-i18n="edit.profile.username">Nombre del torneo</label>
+				<input type="text" class="form-control" id="tournament-name" name="tournament-name" value="" required>
+				<span id="errorName" class="error"></span><br>
+			</div>
+			<div class="mb-3">
+				<label style="color: white;" for="number-players" class="form-label" data-i18n="edit.profile.username">Numero de jugadores</label>
+				<select id="number-players" name="number-players">
+					<!-- <option value="" disabled selected>Numero de jugadores</option> -->
+					<option value="4">4</option>
+					<option value="8">8</option>
+					<option value="16">16</option>
+					<option value="32">32</option>
+				</select>
+			</div>
+			<button type="submit" data-i18n="edit.profile.submit">Crear</button>
+		</form>
+	</div>
+</div>
