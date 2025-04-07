@@ -349,19 +349,15 @@ a {
 }
 
 button {
-	padding: 5px 15px;
-	font-size: x-large;
-	font-weight: bold;
-	color: white;
-	border: 4px solid white;
-	background-color: #00000000;
-	border-radius: 10px;
-}
-
-button:hover {
-	border-bottom: 2px solid white;
-	border-radius: 0px;
-	color: white;
+  background: linear-gradient(to right, #1e3c7250, #2a529850);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: x-large;
 }
 
 .error {

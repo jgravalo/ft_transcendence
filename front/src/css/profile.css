@@ -181,8 +181,8 @@
 	background: linear-gradient(to right, #d32f2f, #b71c1c);
 }
 
-.challenge-btn {
-	background: linear-gradient(to right, #b22633, #001695);
+button {
+	background: linear-gradient(to right, #1e3c7250, #2a529850);
 	color: white;
 	border: none;
 	border-radius: 8px;
@@ -193,7 +193,7 @@
 	font-size: x-large;
 }
 
-.challenge-btn:hover {
+button:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 	filter: brightness(1.1);
@@ -259,7 +259,7 @@
 	gap: 10px;
 	padding: 15px;
 	margin-bottom: 10px;
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: rgba(0, 0, 0, 0.6);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 10px;
 	width: 100%;
@@ -326,7 +326,7 @@
 }
 
 .tab-actions .play-btn {
-	background: linear-gradient(to right, #53d32f50, #1cb75a50);
+	background: linear-gradient(to right, #d48f2e50, #cd790450);
 
 }
 .profile-container .tab-actions {

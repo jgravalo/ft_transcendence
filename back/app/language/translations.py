@@ -48,6 +48,8 @@ TRANSLATION_KEYS = {
     "edit.profile.password.new": _("New Password"),
     "edit.profile.twofa": _("Enable Two-Factor Authentication"),
     "edit.profile.submit": _("Update"),
+    "edit.profile.avatar": _("🛠️ Update Avatar Picture"),
+    "edit.back": _("Back to Profile"),
     "otp.title": _("Login"),
     "otp.introduce": _("Introduce your OTP code"),
     "otp.verify": _("Verify"),

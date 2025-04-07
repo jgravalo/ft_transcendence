@@ -15,8 +15,8 @@
 				</div>
 			</div>
 			<div class="actions">
-				<button class="link challenge-btn" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
-				<button class="link challenge-btn" href="/game/tournament" data-i18n="profile.dash.tournament">Tournament</button>
+				<button style="background: linear-gradient(to right, #d48f2e50, #cd790450);" href="/game" data-i18n="profile.dash.1v1">Play 1v1</button>
+				<button href="/game/tournament" data-i18n="profile.dash.title">Tournament</button>
 			</div>
 		</div>
 	</div>
@@ -91,7 +91,7 @@
 		<div style="flex: 1.5;" data-i18n="table.username">User</div>
 		<div style="flex: 2;" data-i18n="table.email">Email</div>
 		<div style="flex: 1;" data-i18n="table.record">Record</div>
-		<div style="flex: 2;" data-i18n="table.actions">Actions</div>
+		<div style="flex: 3;" data-i18n="table.actions">Actions</div>
 	</div>
 
 	{% for friend in friends %}
@@ -161,7 +161,7 @@
 			<div style="flex: 1.5;" data-i18n="table.username">User</div>
 			<div style="flex: 2;" data-i18n="table.email">Email</div>
 			<div style="flex: 1;" data-i18n="table.record">Record</div>
-			<div style="flex: 2;" data-i18n="table.actions">Actions</div>
+			<div style="flex: 3;" data-i18n="table.actions">Actions</div>
 		</div>
 		
 		{% for user in users %}
@@ -172,7 +172,7 @@
 				{% else %}
 					<img src="{{ user.image.url }}" class="user-avatar" />
 				{% endif %}
-				<span>{{ user.username }}</span>
+				<a href="/users/profile/foreign/?user={{ user.id }}">{{ user.username }}</a>
 			</div>
 			<div class="tab-email">{{ user.email }}</div>
 			<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>

@@ -360,3 +360,6 @@ msgstr "Back to home"
 #: language/translations.py:193
 msgid "⚔️ Game"
 msgstr "⚔️ Game"
+
+msgid "🛠️ Update Avatar Picture"
+msgstr "🛠️ Update Avatar Picture"

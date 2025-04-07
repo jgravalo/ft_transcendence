@@ -598,3 +598,6 @@ msgstr "Retour à la maison"
 #: language/translations.py:193
 msgid "⚔️ Game"
 msgstr "⚔️ Jeu"
+
+msgid "🛠️ Update Avatar Picture"
+msgstr "🛠️ Changer la photo"

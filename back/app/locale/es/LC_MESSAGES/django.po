@@ -684,3 +684,6 @@ msgstr "Volver al inicio"
 #: language/translations.py:193
 msgid "⚔️ Game"
 msgstr "⚔️ Jugar"
+
+msgid "🛠️ Update Avatar Picture"
+msgstr "🛠️ Cambiar la foto"
