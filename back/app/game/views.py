@@ -3,6 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import Tournament
 from users.models import User
+from users.faker import create_fake_users
+import random
 
 def game(request):
     content = render_to_string('game.html')
@@ -33,6 +35,7 @@ def remote_game(request):
     print('try id')
     id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     room = request.GET.get('room', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    tournament = request.GET.get('tournament', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     link = ''
     if id:
         print('get id , create match')
@@ -40,6 +43,8 @@ def remote_game(request):
     elif room:
         print('get room , accept match')
         link = f'/?room={room}'
+        # if tournament:
+        # 	link += f'/?tournament={tournament}'
     context = {
         'link': link
     }
@@ -80,9 +85,19 @@ def set_tournament(request):
                 "content": render_to_string('close_login.html'),
                 "next_path": '/users/profile/'
             })
+
+            """ # test
+            create_fake_users(2)
+            users = set(User.objects.all()) - {request.user} # 2 fake users + admin
+            users_samp = random.sample(users, 3)
+            for user in users_samp:
+                tournament.add_player(user)
+            for player in list(tournament.players.all()):
+                print(f'player {player.username}') """
+            
             return response
         except Exception as e:
-            print(f"Error en login: {str(e)}")
+            print(f"Error en set tournament: {str(e)}")
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
 
     return JsonResponse({"error": "Método no permitido"}, status=405)

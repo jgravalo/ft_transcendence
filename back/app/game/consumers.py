@@ -28,20 +28,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 		User = apps.get_model('users', 'User')
 
 		# Para hacer el otro usuario restringido
-		"""
-		query_string = self.scope["query_string"].decode()  # Convertir bytes a string
-		query_params = parse_qs(query_string)  # Parsear la query string en un diccionario
-		
-		# Obtener el usuario desde los parámetros de la consulta
-		self.user2 = query_params.get("user", [None])[0]
-		"""
 
+		print('set game')
 		self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
 		self.room_name = parse_qs(self.scope["query_string"].decode()).get("room", [None])[0]
-		print('set game')
 		try:
 			print(f'user2 before: {self.user2}')
-			# self.user2 = self.scope['url_route']['kwargs']['other_user_id']
 			self.user2 = await sync_to_async(User.objects.get)(id=self.user2)
 			print(f'user2 before: {self.user2.id}')
 		except:
@@ -59,7 +51,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 		elif self.room_name: # in self.games:
 			print('ADD TO RESTRICTED GAME')
 			if self.room_name[:7] == 'game_to':
+				if self.room_name not in self.games or not self.games[self.room_name]: # hacer algo si la sala no existe o está vacía
+					self.games[self.room_name] = []  # Nueva sala
 				self.is_tournament = True
+				# self.tour_name = parse_qs(self.scope["query_string"].decode()).get("tournament", [None])[0]
 			pass
 		elif available_room:
 			print('ADD TO RANDOM GAME')

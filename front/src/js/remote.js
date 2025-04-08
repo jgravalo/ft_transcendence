@@ -8,13 +8,12 @@ function gameRemote(url)
 	console.log(`${route}?user=${params.get("user")}`);
 	if (params.get("user"))
 		route += `?user=${params.get("user")}&token=${sessionStorage.getItem('access')}`
-		// gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/?user=${params.get("user")}`);
 	else if (params.get("room"))
 		route += `?room=${params.get("room")}&token=${sessionStorage.getItem('access')}`
-	// gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/`);
+		// if (params.get("tournament"))
+		// 	route += `&tournament=${params.get("tournament")}`
 	else
 		route += `?token=${sessionStorage.getItem('access')}`;
-	// gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/`);
 	gameSocket = new WebSocket(route);
 	/* document.getElementById('content').innerHTML =
 		`<canvas id="gameCanvas" width="400" height="600"></canvas>`; */

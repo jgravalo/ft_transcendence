@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from itertools import combinations
 import uuid
+import random
 
 # Create your models here.
 # game/models.py
@@ -63,24 +64,30 @@ class Round(models.Model):
 			self.play()
 
 	def play(self):
+		# pairs = list(combinations(players, 2)) # Generar parejas únicas sin repetición
 		players = list(self.players.all()) # Obtener todos los usuarios
-		pairs = list(combinations(players, 2)) # Generar parejas únicas sin repetición
+		pairs = [] # Generar parejas únicas sin repetición
+		for i in range(0, len(players), 2):
+			print(f'round of {self.number}:')
+			pairs.append(players[i:i+2])
 		if self.number > 2:
-			next_round = self.objects.create(
+			next_round = Round.objects.create(
 				tournament=self.tournament,
 				number=self.number / 2
 				)
-
 		# Mostrar las parejas
 		for pair in pairs:
 			print(pair[0].username, "-", pair[1].username)
-			# room_name = f"game_to{uuid.uuid4().hex[:8]}"
-			# pair[0].invite(pair[0], room_name)
-			# pair[1].invite(pair[1], room_name)
+
+			# real
+			room_name = f"game_to{uuid.uuid4().hex[:8]}"
+			pair[0].invite(pair[0], room_name)
+			pair[1].invite(pair[1], room_name)
 			
-			# for debug
+			""" # for debug
 			winner = random.choice(pair)
 			if self.number == 2:
+				print(f'winner: {winner}')
 				self.tournament.winner = winner
 			else:
-				next_round.add_player(winner)
+				next_round.add_player(winner) """
