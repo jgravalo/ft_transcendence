@@ -1,8 +1,186 @@
 <div class="main-container">
-	<div class="">
+	<!-- Game section -->
+	<div class="game">
+		<div class="game-title canvas-title">
+			Pong<span>42</span>
+		</div>
+		<!-- Game canvas container -->
+		<div class="game-canvas-container">
+			<canvas id="gameCanvas" width="500" height="250"></canvas>
+		</div>
+		
+		<!-- Game controls section -->
+		<div class="game-controls">
+			<!-- Player 1 Controls -->
+			<div class="player-controls">
+				<h3 class="player-title" data-i18n="game.player2">Player 1</h3>
+				<div class="control-keys">
+					<div class="key-row">
+						<div class="key" data-i18n="game.keys.w">W</div>
+					</div>
+					<div class="key-row">
+						<div class="key" data-i18n="game.keys.s">S</div>
+					</div>
+				</div>
+			</div>			
+			<!-- Game status -->
+			<div class="game-status">
+				<div class="score-container">
+					<span class="score" id="player1Score">0</span>
+					<span class="score-separator">:</span>
+					<span class="score" id="player2Score">0</span>
+				</div>
+				<button class="game-button" id="startGame" data-i18n="game.start">Start Game</button>
+				<button class="game-button" id="pauseGame" data-i18n="game.pause">Pause</button>
+			</div>
+			
+			<!-- Player 2 Controls -->
+			<div class="player-controls">
+				<h3 class="player-title" data-i18n="game.player1">Player 2</h3>
+				<div class="control-keys">
+					<div class="key-row">
+						<div class="key" data-i18n="game.keys.up">↑</div>
+					</div>
+					<div class="key-row">
+						<div class="key" data-i18n="game.keys.down">↓</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<canvas id="gameCanvas" width="400" height="600"></canvas>
-	<script>
-		game();
-	</script>
 </div>
+
+<style>
+.main-container {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.game {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2rem;
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 15px;
+	padding: 2rem;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.game-canvas-container {
+	width: 100%;
+	max-width: 800px;
+	aspect-ratio: 16/9;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+.canvas-title {
+	font-size: 4rem !important;
+	margin-bottom: 0px !important;
+}
+
+#gameCanvas {
+	width: 100%;
+	height: 100%;
+	background: #1a1a1a;
+}
+
+.game-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	max-width: 800px;
+	gap: 2rem;
+}
+
+.player-controls {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+}
+
+.player-title {
+	color: #fff;
+	font-size: 1.2rem;
+	margin: 0;
+}
+
+.control-keys {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.key-row {
+	display: flex;
+	justify-content: center;
+}
+
+.key {
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 5px;
+	padding: 0.5rem 1rem;
+	color: #fff;
+	font-weight: bold;
+	min-width: 40px;
+	text-align: center;
+}
+
+.game-status {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+}
+
+.score-container {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	font-size: 2rem;
+	color: #fff;
+}
+
+.score {
+	font-weight: bold;
+}
+
+.score-separator {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.game-button {
+	background: linear-gradient(to right, #5500b050, #c43dc950);
+	border: none;
+	border-radius: 5px;
+	padding: 0.5rem 1.5rem;
+	color: #fff;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.game-button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.game-button.disabled {
+	cursor: default;
+	opacity: 0.5;
+	pointer-events: none;
+	transform: none;
+	box-shadow: none;
+}
+
+canvas {
+	width: 100%;
+	height: 100%;
+}
+</style>

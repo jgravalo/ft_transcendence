@@ -127,6 +127,8 @@ function fetchLink(path)
         {
             if (path == '/users/update/' || path == '/game/tournament/')
                 makePost(path);
+            else if (path.includes('/game/local'))
+                setupLocalGame();
             handleLinks();
         }
     })
