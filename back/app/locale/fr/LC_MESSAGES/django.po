@@ -601,3 +601,18 @@ msgstr "⚔️ Jeu"
 
 msgid "🛠️ Update Avatar Picture"
 msgstr "🛠️ Changer la photo"
+
+msgid "Player 1"
+msgstr "Joueur 1"
+
+msgid "Player 2"
+msgstr "Joueur 2"
+
+msgid "Pause"
+msgstr "Pause"
+
+msgid "Resume"
+msgstr "Reprendre"
+
+msgid "Start Game"
+msgstr "Démarrer le Jeu"

@@ -188,4 +188,10 @@ TRANSLATION_KEYS = {
     # Error
     "error.404.message": _("Oops! Page not found"),
     "error.404.home": _("Back to home"),
+    # Game page translations
+    "game.player1": _("Player 1"),
+    "game.player2": _("Player 2"),
+    "game.pause": _("Pause"),
+    "game.resume": _("Resume"),
+    "game.start": _("Start Game"),
 }

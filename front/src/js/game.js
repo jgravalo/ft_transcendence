@@ -181,12 +181,9 @@ function setupLocalGame() {
 	pauseBtn.addEventListener('click', () => {
 		if (gameRunning && !gameOver) {
 			gamePaused = !gamePaused;
-			if (!gamePaused) {
-				pauseBtn.innerText = "Pause";
-				requestAnimationFrame(gameLoop);
-			}
-			else
-				pauseBtn.innerText = "Resume";
+			pauseBtn.setAttribute("data-i18n", gamePaused ? "game.resume" : "game.pause");
+			changeLanguage(localStorage.getItem("selectedLanguage") || "en"); // Update the texts based on the language
+			requestAnimationFrame(gameLoop);
 		}
 	});
 	// Initialize game once	

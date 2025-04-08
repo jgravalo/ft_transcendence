@@ -363,3 +363,18 @@ msgstr "⚔️ Game"
 
 msgid "🛠️ Update Avatar Picture"
 msgstr "🛠️ Update Avatar Picture"
+
+msgid "Player 1"
+msgstr "Player 1"
+
+msgid "Player 2"
+msgstr "Player 2"
+
+msgid "Pause"
+msgstr "Pause"
+
+msgid "Resume"
+msgstr "Resume"
+
+msgid "Start Game"
+msgstr "Start Game"

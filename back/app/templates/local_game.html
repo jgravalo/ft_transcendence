@@ -2,24 +2,24 @@
 	<!-- Game section -->
 	<div class="game">
 		<div class="game-title canvas-title">
-			Pong<span>42</span>
+			<span>Pong</span><span>42</span>
 		</div>
 		<!-- Game canvas container -->
 		<div class="game-canvas-container">
-			<canvas id="gameCanvas" width="500" height="250"></canvas>
+			<canvas id="gameCanvas" width="600" height="300"></canvas>
 		</div>
 		
 		<!-- Game controls section -->
 		<div class="game-controls">
 			<!-- Player 1 Controls -->
 			<div class="player-controls">
-				<h3 class="player-title" data-i18n="game.player2">Player 1</h3>
+				<h3 class="player-title" data-i18n="game.player1">Player 1</h3>
 				<div class="control-keys">
 					<div class="key-row">
-						<div class="key" data-i18n="game.keys.w">W</div>
+						<div class="key">W</div>
 					</div>
 					<div class="key-row">
-						<div class="key" data-i18n="game.keys.s">S</div>
+						<div class="key">S</div>
 					</div>
 				</div>
 			</div>			
@@ -36,13 +36,13 @@
 			
 			<!-- Player 2 Controls -->
 			<div class="player-controls">
-				<h3 class="player-title" data-i18n="game.player1">Player 2</h3>
+				<h3 class="player-title" data-i18n="game.player2">Player 2</h3>
 				<div class="control-keys">
 					<div class="key-row">
-						<div class="key" data-i18n="game.keys.up">↑</div>
+						<div class="key">↑</div>
 					</div>
 					<div class="key-row">
-						<div class="key" data-i18n="game.keys.down">↓</div>
+						<div class="key">↓</div>
 					</div>
 				</div>
 			</div>
@@ -53,7 +53,7 @@
 <style>
 .main-container {
 	width: 100%;
-	max-width: 1200px;
+	max-width: 800px;
 	margin: 0 auto;
 	padding: 20px;
 }
@@ -71,7 +71,7 @@
 
 .game-canvas-container {
 	width: 100%;
-	max-width: 800px;
+	max-width: 600px;
 	aspect-ratio: 16/9;
 	background: rgba(0, 0, 0, 0.2);
 	border-radius: 10px;
@@ -129,7 +129,7 @@
 	padding: 0.5rem 1rem;
 	color: #fff;
 	font-weight: bold;
-	min-width: 40px;
+	min-width: 45px;
 	text-align: center;
 }
 
@@ -182,5 +182,18 @@
 canvas {
 	width: 100%;
 	height: 100%;
+}
+
+@media (max-width: 480px) {
+	.canvas-title {
+		font-size: 2.5rem !important;
+	}
+
+	.game-button {
+		font-size: 0.8rem;
+	}
+	.player-title {
+	font-size: 1rem;
+	}
 }
 </style>
