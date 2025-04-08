@@ -9,9 +9,12 @@ function gameRemote(url)
 	if (params.get("user"))
 		route += `?user=${params.get("user")}&token=${sessionStorage.getItem('access')}`
 	else if (params.get("room"))
-		route += `?room=${params.get("room")}&token=${sessionStorage.getItem('access')}`
-		// if (params.get("tournament"))
-		// 	route += `&tournament=${params.get("tournament")}`
+	{
+		route += `?room=${params.get("room")}`
+		if (params.get("tournament"))
+			route += `&tournament=${params.get("tournament")}`
+		route += `&token=${sessionStorage.getItem('access')}`
+	}
 	else
 		route += `?token=${sessionStorage.getItem('access')}`;
 	gameSocket = new WebSocket(route);

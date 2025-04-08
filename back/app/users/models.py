@@ -119,7 +119,7 @@ class User(AbstractUser):
 				# "type": "warn_player",
 				"type": "warn.player",
 				"user": user.username,
-				"room": room, # if tournament == '' else f'{room}&tournament={tournament}',
+				"room": room if tournament == '' else f'{room}&tournament={tournament}',
 				"message": "Hola desde la vista!",
 			}
 		)

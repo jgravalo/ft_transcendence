@@ -54,7 +54,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 				if self.room_name not in self.games or not self.games[self.room_name]: # hacer algo si la sala no existe o está vacía
 					self.games[self.room_name] = []  # Nueva sala
 				self.is_tournament = True
-				# self.tour_name = parse_qs(self.scope["query_string"].decode()).get("tournament", [None])[0]
+				self.tournament_id = parse_qs(self.scope["query_string"].decode()).get("tournament", [None])[0]
 			pass
 		elif available_room:
 			print('ADD TO RANDOM GAME')
@@ -170,16 +170,15 @@ class PongConsumer(AsyncWebsocketConsumer):
 							score_player1=self.games[self.room_name][0].paddle["score"],
 							score_player2=self.games[self.room_name][1].paddle["score"],
 						)
-
 						if self.is_tournament:
 							Round = apps.get_model('game', 'Round')
-							round = Round.objects.get(tournament__name=self.tour_name) # aqui saldran varios casos, hay que filtrr mas (por players)
-							round.matches.add(game)
+							round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id) # aqui saldran varios casos, hay que filtrr mas (por players)
+							await sync_to_async(round.matches.add)(game)
 							if round.number == 2:
 								round.tournament.winner = winner
-								round.tournament.save()
+								await sync_to_async(round.tournament.save)()
 							else:
-								next_round.add_player(winner)
+								await sync_to_async(next_round.add_player)(winner)
 
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",

@@ -81,8 +81,8 @@ class Round(models.Model):
 
 			# real
 			room_name = f"game_to{uuid.uuid4().hex[:8]}"
-			pair[0].invite(pair[0], room_name)
-			pair[1].invite(pair[1], room_name)
+			pair[0].invite(pair[0], room_name, self.tournament.id)
+			pair[1].invite(pair[1], room_name, self.tournament.id)
 			
 			""" # for debug
 			winner = random.choice(pair)
