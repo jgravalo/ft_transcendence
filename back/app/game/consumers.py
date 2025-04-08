@@ -32,6 +32,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print('set game')
 		self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
 		self.room_name = parse_qs(self.scope["query_string"].decode()).get("room", [None])[0]
+		print(f'ROOM NAME = {self.room_name}')
 		try:
 			print(f'user2 before: {self.user2}')
 			self.user2 = await sync_to_async(User.objects.get)(id=self.user2)
@@ -55,6 +56,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 					self.games[self.room_name] = []  # Nueva sala
 				self.is_tournament = True
 				self.tournament_id = parse_qs(self.scope["query_string"].decode()).get("tournament", [None])[0]
+				self.round = int(parse_qs(self.scope["query_string"].decode()).get("round", [None])[0])
+				print(f'TOURNAMENT ID = {self.tournament_id}')
+				print(f'round = {self.round}')
 			pass
 		elif available_room:
 			print('ADD TO RANDOM GAME')
@@ -156,9 +160,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 				if (self.games[self.room_name][0].paddle["score"] >= ball["max-score"] or
 					self.games[self.room_name][1].paddle["score"] >= ball["max-score"]):
 					if self.games[self.room_name][0].paddle["score"] >= ball["max-score"]:
-						winner = self.games[self.room_name][0].name
+						winner = self.games[self.room_name][0].user
 					elif self.games[self.room_name][1].paddle["score"] >= ball["max-score"]:
-						winner = self.games[self.room_name][1].name
+						winner = self.games[self.room_name][1].user
 					
 					# guarda en db
 					if (self.games[self.room_name][0].user.is_authenticated and
@@ -172,17 +176,22 @@ class PongConsumer(AsyncWebsocketConsumer):
 						)
 						if self.is_tournament:
 							Round = apps.get_model('game', 'Round')
-							round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id) # aqui saldran varios casos, hay que filtrr mas (por players)
+							# cualquier filtro extra,
+							# modificar User.invite() y remote_game() en py
+							# y gameRemote() en js
+							round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round)
+							# aqui saldran varios casos, hay que filtar mas (por players)
 							await sync_to_async(round.matches.add)(game)
 							if round.number == 2:
 								round.tournament.winner = winner
 								await sync_to_async(round.tournament.save)()
 							else:
+								next_round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round / 2)
 								await sync_to_async(next_round.add_player)(winner)
 
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
-						"winner": winner
+						"winner": winner.username
 					})
 					self.close()
 					break

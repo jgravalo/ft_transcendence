@@ -111,15 +111,18 @@ class User(AbstractUser):
 		# Eliminar completamente el usuario y todos sus datos
 		super().delete(*args, **kwargs)
 	
-	def invite(self, user, room, tournament = ''):
+	def invite(self, user, room, info = ''):
+		print(f'ROOM: {room}')
+		if info != '':
+			room = f"{room}&round={info.round}&tournament={info.tournament}"
+		print(f'ROOM: {room}')
 		channel_layer = get_channel_layer()
 		async_to_sync(channel_layer.group_send)(
 			self.username,  # Nombre del grupo
 			{
-				# "type": "warn_player",
 				"type": "warn.player",
 				"user": user.username,
-				"room": room if tournament == '' else f'{room}&tournament={tournament}',
+				"room": room,
 				"message": "Hola desde la vista!",
 			}
 		)

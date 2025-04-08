@@ -17,6 +17,7 @@
 </div>
 <script>
 	console.log('Will u accept the match?');
+	console.log('from template invite: ' + window.location.origin + '/game/remote/{{ room|escapejs }}');
 	link = '/game/remote/?room={{ room|escapejs }}';
 	// document.getElementById('accept-match').addEventListener('click', () => {
 	// 	fetchlink('/game/remote/?room={{ room|escapejs }}');

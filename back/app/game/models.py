@@ -2,8 +2,10 @@ from django.db import models
 from django.db import models
 from django.contrib.auth import get_user_model
 from itertools import combinations
+from types import SimpleNamespace
 import uuid
 import random
+
 
 # Create your models here.
 # game/models.py
@@ -80,9 +82,13 @@ class Round(models.Model):
 			print(pair[0].username, "-", pair[1].username)
 
 			# real
+
+			info = SimpleNamespace(round=self.number, tournament=self.tournament.id)
 			room_name = f"game_to{uuid.uuid4().hex[:8]}"
-			pair[0].invite(pair[0], room_name, self.tournament.id)
-			pair[1].invite(pair[1], room_name, self.tournament.id)
+			print(f'room_name: {room_name}')
+
+			pair[0].invite(pair[0], room_name, info)
+			pair[1].invite(pair[1], room_name, info)
 			
 			""" # for debug
 			winner = random.choice(pair)

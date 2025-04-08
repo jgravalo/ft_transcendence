@@ -1,5 +1,5 @@
 <canvas id="gameCanvas" width="400" height="600"></canvas>
 <script>
+	console.log('from template remote_game: ' + window.location.origin + '/game/remote/{{ link|escapejs }}');
 	gameRemote(window.location.origin + '/game/remote/{{ link|escapejs }}');
-	console.log('from template: ' + window.location.origin + '/game/remote/{{ link|escapejs }}');
 </script>

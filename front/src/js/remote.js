@@ -5,18 +5,19 @@ function gameRemote(url)
 {
 	const params = new URLSearchParams(new URL(url).search);
 	let route = `ws://${base.slice(7)}/ws/game/`;
-	console.log(`${route}?user=${params.get("user")}`);
 	if (params.get("user"))
 		route += `?user=${params.get("user")}&token=${sessionStorage.getItem('access')}`
 	else if (params.get("room"))
 	{
+		console.log(`params.get("room") = ${params.get("room")}`);
 		route += `?room=${params.get("room")}`
 		if (params.get("tournament"))
-			route += `&tournament=${params.get("tournament")}`
+			route += `&round=${params.get("round")}&tournament=${params.get("tournament")}`
 		route += `&token=${sessionStorage.getItem('access')}`
 	}
 	else
 		route += `?token=${sessionStorage.getItem('access')}`;
+	console.log(`route = ${route}`);
 	gameSocket = new WebSocket(route);
 	/* document.getElementById('content').innerHTML =
 		`<canvas id="gameCanvas" width="400" height="600"></canvas>`; */

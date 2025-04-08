@@ -36,15 +36,18 @@ def remote_game(request):
     id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     room = request.GET.get('room', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     tournament = request.GET.get('tournament', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    round = request.GET.get('round', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     link = ''
     if id:
-        print('get id , create match')
+        print(f'get id , create match = {id}')
         link = f'/?user={id}'
     elif room:
-        print('get room , accept match')
+        print(f'get room , accept  = {room}')
         link = f'/?room={room}'
-        # if tournament:
-        # 	link += f'/?tournament={tournament}'
+        if tournament:
+            link += f'&round={round}'
+            link += f'&tournament={tournament}'
+    print(f'link: {link}')
     context = {
         'link': link
     }
@@ -86,8 +89,8 @@ def set_tournament(request):
                 "next_path": '/users/profile/'
             })
 
-            """ # test
-            create_fake_users(2)
+            # test
+            """ create_fake_users(2)
             users = set(User.objects.all()) - {request.user} # 2 fake users + admin
             users_samp = random.sample(users, 3)
             for user in users_samp:
