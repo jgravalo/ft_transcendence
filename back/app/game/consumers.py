@@ -126,26 +126,51 @@ class PongConsumer(AsyncWebsocketConsumer):
 				}))
 
 	async def disconnect(self, close_code):
-		if self.room_name in self:
-			print(f'room_name in disconnect = {self.room_name} by {self.name}')
-		else:
-			print(f'room_name in disconnect = NULL by {self.name}')
-		self.ball[self.room_name]['connect'] = False
+		print(f'room_name in disconnect = {self.room_name} by {self.name}')
+		self.ball[self.room_name]['connect'] = False # detiene la bola
 		if self in self.games[self.room_name]:
+			# close socket, group and send final message
 			for player in self.games[self.room_name]:
 				if self != player:
+					player1 = player if player.role == 'player1' else self
+					player2 = player if player.role == 'player2' else self
+					winner = player.user
+
+					# guarda en db
+					if (player1.user.is_authenticated and
+					player2.user.is_authenticated):
+						player1.user.is_playing = False
+						await database_sync_to_async(player1.user.save)()
+						player2.user.is_playing = False
+						await database_sync_to_async(player2.user.save)()
+						Match = apps.get_model('game', 'Match')
+						Round = apps.get_model('game', 'Round')
+						game = await sync_to_async(Match.objects.create)(
+							player1=player1.user,
+							player2=player2.user,
+							score_player1=0 if self.role == 'player1' else 3,
+							score_player2=0 if self.role == 'player2' else 3,
+						)
+						print(f'WINNER: {winner.username}')
+						if self.is_tournament:
+							round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round)
+							await sync_to_async(round.matches.add)(game)
+							if round.number == 2:
+								round.tournament.winner = winner
+								await sync_to_async(round.tournament.save)()
+							else:
+								next_round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round / 2)
+								await sync_to_async(next_round.add_player)(winner)
+
 					await player.send(text_data=json.dumps({
 						"action": "finish",
-						"winner": player.name
+						"winner": winner.username
 					}))
-				# player.connected = False
 				player.user.is_playing = False
 				await database_sync_to_async(self.scope['user'].save)()
 				await player.close()
 				await self.channel_layer.group_discard(self.room_group_name, player.channel_name)
 			print(f'{self.role} has been disconnected in games')
-			# self.games[self.room_name].remove(self)
-			# await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 			self.games[self.room_name].clear()
 
 	async def receive(self, text_data):
@@ -163,20 +188,17 @@ class PongConsumer(AsyncWebsocketConsumer):
 		while len(self.games[self.room_name]) == 2:
 			ball["x"] += ball["vx"]
 			ball["y"] += ball["vy"]
-			# print('ball: x:', self.ball["x"], ', y:', self.ball["y"])
 
-			# Rebote en las paredes superior e inferior
-			if ball["x"] <= 0 or ball["x"] >= ball["width"]:
-				ball["vx"] *= -1  # Invertir dirección en Y
+			if ball["x"] <= 0 or ball["x"] >= ball["width"]: # Rebote en las paredes de los lados
+				ball["vx"] *= -1  # Invertir dirección en X
 
-			if (ball["y"] <= 0 or ball["y"] >= ball["height"]):
+			if (ball["y"] <= 0 or ball["y"] >= ball["height"]): # anotacion
 				if ball["y"] <= 0:
-					self.games[self.room_name][1].paddle["score"] += 1
+					self.games[self.room_name][1].paddle["score"] += 1 # sube el marcador
 				elif ball["y"] >= ball["height"]:
 					self.games[self.room_name][0].paddle["score"] += 1
-
 				ball["vy"] *= -1  # Invertir dirección en Y
-				ball["x"] = ball["width"] / 2
+				ball["x"] = ball["width"] / 2 # coloca en el centro
 				ball["y"] = ball["height"] / 2
 				print(f'{self.games[self.room_name][0].paddle["score"]}-{self.games[self.room_name][1].paddle["score"]}')
 
@@ -194,10 +216,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 						await database_sync_to_async(self.games[self.room_name][0].user.save)()
 						self.games[self.room_name][1].user.is_playing = False
 						await database_sync_to_async(self.games[self.room_name][1].user.save)()
-
-						# self.games[self.room_name][0].connected = False
-						# self.games[self.room_name][1].connected = False
 						Match = apps.get_model('game', 'Match')
+						Round = apps.get_model('game', 'Round')
 						game = await sync_to_async(Match.objects.create)(
 							player1=self.games[self.room_name][0].user,
 							player2=self.games[self.room_name][1].user,
@@ -206,10 +226,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 						)
 						print(f'WINNER: {winner.username}')
 						if self.is_tournament:
-							Round = apps.get_model('game', 'Round')
-							# cualquier filtro extra,
-							# modificar User.invite() y remote_game() en py
-							# y gameRemote() en js
 							round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round)
 							await sync_to_async(round.matches.add)(game)
 							if round.number == 2:
@@ -225,28 +241,24 @@ class PongConsumer(AsyncWebsocketConsumer):
 					})
 					await self.close()
 					break
-			if not self.ball[self.room_name]['connect']:
+			if not self.ball[self.room_name]['connect']: # no se sii es util
 				await self.close()
 				break
 
-			# 🏓 Verificar colisión con la paleta del jugador 1
-			if (
+			if ( # 🏓 Verificar colisión con la paleta del jugador 1
 				ball["y"] # - self.ball["size"] / 2
 				<= self.games[self.room_name][0].paddle["y"] + self.games[self.room_name][0].paddle["height"]
 				and ball["x"] >= self.games[self.room_name][0].paddle["x"]
 				and ball["x"] <= self.games[self.room_name][0].paddle["x"] + self.games[self.room_name][0].paddle["width"]
 			):
-				# print(f'choca en paleta 1: {ball["y"]} <= {self.games[self.room_name][0].paddle["y"]} + {self.games[self.room_name][0].paddle["height"]}')
 				ball["vy"] *= -1  # Invierte la dirección vertical
 				ball["y"] = self.games[self.room_name][0].paddle["y"] + self.games[self.room_name][0].paddle["height"] # Evita quedarse pegada
-			# 🏓 Verificar colisión con la paleta del jugador 2
-			elif (
+			elif ( # 🏓 Verificar colisión con la paleta del jugador 2
 				ball["y"] # + self.ball["size"] / 2
 				>= self.games[self.room_name][1].paddle["y"]
 				and ball["x"] >= self.games[self.room_name][1].paddle["x"]
 				and ball["x"] <= self.games[self.room_name][1].paddle["x"] + self.games[self.room_name][1].paddle["width"]
 			):
-				# print(f'choca en paleta 2: {ball["y"]} >= {self.games[self.room_name][0].paddle["y"]}')
 				ball["vy"] *= -1
 				ball["y"] = self.games[self.room_name][1].paddle["y"] - ball["size"]
 			
