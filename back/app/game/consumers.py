@@ -134,8 +134,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 					player2 = player if player.role == 'player2' else self
 					winner = player.user
 
+					""" 
 					# guarda en db
-					""" if (player1.user.is_authenticated and
+					if (player1.user.is_authenticated and
 					player2.user.is_authenticated):
 						player1.user.is_playing = False
 						await database_sync_to_async(player1.user.save)()
@@ -159,7 +160,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 							else:
 								next_round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round / 2)
 								await sync_to_async(next_round.add_player)(winner)
- """
+					 """
 					await player.send(text_data=json.dumps({
 						"action": "finish",
 						"winner": winner.username
@@ -170,6 +171,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 				await self.channel_layer.group_discard(self.room_group_name, player.channel_name)
 			print(f'{self.role} {self.user.username} has been disconnected in games')
 			self.games[self.room_name].clear()
+
 
 	async def receive(self, text_data):
 		# print(f'room_name in receive = {self.room_name}')
