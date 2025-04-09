@@ -33,7 +33,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		if self.scope['user'].is_authenticated:
 			if self.scope['user'].is_playing:
 				print('YA ESTA JUGANDO')
-				self.close()
+				await self.close()
 				print('FUERA')
 				return
 			else:
@@ -41,7 +41,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 				await database_sync_to_async(self.scope['user'].save)()
 				print('EMPIEZA A JUGAR')
 		else:
-			self.close()
+			await self.close()
 		available_room = await self.find_available_room()
 		User = apps.get_model('users', 'User')
 
@@ -126,7 +126,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 				}))
 
 	async def disconnect(self, close_code):
-		print(f'room_name in disconnect = {self.room_name} by {self.name}')
+		if self.room_name in self:
+			print(f'room_name in disconnect = {self.room_name} by {self.name}')
+		else:
+			print(f'room_name in disconnect = NULL by {self.name}')
 		self.ball[self.room_name]['connect'] = False
 		if self in self.games[self.room_name]:
 			for player in self.games[self.room_name]:
@@ -201,6 +204,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 							score_player1=self.games[self.room_name][0].paddle["score"],
 							score_player2=self.games[self.room_name][1].paddle["score"],
 						)
+						print(f'WINNER: {winner.username}')
 						if self.is_tournament:
 							Round = apps.get_model('game', 'Round')
 							# cualquier filtro extra,
@@ -219,10 +223,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 						"type": "finish_game",
 						"winner": winner.username
 					})
-					self.close()
+					await self.close()
 					break
 			if not self.ball[self.room_name]['connect']:
-				self.close()
+				await self.close()
 				break
 
 			# 🏓 Verificar colisión con la paleta del jugador 1
