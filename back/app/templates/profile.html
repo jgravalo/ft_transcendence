@@ -205,7 +205,9 @@
 			</div>
 			<div class="tab-score">{{ tournament.size }}/{{ tournament.number }}</div>
 			<div class="tab-actions">
+				{% if not tournament.is_full %}
 				<button id="tournament-btn-{{ tournament.id }}" class="link" href="/game/tournament/join/?tournament={{ tournament.id }}" data-i18n="profile.users.game">⚔️ join</button>
+				{% endif %}
 			</div>
 		</div>
 		{% empty %}

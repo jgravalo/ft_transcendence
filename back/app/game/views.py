@@ -8,7 +8,7 @@ import random
 
 def game(request):
     content = render_to_string('game.html')
-    print(f'request.user = {request.user}')
+    # print(f'request.user = {request.user}')
     data = {
         "element": 'content',
         "content": content
@@ -17,7 +17,7 @@ def game(request):
 
 def local_game(request):
     content = render_to_string('local_game.html')
-    print(f'request.user = {request.user}')
+    # print(f'request.user = {request.user}')
     data = {
         "element": 'content',
         "content": content
@@ -39,10 +39,10 @@ def remote_game(request):
     round = request.GET.get('round', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
     link = ''
     if id:
-        print(f'get id , create match = {id}')
+        # print(f'get id , create match = {id}')
         link = f'/?user={id}'
     elif room:
-        print(f'get room , accept  = {room}')
+        # print(f'get room , accept  = {room}')
         link = f'/?room={room}'
         if tournament:
             link += f'&round={round}'
@@ -52,7 +52,7 @@ def remote_game(request):
         'link': link
     }
     content = render_to_string('remote_game.html', context)
-    print(f'request.user = {request.user}')
+    # print(f'request.user = {request.user}')
     data = {
         "element": 'content',
         "content": content
@@ -61,7 +61,7 @@ def remote_game(request):
 
 def tournament(request):
     content = render_to_string('tournament.html')
-    print(f'request.user = {request.user}')
+    # print(f'request.user = {request.user}')
     data = {
         "element": 'content',
         "content": content
@@ -106,16 +106,16 @@ def set_tournament(request):
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 def join_tournament(request):
-    print('entra en join_tournament')
+    # print('entra en join_tournament')
     logged_in_user = User.get_user(request)
     if not logged_in_user:
         return JsonResponse({'error': 'Forbidden'}, status=403)
 
     tournament_id = request.GET.get('tournament')
-    print(f'tournament_id: {tournament_id}')
+    # print(f'tournament_id: {tournament_id}')
     if not tournament_id:
         return JsonResponse({'error': 'Tournament ID not provided in query parameters'}, status=400)
-    print(f'tournament_id: {tournament_id}')
+    # print(f'tournament_id: {tournament_id}')
     try:
         tournament = Tournament.objects.get(id=tournament_id)
         # tournament = get_object_or_404(Tournament, pk=tournament_id)
@@ -123,16 +123,16 @@ def join_tournament(request):
         return JsonResponse({'error': 'Invalid Tournament ID format'}, status=400)
     except Tournament.DoesNotExist:
         return JsonResponse({'error': 'Tournament not found'}, status=404)
-    print(f'tournament.id: {tournament.id}')
-    print(f'tournament.name: {tournament.name}')
+    # print(f'tournament.id: {tournament.id}')
+    # print(f'tournament.name: {tournament.name}')
 
-    for player in list(tournament.players.all()):
+    """ for player in list(tournament.players.all()):
         print(f'player {player.username}')
-    print(f'size {tournament.size}')
+    print(f'size {tournament.size}') """
     tournament.add_player(logged_in_user)
-    for player in list(tournament.players.all()):
+    """ for player in list(tournament.players.all()):
         print(f'player {player.username}')
-    print(f'size {tournament.size}')
+    print(f'size {tournament.size}') """
 
     return JsonResponse({"error": "Success"})
 """ 

@@ -36,10 +36,13 @@ class Tournament(models.Model):
 		return self.size == self.number
 
 	def add_player(self, user):
+		if self.is_full:
+			return
 		self.players.add(user)
 		self.size = self.players.count()
 		self.save()
-		if self.size == self.number:
+		# if self.size == self.number:
+		if self.is_full:
 			# self.is_full = True
 			self.play()
 
@@ -59,11 +62,18 @@ class Round(models.Model):
 	players = models.ManyToManyField(User, symmetrical=False, related_name='rounds', blank=True)
 	matches = models.ManyToManyField(Match, symmetrical=False, related_name='matches_did', blank=True)	
 
+	@property
+	def is_full(self):
+		return self.size == self.number
+
 	def add_player(self, user):
+		if self.is_full:
+			return
 		self.players.add(user)
 		self.size = self.players.count()
 		print(f'space: {self.size}/{self.number}')
-		if self.size == self.number:
+		if self.is_full:
+		# if self.size == self.number:
 			self.play()
 
 	def play(self):
@@ -86,7 +96,7 @@ class Round(models.Model):
 
 			info = SimpleNamespace(round=self.number, tournament=self.tournament.id)
 			room_name = f"game_to{uuid.uuid4().hex[:8]}"
-			print(f'room_name: {room_name}')
+			print(f'room_name: {room_name}: {pair[0].username} vs {pair[1].username}')
 
 			pair[0].invite(pair[0], room_name, info)
 			pair[1].invite(pair[1], room_name, info)
