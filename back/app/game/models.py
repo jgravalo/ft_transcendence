@@ -62,6 +62,7 @@ class Round(models.Model):
 	def add_player(self, user):
 		self.players.add(user)
 		self.size = self.players.count()
+		print(f'space: {self.size}/{self.number}')
 		if self.size == self.number:
 			self.play()
 
@@ -70,7 +71,7 @@ class Round(models.Model):
 		players = list(self.players.all()) # Obtener todos los usuarios
 		pairs = [] # Generar parejas únicas sin repetición
 		for i in range(0, len(players), 2):
-			print(f'round of {self.number}:')
+			# print(f'round of {self.number}:')
 			pairs.append(players[i:i+2])
 		if self.number > 2:
 			next_round = Round.objects.create(

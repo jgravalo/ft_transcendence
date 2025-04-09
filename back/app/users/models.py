@@ -22,6 +22,7 @@ class User(AbstractUser):
 	email = models.EmailField(max_length=100, unique=True)  # Asegura que el email sea único
 # 	password = models.CharField(max_length=100)
 	is_online = models.BooleanField(default=True)
+	is_playing = models.BooleanField(default=False)
 #	user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
 	image = models.ImageField(upload_to='', default='default.jpg') # Carpeta dentro de MEDIA_ROOT
 	image_42_url = models.URLField(max_length=255, blank=True, null=True, default="")  # Campo para almacenar la URL de la imagen de 42
@@ -112,10 +113,10 @@ class User(AbstractUser):
 		super().delete(*args, **kwargs)
 	
 	def invite(self, user, room, info = ''):
-		print(f'ROOM: {room}')
+		# print(f'ROOM: {room}')
 		if info != '':
 			room = f"{room}&round={info.round}&tournament={info.tournament}"
-		print(f'ROOM: {room}')
+		# print(f'ROOM: {room}')
 		channel_layer = get_channel_layer()
 		async_to_sync(channel_layer.group_send)(
 			self.username,  # Nombre del grupo

@@ -56,7 +56,7 @@ function deleteUser(path)
             },
         });
 }
-    
+
 function makeModal(path) //modalHTML)
 {
     // Mostrar el modal
@@ -119,7 +119,7 @@ function makeSubmit(path)
             }
             
             if (path !== '/users/update/' && path !== '/game/tournament/') {
-                document.getElementById('close').click();
+				document.getElementById('close').click(); // myModal.hide();
             }
             
             if (data.element) {
@@ -168,11 +168,14 @@ function loginSock() // por definir
 			document.getElementById(data.element).innerHTML = data.content;
 			var warnPlay = new bootstrap.Modal(document.getElementById('loginModal'));
 			warnPlay.show();
+			document.getElementById('loginModal').addEventListener('hidden.bs.modal', function (event) {
+				console.log('Modal cerrado');
+			  });
 			execScript(data.element);
 			document.getElementById('accept-match').addEventListener('click', () => {
 				console.log('I accept the match');
 				fetchLink(link);
-			});
+			}, { once: true });
 		}
     };
     // Manejar desconexión

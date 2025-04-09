@@ -5,6 +5,7 @@ from asgiref.sync import sync_to_async
 from django.apps import apps
 from channels.generic.websocket import AsyncWebsocketConsumer
 from urllib.parse import parse_qs
+from channels.db import database_sync_to_async
 
 class PongConsumer(AsyncWebsocketConsumer):
 	games = {}  # Lista para almacenar jugadores
@@ -15,15 +16,32 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print('in find_available_room')
 		print(f'len games = {len(self.games)}')
 		for room, game_list in self.games.items():
-			print(f'room {room}; len1: {len(game_list)}; len2: {len(self.games[room])}')
+			# print(f'room {room}; len1: {len(game_list)}; len2: {len(self.games[room])}')
 			# Si hay un solo jugador, la sala tiene espacio
-			print(f'room[:7] = {room[:7]}')
-			if len(game_list) == 1 and room[:7] != 'game_re': # Protegemos de partidas restringidas
-			# if len(game_list) == 1 and room[:7] == 'game_ra': # Protegemos de partidas restringidas
+			# print(f'room[:7] = {room[:7]}')
+			# if len(game_list) == 1 and room[:7] != 'game_re': # Protegemos de partidas restringidas
+			if len(game_list) == 1 and room[:7] == 'game_ra': # Protegemos de partidas restringidas
 				return room
 		return None # No hay salas disponibles con espacio
 
 	async def connect(self):
+		""" if self.connected == True:
+			self.close()
+			print('FUERA')
+			return
+		self.connected = True  # Lo definís vos """
+		if self.scope['user'].is_authenticated:
+			if self.scope['user'].is_playing:
+				print('YA ESTA JUGANDO')
+				self.close()
+				print('FUERA')
+				return
+			else:
+				self.scope['user'].is_playing = True
+				await database_sync_to_async(self.scope['user'].save)()
+				print('EMPIEZA A JUGAR')
+		else:
+			self.close()
 		available_room = await self.find_available_room()
 		User = apps.get_model('users', 'User')
 
@@ -76,13 +94,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print('set user')
 		self.user = self.scope['user']
 		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.games[self.room_name]) + 1}"
-		# print(f'user {self.name}: {self.user.id}')
 		self.role = f"player{len(self.games[self.room_name]) + 1}"
 		self.paddle = {"width": 80, "height": 10, "score": 0,
 			"x": 150, "y": 10 if len(self.games[self.room_name]) == 0 else 580}
-		print('role:', self.role)
-		print('paddle[y]:', self.paddle['y'])
-		print(f'user: {self.name} {self}')
+		print(f'user {self.name}: {self.user.id}, role:', self.role)
+		# print('paddle[y]:', self.paddle['y'])
+		# print(f'user: {self.name} {self}')
 		self.games[self.room_name].append(self)
 
 		await self.accept()
@@ -109,7 +126,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 				}))
 
 	async def disconnect(self, close_code):
-		print(f'room_name in disconnect = {self.room_name}')
+		print(f'room_name in disconnect = {self.room_name} by {self.name}')
 		self.ball[self.room_name]['connect'] = False
 		if self in self.games[self.room_name]:
 			for player in self.games[self.room_name]:
@@ -118,6 +135,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 						"action": "finish",
 						"winner": player.name
 					}))
+				# player.connected = False
+				player.user.is_playing = False
+				await database_sync_to_async(self.scope['user'].save)()
 				await player.close()
 				await self.channel_layer.group_discard(self.room_group_name, player.channel_name)
 			print(f'{self.role} has been disconnected in games')
@@ -167,6 +187,13 @@ class PongConsumer(AsyncWebsocketConsumer):
 					# guarda en db
 					if (self.games[self.room_name][0].user.is_authenticated and
 					self.games[self.room_name][1].user.is_authenticated):
+						self.games[self.room_name][0].user.is_playing = False
+						await database_sync_to_async(self.games[self.room_name][0].user.save)()
+						self.games[self.room_name][1].user.is_playing = False
+						await database_sync_to_async(self.games[self.room_name][1].user.save)()
+
+						# self.games[self.room_name][0].connected = False
+						# self.games[self.room_name][1].connected = False
 						Match = apps.get_model('game', 'Match')
 						game = await sync_to_async(Match.objects.create)(
 							player1=self.games[self.room_name][0].user,
@@ -180,7 +207,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 							# modificar User.invite() y remote_game() en py
 							# y gameRemote() en js
 							round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round)
-							# aqui saldran varios casos, hay que filtar mas (por players)
 							await sync_to_async(round.matches.add)(game)
 							if round.number == 2:
 								round.tournament.winner = winner
@@ -206,7 +232,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 				and ball["x"] >= self.games[self.room_name][0].paddle["x"]
 				and ball["x"] <= self.games[self.room_name][0].paddle["x"] + self.games[self.room_name][0].paddle["width"]
 			):
-				print(f'choca en paleta 1: {ball["y"]} <= {self.games[self.room_name][0].paddle["y"]} + {self.games[self.room_name][0].paddle["height"]}')
+				# print(f'choca en paleta 1: {ball["y"]} <= {self.games[self.room_name][0].paddle["y"]} + {self.games[self.room_name][0].paddle["height"]}')
 				ball["vy"] *= -1  # Invierte la dirección vertical
 				ball["y"] = self.games[self.room_name][0].paddle["y"] + self.games[self.room_name][0].paddle["height"] # Evita quedarse pegada
 			# 🏓 Verificar colisión con la paleta del jugador 2
@@ -216,7 +242,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 				and ball["x"] >= self.games[self.room_name][1].paddle["x"]
 				and ball["x"] <= self.games[self.room_name][1].paddle["x"] + self.games[self.room_name][1].paddle["width"]
 			):
-				print(f'choca en paleta 2: {ball["y"]} >= {self.games[self.room_name][0].paddle["y"]}')
+				# print(f'choca en paleta 2: {ball["y"]} >= {self.games[self.room_name][0].paddle["y"]}')
 				ball["vy"] *= -1
 				ball["y"] = self.games[self.room_name][1].paddle["y"] - ball["size"]
 			
