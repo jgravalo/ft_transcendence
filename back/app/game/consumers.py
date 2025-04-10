@@ -172,7 +172,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 					elif p2["score"] >= ball["max-score"]:
 						winner = self.games[self.room_name][1].name
 					
-					# ✅ Send final ball & score state
+					# Send final ball & score state
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "ball_update",
 						"ball": ball,
