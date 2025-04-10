@@ -98,8 +98,8 @@ msgid "There are no users"
 msgstr "There are no users"
 
 #: language/translations.py:24
-msgid "Start 1vs1"
-msgstr "🎮 Play 1vs1"
+msgid "Play Online"
+msgstr "🎮 Play Online"
 
 #: language/translations.py:25
 msgid "Start online"
@@ -377,4 +377,42 @@ msgid "Resume"
 msgstr "Resume"
 
 msgid "Start Game"
-msgstr "Start Game"
+msgstr "New Game"
+
+msgid "New Game"
+msgstr "New Game"
+
+#: language/translations.py:198
+msgid "Back"
+msgstr "🔙 Back"
+
+#: language/translations.py:199
+msgid "Play as Guest"
+msgstr "👤 Guest"
+
+#: language/translations.py:200
+msgid "Jump into a quick match — no login needed"
+msgstr "Jump into a quick match"
+
+#: language/translations.py:201
+msgid "Log In to Play"
+msgstr "🔐 Log In"
+
+#: language/translations.py:202
+msgid "Save your stats, progress, and compete with others"
+msgstr "Save your stats & progress"
+
+msgid "Start Game to begin..."
+msgstr "Start Game to begin..."
+
+msgid "Looking for opponent..."
+msgstr "Looking for opponent..."
+
+msgid "Match in progress..."
+msgstr "Match in progress..."
+
+msgid "Game over! You won!"
+msgstr "Game over! You won 😀"
+
+msgid "Game over! You lost!"
+msgstr "Game over! You lost 😵"

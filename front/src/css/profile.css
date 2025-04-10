@@ -305,8 +305,8 @@ button:hover {
 	color: white;
 	border: none;
 	border-radius: 6px;
-	padding: 8px 12px;
-	font-size: 0.rem;
+	padding: 8px 10px;
+	font-size: 0.80rem;
 	cursor: pointer;
 	transition: all 0.2s ease;
 	display: flex;

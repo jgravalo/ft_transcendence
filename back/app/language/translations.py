@@ -10,7 +10,6 @@ TRANSLATION_KEYS = {
     "footer.project": _("Project"),
     "footer.team": _("Team"),
     "game.start.1vs1": _("Start 1vs1"),
-    "game.start.online": _("Start online"),
     "login.title": _("Login"),
     "login.email.label": _("Email"),
     "login.submit": _("Submit"),
@@ -159,7 +158,7 @@ TRANSLATION_KEYS = {
     "home.tournament.title": _("Tournament"),
     "home.tournament.description": _("Tournament_description"),
     # Profile page translations
-    "profile.dash.1v1": _("Start 1vs1"),
+    "profile.dash.online": _("Play Online"),
     "profile.dash.wins": _("Wins"),
     "profile.dash.losses": _("Losses"),
     "profile.dash.matches": _("Matches"),
@@ -194,4 +193,17 @@ TRANSLATION_KEYS = {
     "game.pause": _("Pause"),
     "game.resume": _("Resume"),
     "game.start": _("Start Game"),
+    "game.newgame": _("New Game"),
+    #Home page translations
+    "home.return.title": _("Back"),
+    "home.guest.title": _("Play as Guest"),
+    "home.guest.description": _("Jump into a quick match — no login needed"),
+    "home.user.title": _("Log In to Play"),
+    "home.user.description": _("Save your stats, progress, and compete with others"),
+    #Game page translations
+    "game.status.start": _("Start Game to begin..."),
+    "game.status.matchmaking": _("Looking for opponent..."),
+    "game.status.progress": _("Match in progress..."),
+    "game.status.win": _("Game over! You won!"),
+    "game.status.lose": _("Game over! You lost!"),
 }

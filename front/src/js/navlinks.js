@@ -113,31 +113,36 @@ function fetchLink(path)
         return response.json();
     }) // Convertir la respuesta a JSON
     .then(data => {
-		var dest = `${data.element}`;
-		if (dest != 'modalContainer' &&
-			path != '/users/login/close/' && path != '/users/logout/close/')
-			pushState(path);
+        const dest = `${data.element}`;
+        if (dest !== 'modalContainer' && !['/users/login/close/', '/users/logout/close/'].includes(path))
+            pushState(path);
         document.getElementById(dest).innerHTML = `${data.content}`;
-		execScript(dest);
-        //updating the newly added content with right language
+        execScript(dest);
+        //Call the changeLanguage function to update the language of the page
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
-        if (dest == 'modalContainer')
+        if (dest === 'modalContainer') {
             makeModal(path);
-        else
-        {
-            if (path == '/users/update/' || path == '/game/tournament/')
-                makePost(path);
-            else if (path.includes('/game/local'))
-                setupLocalGame();
+        } else {
+            //Call the getPageHandler function that calls the right function for the page
+            const pageHandler = getPageHandler(path);
+            if (pageHandler) pageHandler();
             handleLinks();
         }
     })
     .catch(error => {
-        console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
         console.error('path error:', path);
         setError(error);
     });
+}
+
+//Manage the page events
+function getPageHandler(path) {
+    if (path.startsWith("/game/local")) return setupLocalGame;
+    if (path.startsWith("/game/remote")) return setupRemoteGame;
+    if (path === "/users/update/") return () => makePost(path);
+    if (path === "/game/tournament/") return () => makePost(path);
+    return null;
 }
 
 function setError(error)
@@ -171,18 +176,4 @@ function execScript(element)
 		newScript.text = script.innerText;  // Tomamos el código JavaScript del script insertado
 		document.head.appendChild(newScript);  // Insertamos el script de manera segura
 	}
-}
-
-function showTab(tabId, button) {
-	// Hide all tab contents
-	document.querySelectorAll('.tab-content').forEach(div => {
-		div.classList.add('hidden');
-	});
-
-	// Show selected tab
-	document.getElementById(tabId).classList.remove('hidden');
-
-	// Only activate active on the right tab button
-	document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
-	if (button) button.classList.add('active');
 }

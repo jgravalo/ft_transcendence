@@ -8,8 +8,165 @@ canvas {
 	border: 2px solid white;
 	display: block;
 	margin: auto;
+	width: 100%;
+	height: 100%;
 }
 
+/* Game Container Styles */
+.game {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.5rem;
+	background: rgba(255, 255, 255, 0.05);
+	border-radius: 15px;
+	padding: 1.5rem;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.game-title.canvas-title {
+	font-size: 3.5rem !important;
+	margin-bottom: 0px !important;
+}
+
+.game-canvas-container {
+	width: 100%;
+	max-width: 600px;
+	aspect-ratio: 16/9;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+#gameCanvas {
+	width: 100%;
+	height: 100%;
+	background: #1a1a1a;
+}
+
+#pongCanvas {
+	border: 15px solid #ffffff;
+	border-collapse: collapse;
+	background-color: #006b1b;
+}
+
+/* Game Controls Styles */
+.game-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	max-width: 800px;
+	gap: 2rem;
+}
+
+.player-controls {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	width: 30%;
+}
+
+.player-title {
+	color: #fff;
+	font-size: 1.8rem;
+	margin: 0;
+}
+
+.control-keys {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.key-row {
+	display: flex;
+	justify-content: center;
+}
+
+.key {
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 5px;
+	padding: 0.5rem 1rem;
+	color: #fff;
+	font-weight: bold;
+	min-width: 45px;
+	text-align: center;
+}
+
+.game-status {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+}
+
+.score-container {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	font-size: 2rem;
+	color: #fff;
+}
+
+.score {
+	font-weight: bold;
+}
+
+.score-separator {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.game-button {
+	background: linear-gradient(to right, #5500b050, #c43dc950);
+	border: none;
+	border-radius: 5px;
+	padding: 0.5rem 1.5rem;
+	color: #fff;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.game-button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.game-button.disabled {
+	cursor: default;
+	opacity: 0.5;
+	pointer-events: none;
+	transform: none;
+	box-shadow: none;
+}
+
+.status-message {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1rem;
+	font-style: italic;
+	background-color: rgba(255, 255, 255, 0.05);
+	color: #ddd;
+	padding: 0.4rem 1.2rem;
+	border-radius: 8px;
+	margin-bottom: 1rem;
+	backdrop-filter: blur(4px);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	text-align: center;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	animation: blinkBackground 2s infinite ease-in-out;
+}
+
+@keyframes blinkBackground {
+	0% { background-color: rgba(255, 255, 255, 0.05); }
+	50% { background-color: rgba(255, 255, 255, 0.1); }
+	100% { background-color: rgba(255, 255, 255, 0.05); }
+}
+
+/* Font Classes */
 .silkscreen-regular {
 	font-family: "Silkscreen", sans-serif;
 	font-weight: 400;
@@ -23,15 +180,15 @@ canvas {
 }
 
 .geo-regular {
-  font-family: "Geo", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+	font-family: "Geo", sans-serif;
+	font-weight: 400;
+	font-style: normal;
 }
 
 .geo-regular-italic {
-  font-family: "Geo", sans-serif;
-  font-weight: 400;
-  font-style: italic;
+	font-family: "Geo", sans-serif;
+	font-weight: 400;
+	font-style: italic;
 }
 
 .material-symbols-outlined {
@@ -42,6 +199,7 @@ canvas {
 	'opsz' 24
 }
 
+/* Game Console Styles */
 .game-console {
 	display: block;
 	width: 400px;
@@ -49,12 +207,7 @@ canvas {
 	margin: 0;
 }
 
-#pongCanvas {
-	border: 15px solid #ffffff;
-	border-collapse: collapse;
-	background-color: #006b1b;
-}
-
+/* Overlay Styles */
 .overlay_style {
 	position: absolute;
 	top: 0;
@@ -69,6 +222,7 @@ canvas {
 	z-index: 1000;
 }
 
+/* Game Menu Styles */
 .game-menu-style {
 	font-family: "Silkscreen", sans-serif;
 	background: rgba(255, 255, 255, 0.9);
@@ -101,6 +255,35 @@ canvas {
 	color: white;
 }
 
+/* Tab Content Styles */
+#game-info {
+	width: 400px;
+	height: 800px;
+	border-left: 15px solid #ffffff;
+	border-right: 15px solid #ffffff;
+	border-bottom: 15px solid #ffffff;
+	background-color: black;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	text-align: center;
+	color: white;
+	font-family: "Geo", sans-serif;
+	box-sizing: border-box;
+}
+
+.tab-data {
+	margin-top: 15px;
+	display: block;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	clear: both;
+	overflow: auto;
+	overflow-style: marquee-line;
+}
+
 ul.tab-content {
 	width: 100%;
 	font-size: 25px;
@@ -128,41 +311,13 @@ ul.tab-content > li > div {
 ul.tab-content > li > div > span{
 	padding: 5px;
 }
+
 ul.tab-content > li > div > span:hover {
 	background-color: #555;
 }
 
 ul.tab-content > div > li:hover {
 	background-color: #555;
-}
-
-#game-info {
-    width: 400px;
-    height: 800px;
-    border-left: 15px solid #ffffff;
-	border-right: 15px solid #ffffff;
-	border-bottom: 15px solid #ffffff;
-	background-color: black;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    text-align: center;
-    color: white;
-    font-family: "Geo", sans-serif;
-	box-sizing: border-box;
-}
-
-.tab-data {
-	margin-top: 15px;
-	display: block;
-	display: block;
-	width: 100%;
-	height: 100%;
-	padding: 0;
-	clear: both;
-	overflow: auto;
-	overflow-style: marquee-line;
 }
 
 ul.big_data {
@@ -192,7 +347,6 @@ ul#game-log-tab {
 	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 	font-style: italic;
 	font-size: 17px;
-
 }
 
 ul#game-log-tab > li::before {
@@ -203,7 +357,6 @@ ul#game-log-tab > li::before {
 ul#game-log-tab > li {
 	text-align: left;
 	padding: 2px;
-
 }
 
 /* Top menu */
@@ -221,7 +374,8 @@ ul.info-tab {
 	border: none;
 	box-sizing: content-box;
 }
-ul.info-tab>li {
+
+ul.info-tab > li {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -233,6 +387,21 @@ ul.info-tab > li > span {
 	cursor: pointer;
 }
 
-ul.info-tab>li:hover {
+ul.info-tab > li:hover {
 	color: #6f94c6;
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
+	.canvas-title {
+		font-size: 2.5rem !important;
+	}
+
+	.game-button {
+		font-size: 0.8rem;
+	}
+	
+	.player-title {
+		font-size: 1rem;
+	}
 }

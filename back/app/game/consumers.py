@@ -79,8 +79,13 @@ class PongConsumer(AsyncWebsocketConsumer):
 		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.games[self.room_name]) + 1}"
 		# print(f'user {self.name}: {self.user.id}')
 		self.role = f"player{len(self.games[self.room_name]) + 1}"
-		self.paddle = {"width": 80, "height": 10, "score": 0,
-			"x": 150, "y": 10 if len(self.games[self.room_name]) == 0 else 580}
+		self.paddle = {
+			"width": 50,
+			"height": 10,
+			"score": 0,
+			"x": 10 if len(self.games[self.room_name]) == 0 else 480,  # 10px from left or right edge
+			"y": (250 - 50) // 2  # center vertically
+		}
 		print('role:', self.role)
 		print('paddle[y]:', self.paddle['y'])
 		print(f'user: {self.name} {self}')
@@ -93,8 +98,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 			print(f"🔗 Conectando a la sala {self.room_group_name}")
 			# await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 			print('set ball')
-			self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
-				"width": 400, "height": 600, "size": 10, "max-score": 3, "connect": True}
+			self.ball[self.room_name] = {"x": 250, "y": 125, "vx": 5, "vy": 5,
+				"width": 500, "height": 250, "size": 10, "max-score": 5, "connect": True}
 
 			asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
 
@@ -129,41 +134,53 @@ class PongConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		# print(f'room_name in receive = {self.room_name}')
 		data = json.loads(text_data)
-		self.paddle['x'] = data['x']
+		self.paddle['y'] = data['y']
 		for player in self.games[self.room_name]:
 			if player != self:
 				await player.send(text_data=json.dumps(data))
 
 	async def start_game_loop(self):
 		ball = self.ball[self.room_name]
+		p1 = self.games[self.room_name][0].paddle
+		p2 = self.games[self.room_name][1].paddle
+
 		print(f'room_name in ball = {self.room_name}')
 		# Bucle que mueve la pelota y la sincroniza en los clientes
 		while len(self.games[self.room_name]) == 2:
 			ball["x"] += ball["vx"]
 			ball["y"] += ball["vy"]
-			# print('ball: x:', self.ball["x"], ', y:', self.ball["y"])
 
 			# Rebote en las paredes superior e inferior
-			if ball["x"] <= 0 or ball["x"] >= ball["width"]:
-				ball["vx"] *= -1  # Invertir dirección en Y
-
-			if (ball["y"] <= 0 or ball["y"] >= ball["height"]):
-				if ball["y"] <= 0:
-					self.games[self.room_name][1].paddle["score"] += 1
-				elif ball["y"] >= ball["height"]:
-					self.games[self.room_name][0].paddle["score"] += 1
-
+			if ball["y"] <= 0 or ball["y"] >= ball["height"]:
 				ball["vy"] *= -1  # Invertir dirección en Y
+
+			if (ball["x"] <= 0 or ball["x"] >= ball["width"]):
+				if ball["x"] >= ball["width"]:
+					p1["score"] += 1
+				elif ball["x"] <= 0:
+					p2["score"] += 1
+
+				ball["vx"] *= -1  # Invertir dirección en X
 				ball["x"] = ball["width"] / 2
 				ball["y"] = ball["height"] / 2
-				print(f'{self.games[self.room_name][0].paddle["score"]}-{self.games[self.room_name][1].paddle["score"]}')
+				print(f'{p1["score"]}-{p2["score"]}')
 
-				if (self.games[self.room_name][0].paddle["score"] >= ball["max-score"] or
-					self.games[self.room_name][1].paddle["score"] >= ball["max-score"]):
-					if self.games[self.room_name][0].paddle["score"] >= ball["max-score"]:
+				if (p1["score"] >= ball["max-score"] or
+					p2["score"] >= ball["max-score"]):
+					if p1["score"] >= ball["max-score"]:
 						winner = self.games[self.room_name][0].name
-					elif self.games[self.room_name][1].paddle["score"] >= ball["max-score"]:
+					elif p2["score"] >= ball["max-score"]:
 						winner = self.games[self.room_name][1].name
+					
+					# ✅ Send final ball & score state
+					await self.channel_layer.group_send(self.room_group_name, {
+						"type": "ball_update",
+						"ball": ball,
+						"score": {
+							"a": p1["score"],
+							"b": p2["score"]
+						}
+					})
 					
 					# guarda en db
 					if (self.games[self.room_name][0].user.is_authenticated and
@@ -172,8 +189,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 						game = await sync_to_async(Match.objects.create)(
 							player1=self.games[self.room_name][0].user,
 							player2=self.games[self.room_name][1].user,
-							score_player1=self.games[self.room_name][0].paddle["score"],
-							score_player2=self.games[self.room_name][1].paddle["score"],
+							score_player1=p1["score"],
+							score_player2=p2["score"],
 						)
 
 						if self.is_tournament:
@@ -185,6 +202,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 								round.tournament.save()
 							else:
 								next_round.add_player(winner)
+					
 
 					await self.channel_layer.group_send(self.room_group_name, {
 						"type": "finish_game",
@@ -198,24 +216,23 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 			# 🏓 Verificar colisión con la paleta del jugador 1
 			if (
-				ball["y"] # - self.ball["size"] / 2
-				<= self.games[self.room_name][0].paddle["y"] + self.games[self.room_name][0].paddle["height"]
-				and ball["x"] >= self.games[self.room_name][0].paddle["x"]
-				and ball["x"] <= self.games[self.room_name][0].paddle["x"] + self.games[self.room_name][0].paddle["width"]
+				ball["x"] - ball["size"] / 2 <= p1["x"] + p1["width"] and  # left edge overlap
+				ball["y"] + ball["size"] / 2 >= p1["y"] and               # vertical overlap
+				ball["y"] - ball["size"] / 2 <= p1["y"] + p1["height"]
 			):
-				print(f'choca en paleta 1: {ball["y"]} <= {self.games[self.room_name][0].paddle["y"]} + {self.games[self.room_name][0].paddle["height"]}')
-				ball["vy"] *= -1  # Invierte la dirección vertical
-				ball["y"] = self.games[self.room_name][0].paddle["y"] + self.games[self.room_name][0].paddle["height"] # Evita quedarse pegada
+				print(f'collision with paddle 1')
+				ball["vx"] *= -1  # Invert horizontal direction
+				ball["x"] = p1["x"] + p1["width"] + ball["size"] / 2  # Reposition to avoid sticking
+			
 			# 🏓 Verificar colisión con la paleta del jugador 2
-			elif (
-				ball["y"] # + self.ball["size"] / 2
-				>= self.games[self.room_name][1].paddle["y"]
-				and ball["x"] >= self.games[self.room_name][1].paddle["x"]
-				and ball["x"] <= self.games[self.room_name][1].paddle["x"] + self.games[self.room_name][1].paddle["width"]
+			if (
+				ball["x"] + ball["size"] / 2 >= p2["x"] and
+				ball["y"] + ball["size"] / 2 >= p2["y"] and
+				ball["y"] - ball["size"] / 2 <= p2["y"] + p2["height"]
 			):
-				print(f'choca en paleta 2: {ball["y"]} >= {self.games[self.room_name][0].paddle["y"]}')
-				ball["vy"] *= -1
-				ball["y"] = self.games[self.room_name][1].paddle["y"] - ball["size"]
+				print(f'collision with paddle 2')
+				ball["vx"] *= -1
+				ball["x"] = p2["x"] - ball["size"] / 2 
 			
 			# Enviar la nueva posición de la pelota a los clientes
 			await self.channel_layer.group_send(self.room_group_name, {

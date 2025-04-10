@@ -102,8 +102,8 @@ msgid "There are no blocked users"
 msgstr "Il n'y a pas d'utilisateurs bloqués"
 
 #: language/translations.py:25
-msgid "Start 1vs1"
-msgstr "🎮 Jouer en 1vs1"
+msgid "Play Online"
+msgstr "🎮 Jouer en Ligne"
 
 #: language/translations.py:26
 msgid "Start online"
@@ -615,4 +615,43 @@ msgid "Resume"
 msgstr "Reprendre"
 
 msgid "Start Game"
-msgstr "Démarrer le Jeu"
+msgstr "Nouvelle Partie"
+
+msgid "New Game"
+msgstr "Nouvelle Partie"
+
+
+#: language/translations.py:198
+msgid "Back"
+msgstr "🔙 Retour"
+
+#: language/translations.py:199
+msgid "Play as Guest"
+msgstr "👤 Invité"
+
+#: language/translations.py:200
+msgid "Jump into a quick match — no login needed"
+msgstr "Lancez une partie rapide"
+
+#: language/translations.py:201
+msgid "Log In to Play"
+msgstr "🔐 Se connecter"
+
+#: language/translations.py:202
+msgid "Save your stats, progress, and compete with others"
+msgstr "Sauvegardez vos stats & progrès"
+
+msgid "Start Game to begin..."
+msgstr "Démar le jeu pour commencer..."
+
+msgid "Looking for opponent..."
+msgstr "Recherche d'un adversaire..."
+
+msgid "Match in progress..."
+msgstr "Partie en cours..."
+
+msgid "Game over! You won!"
+msgstr "Vous avez gagné 😀"
+
+msgid "Game over! You lost!"
+msgstr "Vous avez perdu 😵"
