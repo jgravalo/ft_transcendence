@@ -107,11 +107,11 @@ msgstr "No hay usuarios bloqueados"
 
 #: language/translations.py:26
 msgid "Play Online"
-msgstr "🎮 Jugar en linéa"
+msgstr "🌐 Jugar en linéa"
 
-#: language/translations.py:27
-msgid "Start online"
-msgstr "Jugar en linéa"
+#: language/translations.py:26
+msgid "Play Local"
+msgstr "🎮 Jugar en local"
 
 #: language/translations.py:28
 msgid "Submit"

@@ -99,7 +99,11 @@ msgstr "There are no users"
 
 #: language/translations.py:24
 msgid "Play Online"
-msgstr "🎮 Play Online"
+msgstr "🌐 Play Online"
+
+#: language/translations.py:24
+msgid "Play Local"
+msgstr "🎮 Play Local"
 
 #: language/translations.py:25
 msgid "Start online"

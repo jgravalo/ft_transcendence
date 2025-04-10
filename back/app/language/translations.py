@@ -159,6 +159,7 @@ TRANSLATION_KEYS = {
     "home.tournament.description": _("Tournament_description"),
     # Profile page translations
     "profile.dash.online": _("Play Online"),
+    "profile.dash.local": _("Play Local"),
     "profile.dash.wins": _("Wins"),
     "profile.dash.losses": _("Losses"),
     "profile.dash.matches": _("Matches"),

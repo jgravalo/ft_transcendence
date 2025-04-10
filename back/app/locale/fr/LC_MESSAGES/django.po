@@ -103,7 +103,11 @@ msgstr "Il n'y a pas d'utilisateurs bloqués"
 
 #: language/translations.py:25
 msgid "Play Online"
-msgstr "🎮 Jouer en Ligne"
+msgstr "🌐 Jouer en Ligne"
+
+#: language/translations.py:25
+msgid "Play Local"
+msgstr "🎮 Jouer en Local"
 
 #: language/translations.py:26
 msgid "Start online"
