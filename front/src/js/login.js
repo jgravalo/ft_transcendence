@@ -170,6 +170,9 @@ function loginSock() // por definir
 			warnPlay.show();
 			document.getElementById('loginModal').addEventListener('hidden.bs.modal', function (event) {
 				console.log('Modal cerrado');
+				// socket = new (...{link})
+				gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/` + link);
+				gameSocket.close()
 			  });
 			execScript(data.element);
 			document.getElementById('accept-match').addEventListener('click', () => {

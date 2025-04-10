@@ -34,7 +34,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			else:
 				self.scope['user'].is_playing = True
 				await database_sync_to_async(self.scope['user'].save)()
-				print(f"NUEVO JUGADOR = {self.scope['user'].username}")
+				print(f"NUEVO JUGADOR = {self.scope['user'].username} playing: {self.scope['user'].is_playing}")
 		else:
 			await self.close()
 		available_room = await self.find_available_room()
@@ -194,6 +194,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 		for player in self.games[self.room_name]:
 			if player != self:
 				await player.send(text_data=json.dumps(data))
+	
+	@sync_to_async
+	def set_winner(self, round, winner):
+		tournament = round.tournament
+		tournament.winner = winner
+		tournament.save()
 
 	async def start_game_loop(self):
 		ball = self.ball[self.room_name]
@@ -244,7 +250,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 							round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round)
 							await sync_to_async(round.matches.add)(game)
 							if round.number == 2:
-								round.tournament.winner = winner
+								# round.tournament.winner = winner
+								await self.set_winner(round, winner)
 								await sync_to_async(round.tournament.save)()
 							else:
 								next_round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round / 2)
