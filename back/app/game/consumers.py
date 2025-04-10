@@ -13,8 +13,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 	
 	async def find_available_room(self):
 		""" Busca una sala con espacio disponible (1 jugador) """
-		print('in find_available_room')
-		print(f'len games = {len(self.games)}')
+		# print('in find_available_room')
+		# print(f'len games = {len(self.games)}')
 		for room, game_list in self.games.items():
 			# print(f'room {room}; len1: {len(game_list)}; len2: {len(self.games[room])}')
 			# Si hay un solo jugador, la sala tiene espacio
@@ -25,21 +25,16 @@ class PongConsumer(AsyncWebsocketConsumer):
 		return None # No hay salas disponibles con espacio
 
 	async def connect(self):
-		""" if self.connected == True:
-			self.close()
-			print('FUERA')
-			return
-		self.connected = True  # Lo definís vos """
 		if self.scope['user'].is_authenticated:
 			if self.scope['user'].is_playing:
-				print('YA ESTA JUGANDO')
+				print(f"JUGADOR REPETIDO = {self.scope['user'].username}")
 				await self.close()
 				print('FUERA')
 				return
 			else:
 				self.scope['user'].is_playing = True
 				await database_sync_to_async(self.scope['user'].save)()
-				print('EMPEZARA A JUGAR')
+				print(f"NUEVO JUGADOR = {self.scope['user'].username}")
 		else:
 			await self.close()
 		available_room = await self.find_available_room()
@@ -47,7 +42,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 		# Para hacer el otro usuario restringido
 
-		print('set game')
+		# print('set game')
 		self.room_name = parse_qs(self.scope["query_string"].decode()).get("room", [None])[0]
 		self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
 		try:
@@ -57,7 +52,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		except:
 			self.user2 = None  # O cualquier valor predeterminado
 		# Obtener la sala desde la URL o algún identificador
-		print("self.room_name =", self.room_name)
+		print(f"self.room_name: {self.room_name}")
 
 		self.is_tournament = False
 		if self.user2:
@@ -67,14 +62,31 @@ class PongConsumer(AsyncWebsocketConsumer):
 			print(f'invite {self.user2.username}')
 			await sync_to_async(self.user2.invite)(self.user2, self.room_name)
 		elif self.room_name: # in self.games:
-			print('ADD TO RESTRICTED GAME')
+			# print('ADD TO RESTRICTED GAME')
 			if self.room_name[:7] == 'game_to':
-				if self.room_name not in self.games or not self.games[self.room_name]: # hacer algo si la sala no existe o está vacía
-					self.games[self.room_name] = []  # Nueva sala
+				print('🧪 TORNEO DETECTADO')
 				self.is_tournament = True
 				self.tournament_id = parse_qs(self.scope["query_string"].decode()).get("tournament", [None])[0]
 				self.round = int(parse_qs(self.scope["query_string"].decode()).get("round", [None])[0])
-				print(f'TOURNAMENT ID = {self.tournament_id}, round = {self.round}')
+				print(f'TOURNAMENT ID = {self.tournament_id}, ROUND = {self.round}')
+
+				# Si la sala existe y hay espacio, me uno
+				if self.room_name not in self.games:
+					print('✅ CREANDO NUEVA SALA DE TORNEO')
+					self.games[self.room_name] = []
+				elif len(self.games[self.room_name]) >= 2:
+					print('❌ SALA DE TORNEO YA COMPLETA')
+					await self.close()
+					return
+				else:
+					print('🔗 UNIÉNDOSE A SALA DE TORNEO EXISTENTE')
+
+				# if self.room_name not in self.games or not self.games[self.room_name]: # hacer algo si la sala no existe o está vacía
+				# 	self.games[self.room_name] = []  # Nueva sala
+				# self.is_tournament = True
+				# self.tournament_id = parse_qs(self.scope["query_string"].decode()).get("tournament", [None])[0]
+				# self.round = int(parse_qs(self.scope["query_string"].decode()).get("round", [None])[0])
+				# print(f'TOURNAMENT ID = {self.tournament_id}, round = {self.round}')
 			pass
 		elif available_room:
 			print('ADD TO RANDOM GAME')
@@ -87,9 +99,9 @@ class PongConsumer(AsyncWebsocketConsumer):
 			self.games[self.room_name] = []
 			# print('new room')
 
-		print(f'room_name in connect = {self.room_name}')
+		# print(f'room_name in connect = {self.room_name}')
 		self.room_group_name = f'private_{self.room_name}'
-		print('set user')
+		# print('set user')
 		self.user = self.scope['user']
 		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.games[self.room_name]) + 1}"
 		self.role = f"player{len(self.games[self.room_name]) + 1}"
@@ -98,15 +110,17 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print(f'user {self.name}: {self.user.id}, role:', self.role)
 		# print('paddle[y]:', self.paddle['y'])
 		# print(f'user: {self.name} {self}')
+		print(f'[DEBUG] Antes de append: {len(self.games[self.room_name])} jugadores en la sala {self.room_name}')
 		self.games[self.room_name].append(self)
+		print(f'[DEBUG] Después de append: {[p.user.username for p in self.games[self.room_name]]}')
 
 		await self.accept()
 		await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
 		if len(self.games[self.room_name]) == 2:
-			print('set group')
-			print(f"🔗 Conectando a la sala {self.room_group_name}")
+			# print('set group')
+			# print(f"🔗 Conectando a la sala {self.room_group_name}")
 			# await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-			print('set ball')
+			# print('set ball')
 			self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
 				"width": 400, "height": 600, "size": 10, "max-score": 3, "connect": True}
 			print(f'EMPIEZA EL PARTIDO !!! {self.room_name}: {self.games[self.room_name][0].user.username} vs {self.games[self.room_name][1].user.username}')
@@ -169,7 +183,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 				await database_sync_to_async(self.scope['user'].save)()
 				await player.close()
 				await self.channel_layer.group_discard(self.room_group_name, player.channel_name)
-			print(f'{self.role} {self.user.username} has been disconnected in games')
+			# print(f'{self.role} {self.user.username} has been disconnected in games')
 			self.games[self.room_name].clear()
 
 
@@ -200,7 +214,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 				ball["vy"] *= -1  # Invertir dirección en Y
 				ball["x"] = ball["width"] / 2 # coloca en el centro
 				ball["y"] = ball["height"] / 2
-				print(f'{self.games[self.room_name][0].paddle["score"]}-{self.games[self.room_name][1].paddle["score"]}')
+				# print(f'{self.games[self.room_name][0].paddle["score"]}-{self.games[self.room_name][1].paddle["score"]}')
 
 				if (self.games[self.room_name][0].paddle["score"] >= ball["max-score"] or
 					self.games[self.room_name][1].paddle["score"] >= ball["max-score"]):
@@ -208,6 +222,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 						winner = self.games[self.room_name][0].user
 					elif self.games[self.room_name][1].paddle["score"] >= ball["max-score"]:
 						winner = self.games[self.room_name][1].user
+					print(f'{self.games[self.room_name][0].paddle["score"]}-{self.games[self.room_name][1].paddle["score"]}')
 					
 					# guarda en db
 					if (self.games[self.room_name][0].user.is_authenticated and
