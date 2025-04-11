@@ -59,9 +59,6 @@ def set_phone(request):
 
 @csrf_exempt
 def verify(request):
-    #way = request.GET.get('way', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-    #print(way)
-    print(request)
     user = User.get_user(request)
     if TwoFactorAuth.objects.filter(user=user).exists():
         two_fa = TwoFactorAuth.objects.get(user=user)
@@ -70,14 +67,7 @@ def verify(request):
     totp = two_fa.generate_totp()
     two_fa.otp_code = totp.now()
     two_fa.save()
-    #if way == 'email/':
-    #send_email_otp(two_fa, totp)
-    # elif way == 'sms/':
-    #     send_sms_code(user)
-    # elif way == 'google/':
     qr = generate_qr_code(two_fa, totp)
-    # else:
-    #     return JsonResponse({'error': 'Query inválida'}, status=404)
     print("two_fa.otp_code after send:", two_fa.otp_code)
     content = render_to_string('verify.html', {"qr": qr["image"]})
     data = {
