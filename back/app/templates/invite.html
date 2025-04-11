@@ -18,7 +18,6 @@
 <script>
 	console.log('Will u accept the match?');
 	console.log('from template invite: ' + window.location.origin + '/game/remote/{{ room|escapejs }}');
-	room = '?room={{ room|escapejs }}';
-	// room = '/game/remote/?room={{ room|escapejs }}';
+	room = '/game/remote/?room={{ room|escapejs }}';
 	// href="/game/remote/?room={{ room }}"
 </script>

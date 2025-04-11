@@ -238,7 +238,8 @@ function loginSock() // por definir
 			}, { once: true });
 			document.getElementById('accept-match').addEventListener('click', () => {
 				console.log('I accept the match');
-				fetchLink(link);
+				// fetchLink(link);
+				fetchLink(room);
 			}, { once: true });
 		}
     };

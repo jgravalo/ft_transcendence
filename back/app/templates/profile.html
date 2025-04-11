@@ -113,10 +113,10 @@
 					{% endif %}
 				</div>
 				<div class="tab-email">{{ friend.email }}</div>
-				<div class="tab-score">{{ friend.wins }} - {{ friend.losses }}</div>
+				<div class="tab-score">{{ friend.wins|length }} - {{ friend.losses|length }}</div>
 				<div class="tab-actions">
-						<button id="gamefriend-btn-{{ friend.id }}" class="link" href="/game/remote/?user={{ friend.id }}" data-i18n="action.game">⚔️ Game</button>
-						<button id="chatfriend-btn-{{ friend.id }}" class="link" href="/chat/?user={{ friend.id }}"  data-i18n="action.chat">💬 Chat</button>
+					<button id="gamefriend-btn-{{ friend.id }}" class="link" href="/game/remote/?user={{ friend.id }}" data-i18n="action.game">⚔️ Game</button>
+					<button id="chatfriend-btn-{{ friend.id }}" class="link" href="/chat/?user={{ friend.id }}"  data-i18n="action.chat">💬 Chat</button>
 					<button id="deletefriend-btn-{{ friend.id }}" onclick="deleteFriend('{{ friend.id }}')" data-i18n="action.unfriend">💔 Unfriend</button>
 				</div>
 			</div>
@@ -149,7 +149,7 @@
 						<span class="online-status">🚫</span>
 					</div>
 					<div class="tab-email">{{ blocked.email }}</div>
-					<div class="tab-score">{{ blocked.wins }} - {{ blocked.losses }}</div>
+					<div class="tab-score">{{ blocked.wins|length }} - {{ blocked.losses|length }}</div>
 					<div class="tab-actions">
 						<button id="unblockfriend-btn-{{ blocked.id }}" onclick="unlockUser('{{ blocked.id }}')" data-i18n="action.unblock">🔓 Unblock</button>
 					</div>
@@ -182,9 +182,9 @@
 						<span class="link user-link" href="/users/profile/foreign/?user={{ user.id }}">{{ user.username }}</span>
 					</div>
 					<div class="tab-email">{{ user.email }}</div>
-					<div class="tab-score">{{ user.wins }} - {{ user.losses }}</div>
+					<div class="tab-score">{{ user.wins|length }} - {{ user.losses|length }}</div>
 					<div class="tab-actions">
-						<button id="gamefriend-btn-{{ user.id }}" class="play-btn" href="/game/remote/?user={{ user.id }}" data-i18n="action.game">⚔️ Game</button>
+						<button id="gamefriend-btn-{{ user.id }}" class="link play-btn" href="/game/remote/?user={{ user.id }}" data-i18n="action.game">⚔️ Game</button>
 						<button id="chatfriend-btn-{{ user.id }}" class="link" href="/chat/?user={{ user.id }}" data-i18n="action.chat">💬 Chat</button>
 						<button id="addfriend-btn-{{ user.id }}" onclick="addFriend('{{ user.id }}')" data-i18n="action.add">❤️ Add Friend</button>
 						<button id="blockfriend-btn-{{ user.id }}" class="block-btn" onclick="blockUser('{{ user.id }}')" data-i18n="action.block">🚫 Block</button>
