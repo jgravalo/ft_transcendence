@@ -9,8 +9,6 @@ from django.db.models import Q
 from django.apps import apps
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
-
 import uuid
 
 # Create your models here.
@@ -26,9 +24,9 @@ class User(AbstractUser):
 #	user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
 	image = models.ImageField(upload_to='', default='default.jpg') # Carpeta dentro de MEDIA_ROOT
 	image_42_url = models.URLField(max_length=255, blank=True, null=True, default="")  # Campo para almacenar la URL de la imagen de 42
-	wins = models.IntegerField(default=0)
-	losses = models.IntegerField(default=0)
-	matches = models.IntegerField(default=0)
+	# wins = models.IntegerField(default=0)
+	# losses = models.IntegerField(default=0)
+	# matches = models.IntegerField(default=0)
 	points = models.IntegerField(default=0)
 	two_fa_enabled = models.BooleanField(default=False)
 	#history = models.ManyToManyField(Match, symmetrical=False, related_name='players', blank=True)
@@ -37,8 +35,8 @@ class User(AbstractUser):
 	groups = models.ManyToManyField(
 		"auth.Group",
 		related_name="user_set",  # Evita el conflicto con 'auth.User.groups'
- 		blank=True
-    )
+		blank=True
+	)
 	user_permissions = models.ManyToManyField(
 		"auth.Permission",
 		related_name="user_permissions_set",  # Evita el conflicto con 'auth.User.user_permissions'
@@ -47,6 +45,25 @@ class User(AbstractUser):
 
 	# USERNAME_FIELD = "username"
 	# REQUIRED_FIELDS = []
+
+
+	@property
+	def matches(self):
+		Match = apps.get_model('game', 'Match')
+		return (Match.objects.filter(player1=self) | Match.objects.filter(player2=self)).order_by('-created_at')
+	
+	# def matches_count(self):
+	# 	return (Match.objects.filter(player1=user) | Match.objects.filter(player2=user)).count()
+	
+	@property
+	def wins(self):
+		Match = apps.get_model('game', 'Match')
+		return [m for m in self.matches if m.winner == self]
+	
+	@property
+	def losses(self):
+		Match = apps.get_model('game', 'Match')
+		return [m for m in self.matches if m.loser == self]
 
 	def __str__(self):
 		return self.username  # Representación amigable del objeto

@@ -24,20 +24,20 @@
 	<div class="stats">
 		<div class="stat-card">
 			<div class="stat-icon trophy">🏆</div>
-			<div class="stat-value">{{ user.wins }}</div>
+			<div class="stat-value">{{ user.wins|length }}</div>
 			<div class="stat-label" data-i18n="profile.dash.wins">Total Wins</div>
 		</div>
 
 		<!-- loses -->
 		<div class="stat-card">
 			<div class="stat-icon trophy">💀</div>
-			<div class="stat-value">{{ user.losses }}</div>
+			<div class="stat-value">{{ user.losses|length }}</div>
 			<div class="stat-label" data-i18n="profile.dash.losses">Total Losses</div>
 		</div>
 		
 		<div class="stat-card">
 			<div class="stat-icon clock">🕒</div>
-			<div class="stat-value">{{ user.matches }}</div>
+			<div class="stat-value">{{ user.matches|length }}</div>
 			<div class="stat-label" data-i18n="profile.dash.matches">Games Played</div>
 		</div>
 		

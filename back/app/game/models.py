@@ -6,7 +6,6 @@ from types import SimpleNamespace
 import uuid
 import random
 
-
 # Create your models here.
 # game/models.py
 
@@ -22,6 +21,23 @@ class Match(models.Model):
 
 	def __str__(self):
 		return f"{self.player1} vs {self.player2} - {self.score_player1}:{self.score_player2}"
+	
+	@property
+	def winner(self):
+		if self.score_player1 > self.score_player2:
+			return self.player1
+		elif self.score_player1 < self.score_player2:
+			return self.player2
+		return None
+	
+	@property
+	def loser(self):
+		if self.score_player1 < self.score_player2:
+			return self.player1
+		elif self.score_player1 > self.score_player2:
+			return self.player2
+		return None
+
 
 class Tournament(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Campo de UUID único.
