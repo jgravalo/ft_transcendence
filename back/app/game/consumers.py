@@ -113,6 +113,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print(f'[DEBUG] Antes de append: {len(self.games[self.room_name])} jugadores en la sala {self.room_name}')
 		self.games[self.room_name].append(self)
 		print(f'[DEBUG] Después de append: {[p.user.username for p in self.games[self.room_name]]}')
+		self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
+			"width": 400, "height": 600, "size": 10, "max-score": 3, "connect": True}
 
 		await self.accept()
 		await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
@@ -121,8 +123,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 			# print(f"🔗 Conectando a la sala {self.room_group_name}")
 			# await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 			# print('set ball')
-			self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
-				"width": 400, "height": 600, "size": 10, "max-score": 3, "connect": True}
 			print(f'EMPIEZA EL PARTIDO !!! {self.room_name}: {self.games[self.room_name][0].user.username} vs {self.games[self.room_name][1].user.username}')
 			asyncio.create_task(self.start_game_loop())  # 🔥 Iniciar el bucle de la pelota
 

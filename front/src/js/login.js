@@ -150,6 +150,7 @@ function loginSock() // por definir
 { 
     // CREATE SOCKET
     const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/?token=' + sessionStorage.getItem('access');
+    console.log('ruta test: ', 'ws://' + window.location.hostname + ':8080/ws/connect/?token=' + sessionStorage.getItem('access'));
     console.log('ruta: ', route);
     connSocket = new WebSocket(route);
 	
@@ -170,11 +171,23 @@ function loginSock() // por definir
 			warnPlay.show();
 			document.getElementById('loginModal').addEventListener('hidden.bs.modal', function (event) {
 				console.log('Modal cerrado');
-				// socket = new (...{link})
-				gameSocket = new WebSocket(`ws://${base.slice(7)}/ws/game/` + link);
-				gameSocket.close()
-			  });
+				/* const params = new URLSearchParams(new URL(`${window.location.origin}/game/remote/${link}`).search)
+				if (params.get("tournament")) {
+					console.log('out of the tournament');
+					gameSocket = new WebSocket(`ws://${window.location.host}/ws/game/${link}`);
+					gameSocket.onopen = function (event) {gameSocket.close()}
+				} */
+			});
 			execScript(data.element);
+			document.getElementById('decline-match').addEventListener('click', () => {
+				console.log('I decline the match');
+				/* const params = new URLSearchParams(new URL(`${window.location.origin}/game/remote/${link}`).search)
+				if (params.get("tournament")) {
+					console.log('out of the tournament');
+					gameSocket = new WebSocket(`ws://${window.location.host}/ws/game/${link.slice(13)}`);
+					gameSocket.onopen = function (event) {gameSocket.close()}
+				} */
+			}, { once: true });
 			document.getElementById('accept-match').addEventListener('click', () => {
 				console.log('I accept the match');
 				fetchLink(link);
