@@ -181,18 +181,6 @@
 	background: linear-gradient(to right, #d32f2f, #b71c1c);
 }
 
-button {
-	background: linear-gradient(to right, #1e3c7250, #2a529850);
-	color: white;
-	border: none;
-	border-radius: 8px;
-	padding: 10px 20px;
-	font-weight: bold;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	font-size: x-large;
-}
-
 button:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
@@ -433,3 +421,21 @@ button:hover {
 	  display: none;
 	}
   }
+
+.pagination {
+	text-align: center;
+	justify-content: center;
+	margin-top: 15px;
+}
+.pagination button {
+	margin: 0 5px;
+	padding: 1px 10px;
+	background-color: #444;
+	color: white;
+	border: none;
+	cursor: pointer;
+	font-size: 1.2rem;
+}
+.pagination button.active {
+	background-color: #f39c12;
+}

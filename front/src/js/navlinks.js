@@ -140,6 +140,7 @@ function fetchLink(path)
 function getPageHandler(path) {
     if (path.startsWith("/game/local")) return setupLocalGame;
     if (path.startsWith("/game/remote")) return setupRemoteGame;
+    if (path.startsWith("/users/profile")) return setupProfilePagination;
     if (path === "/users/update/") return () => makePost(path);
     if (path === "/game/tournament/") return () => makePost(path);
     return null;
