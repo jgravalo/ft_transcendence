@@ -20,7 +20,7 @@
 .chat-log {
 	width: 990px;
 	/* width: 1100px; */
-	max-width: 90%;
+	/* max-width: 90%; */
 	flex: 1;
 	padding: 10px;
 	overflow-y: auto;
