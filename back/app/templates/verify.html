@@ -15,8 +15,7 @@
 					<label for="otp_code" data-i18n="otp.introduce">Introduce tu código OTP:</label>
 					<input type="text" id="otp-code" name="otp-code" required>
 					<span id="errorName" class="error"></span><br>
-					<button type="submit" data-i18n="otp.verify">Verificar</button>
-					<button type="submit" class="btn btn-primary" data-i18n="otp.verify">Verificar</button>
+					<button type="submit" class="btn btn-primary" data-i18n="otp.verify" style="padding: 5px;">Verificar</button>
 					{% if error %}
 						<p style="color: red;">{{ error }}</p>
 					{% endif %}

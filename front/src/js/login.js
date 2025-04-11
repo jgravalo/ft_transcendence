@@ -147,12 +147,10 @@ function makeSubmit(path)
                 alert("Perfil actualizado con éxito");
             }
             if (data.element && data.content) {
-                console.error("next path?");
                 const targetElement = document.getElementById(data.element);
                 if (targetElement) {
                     targetElement.innerHTML = data.content;
                 }
-                console.error(" end of...");
             }
             
             if (data.next_path && path !== '/users/update/') {

@@ -1,0 +1,12 @@
+.modal-body > * {
+    padding: 5px;
+}
+
+.modal-body img {
+    width: 90%;
+    resize: both;
+}
+
+.modal-body form > button {
+    padding: 5px;
+}
