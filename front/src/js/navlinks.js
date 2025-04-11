@@ -39,7 +39,7 @@ function updateNavigationBarState() {
     }
 }
 
-updateNavigationBarState(); 
+// updateNavigationBarState(); 
 
 handleLinks();
 
@@ -75,9 +75,7 @@ function handleLink(event)
 {
     event.preventDefault(); // Evita que el enlace navegue a otro lugar
     var path = event.currentTarget.getAttribute('href');
-    /* if (path == "/")
-        path = "";
-    else  */if (!path.includes('?'))
+    if (!path.includes('?'))
         path += "/";
     var state = base + path;
     console.log("path = " + path);
@@ -113,6 +111,7 @@ function fetchLink(path)
         return response.json();
     }) // Convertir la respuesta a JSON
     .then(data => {
+		/*
 		var dest = `${data.element}`;
 		if (dest != 'modalContainer' &&
 			path.slice(0, 22) != '/game/tournament/join/' &&
@@ -127,24 +126,41 @@ function fetchLink(path)
         	document.getElementById(dest).innerHTML = `${data.content}`;
 			execScript(dest);
 		}
+		*/
         //updating the newly added content with right language
+        const dest = `${data.element}`;
+        if (dest !== 'modalContainer' && !['/users/login/close/', '/users/logout/close/'].includes(path) && path.slice(0, 22) != '/game/tournament/join/')
+            pushState(path);
+		if (path.slice(0, 22) == '/game/tournament/join/')
+			fetchLink('/users/profile/');
+        document.getElementById(dest).innerHTML = `${data.content}`;
+        execScript(dest);
+        //Call the changeLanguage function to update the language of the page
         changeLanguage(localStorage.getItem("selectedLanguage") || "en");
-        if (dest == 'modalContainer')
+        if (dest === 'modalContainer') {
             makeModal(path);
-        else
-        {
-            if (path == '/users/update/' || path == '/game/tournament/')
-                makePost(path);
+        } else {
+            //Call the getPageHandler function that calls the right function for the page
+            const pageHandler = getPageHandler(path);
+            if (pageHandler) pageHandler();
             handleLinks();
         }
-        initGameLandingControls(); // Comentado por Victor
     })
     .catch(error => {
-        console.error('fallo el 42 auth');
         console.error('Error al obtener productos:', error);
         console.error('path error:', path);
         setError(error);
     });
+}
+
+//Manage the page events
+function getPageHandler(path) {
+    if (path.startsWith("/game/local")) return setupLocalGame;
+    if (path.startsWith("/game/remote")) return setupRemoteGame;
+    if (path.startsWith("/users/profile")) return setupProfilePagination;
+    if (path === "/users/update/") return () => makePost(path);
+    if (path === "/game/tournament/") return () => makePost(path);
+    return null;
 }
 
 function setError(error)
@@ -178,54 +194,4 @@ function execScript(element)
 		newScript.text = script.innerText;  // Tomamos el código JavaScript del script insertado
 		document.head.appendChild(newScript);  // Insertamos el script de manera segura
 	}
-}
-
-//Add keyboard even listener
-let focusedIndex = 0;
-let modes = [];
-
-document.addEventListener("keydown", (e) => {
-	if (!modes.length) return;
-
-	if (e.key === "ArrowRight") {
-		focusedIndex = (focusedIndex + 1) % modes.length;
-		updateSelection();
-	}
-	if (e.key === "ArrowLeft") {
-		focusedIndex = (focusedIndex - 1 + modes.length) % modes.length;
-		updateSelection();
-	}
-	if (e.key === "Enter") {
-		modes[focusedIndex].click();
-	}
-});
-
-function updateSelection() {
-	modes.forEach(btn => btn.classList.remove("selected"));
-	modes[focusedIndex].classList.add("selected");
-}
-function initGameLandingControls() {
-	const localBtn = document.getElementById("play-local");
-	const onlineBtn = document.getElementById("play-online");
-	const tournamentBtn = document.getElementById("play-tournament");
-
-	if (!localBtn || !onlineBtn || !tournamentBtn) return;
-
-	modes = [localBtn, onlineBtn, tournamentBtn];
-	focusedIndex = 0;
-	updateSelection();
-}
-
-function showTab(tabId, button) {
-	// Hide all tab contents
-	document.querySelectorAll('.tab-content').forEach(div => {
-		div.classList.add('hidden');
-	});
-
-	// Show selected tab
-	document.getElementById(tabId).classList.remove('hidden');
-
-	// Only activate active on the right tab button
-	document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
-	if (button) button.classList.add('active');
 }

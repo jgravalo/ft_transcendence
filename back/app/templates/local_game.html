@@ -1,4 +1,51 @@
-<canvas id="gameCanvas" width="400" height="600"></canvas>
-<script>
-	game();
-</script>
+<div class="main-container">
+	<!-- Game section -->
+	<div class="game">
+		<div class="game-title canvas-title">
+			<span>🏓 Pong</span><span>42</span>
+		</div>
+		<!-- Game canvas container -->
+		<div class="game-canvas-container">
+			<canvas id="gameCanvas" width="500" height="250"></canvas>
+		</div>
+		
+		<!-- Game controls section -->
+		<div class="game-controls">
+			<!-- Player 1 Controls -->
+			<div class="player-controls">
+				<h3 class="player-title" data-i18n="game.player1">Player 1</h3>
+				<div class="control-keys">
+					<div class="key-row">
+						<div class="key">W</div>
+					</div>
+					<div class="key-row">
+						<div class="key">S</div>
+					</div>
+				</div>
+			</div>			
+			<!-- Game status -->
+			<div class="game-status">
+				<div class="score-container">
+					<span class="score" id="player1Score">0</span>
+					<span class="score-separator">:</span>
+					<span class="score" id="player2Score">0</span>
+				</div>
+				<button class="game-button" id="startGame" data-i18n="game.start">Start Game</button>
+				<button class="game-button" id="pauseGame" data-i18n="game.pause">Pause</button>
+			</div>
+			
+			<!-- Player 2 Controls -->
+			<div class="player-controls">
+				<h3 class="player-title" data-i18n="game.player2">Player 2</h3>
+				<div class="control-keys">
+					<div class="key-row">
+						<div class="key">↑</div>
+					</div>
+					<div class="key-row">
+						<div class="key">↓</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

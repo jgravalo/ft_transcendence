@@ -1,39 +1,38 @@
+(() => {
+	let canvas, ctx;
+	let player1, player2, ball;
+	let paddleWidth = 10, paddleHeight = 50, ballSize = 10;
+	let ballSpeedX = 5, ballSpeedY = 5;
+	let paddleSpeed = 10;
+	let maxScore = 5;
 
-function gameOptions(winner = "")
-{
-	// <h2 id="winnerMessage">${winner}</h2>
-	document.getElementById('content').innerHTML = `
-	<h2 id="winnerMessage"></h2>
-	<button onclick="game()">LOCAL</button>
-	<button onclick="gameRemote()">REMOTE</button>
-	`;
-	document.getElementById('winnerMessage').innerText = winner;
-}
-
-function game()
-{
-	document.getElementById('content').innerHTML =
-		`<canvas id="gameCanvas" width="400" height="600"></canvas>`;
-	const canvas = document.getElementById("gameCanvas");
-	const ctx = canvas.getContext("2d");
-	const winnerMessage = document.getElementById("winnerMessage");
-
-    // Configuración
-	const paddleWidth = 80, paddleHeight = 10;
-	const ballSize = 10;
-	const paddleSpeed = 15;
-	let ballSpeedX = 4, ballSpeedY = 4;
-	const maxScore = 5; // Puntuación máxima para ganar
+	let gameRunning = false;
+	let gamePaused = false;
 	let gameOver = false;
-    
-	// Paletas y pelota
-	const player1 = { x: canvas.width / 2 - paddleWidth / 2, y: 10,
-		name: 'player1', score: 0 };
-    const player2 = { x: canvas.width / 2 - paddleWidth / 2, y: canvas.height - 20,
-		name: 'player2', score: 0 };
-    const ball = { x: canvas.width / 2, y: canvas.height / 2 };
 
-	const keys = {};
+	let keys = {};
+	let hasBouncedThisFrame = false;
+
+	function game() {
+		canvas = document.getElementById("gameCanvas");
+		ctx = canvas.getContext("2d");
+
+		player1 = { name: "Player 1", x: 10, y: canvas.height / 2 - paddleHeight / 2, score: 0 };
+		player2 = { name: "Player 2", x: canvas.width - 10 - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, score: 0 };
+		ball = { x: canvas.width / 2, y: canvas.height / 2 };
+
+		// --- Keydown Event Listener (also prevent scrolling) ---
+		document.addEventListener("keydown", (event) => {
+			if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
+				event.preventDefault(); // prevent scrolling
+			}
+			keys[event.key] = true;
+		});
+		
+		document.addEventListener("keyup", (event) => {
+			keys[event.key] = false;
+		});
+	}
 
 	function drawRect(x, y, width, height, color) {
 		ctx.fillStyle = color;
@@ -46,106 +45,158 @@ function game()
 		ctx.arc(ball.x, ball.y, ballSize / 2, 0, Math.PI * 2);
 		ctx.fill();
 	}
-	
-	function drawPlayers() {
-		ctx.font = "20px Arial";
-		ctx.fillText(player1.name, 20, 30);
-		ctx.fillText(player2.name, 20, canvas.height - 30);
+
+	function updateScoreDisplay() {
+		document.getElementById("player1Score").innerText = player1.score;
+		document.getElementById("player2Score").innerText = player2.score;
 	}
 
-	function drawScore() {
-		ctx.font = "20px Arial";
-		ctx.fillText(player1.score, canvas.width - 20, 30);
-		ctx.fillText(player2.score, canvas.width - 20, canvas.height - 30);
+	function updatePaddles() {
+		if (keys["s"] && player1.y > 0) player1.y -= paddleSpeed;
+		if (keys["w"] && player1.y < canvas.height - paddleHeight) player1.y += paddleSpeed;
+
+		if (keys["ArrowUp"] && player2.y > 0) player2.y -= paddleSpeed;
+		if (keys["ArrowDown"] && player2.y < canvas.height - paddleHeight) player2.y += paddleSpeed;
 	}
 
 	function updateBall() {
 		ball.x += ballSpeedX;
 		ball.y += ballSpeedY;
 
-		// Rebote en los lados
-		if (ball.x <= 1 || ball.x >= canvas.width - 1) {
-			ballSpeedX *= -1;
+		if (ball.y <= 0 || ball.y >= canvas.height) {
+			ballSpeedY *= -1;
 		}
-		
 
-		// Rebote en paletas con mejor detección de colisión
 		function checkCollision(player) {
+			if (hasBouncedThisFrame) return; // Avoid multiple collisions
+			const margin = 2; // Margin of error to avoid collision issues
 			if (
-				ball.y + ballSize >= player.y &&
-				ball.y <= player.y + paddleHeight &&
-				ball.x >= player.x &&
-				ball.x <= player.x + paddleWidth
-			)
-			{
-				let hitPosition = (ball.x - player.x) / paddleWidth - 0.5; // Rango de -0.5 a 0.5
-				ballSpeedX = hitPosition * 6; // Ajusta la dirección X según el punto de impacto
-				ballSpeedY *= -1;
+				ball.x + ballSize / 2 >= player.x - margin &&
+				ball.x - ballSize / 2 <= player.x + paddleWidth + margin &&
+				ball.y + ballSize / 2 >= player.y - margin &&
+				ball.y - ballSize / 2 <= player.y + paddleHeight + margin
+			) {
+				if (ball.x < canvas.width / 2) {
+					ball.x = player.x + paddleWidth + ballSize / 2 + 1;
+				} else {
+					ball.x = player.x - ballSize / 2 - 1;
+				}
+				let hitPosition = (ball.y - player.y) / paddleHeight - 0.5;
+				ballSpeedY = hitPosition * 6;
+				ballSpeedX *= -1;
+
+				hasBouncedThisFrame = true;
 			}
 		}
+
 		checkCollision(player1);
 		checkCollision(player2);
 
-		// Punto para un jugador
-		if (gameOver)
-			return;
-		if (ball.y <= 0) {
+		if (ball.x <= 0) {
 			player2.score++;
 			checkWin(player2);
 			resetBall();
 		}
-		else if (ball.y >= canvas.height) {
+		else if (ball.x >= canvas.width) {
 			player1.score++;
 			checkWin(player1);
 			resetBall();
 		}
-	}
 
-	function checkWin(player) {
-		if (player.score >= maxScore) {
-			gameOver = true;
-			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
-		}
+		updateScoreDisplay();
 	}
 
 	function resetBall() {
 		if (gameOver) return;
 		ball.x = canvas.width / 2;
 		ball.y = canvas.height / 2;
-		ballSpeedY *= -1;
+		ballSpeedX *= -1;
 	}
 
-	document.addEventListener("keydown", (event) => keys[event.key] = true);
-	document.addEventListener("keyup", (event) => keys[event.key] = false);
+	function checkWin(player) {
+		if (player.score >= maxScore) {
+			gameOver = true;
+			finishGame(player);
+			gameRunning = false;
+		}
+	}
 
-	function updatePaddles() {
-		if (keys["a"] && player1.x > 0) player1.x -= paddleSpeed;
-		if (keys["d"] && player1.x < canvas.width - paddleWidth) player1.x += paddleSpeed;
+	function finishGame(player) {
+		ctx.fillText(player.name + " wins!", canvas.width / 2, canvas.height / 2);
+		document.getElementById('startGame').classList.remove('disabled');
+	}
 
-		if (keys["ArrowLeft"] && player2.x > 0) player2.x -= paddleSpeed;
-		if (keys["ArrowRight"] && player2.x < canvas.width - paddleWidth) player2.x += paddleSpeed;
+	function resetGame() {
+		player1.score = 0;
+		player2.score = 0;
+		player1.y = canvas.height / 2 - paddleHeight / 2;
+		player2.y = canvas.height / 2 - paddleHeight / 2;
+		ball.x = canvas.width / 2;
+		ball.y = canvas.height / 2;
+		gameOver = false;
+		gamePaused = false;
+		updateScoreDisplay();
 	}
 
 	function gameLoop() {
-		if (gameOver)
-		{
-			// winnerMessage.innerText = `¡Jugador ${player === player1 ? "1" : "2"} gana!`;
-			// gameOptions(`Player ${player1.score > player2.score ? "1" : "2"} wins!`);
-			fetchLink('/game/');
-			return;
-		}
+		if (!gameRunning || gamePaused) return;
+		hasBouncedThisFrame = false; // Reset the flag for the next frame
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-
 		updatePaddles();
 		drawRect(player1.x, player1.y, paddleWidth, paddleHeight, "white");
 		drawRect(player2.x, player2.y, paddleWidth, paddleHeight, "white");
 		drawBall();
-		drawPlayers();
-		drawScore();
 		updateBall();
 
 		requestAnimationFrame(gameLoop);
 	}
-	gameLoop();
 
-}
+	function showCountdown() {
+		let countdown = ["Ready", "3", "2", "1", "Go!"];
+		let countIndex = 0;
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.font = "30px Arial";
+		ctx.fillStyle = "white";
+		ctx.textAlign = "center";
+
+		function nextCount() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.fillText(countdown[countIndex], canvas.width / 2, canvas.height / 2);
+			countIndex++;
+			if (countIndex < countdown.length) {
+				setTimeout(nextCount, 800);
+			} else {
+				gameRunning = true;
+				gamePaused = false;
+				requestAnimationFrame(gameLoop);
+			}
+		}
+		nextCount();
+	}
+
+	window.setupLocalGame = function (){
+		const startBtn = document.getElementById('startGame');
+		const pauseBtn = document.getElementById('pauseGame');
+		if (!startBtn || !pauseBtn) {
+			console.error('startBtn or pauseBtn not found');
+			return;
+		}
+
+		startBtn.addEventListener('click', () => {
+			startBtn.classList.add('disabled');
+			resetGame()
+			showCountdown();
+		});
+
+		pauseBtn.addEventListener('click', () => {
+			if (gameRunning && !gameOver) {
+				gamePaused = !gamePaused;
+				pauseBtn.setAttribute("data-i18n", gamePaused ? "game.resume" : "game.pause");
+				changeLanguage(localStorage.getItem("selectedLanguage") || "en"); // Update the texts based on the language
+				requestAnimationFrame(gameLoop);
+			}
+		});
+		// Initialize game once	
+		game();
+	}
+})();

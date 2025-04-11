@@ -1,4 +1,4 @@
-<div class="profile-container">
+<div class="main-container">
 	<div class="profile">
 		<div class="profile-photo">
 			<img src="{{ user.image.url }}">
@@ -9,7 +9,7 @@
 			</div>
 			<div class="tab-actions">
 				{% if not is_own_profile %}
-					<button class="challenge-btn" href="/game" data-i18n="profile.dash.1v1">🎮 Play 1v1</button>
+					<button href="/game" data-i18n="profile.dash.1v1">🎮 Play 1v1</button>
 					
 					{% if is_friend %}
 						<button id="deletefriend-btn-{{ user.id }}" onclick="deleteFriend('{{ user.id }}')" data-i18n="action.unfriend">💔 Unfriend</button>

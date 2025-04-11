@@ -63,6 +63,13 @@ function makeModal(path) //modalHTML)
     var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
     myModal.show();
 
+    // Disable Enter key when modal is open
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && document.getElementById('loginModal').classList.contains('show')) {
+            event.preventDefault();
+        }
+    });
+
     //document.getElementById('close').addEventListener('click', deleteUser(path));
 
     // Manejador del evento de envío del formulario
@@ -82,31 +89,41 @@ function makePost(path)
     //console.log("token =", token);
     const form =  document.getElementById('loginForm');
 	console.log('entra en submit');
-    form.addEventListener('submit', function(event) {
-        console.log('hace event default');
-        event.preventDefault();
-        console.log('hizo event default');
-        makeSubmit(path);
-    })
+    if (form)
+    {
+        form.addEventListener('submit', function(event) {
+            console.log('hace event default');
+            event.preventDefault();
+            console.log('hizo event default');
+            makeSubmit(path);
+        })
+    }
 }
 
 function makeSubmit(path)
 {
     const info = getInfo();
     const post = path + "set/";
-	console.log(`post: ${post}`);
-    
+    const headers = {
+        'X-CSRFToken': getCSRFToken(),
+    };
+    const token = getJWTToken();
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     fetch(base + '/api' + post, {
         method: "POST",
-        headers: {
-            'X-CSRFToken': getCSRFToken(),
-        },
+        headers: headers,
         body: info,
         credentials: 'include'
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
+            console.error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+            return response.json().then(errData => {
+                throw new Error(errData.error || 'Error en la respuesta del servidor');
+            });
         }
         return response.json();
     })
@@ -119,22 +136,44 @@ function makeSubmit(path)
             }
             
             if (path !== '/users/update/' && path !== '/game/tournament/') {
-				document.getElementById('close').click(); // myModal.hide();
+                const modalElement = document.getElementById('loginModal');
+                if (modalElement) {
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                }
+            } else {
+                console.log("Perfil actualizado con éxito");
+                alert("Perfil actualizado con éxito");
             }
             
-            if (data.element) {
-                document.getElementById(data.element).innerHTML = data.content;
+            if (data.element && data.content) {
+                const targetElement = document.getElementById(data.element);
+                if (targetElement) {
+                    targetElement.innerHTML = data.content;
+                }
             }
             
-            fetchLink(data.next_path);
-            handleLinks();
+            if (data.next_path && path !== '/users/update/') {
+                fetchLink(data.next_path);
+                handleLinks();
+            } else if (path === '/users/update/') {
+                handleLinks();
+            }
         } else {
-            document.getElementById(data.type).textContent = data.error;
-            document.getElementById('loginForm').reset();
+            const errorElement = document.getElementById(data.type);
+            if (errorElement) {
+                errorElement.textContent = data.error;
+            } else {
+                console.error("Error devuelto por el servidor:", data.error);
+                alert("Error: " + data.error);
+            }
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Error en fetch:', error);
+        alert('Ocurrió un error al procesar tu solicitud: ' + error.message);
     });
 }
 
@@ -149,8 +188,17 @@ let link = null;
 function loginSock() // por definir
 { 
     // CREATE SOCKET
-    const route = 'ws://' + base.slice(7, -5) + ':8080/ws/connect/?token=' + sessionStorage.getItem('access');
-    console.log('ruta test: ', 'ws://' + window.location.hostname + ':8080/ws/connect/?token=' + sessionStorage.getItem('access'));
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Get the hostname from the current location
+    // let hostname = window.location.hostname;
+    let hostname = window.location.host;
+    let route;
+
+    // if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    //     hostname += ':8080';
+    // }
+    route = `${protocol}//${hostname}/ws/connect/?token=${sessionStorage.getItem('access')}`;
+    
     console.log('ruta: ', route);
     connSocket = new WebSocket(route);
 	
@@ -205,3 +253,4 @@ function loginSock() // por definir
         console.error("WebSocket error:", error);
     };
 }
+

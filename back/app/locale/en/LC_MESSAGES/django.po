@@ -98,8 +98,12 @@ msgid "There are no users"
 msgstr "There are no users"
 
 #: language/translations.py:24
-msgid "Start 1vs1"
-msgstr "🎮 Play 1vs1"
+msgid "Play Online"
+msgstr "🌐 Play Online"
+
+#: language/translations.py:24
+msgid "Play Local"
+msgstr "🎮 Play Local"
 
 #: language/translations.py:25
 msgid "Start online"
@@ -336,3 +340,83 @@ msgstr "❤️ Add Friend"
 #: language/translations.py:188
 msgid "🚫 Block"
 msgstr "🚫 Block"
+
+#: language/translations.py:189
+msgid "Oops! Page not found"
+msgstr "Oops! Page not found"
+
+#: language/translations.py:190
+msgid "Download account data"
+msgstr "Download account data"
+
+#: language/translations.py:191
+msgid "Delete account"
+msgstr "Delete account"
+
+#: language/translations.py:191
+msgid "Anonymize account"
+msgstr "Anonymize account"
+
+#: language/translations.py:192
+msgid "Back to home"
+msgstr "Back to home"
+
+#: language/translations.py:193
+msgid "⚔️ Game"
+msgstr "⚔️ Game"
+
+msgid "🛠️ Update Avatar Picture"
+msgstr "🛠️ Update Avatar Picture"
+
+msgid "Player 1"
+msgstr "Player 1"
+
+msgid "Player 2"
+msgstr "Player 2"
+
+msgid "Pause"
+msgstr "Pause"
+
+msgid "Resume"
+msgstr "Resume"
+
+msgid "Start Game"
+msgstr "New Game"
+
+msgid "New Game"
+msgstr "New Game"
+
+#: language/translations.py:198
+msgid "Back"
+msgstr "🔙 Back"
+
+#: language/translations.py:199
+msgid "Play as Guest"
+msgstr "👤 Guest"
+
+#: language/translations.py:200
+msgid "Jump into a quick match — no login needed"
+msgstr "Jump into a quick match"
+
+#: language/translations.py:201
+msgid "Log In to Play"
+msgstr "🔐 Log In"
+
+#: language/translations.py:202
+msgid "Save your stats, progress, and compete with others"
+msgstr "Save your stats & progress"
+
+msgid "Start Game to begin..."
+msgstr "Start Game to begin..."
+
+msgid "Looking for opponent..."
+msgstr "Looking for opponent..."
+
+msgid "Match in progress..."
+msgstr "Match in progress..."
+
+msgid "Game over! You won!"
+msgstr "Game over! You won 😀"
+
+msgid "Game over! You lost!"
+msgstr "Game over! You lost 😵"

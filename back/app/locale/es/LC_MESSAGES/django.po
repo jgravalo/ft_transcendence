@@ -106,12 +106,12 @@ msgid "There are no blocked users"
 msgstr "No hay usuarios bloqueados"
 
 #: language/translations.py:26
-msgid "Start 1vs1"
-msgstr "🎮 Jugar 1vs1"
+msgid "Play Online"
+msgstr "🌐 Jugar en linéa"
 
-#: language/translations.py:27
-msgid "Start online"
-msgstr "Jugar en linéa"
+#: language/translations.py:26
+msgid "Play Local"
+msgstr "🎮 Jugar en local"
 
 #: language/translations.py:28
 msgid "Submit"
@@ -661,3 +661,82 @@ msgstr "❤️ Agregar Amigo"
 msgid "🚫 Block"
 msgstr "🚫 Bloquear"
 
+#: language/translations.py:189
+msgid "Oops! Page not found"
+msgstr "¡Uy! Página no encontrada"
+
+#: language/translations.py:190
+msgid "Download account data"
+msgstr "Descargar datos de la cuenta"
+
+#: language/translations.py:191
+msgid "Delete account"
+msgstr "Eliminar cuenta"
+
+#: language/translations.py:191
+msgid "Anonymize account"
+msgstr "Anonimizar cuenta"
+
+#: language/translations.py:192
+msgid "Back to home"
+msgstr "Volver al inicio"
+
+#: language/translations.py:193
+msgid "⚔️ Game"
+msgstr "⚔️ Jugar"
+
+msgid "🛠️ Update Avatar Picture"
+msgstr "🛠️ Cambiar la foto"
+
+msgid "Player 1"
+msgstr "Jugador 1"
+
+msgid "Player 2"
+msgstr "Jugador 2"
+
+msgid "Pause"
+msgstr "Pausa"
+
+msgid "Resume"
+msgstr "Reanudar"
+
+msgid "Start Game"
+msgstr "Nueva Partida"
+
+msgid "New Game"
+msgstr "Nueva Partida"
+
+#: language/translations.py:198
+msgid "Back"
+msgstr "🔙 Volver"
+
+#: language/translations.py:199
+msgid "Play as Guest"
+msgstr "👤 Invitado"
+
+#: language/translations.py:200
+msgid "Jump into a quick match — no login needed"
+msgstr "Entra en una partida rápida"
+
+#: language/translations.py:201
+msgid "Log In to Play"
+msgstr "🔐 Iniciar"
+
+#: language/translations.py:202
+msgid "Save your stats, progress, and compete with others"
+msgstr "Guarda estadísticas & progreso"
+
+msgid "Start Game to begin..."
+msgstr "Inicia el juego..."
+
+msgid "Looking for opponent..."
+msgstr "Buscando oponente..."
+
+msgid "Match in progress..."
+msgstr "Partida en progreso..."
+
+msgid "Game over! You won!"
+msgstr "¡Ganaste! 😀"
+
+msgid "Game over! You lost!"
+msgstr "¡Perdiste! 😵"

@@ -1,5 +1,38 @@
-<canvas id="gameCanvas" width="400" height="600"></canvas>
+<div class="main-container">
+	<!-- Game section -->
+	<div class="game">
+		<div class="game-title canvas-title">
+			<span>🏓 Pong</span><span>42</span>
+		</div>
+		<!-- Game canvas container -->
+		<div class="game-canvas-container">
+			<canvas id="gameCanvas" width="500" height="250"></canvas>
+		</div>
+		<div class="game-controls">
+			<!-- Player 1 Controls -->
+			<div class="player-controls">
+				<h3 id="player1Name" class="player-title" data-i18n="game.player1">Player 1</h3>
+			</div>	
+			<!-- Game status -->
+			<div class="game-status">
+				<div class="score-container">
+					<span class="score" id="player1Score">0</span>
+					<span class="score-separator">:</span>
+					<span class="score" id="player2Score">0</span>
+				</div>
+				<div class="status-message" id="statusMessage" data-i18n="game.status.start">
+					Start Game to begin...
+				</div>
+				<button class="game-button" id="startGame" data-i18n="game.start">Start Game</button>
+			</div>
+			<!-- Player 2 -->
+			<div class="player-controls">
+					<h3 id="player2Name" class="player-title" data-i18n="game.player2">Player 2</h3>
+			</div>
+		</div>
+	</div>
+</div>
 <script>
-	console.log('from template remote_game: ' + window.location.origin + '/game/remote/{{ link|escapejs }}');
-	gameRemote(window.location.origin + '/game/remote/{{ link|escapejs }}');
+	// console.log('from template remote_game: ' + window.location.origin + '/game/remote/{{ link|escapejs }}');
+	// gameRemote(window.location.origin + '/game/remote/{{ link|escapejs }}');
 </script>

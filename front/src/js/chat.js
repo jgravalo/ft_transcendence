@@ -16,11 +16,17 @@ function chat(url)
     console.log(`url de donde extraer id: <${url}>`);
 	const params = new URLSearchParams(new URL(url).search);
     const otherUserId = params.get("user"); // Asumo que 'user' es el ID del otro usuario
-    console.log(`id a enviar a chat: <${otherUserId}>`);
-    const wsUrl = 'ws://' + base.slice(7, -5) + ':8080/ws/chat/?user=' + otherUserId + '&token=' + accessToken;
+   
+    // let hostname = window.location.hostname;
+    let hostname = window.location.host;
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        hostname += ':8080';
+    }
+    const route = `${protocol}//${hostname}/ws/chat/?user=${otherUserId}&token=${accessToken}`;
     
-    chatSocket = new WebSocket(wsUrl);
-    console.log("Intentando conectar a:", wsUrl);
+    chatSocket = new WebSocket(route); 
+    console.log("Intentando conectar a:", route); 
     console.log("hizo chatsocket");
 
     chatSocket.onopen = function () {

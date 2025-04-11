@@ -6,11 +6,12 @@ fetch(window.location.href)
     console.log("ref =", ref);  // "/ruta/actual"
     fetchLink(ref);
 });
+
 window.onload = function() {
     // Si hay un token de acceso, cargar la barra de usuario autenticado
     if (sessionStorage.getItem('access'))
         loginSock();
-    }
+}
 
 (function() {
     const originalPushState = history.pushState;
