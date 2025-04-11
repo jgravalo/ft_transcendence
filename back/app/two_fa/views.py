@@ -61,6 +61,7 @@ def set_phone(request):
 def verify(request):
     #way = request.GET.get('way', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
     #print(way)
+    print(request)
     user = User.get_user(request)
     if TwoFactorAuth.objects.filter(user=user).exists():
         two_fa = TwoFactorAuth.objects.get(user=user)
@@ -92,8 +93,7 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def verify_otp(request): # email o SMS
     if request.method == 'POST':
-        data = json.loads(request.body)
-        otp_code = data.get('otp-code')
+        otp_code = request.POST.get('otp-code')
         user = User.get_user(request)
         two_fa = TwoFactorAuth.objects.get(user=user)
         print("otp_code:", otp_code)
