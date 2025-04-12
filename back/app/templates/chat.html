@@ -1,15 +1,15 @@
-<div class="chat-profile link" href="/users/profile/foreign/?user={{ other_user.username }}">
+<div class="chat-profile link" href="/users/profile/foreign/?user={{ user.username }}">
 	<div class="chat-photo">
-		{% if other_user.image_42_url %}
-			<img src="{{ other_user.image_42_url }}">
+		{% if user.image_42_url %}
+			<img src="{{ user.image_42_url }}">
 		{% else %}
-			<img src="{{ other_user.image.url }}">
+			<img src="{{ user.image.url }}">
 		{% endif %}
 	</div>
 	<div class="chat-info">
 		<div>
 			<h1 id="username">{{ user.username }}</h1>
-			<h2>wins: {{ user.wins }}</h2>
+			<h2>record: {{ user.wins|length }}-{{ user.losses|length }}</h2>
 		</div>
 	</div>
 </div>
