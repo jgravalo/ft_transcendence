@@ -107,8 +107,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 		self.name = self.user.username if self.user.is_authenticated else f"Customplayer{len(self.games[self.room_name]) + 1}"
 		self.role = f"player{len(self.games[self.room_name]) + 1}"
 		self.paddle = {
-			"width": 50,
-			"height": 10,
+			"width": 10,
+			"height": 50,
 			"score": 0,
 			"x": 10 if len(self.games[self.room_name]) == 0 else 480,  # 10px from left or right edge
 			"y": (250 - 50) // 2  # center vertically
@@ -152,31 +152,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print(f'room_name in disconnect = {self.room_name} by {self.name}')
 		self.ball[self.room_name]['connect'] = False # detiene la bola
 		self.is_playing = False
-
-		# if self in self.games[self.room_name]:
-		# 	# close socket, group and send final message
-		# 	for player in self.games[self.room_name]:
-		# 		if self != player:
-		# 			player1 = player if player.role == 'player1' else self
-		# 			player2 = player if player.role == 'player2' else self
-		# 			winner = player.user
-		# 			# loser = self.user
-		# 	if self.role == 'player1':
-		# 		await self.set_finish(winner, 0, 3)
-		# 	elif self.role == 'player2':
-		# 		await self.set_finish(winner, 3, 0)
-					# # db
-					# await player.send(text_data=json.dumps({
-					# 	"action": "finish",
-					# 	"winner": winner.username
-					# }))
-				# player.user.is_playing = False
-				# await database_sync_to_async(self.scope['user'].save)()
-				# await player.close()
-				# await self.channel_layer.group_discard(self.room_group_name, player.channel_name)
-			# print(f'{self.role} {self.user.username} has been disconnected in games')
-			# self.games[self.room_name].clear()
-		# await self.set_finish(winner, p1["score"], p2["score"])
 
 	async def receive(self, text_data):
 		# print(f'room_name in receive = {self.room_name}')
@@ -259,7 +234,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			):
 				print(f'collision with paddle 1')
 				ball["vx"] *= -1  # Invert horizontal direction
-				ball["x"] = p1["x"] + p1["width"] + margin  # Reposition to avoid sticking
+				ball["x"] = p1["x"] + p1["width"] + margin + ball["size"] / 2  # Reposition to avoid sticking
 			
 			# 🏓 Verificar colisión con la paleta del jugador 2
 			if (
@@ -269,7 +244,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 			):
 				print(f'collision with paddle 2')
 				ball["vx"] *= -1
-				ball["x"] = p2["x"] - margin
+				ball["x"] = p2["x"] - margin - ball["size"] / 2
 			
 			# Enviar la nueva posición de la pelota a los clientes
 			await self.channel_layer.group_send(self.room_group_name, {
