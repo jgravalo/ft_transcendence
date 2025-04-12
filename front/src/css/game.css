@@ -94,6 +94,19 @@ canvas {
 	font-weight: bold;
 	min-width: 45px;
 	text-align: center;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.key:hover {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.key.active {
+	background: rgba(85, 0, 176, 0.6);
+	border-color: rgba(255, 255, 255, 0.4);
+	transform: translateY(2px);
+	box-shadow: 0 0 8px rgba(85, 0, 176, 0.4);
 }
 
 .game-status {
@@ -404,4 +417,41 @@ ul.info-tab > li:hover {
 	.player-title {
 		font-size: 1rem;
 	}
+	
+	/* Make control keys bigger on mobile for easier touch targets */
+	.key {
+		padding: 0.8rem 1.2rem;
+		min-width: 60px;
+		min-height: 60px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 1.5rem;
+		touch-action: manipulation; /* Optimize for touch */
+	}
+	
+	/* Adjust game controls layout for mobile */
+	.game-controls {
+		flex-direction: column;
+		gap: 1rem;
+	}
+	
+	.player-controls {
+		width: 100%;
+		flex-direction: row;
+		justify-content: space-between;
+	}
+	
+	.control-keys {
+		flex-direction: row;
+		gap: 1rem;
+	}
+}
+
+/* Prevent text selection on controls to improve touch experience */
+.key {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }

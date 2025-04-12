@@ -32,6 +32,124 @@
 		document.addEventListener("keyup", (event) => {
 			keys[event.key] = false;
 		});
+
+		// --- Add click handlers for control buttons ---
+		setupControlButtons();
+	}
+
+	function setupControlButtons() {
+		// Get all control keys
+		const controlKeys = document.querySelectorAll('.control-keys .key');
+		
+		// Add event listeners to each key
+		controlKeys.forEach(key => {
+			// Mouse events
+			key.addEventListener('mousedown', (event) => {
+				const keyText = key.textContent.trim();
+				
+				// Add active class for visual feedback
+				key.classList.add('active');
+				
+				if (keyText === 'W') {
+					keys['w'] = true;
+				} else if (keyText === 'S') {
+					keys['s'] = true;
+				} else if (keyText === '↑') {
+					keys['ArrowUp'] = true;
+				} else if (keyText === '↓') {
+					keys['ArrowDown'] = true;
+				}
+			});
+			
+			key.addEventListener('mouseup', (event) => {
+				const keyText = key.textContent.trim();
+				
+				// Remove active class
+				key.classList.remove('active');
+				
+				if (keyText === 'W') {
+					keys['w'] = false;
+				} else if (keyText === 'S') {
+					keys['s'] = false;
+				} else if (keyText === '↑') {
+					keys['ArrowUp'] = false;
+				} else if (keyText === '↓') {
+					keys['ArrowDown'] = false;
+				}
+			});
+			
+			key.addEventListener('mouseleave', (event) => {
+				const keyText = key.textContent.trim();
+				
+				// Remove active class
+				key.classList.remove('active');
+				
+				if (keyText === 'W') {
+					keys['w'] = false;
+				} else if (keyText === 'S') {
+					keys['s'] = false;
+				} else if (keyText === '↑') {
+					keys['ArrowUp'] = false;
+				} else if (keyText === '↓') {
+					keys['ArrowDown'] = false;
+				}
+			});
+			
+			// Touch events for mobile
+			key.addEventListener('touchstart', (event) => {
+				event.preventDefault(); // Prevent scrolling when touching the buttons
+				const keyText = key.textContent.trim();
+				
+				// Add active class for visual feedback
+				key.classList.add('active');
+				
+				if (keyText === 'W') {
+					keys['w'] = true;
+				} else if (keyText === 'S') {
+					keys['s'] = true;
+				} else if (keyText === '↑') {
+					keys['ArrowUp'] = true;
+				} else if (keyText === '↓') {
+					keys['ArrowDown'] = true;
+				}
+			});
+			
+			key.addEventListener('touchend', (event) => {
+				event.preventDefault(); // Prevent any default behavior
+				const keyText = key.textContent.trim();
+				
+				// Remove active class
+				key.classList.remove('active');
+				
+				if (keyText === 'W') {
+					keys['w'] = false;
+				} else if (keyText === 'S') {
+					keys['s'] = false;
+				} else if (keyText === '↑') {
+					keys['ArrowUp'] = false;
+				} else if (keyText === '↓') {
+					keys['ArrowDown'] = false;
+				}
+			});
+			
+			key.addEventListener('touchcancel', (event) => {
+				event.preventDefault(); // Prevent any default behavior
+				const keyText = key.textContent.trim();
+				
+				// Remove active class
+				key.classList.remove('active');
+				
+				if (keyText === 'W') {
+					keys['w'] = false;
+				} else if (keyText === 'S') {
+					keys['s'] = false;
+				} else if (keyText === '↑') {
+					keys['ArrowUp'] = false;
+				} else if (keyText === '↓') {
+					keys['ArrowDown'] = false;
+				}
+			});
+		});
 	}
 
 	function drawRect(x, y, width, height, color) {
@@ -52,8 +170,8 @@
 	}
 
 	function updatePaddles() {
-		if (keys["s"] && player1.y > 0) player1.y -= paddleSpeed;
-		if (keys["w"] && player1.y < canvas.height - paddleHeight) player1.y += paddleSpeed;
+		if (keys["s"] && player1.y < canvas.height - paddleHeight) player1.y += paddleSpeed;
+		if (keys["w"] && player1.y > 0) player1.y -= paddleSpeed;
 
 		if (keys["ArrowUp"] && player2.y > 0) player2.y -= paddleSpeed;
 		if (keys["ArrowDown"] && player2.y < canvas.height - paddleHeight) player2.y += paddleSpeed;
