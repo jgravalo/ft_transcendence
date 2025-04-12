@@ -1,3 +1,6 @@
+.modal-dialog > div {
+    padding: 5px;
+}
 .modal-body > * {
     padding: 5px;
 }
@@ -9,4 +12,19 @@
 
 .modal-body form > button {
     padding: 5px;
+}
+
+.modal-body button {
+    padding: 5px;
+}
+
+.button_container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.button_container button {
+    width: 45%;
+    margin: 1%;
 }
