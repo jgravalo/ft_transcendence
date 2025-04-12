@@ -92,15 +92,11 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def verify_otp(request): # email o SMS
     if request.method == 'POST':
-        data = json.loads(request.body)
-        otp_code = data.get('otp-code')
+        otp_code = request.POST.get('otp-code')
         user = User.get_user(request)
         two_fa = TwoFactorAuth.objects.get(user=user)
-        print("otp_code:", otp_code)
-        print("two_fa.otp_code:", two_fa.otp_code)
-        #if (otp_code != two_fa.otp_code):
         if not two_fa.verify_otp(otp_code):
-            #user.delete()
+            user.delete()
             return JsonResponse({'type': 'errorName', 'error': 'Your code is wrong.'})
         two_fa.delete()
         user.is_active=True
