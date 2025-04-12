@@ -158,13 +158,20 @@ def set_login(request):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
 
+            if not user.two_fa_enabled:
+                content = render_to_string('close_login.html')
+                next_path = '/users/profile/'
+            else:
+                content = render_to_string('close_logout.html')
+                next_path = '/two_fa/verify/'
+
             response = JsonResponse({
                 "access": access_token,
                 "refresh": str(refresh),
                 "error": "Success",
                 "element": 'bar',
-                "content": render_to_string('close_login.html'),
-                "next_path": '/users/profile/',
+                "content": content,
+                "next_path": next_path,
             })
 
             # Establecer cookies
