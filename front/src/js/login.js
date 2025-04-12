@@ -134,6 +134,38 @@ function makeSubmit(path)
                 saveStorage('refresh', data.refresh);
 				loginSock();
             }
+
+            // Actualización de usuario
+            if (path === '/users/update/') {
+                if (data.access && data.refresh) {
+                    // console.log('[makeSubmit] Nuevos tokens recibidos tras update:', data.access.substring(0, 15) + '...');
+                    saveStorage('access', data.access);
+                    saveStorage('refresh', data.refresh);
+                    // console.log('[makeSubmit] Tokens guardados. Valor actual de getJWTToken():', getJWTToken().substring(0, 15) + '...');
+
+                    // Cerrar WebSocket
+                    if (window.socket) {
+                        // console.log('[makeSubmit] Cerrando WebSocket actual');
+                        window.socket.close();
+                        window.socket = null;
+                    }
+
+                    // Esperar un poco antes de reconectar para que no de errores
+                    setTimeout(() => {
+                        const currentToken = getJWTToken();
+                        // console.log('[makeSubmit] Intentando reconectar WebSocket con token:', currentToken.substring(0, 15) + '...');
+                        if (!currentToken) {
+                            console.error('¡Error crítico! Intentando reconectar WebSocket sin token después de update.');
+                            return; 
+                        }
+                        loginSock();
+                    }, 1500); 
+                }
+                 else {
+                     console.warn('[makeSubmit] La respuesta de update no incluyó nuevos tokens.');
+                 }
+                //  alert("Success!");
+            }
             
             if (path !== '/users/update/' && path !== '/game/tournament/') {
                 const modalElement = document.getElementById('loginModal');

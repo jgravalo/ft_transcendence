@@ -444,12 +444,24 @@ def set_update(request):
             user.two_fa_enabled = two_fa_enabled
 
             user.save()
+
+            # Generar nuevos tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            print(f"[UPDATE] Nuevos tokens generados - Access: {access_token[:10]}...")
+
+            # Invalidar tokens anteriores
+            from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+            # OutstandingToken.objects.filter(user=user).exclude(token=str(refresh))
+            OutstandingToken.objects.filter(user=user).exclude(token=str(refresh)).delete()
             
             content = render_to_string('close_login.html')
             data = {
                 "error": "Success",
                 "element": 'bar',
                 "content": content,
+                "access": access_token,
+                "refresh": str(refresh)
             }
             return JsonResponse(data)
         except json.JSONDecodeError:

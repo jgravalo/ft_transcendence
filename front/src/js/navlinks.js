@@ -127,6 +127,55 @@ function fetchLink(path)
 			execScript(dest);
 		}
 		*/
+        // Actualizar tokens si vienen en la respuesta
+        if (data.access && data.refresh) {
+            // console.log('Nuevos tokens recibidos en fetchLink:', data.access.substring(0, 15) + '...');
+            saveJWTToken(data.access);
+            saveRefreshToken(data.refresh);
+            // console.log('Tokens guardados. Valor actual de getJWTToken():', getJWTToken().substring(0, 15) + '...');
+
+            // Cerrar WebSocket actual y reconectar con nuevo token
+            if (window.socket) {
+                // console.log('Cerrando WebSocket actual');
+                window.socket.close();
+                window.socket = null;
+            }
+
+            // Esperar 1.5 segundos antes de reconectar
+            setTimeout(() => {
+                const currentToken = getJWTToken();
+                // console.log('Intentando reconectar WebSocket con token:', currentToken.substring(0, 15) + '...');
+                if (!currentToken) {
+                    console.error('¡Error crítico! Intentando reconectar WebSocket sin token.');
+                    return;
+                }
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const hostname = window.location.host;
+                const route = `${protocol}//${hostname}/ws/connect/?token=${currentToken}`;
+                
+                try {
+                    window.socket = new WebSocket(route);
+                } catch (e) {
+                    console.error("Error al crear WebSocket:", e);
+                    return;
+                }
+
+                // window.socket.onopen = function() {
+                    // console.log('WebSocket reconectado exitosamente con el token esperado.');
+                    // fetchLink('/users/login/close/');
+                // };
+
+                // window.socket.onerror = function(error) {
+                    // console.error('Error en WebSocket después de reconexión:', error);
+                // };
+
+                // window.socket.onclose = function(event) {
+                    // console.log('WebSocket cerrado después de intento de reconexión. Código:', event.code, 'Razón:', event.reason);
+                    // fetchLink('/users/logout/close/');
+                // };
+            }, 1500); // 1,5 segundos quizas funcione con menos
+        }
+
         //updating the newly added content with right language
         const dest = `${data.element}`;
         if (dest !== 'modalContainer' && !['/users/login/close/', '/users/logout/close/'].includes(path) && path.slice(0, 22) != '/game/tournament/join/')
