@@ -2,7 +2,7 @@
 	let canvas, ctx;
 	let player1, player2, ball;
 	let paddleWidth = 10, paddleHeight = 50, ballSize = 10;
-	let ballSpeedX = 5, ballSpeedY = 5;
+	let ballSpeedX = 4, ballSpeedY = 4;
 	let paddleSpeed = 10;
 	let maxScore = 5;
 
