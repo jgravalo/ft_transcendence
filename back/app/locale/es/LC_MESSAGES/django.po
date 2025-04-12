@@ -742,7 +742,7 @@ msgid "Game over! You lost!"
 msgstr "¡Perdiste! 😵"
 
 msgid "There are no tournaments"
-msgstr "No hay torneos
+msgstr "No hay torneos"
 
 msgid "table.tournament.name"
 msgstr "Nombre del torneo"
