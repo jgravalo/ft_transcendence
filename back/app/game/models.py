@@ -61,6 +61,16 @@ class Tournament(models.Model):
 		if self.is_full:
 			# self.is_full = True
 			self.play()
+			
+	def remove_player(self, user):
+		if self.is_full:
+			return False  # Can't leave if tournament is full/started
+		if user in self.players.all():
+			self.players.remove(user)
+			self.size = self.players.count()
+			self.save()
+			return True
+		return False
 
 	def play(self):
 		start = Round.objects.create(

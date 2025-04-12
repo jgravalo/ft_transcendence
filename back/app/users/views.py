@@ -315,7 +315,7 @@ def profile(request):
             'blockeds': blocked,
             'users': non_friends,
             'matches': matches.order_by('-created_at'),
-            'tournaments': tournaments,
+            'tournaments': tournaments.order_by('-created_at'),
         }
         content = render_to_string('profile.html', context)
         data = {

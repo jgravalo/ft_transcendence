@@ -144,8 +144,7 @@ function makeSubmit(path)
                     }
                 }
             } else {
-                console.log("Perfil actualizado con éxito");
-                alert("Perfil actualizado con éxito");
+                    alert("Success!");
             }
             
             if (data.element && data.content) {

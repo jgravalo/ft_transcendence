@@ -165,10 +165,10 @@
 	<div id="users-list" class="tab-content hidden">
 		<!-- Header Row -->
 		<div class="tab-header">
-			<div style="flex: 1.5;" data-i18n="table.username">User</div>
-			<div style="flex: 2;" data-i18n="table.email">Email</div>
-			<div style="flex: 1;" data-i18n="table.record">Record</div>
-			<div style="flex: 3;" data-i18n="table.actions">Actions</div>
+			<div style="flex: 1.5;" data-i18n="table.tournament.name">Tournament name</div>
+			<div style="flex: 1;" data-i18n="table.tournament.size">Room</div>
+			<div style="flex: 2;" data-i18n="table.tournament.status">Status</div>
+			<div style="flex: 2;" data-i18n="table.actions">Actions</div>
 		</div>
 		{% if users %}
 			{% for user in users %}
@@ -201,25 +201,50 @@
 	<div id="tournaments-list" class="tab-content hidden">
 		<!-- Header Row -->
 		<div class="tab-header">
-			<div style="flex: 1.5;" data-i18n="table.username">Tournament</div>
-			<div style="flex: 1;" data-i18n="table.record">Users</div>
+			<div style="flex: 1.5;" data-i18n="table.tournament.name">Tournament</div>
+			<div style="flex: 1;" data-i18n="table.tournament.size">Room</div>
 			<div style="flex: 2;" data-i18n="table.actions">Actions</div>
+			<div style="flex: 3;" data-i18n="table.tournament.status">Status</div>
 		</div>
 		
-		{% for tournament in tournaments %}
-		<div class="tab-item">
-			<div class="tab-players">
-				<span>{{ tournament.name }}</span>
-			</div>
-			<div class="tab-score">{{ tournament.size }}/{{ tournament.number }}</div>
-			<div class="tab-actions">
-				{% if not tournament.is_full %}
-				<button id="tournament-btn-{{ tournament.id }}" class="link" href="/game/tournament/join/?tournament={{ tournament.id }}" data-i18n="profile.users.game">⚔️ join</button>
-				{% endif %}
-			</div>
-		</div>
-		{% empty %}
-		<p style="color: white;" data-i18n="profile.users.empty">There are no other users.</p>
-		{% endfor %}
+		{% if tournaments %}
+			{% for tournament in tournaments %}
+				<div class="tab-item">
+					<div class="tab-players">
+						<span>{{ tournament.name }}</span>
+					</div>
+					<div class="tab-score">{{ tournament.size }}/{{ tournament.number }}</div>
+					<div class="tab-actions" id="tournament-actions-{{ tournament.id }}">
+						{% if user in tournament.players.all %}
+							<button id="tournament-leave-btn-{{ tournament.id }}"
+									class="link block-btn"
+									onclick="leaveTournament('{{ tournament.id }}')"
+									data-i18n="profile.tournaments.leave">
+								🚪 Leave Room
+							</button>
+						{% else %}
+							<button id="tournament-join-btn-{{ tournament.id }}"
+									class="link"
+									onclick="joinTournament('{{ tournament.id }}')"
+									data-i18n="profile.tournaments.join">
+								⚔️ Join Room
+							</button>
+						{% endif %}
+					</div>
+					<div class="tab-status" id="tournament-status-{{ tournament.id }}">
+						{% if not tournament.is_full %}
+							{% if user in tournament.players.all %}
+								<span data-i18n="profile.tournaments.joined">Room Joined. Waiting for other players...</span>
+							{% else %}
+								<span data-i18n="profile.tournaments.notjoined">Press Join Room to join the tournament</span>
+							{% endif %}
+						{% endif %}
+					</div>
+				</div>
+			{% endfor %}
+		{% else %}
+			<p style="color: white;" data-i18n="profile.tournaments.empty">There are no tournaments.</p>
+		{% endif %}
+		<div class="pagination"></div>
 	</div>
 </div>

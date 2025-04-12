@@ -740,3 +740,27 @@ msgstr "¡Ganaste! 😀"
 
 msgid "Game over! You lost!"
 msgstr "¡Perdiste! 😵"
+
+msgid "There are no tournaments"
+msgstr "No hay torneos
+
+msgid "table.tournament.name"
+msgstr "Nombre del torneo"
+
+msgid "table.tournament.size"
+msgstr "Sala"
+
+msgid "table.tournament.status"
+msgstr "Estado"
+
+msgid "profile.tournaments.join"
+msgstr "⚔️ Unirse"
+
+msgid "profile.tournaments.leave"
+msgstr "🔙 Salir"
+
+msgid "profile.tournaments.joined"
+msgstr "Sala unida. Esperando que la sala se llena..."
+
+msgid "profile.tournaments.notjoined"
+msgstr "Unirse para entrar al torneo"

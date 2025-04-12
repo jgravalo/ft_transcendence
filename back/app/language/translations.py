@@ -207,4 +207,12 @@ TRANSLATION_KEYS = {
     "game.status.progress": _("Match in progress..."),
     "game.status.win": _("Game over! You won!"),
     "game.status.lose": _("Game over! You lost!"),
+    "profile.tournaments.empty": _("There are no tournaments"),
+    "table.tournament.name": _("Tournament name"),
+    "table.tournament.size": _("Room"),
+    "table.tournament.status": _("Status"),
+    "profile.tournaments.join": _("Join Room"),
+    "profile.tournaments.leave": _("Leave Room"),
+    "profile.tournaments.joined": _("Room Joined. Waiting for other players..."),
+    "profile.tournaments.notjoined": _("Press Join Room to join the tournament"),
 }

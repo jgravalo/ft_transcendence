@@ -420,3 +420,27 @@ msgstr "Game over! You won 😀"
 
 msgid "Game over! You lost!"
 msgstr "Game over! You lost 😵"
+
+msgid "There are no tournaments"
+msgstr "There are no tournaments"
+
+msgid "table.tournament.name"
+msgstr "Tournament name"
+
+msgid "table.tournament.size"
+msgstr "Room"
+
+msgid "table.tournament.status"
+msgstr "Status"
+
+msgid "profile.tournaments.join"
+msgstr "⚔️ Join Room"
+
+msgid "profile.tournaments.leave"
+msgstr "🔙 Leave Room"
+
+msgid "profile.tournaments.joined"
+msgstr "Room Joined. Waiting for the room to be full..."
+
+msgid "profile.tournaments.notjoined"
+msgstr "Join to enter the tournament"

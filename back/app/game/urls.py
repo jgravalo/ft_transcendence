@@ -8,4 +8,5 @@ urlpatterns = [
     path('tournament/', views.tournament, name='tournament'),
     path('tournament/set/', views.set_tournament, name='set_tournament'),
     path('tournament/join/', views.join_tournament, name='join_tournament'),
+    path('tournament/leave/', views.leave_tournament, name='leave_tournament'),
 ]

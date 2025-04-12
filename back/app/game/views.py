@@ -128,6 +128,29 @@ def join_tournament(request):
     print(f'size {tournament.size}') """
 
     return JsonResponse({"error": "Success"})
+
+def leave_tournament(request):
+    logged_in_user = User.get_user(request)
+    if not logged_in_user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+
+    tournament_id = request.GET.get('tournament')
+    if not tournament_id:
+        return JsonResponse({'error': 'Tournament ID not provided in query parameters'}, status=400)
+    
+    try:
+        tournament = Tournament.objects.get(id=tournament_id)
+    except ValueError:
+        return JsonResponse({'error': 'Invalid Tournament ID format'}, status=400)
+    except Tournament.DoesNotExist:
+        return JsonResponse({'error': 'Tournament not found'}, status=404)
+    
+    success = tournament.remove_player(logged_in_user)
+    if success:
+        return JsonResponse({"error": "Success"})
+    else:
+        return JsonResponse({"error": "Cannot leave tournament - it's either full or you're not in it"}, status=400)
+
 """ 
     context = {
         'user': other_user
