@@ -29,7 +29,6 @@ class User(AbstractUser):
 	# matches = models.IntegerField(default=0)
 	points = models.IntegerField(default=0)
 	two_fa_enabled = models.BooleanField(default=False)
-	is_logged = False if two_fa_enabled else True
 	#history = models.ManyToManyField(Match, symmetrical=False, related_name='players', blank=True)
 	friends = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
 	blocked = models.ManyToManyField('self', symmetrical=False, related_name='blocked_by', blank=True)
