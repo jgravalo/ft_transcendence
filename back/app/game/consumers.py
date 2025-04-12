@@ -291,12 +291,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 				else:
 					next_round = await sync_to_async(Round.objects.get)(tournament__id=self.tournament_id, number=self.round / 2)
 					await sync_to_async(next_round.add_player)(winner)
-		await self.close()
 
 		await self.channel_layer.group_send(self.room_group_name, {
 			"type": "finish_game",
 			"winner": winner.username
 		})
+		await self.close()
 
 	async def ball_update(self, event):
 		# Enviar la posición de la pelota a los clientes
