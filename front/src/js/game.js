@@ -21,7 +21,48 @@
 		player2 = { name: "Player 2", x: canvas.width - 10 - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, score: 0 };
 		ball = { x: canvas.width / 2, y: canvas.height / 2 };
 
-		// --- Keydown Event Listener (also prevent scrolling) ---
+		// --- Add click/press handlers for control buttons ---
+		setupControlButtons();
+	}
+
+	function setupControlButtons() {
+
+		// --- Control keys in the UI ---
+		const controlKeys = document.querySelectorAll('.control-keys .key');
+		const keyMap = { 'W': 'w', 'S': 's', '↑': 'ArrowUp', '↓': 'ArrowDown' };
+	
+		function setKey(keyText, state) {
+			const key = keyMap[keyText];
+			if (key) keys[key] = state;
+		}
+	
+		controlKeys.forEach(key => {
+			const keyText = key.textContent.trim();
+	
+			// Mouse events
+			key.addEventListener('mousedown', () => {
+				key.classList.add('active');
+				setKey(keyText, true);
+			});
+			key.addEventListener('mouseup', () => {
+				key.classList.remove('active');
+				setKey(keyText, false);
+			});
+	
+			// Touch events
+			key.addEventListener('touchstart', (e) => {
+				e.preventDefault();
+				key.classList.add('active');
+				setKey(keyText, true);
+			});
+			key.addEventListener('touchend', (e) => {
+				e.preventDefault();
+				key.classList.remove('active');
+				setKey(keyText, false);
+			});
+		});
+
+		// --- Keydown Control Key (also prevent scrolling) ---
 		document.addEventListener("keydown", (event) => {
 			if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
 				event.preventDefault(); // prevent scrolling
@@ -31,124 +72,6 @@
 		
 		document.addEventListener("keyup", (event) => {
 			keys[event.key] = false;
-		});
-
-		// --- Add click handlers for control buttons ---
-		setupControlButtons();
-	}
-
-	function setupControlButtons() {
-		// Get all control keys
-		const controlKeys = document.querySelectorAll('.control-keys .key');
-		
-		// Add event listeners to each key
-		controlKeys.forEach(key => {
-			// Mouse events
-			key.addEventListener('mousedown', (event) => {
-				const keyText = key.textContent.trim();
-				
-				// Add active class for visual feedback
-				key.classList.add('active');
-				
-				if (keyText === 'W') {
-					keys['w'] = true;
-				} else if (keyText === 'S') {
-					keys['s'] = true;
-				} else if (keyText === '↑') {
-					keys['ArrowUp'] = true;
-				} else if (keyText === '↓') {
-					keys['ArrowDown'] = true;
-				}
-			});
-			
-			key.addEventListener('mouseup', (event) => {
-				const keyText = key.textContent.trim();
-				
-				// Remove active class
-				key.classList.remove('active');
-				
-				if (keyText === 'W') {
-					keys['w'] = false;
-				} else if (keyText === 'S') {
-					keys['s'] = false;
-				} else if (keyText === '↑') {
-					keys['ArrowUp'] = false;
-				} else if (keyText === '↓') {
-					keys['ArrowDown'] = false;
-				}
-			});
-			
-			key.addEventListener('mouseleave', (event) => {
-				const keyText = key.textContent.trim();
-				
-				// Remove active class
-				key.classList.remove('active');
-				
-				if (keyText === 'W') {
-					keys['w'] = false;
-				} else if (keyText === 'S') {
-					keys['s'] = false;
-				} else if (keyText === '↑') {
-					keys['ArrowUp'] = false;
-				} else if (keyText === '↓') {
-					keys['ArrowDown'] = false;
-				}
-			});
-			
-			// Touch events for mobile
-			key.addEventListener('touchstart', (event) => {
-				event.preventDefault(); // Prevent scrolling when touching the buttons
-				const keyText = key.textContent.trim();
-				
-				// Add active class for visual feedback
-				key.classList.add('active');
-				
-				if (keyText === 'W') {
-					keys['w'] = true;
-				} else if (keyText === 'S') {
-					keys['s'] = true;
-				} else if (keyText === '↑') {
-					keys['ArrowUp'] = true;
-				} else if (keyText === '↓') {
-					keys['ArrowDown'] = true;
-				}
-			});
-			
-			key.addEventListener('touchend', (event) => {
-				event.preventDefault(); // Prevent any default behavior
-				const keyText = key.textContent.trim();
-				
-				// Remove active class
-				key.classList.remove('active');
-				
-				if (keyText === 'W') {
-					keys['w'] = false;
-				} else if (keyText === 'S') {
-					keys['s'] = false;
-				} else if (keyText === '↑') {
-					keys['ArrowUp'] = false;
-				} else if (keyText === '↓') {
-					keys['ArrowDown'] = false;
-				}
-			});
-			
-			key.addEventListener('touchcancel', (event) => {
-				event.preventDefault(); // Prevent any default behavior
-				const keyText = key.textContent.trim();
-				
-				// Remove active class
-				key.classList.remove('active');
-				
-				if (keyText === 'W') {
-					keys['w'] = false;
-				} else if (keyText === 'S') {
-					keys['s'] = false;
-				} else if (keyText === '↑') {
-					keys['ArrowUp'] = false;
-				} else if (keyText === '↓') {
-					keys['ArrowDown'] = false;
-				}
-			});
 		});
 	}
 

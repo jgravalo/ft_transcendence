@@ -51,7 +51,48 @@ function gameRemote(url)
 
 		setupWebSocket(url);
 
-		// --- Keydown Event Listener (also prevent scrolling) ---
+		// --- Setup control buttons ---
+		setupControlButtons();
+	}
+
+	function setupControlButtons() {
+
+		// --- Control keys in the UI ---
+		const controlKeys = document.querySelectorAll('.control-keys .key');
+		const keyMap = { '↑': 'ArrowUp', '↓': 'ArrowDown' };
+	
+		function setKey(keyText, state) {
+			const key = keyMap[keyText];
+			if (key) keys[key] = state;
+		}
+	
+		controlKeys.forEach(key => {
+			const keyText = key.textContent.trim();
+	
+			// Mouse events
+			key.addEventListener('mousedown', () => {
+				key.classList.add('active');
+				setKey(keyText, true);
+			});
+			key.addEventListener('mouseup', () => {
+				key.classList.remove('active');
+				setKey(keyText, false);
+			});
+	
+			// Touch events
+			key.addEventListener('touchstart', (e) => {
+				e.preventDefault();
+				key.classList.add('active');
+				setKey(keyText, true);
+			});
+			key.addEventListener('touchend', (e) => {
+				e.preventDefault();
+				key.classList.remove('active');
+				setKey(keyText, false);
+			});
+		});
+
+		// --- Keydown Control Key (also prevent scrolling) ---
 		document.addEventListener("keydown", (event) => {
 			if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
 				event.preventDefault(); // prevent scrolling
