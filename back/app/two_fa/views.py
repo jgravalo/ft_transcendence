@@ -59,8 +59,6 @@ def set_phone(request):
 
 @csrf_exempt
 def verify(request):
-    #way = request.GET.get('way', '') # 'q' es el parámetro, '' es el valor por defecto si no existe
-    #print(way)
     user = User.get_user(request)
     if TwoFactorAuth.objects.filter(user=user).exists():
         two_fa = TwoFactorAuth.objects.get(user=user)
@@ -69,14 +67,7 @@ def verify(request):
     totp = two_fa.generate_totp()
     two_fa.otp_code = totp.now()
     two_fa.save()
-    #if way == 'email/':
-    #send_email_otp(two_fa, totp)
-    # elif way == 'sms/':
-    #     send_sms_code(user)
-    # elif way == 'google/':
     qr = generate_qr_code(two_fa, totp)
-    # else:
-    #     return JsonResponse({'error': 'Query inválida'}, status=404)
     print("two_fa.otp_code after send:", two_fa.otp_code)
     content = render_to_string('verify.html', {"qr": qr["image"]})
     data = {
@@ -92,15 +83,11 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def verify_otp(request): # email o SMS
     if request.method == 'POST':
-        data = json.loads(request.body)
-        otp_code = data.get('otp-code')
+        otp_code = request.POST.get('otp-code')
         user = User.get_user(request)
         two_fa = TwoFactorAuth.objects.get(user=user)
-        print("otp_code:", otp_code)
-        print("two_fa.otp_code:", two_fa.otp_code)
-        #if (otp_code != two_fa.otp_code):
         if not two_fa.verify_otp(otp_code):
-            #user.delete()
+            user.delete()
             return JsonResponse({'type': 'errorName', 'error': 'Your code is wrong.'})
         two_fa.delete()
         user.is_active=True

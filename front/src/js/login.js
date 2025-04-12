@@ -146,7 +146,6 @@ function makeSubmit(path)
             } else {
                     alert("Success!");
             }
-            
             if (data.element && data.content) {
                 const targetElement = document.getElementById(data.element);
                 if (targetElement) {

@@ -7,6 +7,7 @@ import pyotp
 
 class TwoFactorAuth(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user.is_active = False
     otp_code = models.CharField(max_length=6, unique=True)
     secret_key = models.CharField(max_length=32, unique=True)
     is_2fa_enabled = models.BooleanField(default=False)
