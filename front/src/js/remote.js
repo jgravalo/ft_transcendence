@@ -185,9 +185,16 @@ function gameRemote(url)
 
 	function finishGame(winner) {
 		gameRunning = false;
+		gameOver = true;
 		document.getElementById('startGame').classList.remove('disabled');
-		if (player.name === winner) {
-			
+		
+		// Add debugging to see what's being compared
+		console.log("Game finished. Winner:", winner);
+		console.log("Current player:", player.name);
+		console.log("Player 1:", player1.name);
+		console.log("Player 2:", player2.name);
+		
+		if (winner === player1.name && role === "player1" || winner === player2.name && role === "player2") {
 			updateStatusMessage('game.status.win');
 		} else {
 			updateStatusMessage('game.status.lose');

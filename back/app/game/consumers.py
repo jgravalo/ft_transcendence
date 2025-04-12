@@ -121,7 +121,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print(f'[DEBUG] Después de append: {[p.user.username for p in self.games[self.room_name]]}')
 		# self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
 		# 	"width": 400, "height": 600, "size": 10, "max-score": 3, "connect": True}
-		self.ball[self.room_name] = {"x": 250, "y": 125, "vx": 5, "vy": 5,
+		self.ball[self.room_name] = {"x": 250, "y": 125, "vx": 4, "vy": 4,
 			"width": 500, "height": 250, "size": 10, "max-score": 5, "connect": True}
 
 		await self.accept()
@@ -215,6 +215,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 		ball = self.ball[self.room_name]
 		p1 = self.games[self.room_name][0].paddle
 		p2 = self.games[self.room_name][1].paddle
+		margin = 2; # margin of error for collision
 
 		print(f'room_name in ball = {self.room_name}')
 		# Bucle que mueve la pelota y la sincroniza en los clientes
@@ -290,26 +291,26 @@ class PongConsumer(AsyncWebsocketConsumer):
 			if not self.ball[self.room_name]['connect']: # no se sii es util
 				await self.close()
 				break
-
+			
 			# 🏓 Verificar colisión con la paleta del jugador 1
 			if (
-				ball["x"] - ball["size"] / 2 <= p1["x"] + p1["width"] and  # left edge overlap
-				ball["y"] + ball["size"] / 2 >= p1["y"] and               # vertical overlap
-				ball["y"] - ball["size"] / 2 <= p1["y"] + p1["height"]
+				ball["x"] - ball["size"] / 2 <= p1["x"] + p1["width"] + margin and  # left edge overlap
+				ball["y"] + ball["size"] / 2 >= p1["y"] - margin and               # vertical overlap
+				ball["y"] - ball["size"] / 2 <= p1["y"] + p1["height"] + margin
 			):
 				print(f'collision with paddle 1')
 				ball["vx"] *= -1  # Invert horizontal direction
-				ball["x"] = p1["x"] + p1["width"] + ball["size"] / 2  # Reposition to avoid sticking
+				ball["x"] = p1["x"] + p1["width"] + margin  # Reposition to avoid sticking
 			
 			# 🏓 Verificar colisión con la paleta del jugador 2
 			if (
-				ball["x"] + ball["size"] / 2 >= p2["x"] and
-				ball["y"] + ball["size"] / 2 >= p2["y"] and
-				ball["y"] - ball["size"] / 2 <= p2["y"] + p2["height"]
+				ball["x"] + ball["size"] / 2 >= p2["x"] - margin and
+				ball["y"] + ball["size"] / 2 >= p2["y"] - margin and
+				ball["y"] - ball["size"] / 2 <= p2["y"] + p2["height"] + margin
 			):
 				print(f'collision with paddle 2')
 				ball["vx"] *= -1
-				ball["x"] = p2["x"] - ball["size"] / 2 
+				ball["x"] = p2["x"] - margin
 			
 			# Enviar la nueva posición de la pelota a los clientes
 			await self.channel_layer.group_send(self.room_group_name, {

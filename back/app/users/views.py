@@ -307,7 +307,7 @@ def profile(request):
         friends = user.friends.all()
         non_friends = set(User.objects.all()) - set(friends) - {user} - set(blocked) - set(blocked_by)
         matches = Match.objects.filter(player1=user) | Match.objects.filter(player2=user)
-        tournaments = Tournament.objects.all()
+        tournaments = Tournament.objects.filter(winner__isnull=True)
 
         context = {
             'user': user,
@@ -315,7 +315,7 @@ def profile(request):
             'blockeds': blocked,
             'users': non_friends,
             'matches': matches.order_by('-created_at'),
-            'tournaments': tournaments.order_by('-created_at'),
+            'tournaments': tournaments.order_by('-id'),
         }
         content = render_to_string('profile.html', context)
         data = {
