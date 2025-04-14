@@ -65,6 +65,9 @@ def remote_game(request):
     return JsonResponse(data)
 
 def tournament(request):
+    user = User.get_user(request)
+    if not user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     content = render_to_string('tournament.html')
     # print(f'request.user = {request.user}')
     data = {
