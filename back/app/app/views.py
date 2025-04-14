@@ -14,24 +14,23 @@ from users.views import profile
 # Create your views here.
 
 #def home(request):
+# def get_home(request):
+#     content = render_to_string('index.html')
+#     data = {
+#         "element": 'content',
+#         "content": content
+#     }
+#     return JsonResponse(data)
 def get_home(request):
+    user = User.get_user(request)
+    if user:
+        return profile(request)
     content = render_to_string('index.html')
     data = {
         "element": 'content',
         "content": content
     }
     return JsonResponse(data)
-# def get_home(request):
-#     try:
-#         user = User.get_user(request)
-#         return profile(request)
-#     except:
-#         content = render_to_string('index.html')
-#     data = {
-#         "element": 'content',
-#         "content": content
-#     }
-#     return JsonResponse(data)
 
 def get_error(request):
     error_code = request.GET.get('error', '404')
