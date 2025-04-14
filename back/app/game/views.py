@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from .models import Tournament
 from users.models import User
 from users.faker import create_fake_users
+from django.shortcuts import render, get_object_or_404
 import random
 
 def game(request):
@@ -25,14 +26,25 @@ def local_game(request):
     return JsonResponse(data)
 
 def remote_game(request):
+    user = User.get_user(request)
+    if not user:
+        return JsonResponse({'error': 'Forbidden'}, status=403)
     print('try id')
     id = request.GET.get('user', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-    room = request.GET.get('room', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-    tournament = request.GET.get('tournament', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
-    round = request.GET.get('round', '')  # 'q' es el parámetro, '' es el valor por defecto si no existe
+    room = request.GET.get('room', '')
+    tournament = request.GET.get('tournament', '')
+    round = request.GET.get('round', '')
     link = ''
     if id:
         # print(f'get id , create match = {id}')
+        try:
+            other_user = get_object_or_404(User, pk=id)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid User ID format'}, status=400)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        if other_user in user.blocked_by.all() or other_user == user:
+            return JsonResponse({'error': 'Forbidden'}, status=403)
         link = f'/?user={id}'
     elif room:
         # print(f'get room , accept  = {room}')

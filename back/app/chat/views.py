@@ -22,6 +22,8 @@ def chat(request):
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
     print(f'other_user.id: {other_user.id}')
+    if other_user in logged_in_user.blocked_by.all():
+        return JsonResponse({'error': 'Forbidden'}, status=403)
 
     context = {
         'user': other_user

@@ -357,6 +357,8 @@ def foreign_profile(request):
             
         # Check if the user is viewing their own profile
         current_user = User.get_user(request)
+        if user in current_user.blocked_by.all():
+            return JsonResponse({'error': 'Forbidden'}, status=403)
         is_own_profile = (current_user.id == user.id)
         is_friend = user in current_user.friends.all()
         is_blocked = user in current_user.blocked.all()
