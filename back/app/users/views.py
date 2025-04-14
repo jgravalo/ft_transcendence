@@ -165,7 +165,10 @@ def set_login(request):
             else:
                 content = render_to_string('close_logout.html')
                 next_path = '/two_fa/verify/'
-                two_fa = TwoFactorAuth.objects.create(user=user)
+                try:
+                    two_fa = TwoFactorAuth.objects.get(user=user)
+                except:
+                    two_fa = TwoFactorAuth.objects.create(user=user)
 
             response = JsonResponse({
                 "access": access_token,
@@ -463,7 +466,8 @@ def set_update(request):
                 "element": 'bar',
                 "content": content,
                 "access": access_token,
-                "refresh": str(refresh)
+                "refresh": str(refresh),
+                "next_path": '/users/profile/'
             }
             return JsonResponse(data)
         except json.JSONDecodeError:
