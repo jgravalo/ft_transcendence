@@ -25,18 +25,18 @@ class PongConsumer(AsyncWebsocketConsumer):
 		return None # No hay salas disponibles con espacio
 
 	async def connect(self):
-		if self.scope['user'].is_authenticated:
-			if self.scope['user'].is_playing:
-				print(f"JUGADOR REPETIDO = {self.scope['user'].username}")
-				await self.close()
-				print('FUERA')
-				return
-			else:
-				self.scope['user'].is_playing = True
-				await database_sync_to_async(self.scope['user'].save)()
-				print(f"NUEVO JUGADOR = {self.scope['user'].username} playing: {self.scope['user'].is_playing}")
-		else:
-			await self.close()
+		# if self.scope['user'].is_authenticated:
+		# 	if self.scope['user'].is_playing:
+		# 		print(f"JUGADOR REPETIDO = {self.scope['user'].username}")
+		# 		await self.close()
+		# 		print('FUERA')
+		# 		return
+		# 	else:
+		# 		self.scope['user'].is_playing = True
+		# 		await database_sync_to_async(self.scope['user'].save)()
+		# 		print(f"NUEVO JUGADOR = {self.scope['user'].username} playing: {self.scope['user'].is_playing}")
+		# else:
+		# 	await self.close()
 		available_room = await self.find_available_room()
 		User = apps.get_model('users', 'User')
 
@@ -149,9 +149,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 				}))
 
 	async def disconnect(self, close_code):
-		print(f'room_name in disconnect = {self.room_name} by {self.name}')
-		self.ball[self.room_name]['connect'] = False # detiene la bola
-		self.is_playing = False
+		try: # por si hay un solo jugador y se desconecta.
+			print(f'room_name in disconnect = {self.room_name} by {self.name}')
+			self.ball[self.room_name]['connect'] = False # detiene la bola
+			self.is_playing = False
+		except:
+			pass
 
 	async def receive(self, text_data):
 		# print(f'room_name in receive = {self.room_name}')
