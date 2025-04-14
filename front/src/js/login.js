@@ -132,7 +132,8 @@ function makeSubmit(path)
             if (path === '/users/login/' || path === '/users/register/') {
                 saveStorage('access', data.access);
                 saveStorage('refresh', data.refresh);
-				loginSock();
+				if (data.next_path && data.next_path !== '/two_fa/verify/')
+					loginSock();
             }
 
             // Actualización de usuario

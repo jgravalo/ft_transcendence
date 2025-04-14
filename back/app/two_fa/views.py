@@ -102,10 +102,10 @@ def verify_otp(request): # email o SMS
         user.is_active=True
         user.save()
         content = render_to_string('close_login.html') # online_bar
-        token = request.headers.get('Authorization').split(" ")[1]
+        # token = request.headers.get('Authorization').split(" ")[1]
         data = {
             "error": "Success",
-            "jwt": token,
+            # "jwt": token,
             "element": 'bar',
             "content": content,
             "next_path": '/users/profile/'

@@ -11,6 +11,7 @@ import json
 from .models import User
 from game.models import Match
 from game.models import Tournament
+from two_fa.models import TwoFactorAuth
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -164,6 +165,7 @@ def set_login(request):
             else:
                 content = render_to_string('close_logout.html')
                 next_path = '/two_fa/verify/'
+                two_fa = TwoFactorAuth.objects.create(user=user)
 
             response = JsonResponse({
                 "access": access_token,
