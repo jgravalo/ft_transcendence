@@ -13,16 +13,14 @@ class PongConsumer(AsyncWebsocketConsumer):
 	
 	async def find_available_room(self):
 		""" Busca una sala con espacio disponible (1 jugador) """
-		# print('in find_available_room')
-		# print(f'len games = {len(self.games)}')
 		for room, game_list in self.games.items():
-			# print(f'room {room}; len1: {len(game_list)}; len2: {len(self.games[room])}')
-			# Si hay un solo jugador, la sala tiene espacio
-			# print(f'room[:7] = {room[:7]}')
-			# if len(game_list) == 1 and room[:7] != 'game_re': # Protegemos de partidas restringidas
 			if len(game_list) == 1 and room[:7] == 'game_ra': # Protegemos de partidas restringidas
 				return room
 		return None # No hay salas disponibles con espacio
+
+	async def wait_for_opponent(self):
+		while len(self.games[self.room_name]) < 2:
+			await asyncio.sleep(0.1)
 
 	async def connect(self):
 		# if self.scope['user'].is_authenticated:
@@ -42,13 +40,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 		# Para hacer el otro usuario restringido
 
-		# print('set game')
 		self.room_name = parse_qs(self.scope["query_string"].decode()).get("room", [None])[0]
 		self.user2 = parse_qs(self.scope["query_string"].decode()).get("user", [None])[0]
 		try:
-			# print(f'user2 before: {self.user2}')
 			self.user2 = await sync_to_async(User.objects.get)(id=self.user2)
-			# print(f'user2 before: {self.user2.id}')
 		except:
 			self.user2 = None  # O cualquier valor predeterminado
 		# Obtener la sala desde la URL o algún identificador
@@ -81,13 +76,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 					return
 				else:
 					print('🔗 UNIÉNDOSE A SALA DE TORNEO EXISTENTE')
-
-				# if self.room_name not in self.games or not self.games[self.room_name]: # hacer algo si la sala no existe o está vacía
-				# 	self.games[self.room_name] = []  # Nueva sala
-				# self.is_tournament = True
-				# self.tournament_id = parse_qs(self.scope["query_string"].decode()).get("tournament", [None])[0]
-				# self.round = int(parse_qs(self.scope["query_string"].decode()).get("round", [None])[0])
-				# print(f'TOURNAMENT ID = {self.tournament_id}, round = {self.round}')
 			pass
 		elif available_room:
 			print('ADD TO RANDOM GAME')
@@ -129,11 +117,15 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 		await self.accept()
 		await self.send(text_data=json.dumps({"action": "set-player", "role": self.role}))
+
+		if self.is_tournament and len(self.games[self.room_name]) == 1:
+			try:
+				await asyncio.wait_for(self.wait_for_opponent(), timeout=5)
+			except asyncio.TimeoutError:
+				# await self.send(text_data="No se encontró segundo jugador a tiempo.")
+				await self.close()
+
 		if len(self.games[self.room_name]) == 2:
-			# print('set group')
-			# print(f"🔗 Conectando a la sala {self.room_group_name}")
-			# await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-			# print('set ball')
 			print(f'EMPIEZA EL PARTIDO !!! {self.room_name}: {self.games[self.room_name][0].user.username} vs {self.games[self.room_name][1].user.username}')
 			# print('set ball')
 
