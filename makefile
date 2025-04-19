@@ -3,6 +3,15 @@ ENVIRONMENT ?= development
 ENV_FILE = ./env/root/.env.$(ENVIRONMENT)
 export ENVIRONMENT
 
+encrypt:
+	find ./env -type f -name ".env*" | while read f; do \
+		openssl aes-256-cbc -a -salt -in "$$f" -out "$$f.enc" -pass pass:$(ENC_PASS) && rm "$$f"; \
+	done
+
+decrypt:
+	find ./env -type f -name "*.enc" | while read f; do \
+		openssl aes-256-cbc -a -d -in "$$f" -out "$${f%.enc}" -pass pass:$(ENC_PASS) && rm "$$f"; \
+	done
 
 all:
 	@echo "Starting containers with environment: $(ENVIRONMENT)"
