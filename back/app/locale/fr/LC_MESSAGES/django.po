@@ -683,3 +683,27 @@ msgstr "En attente que la salle soit pleine..."
 
 msgid "profile.tournaments.notjoined"
 msgstr "Entrez pour participer à un tournoi"
+
+msgid "profile.tournaments.tournament"
+msgstr "Tournoi"
+
+msgid "tournament.create.title"
+msgstr "Créer un tournoi"
+
+msgid "tournament.create.players"
+msgstr "Joueurs"
+
+msgid "tournament.create.submit"
+msgstr "Créer"
+
+msgid "tournament.create.name"
+msgstr "Nom"
+
+msgid "privacy.data.management"
+msgstr "Gestion des données du compte"
+
+msgid "privacy.data.download.title"
+msgstr "📥 Télécharger les données du compte"
+
+msgid "privacy.data.download.description"
+msgstr "Obtenir une copie de toutes vos données du compte"

@@ -444,3 +444,31 @@ msgstr "Room Joined. Waiting for the room to be full..."
 
 msgid "profile.tournaments.notjoined"
 msgstr "Join to enter the tournament"
+
+msgid "profile.tournaments.tournament"
+msgstr "Tournament"
+
+
+msgid "tournament.create.title"
+msgstr "Create a Tournament"
+
+msgid "tournament.create.players"
+msgstr "Players"
+
+msgid "tournament.create.submit"
+msgstr "Submit"
+
+msgid "tournament.create.name"
+msgstr "Name"
+
+msgid "privacy.data.management"
+msgstr "Account Data Management"
+
+msgid "privacy.data.download.title"
+msgstr "📥 Download Data"
+
+msgid "privacy.data.download.description"
+msgstr "Get a copy of all your account data"
+
+
+

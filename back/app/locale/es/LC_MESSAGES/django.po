@@ -764,3 +764,27 @@ msgstr "Sala unida. Esperando que la sala se llena..."
 
 msgid "profile.tournaments.notjoined"
 msgstr "Unirse para entrar al torneo"
+
+msgid "profile.tournaments.tournament"
+msgstr "Torneo"
+
+msgid "tournament.create.title"
+msgstr "Crear un torneo"
+
+msgid "tournament.create.players"
+msgstr "Jugadores"
+
+msgid "tournament.create.submit"
+msgstr "Crear"
+
+msgid "tournament.create.name"
+msgstr "Nombre"
+
+msgid "privacy.data.management"
+msgstr "Gestión de datos de la cuenta"
+
+msgid "privacy.data.download.title"
+msgstr "Descargar datos de la cuenta"
+
+msgid "privacy.data.download.description"
+msgstr "Obtener una copia de todos tus datos de la cuenta"

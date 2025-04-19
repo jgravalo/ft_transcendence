@@ -215,4 +215,12 @@ TRANSLATION_KEYS = {
     "profile.tournaments.leave": _("Leave Room"),
     "profile.tournaments.joined": _("Room Joined. Waiting for other players..."),
     "profile.tournaments.notjoined": _("Press Join Room to join the tournament"),
+    "tournament.create.title": _("Create a Tournament"),
+    "tournament.create.players": _("Players"),
+    "tournament.create.submit": _("Submit"),
+    "profile.tabs.tournaments": _("Tournaments"),
+    "tournament.create.name": _("Name"),
+    "privacy.data.management": _("Account Data Management"),
+    "privacy.data.download.title": _("📥 Download Data"),
+    "privacy.data.download.description": _("Get a copy of all your account data"),
 }
