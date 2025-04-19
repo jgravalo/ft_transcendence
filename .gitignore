@@ -3,4 +3,6 @@
 .idea/
 .DS_Store
 
-vault/*
+Remove env files from git (do before eval)
+#env/*
+#env/

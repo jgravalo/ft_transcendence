@@ -6,7 +6,7 @@ services:
     build:
       context: ./waf
     env_file:
-      - ./waf/.env.${ENVIRONMENT}
+      - ./env/waf/.env.${ENVIRONMENT}
     image: waf
     ports:
       - "${EXTERNAL_PORT}:8080"
@@ -30,7 +30,7 @@ services:
     build:
       context: ./front
     env_file:
-      - ./front/.env.${ENVIRONMENT}
+      - ./env/front/.env.${ENVIRONMENT}
     image: front
     networks:
       - pongnet
@@ -44,7 +44,7 @@ services:
       context: ./back
     image: back
     env_file:
-      - ./back/.env.${ENVIRONMENT}
+      - ./env/back/.env.${ENVIRONMENT}
     depends_on:
       db:
         condition: service_healthy
@@ -70,7 +70,7 @@ services:
       context: ./db
     container_name: db
     env_file:
-      - ./db/.env
+      - ./env/db/.env
     networks:
       - pongnet
       - monitoring_net
@@ -92,7 +92,7 @@ services:
     build:
       context: ./vault
     env_file:
-      - ./vault/.env.${ENVIRONMENT}
+      - ./env/vault/.env.${ENVIRONMENT}
     container_name: vault
     volumes:
       - ./vault/data:/vault/data
@@ -123,7 +123,7 @@ services:
       context: ./prometheus
     container_name: prometheus
     env_file:
-      - ./prometheus/.env
+      - ./env/prometheus/.env
     volumes:
       - prometheus_data:/etc/prometheus
     ports:
@@ -139,7 +139,7 @@ services:
       context: ./db-exporter
     container_name: db-exporter
     env_file:
-      - ./db-exporter/.env
+      - ./env/db-exporter/.env
     networks:
       - monitoring_net
     depends_on:
@@ -185,7 +185,7 @@ services:
       context: ./grafana
     container_name: grafana
     env_file:
-      - ./grafana/.env.${ENVIRONMENT}
+      - ./env/grafana/.env.${ENVIRONMENT}
     ports:
       - 3000:3000
     networks:

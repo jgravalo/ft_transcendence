@@ -1,6 +1,6 @@
 # Global environment (default: development).
 ENVIRONMENT ?= development
-ENV_FILE = .env.$(ENVIRONMENT)
+ENV_FILE = ./env/root/.env.$(ENVIRONMENT)
 export ENVIRONMENT
 
 

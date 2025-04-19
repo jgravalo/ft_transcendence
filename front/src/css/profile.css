@@ -288,8 +288,8 @@ button:hover {
 	color: white;
 	border: none;
 	border-radius: 6px;
-	padding: 8px 10px;
-	font-size: 0.80rem;
+	padding: 8px 6px;
+	font-size: 0.72rem;
 	cursor: pointer;
 	transition: all 0.2s ease;
 	display: flex;
@@ -371,6 +371,7 @@ button:hover {
 		width: 100%;
 	}
 	.tab {
+		padding: 2px 5px;
 		font-size: medium;
 	}
 }
@@ -381,7 +382,6 @@ button:hover {
 	}
 	
 	.tab {
-		padding: 5px 10px;
 		font-size: small;
 	}
 
