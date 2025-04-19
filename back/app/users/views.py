@@ -81,6 +81,8 @@ def delete_user(request):
         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response['Pragma'] = 'no-cache'
         response['Expires'] = '0'
+        # for u in User.objects.all():
+        #     print(f'{u.username}')
         return response
 
     except Exception as e:
@@ -128,7 +130,9 @@ def set_login(request):
         try:
             username = request.POST.get('username')
             password = request.POST.get('password')
-            
+            # for u in User.objects.all():
+            #     print(f'{u.username}')
+
             try:
                 if '@' not in username:
                     user = User.objects.get(username=username)

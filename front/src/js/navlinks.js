@@ -52,13 +52,13 @@ function handleLinks()
     });
 
     // Escuchando el evento click del botón de eliminación de usuario
-    const deleteButton = document.querySelector('.delete-user-btn');
+    /* const deleteButton = document.querySelector('.delete-user-btn');
     if (deleteButton) {
         // console.log('Botón de eliminación de usuario encontrado');
         // deleteButton.addEventListener('dblclick', deleteUserAccount);
         deleteButton.addEventListener('click', deleteUserAccount);
 
-    }
+    } */
 
     const anonymizeButton = document.querySelector('.anonymize-user-btn');
     if (anonymizeButton) {

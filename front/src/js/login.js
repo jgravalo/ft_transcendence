@@ -45,7 +45,7 @@ function makeLogout()
 
 function deleteUser(path)
 {
-    if (path.slice(8) == "/two_fa/")
+    // if (path.slice(8) == "/two_fa/")
         //remove_user();
         fetch(base + '/api/users/delete/', {
             method: "POST",
