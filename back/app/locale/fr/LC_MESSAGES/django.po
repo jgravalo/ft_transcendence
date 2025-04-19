@@ -75,7 +75,7 @@ msgstr "Adresse e-mail"
 
 #: language/translations.py:18
 msgid "Record"
-msgstr "Enregistrement"
+msgstr "Historique"
 
 #: language/translations.py:19
 msgid "-"
@@ -663,47 +663,46 @@ msgstr "Vous avez perdu 😵"
 msgid "There are no tournaments"
 msgstr "Il n'y a pas de tournois"
 
-msgid "table.tournament.name"
+msgid "Tournament name"
 msgstr "Nom du tournoi"
 
-msgid "table.tournament.size"
+msgid "Room"
 msgstr "Salle"
 
-msgid "table.tournament.status"
+msgid "Status"
 msgstr "Statut"
 
-msgid "profile.tournaments.join"
+msgid "Join Room"
 msgstr "⚔️ Rejoindre"
 
-msgid "profile.tournaments.leave"
+msgid "Leave Room"
 msgstr "🔙 Quitter"
 
-msgid "profile.tournaments.joined"
-msgstr "En attente que la salle soit pleine..."
+msgid "Room Joined. Waiting for other players..."
+msgstr "Salle rejointe. En attente des autres joueurs..."
 
-msgid "profile.tournaments.notjoined"
-msgstr "Entrez pour participer à un tournoi"
+msgid "Join to enter the tournament"
+msgstr "Rejoignez pour entrer dans le tournoi"
 
-msgid "profile.tournaments.tournament"
-msgstr "Tournoi"
+msgid "Tournaments"
+msgstr "Tournois"
 
-msgid "tournament.create.title"
+msgid "Create a Tournament"
 msgstr "Créer un tournoi"
 
-msgid "tournament.create.players"
+msgid "Players"
 msgstr "Joueurs"
 
-msgid "tournament.create.submit"
-msgstr "Créer"
-
-msgid "tournament.create.name"
-msgstr "Nom"
-
-msgid "privacy.data.management"
+msgid "Account Data Management"
 msgstr "Gestion des données du compte"
 
-msgid "privacy.data.download.title"
-msgstr "📥 Télécharger les données du compte"
+msgid "Download Data"
+msgstr "📥 Télécharger les données"
 
-msgid "privacy.data.download.description"
-msgstr "Obtenir une copie de toutes vos données du compte"
+msgid "Get a copy of all your account data"
+msgstr "Obtenez une copie de toutes vos données de compte"
+
+msgid "You have been invited. You want to accept the match?"
+msgstr "Vous avez été invité. Voulez-vous accepter la partie ?"
+
+

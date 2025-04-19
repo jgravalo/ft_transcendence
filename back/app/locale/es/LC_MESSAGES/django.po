@@ -744,47 +744,45 @@ msgstr "¡Perdiste! 😵"
 msgid "There are no tournaments"
 msgstr "No hay torneos"
 
-msgid "table.tournament.name"
+msgid "Tournament name"
 msgstr "Nombre del torneo"
 
-msgid "table.tournament.size"
+msgid "Room"
 msgstr "Sala"
 
-msgid "table.tournament.status"
+msgid "Status"
 msgstr "Estado"
 
-msgid "profile.tournaments.join"
+msgid "Join Room"
 msgstr "⚔️ Unirse"
 
-msgid "profile.tournaments.leave"
+msgid "Leave Room"
 msgstr "🔙 Salir"
 
-msgid "profile.tournaments.joined"
-msgstr "Sala unida. Esperando que la sala se llena..."
+msgid "Room Joined. Waiting for other players..."
+msgstr "Sala unida. Esperando a los demás jugadores..."
 
-msgid "profile.tournaments.notjoined"
-msgstr "Unirse para entrar al torneo"
+msgid "Join to enter the tournament"
+msgstr "Únete para entrar en el torneo"
 
-msgid "profile.tournaments.tournament"
-msgstr "Torneo"
+msgid "Tournaments"
+msgstr "Torneos"
 
-msgid "tournament.create.title"
+msgid "Create a Tournament"
 msgstr "Crear un torneo"
 
-msgid "tournament.create.players"
+msgid "Players"
 msgstr "Jugadores"
 
-msgid "tournament.create.submit"
-msgstr "Crear"
-
-msgid "tournament.create.name"
-msgstr "Nombre"
-
-msgid "privacy.data.management"
+msgid "Account Data Management"
 msgstr "Gestión de datos de la cuenta"
 
-msgid "privacy.data.download.title"
-msgstr "Descargar datos de la cuenta"
+msgid "Download Data"
+msgstr "📥 Descargar datos"
 
-msgid "privacy.data.download.description"
-msgstr "Obtener una copia de todos tus datos de la cuenta"
+msgid "Get a copy of all your account data"
+msgstr "Obtén una copia de todos los datos de tu cuenta"
+
+msgid "You have been invited. You want to accept the match?"
+msgstr "Has sido invitado. ¿Quieres aceptar la partida?"
+

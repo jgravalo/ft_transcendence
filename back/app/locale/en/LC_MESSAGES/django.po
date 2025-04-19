@@ -424,51 +424,48 @@ msgstr "Game over! You lost 😵"
 msgid "There are no tournaments"
 msgstr "There are no tournaments"
 
-msgid "table.tournament.name"
+msgid "Tournament name"
 msgstr "Tournament name"
 
-msgid "table.tournament.size"
+msgid "Room"
 msgstr "Room"
 
-msgid "table.tournament.status"
+msgid "Status"
 msgstr "Status"
 
-msgid "profile.tournaments.join"
+msgid "Join Room"
 msgstr "⚔️ Join Room"
 
-msgid "profile.tournaments.leave"
+msgid "Leave Room"
 msgstr "🔙 Leave Room"
 
-msgid "profile.tournaments.joined"
-msgstr "Room Joined. Waiting for the room to be full..."
+msgid "Room Joined. Waiting for other players..."
+msgstr "Room Joined. Waiting for other players..."
 
-msgid "profile.tournaments.notjoined"
+msgid "Join to enter the tournament"
 msgstr "Join to enter the tournament"
 
-msgid "profile.tournaments.tournament"
-msgstr "Tournament"
+msgid "Tournaments"
+msgstr "Tournaments"
 
-
-msgid "tournament.create.title"
+msgid "Create a Tournament"
 msgstr "Create a Tournament"
 
-msgid "tournament.create.players"
+msgid "Players"
 msgstr "Players"
 
-msgid "tournament.create.submit"
-msgstr "Submit"
-
-msgid "tournament.create.name"
-msgstr "Name"
-
-msgid "privacy.data.management"
+msgid "Account Data Management"
 msgstr "Account Data Management"
 
-msgid "privacy.data.download.title"
+msgid "Download Data"
 msgstr "📥 Download Data"
 
-msgid "privacy.data.download.description"
+msgid "Get a copy of all your account data"
 msgstr "Get a copy of all your account data"
+
+msgid "You have been invited. You want to accept the match?"
+msgstr "You have been invited. You want to accept the match?"
+
 
 
 

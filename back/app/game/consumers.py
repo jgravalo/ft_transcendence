@@ -299,7 +299,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 			"type": "finish_game",
 			"winner": winner.username
 		})
-		await self.close()
 
 	async def ball_update(self, event):
 		# Enviar la posición de la pelota a los clientes
@@ -308,3 +307,4 @@ class PongConsumer(AsyncWebsocketConsumer):
 	async def finish_game(self, event):
 		# Enviar la posición de la pelota a los clientes
 		await self.send(text_data=json.dumps({"action": "finish", "winner": event["winner"]}))
+		await self.close()
