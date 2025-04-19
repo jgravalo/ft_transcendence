@@ -122,6 +122,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print(f'[DEBUG] Después de append: {[p.user.username for p in self.games[self.room_name]]}')
 		# self.ball[self.room_name] = {"x": 300, "y": 200, "vx": 5, "vy": 5,
 		# 	"width": 400, "height": 600, "size": 10, "max-score": 3, "connect": True}
+		self.vx_default = 4
+		self.speed = 0.03
 		self.ball[self.room_name] = {"x": 250, "y": 125, "vx": 4, "vy": 4,
 			"width": 500, "height": 250, "size": 10, "max-score": 3, "connect": True}
 
@@ -237,6 +239,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 			):
 				print(f'collision with paddle 1')
 				ball["vx"] *= -1  # Invert horizontal direction
+				# self.speed += 0.01
+				ball["vx"] += 0.1  # Increase speed
 				ball["x"] = p1["x"] + p1["width"] + margin + ball["size"] / 2  # Reposition to avoid sticking
 			
 			# 🏓 Verificar colisión con la paleta del jugador 2
@@ -247,6 +251,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 			):
 				print(f'collision with paddle 2')
 				ball["vx"] *= -1
+				# self.speed += 0.01
+				ball["vx"] -= 1  # Increase speed
 				ball["x"] = p2["x"] - margin - ball["size"] / 2
 			
 			# Enviar la nueva posición de la pelota a los clientes
@@ -259,7 +265,8 @@ class PongConsumer(AsyncWebsocketConsumer):
 					}
 				}
 			)
-			await asyncio.sleep(0.03)  # Controla la velocidad de actualización
+			# await asyncio.sleep(0.03)  # Controla la velocidad de actualización
+			await asyncio.sleep(self.speed)  # Controla la velocidad de actualización
 	
 	# @sync_to_async
 	async def set_finish(self, winner, score1, score2):
@@ -299,7 +306,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 			"type": "finish_game",
 			"winner": winner.username
 		})
-		await self.close()
 
 	async def ball_update(self, event):
 		# Enviar la posición de la pelota a los clientes
@@ -308,3 +314,4 @@ class PongConsumer(AsyncWebsocketConsumer):
 	async def finish_game(self, event):
 		# Enviar la posición de la pelota a los clientes
 		await self.send(text_data=json.dumps({"action": "finish", "winner": event["winner"]}))
+		await self.close()

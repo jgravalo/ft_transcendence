@@ -175,6 +175,7 @@ function gameRemote(url)
 
 			case "finish":
 			case "disconnect":
+				// document.getElementById('content').innerText = `${data.winner} has won`;
 				finishGame(data.winner);
 				break;
 		}
